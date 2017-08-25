@@ -49,7 +49,7 @@
 
 
 <meta itemprop="dateModified" content="2017-08-07T18:52:01&#43;08:00" />
-<meta itemprop="wordCount" content="670">
+<meta itemprop="wordCount" content="879">
 
 
 
@@ -266,10 +266,10 @@
             <i class="fa fa-calendar"></i>
             <time datetime="2017-08-07 18:52:01 &#43;0800 CST" itemprop="datePublished">August 07, 2017</time>
             &middot;
-            670
+            879
             words
             &middot;
-            4
+            5
             minute read
         </div>
         
@@ -436,7 +436,64 @@
 }
 </code></pre>
 
-<p>To be continued.</p>
+<h1 id="document">Document</h1>
+
+<p>Documents are the unit of indexing and search. A Document is a set of fields. Each field has a name and a textual value. A field may be stored with the document, in which case it is returned with search hits on the document. Thus each document should typically contain one or more stored fields which uniquely identify it.</p>
+
+<pre><code class="language-java">public final class Document implements Iterable&lt;IndexableField&gt; {
+
+  private final List&lt;IndexableField&gt; fields = new ArrayList&lt;&gt;();
+
+  @Override
+  public Iterator&lt;IndexableField&gt; iterator() {
+    return fields.iterator();
+  }
+
+  /**
+  Adds a field to a document.
+  Several fields may be added with the same name. 
+  */
+  public final void add(IndexableField field) {
+    fields.add(field);
+  }
+
+  public final void removeField(String name) {
+    Iterator&lt;IndexableField&gt; it = fields.iterator();
+    while (it.hasNext()) {
+      IndexableField field = it.next();
+      if (field.name().equals(name)) {
+        it.remove();
+        return;
+      }
+    }
+  }
+
+  /**
+  * Returns an array of bytes for the first (or only) field that has the name
+  * specified as the method parameter. 
+  */
+  public final BytesRef getBinaryValue(String name) {
+    for (IndexableField field : fields) {
+      if (field.name().equals(name)) {
+        final BytesRef bytes = field.binaryValue();
+        if (bytes != null) {
+          return bytes;
+        }
+      }
+    }
+    return null;
+  }
+
+  public final IndexableField getField(String name) {
+    for (IndexableField field : fields) {
+      if (field.name().equals(name)) {
+        return field;
+      }
+    }
+    return null;
+  }
+}
+</code></pre>
 
         </div>
         <footer class="article-footer">
