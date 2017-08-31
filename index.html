@@ -30,7 +30,7 @@
 
 
 
-<meta property="og:updated_time" content="2017-08-10T18:04:07&#43;08:00"/>
+<meta property="og:updated_time" content="2017-08-31T14:25:37&#43;08:00"/>
 
 
 
@@ -148,7 +148,7 @@
     </div>
     <div class="article-info profile-block">
       <div class="article-info-block">
-        4
+        5
         <span>Posts</span>
       </div>
       <div class="article-info-block">
@@ -231,6 +231,140 @@
     <section id="main">
     
     
+
+<article class="article article-type-post" itemscope="" itemprop="blogPost">
+    <div class="article-inner">
+        
+        </a>
+
+        <header class="article-header">
+    <a href="https://hellokangning.github.io/2017/08/31/a-dive-into-__slots__/">
+    <h1 class="article-title" itemprop="name">
+        A dive into __slots__
+    </h1>
+    </a>
+    <div class="article-meta">
+
+        
+        <div class="article-date">
+            <i class="fa fa-calendar"></i>
+            <time datetime="2017-08-31 14:25:37 &#43;0800 CST" itemprop="datePublished">August 31, 2017</time>
+            &middot;
+            490
+            words
+            &middot;
+            3
+            minute read
+        </div>
+        
+        
+            
+            
+            <div class="article-category">
+                <i class="fa fa-folder"></i>
+                
+                
+                <a class="article-category-link" href="https://hellokangning.github.io/categories/python">Python</a>
+                
+                
+            </div>
+            
+        
+
+        
+    </div>
+</header>
+
+        <div class="article-entry" itemprop="articleBody">
+            <p>
+                Every class have instance attributes, no matter what kind of programming language. By default, Python uses a dict(__dict__) to store an object&rsquo;s instance attributes, which allows you setting arbitary new attributes at runtime handily.
+class Bird(object): fly = True def __init__(self, age): self.age = age print Bird.__dict # {'fly': True, '__module__': '__main__', '__dict__': &lt;attribute '__dict__' of 'Bird' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'Bird' objects&gt;, '__doc__': None, '__init__': &lt;function __init__ at 0x1052cbf50&gt;} larry = Bird(2) print larry.
+            </p>
+            <p class="article-more-link">
+                <a href="https://hellokangning.github.io/2017/08/31/a-dive-into-__slots__/">
+                    Read more
+                </a>
+            </p>
+        </div>
+        <footer class="article-footer">
+    <a data-url="https://hellokangning.github.io/2017/08/31/a-dive-into-__slots__/" data-id="e4163127ba4319c6dee8f622044ac31f" class="article-share-link">
+        <i class="fa fa-share"></i>
+        Share
+    </a>
+    
+    <a href="https://hellokangning.github.io/2017/08/31/a-dive-into-__slots__/#disqus_thread" class="article-comment-link">
+        Comments
+    </a>
+    
+
+    <script>
+    (function ($) {
+        
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+    </script>
+</footer>
+
+    </div>
+</article>
 
 <article class="article article-type-post" itemscope="" itemprop="blogPost">
     <div class="article-inner">
@@ -384,7 +518,7 @@ Therefore, I stopped my reading and searched on the Internet for better approach
             <i class="fa fa-calendar"></i>
             <time datetime="2017-08-07 18:52:01 &#43;0800 CST" itemprop="datePublished">August 07, 2017</time>
             &middot;
-            879
+            885
             words
             &middot;
             5
@@ -829,7 +963,7 @@ OS X EI Capition shipped a security feature named System Integrity Protection, w
                 <a class="category-list-link" href="https://hellokangning.github.io/categories/python">
                     python
                 </a>
-                <span class="category-list-count">1</span>
+                <span class="category-list-count">2</span>
             </li>
             
         </ul>
