@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-us">
 <head>
-    <title>Guice Usage in Elasticsearch &middot; Guoqing Geng</title>
+    <title>The Difference between range and xrange &middot; Guoqing Geng</title>
     <meta name="generator" content="Hugo 0.25.1" />
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -10,7 +10,7 @@
       <meta name="description" content="say something">
     
     
-    <link rel="canonical" href="https://hellokangning.github.io/2017/08/04/guice-usage-in-elasticsearch/"/>
+    <link rel="canonical" href="https://hellokangning.github.io/2017/09/01/the-difference-between-range-and-xrange/"/>
     <link rel="icon" href="https://hellokangning.github.io/favicon.ico">
     <link rel="apple-touch-icon" href="https://hellokangning.github.io/apple-touch-icon.png"/>
     <link rel="stylesheet" href="https://hellokangning.github.io/css/style.css">
@@ -20,17 +20,16 @@
     
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400italic,400,600' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Source+Code+Pro' rel='stylesheet' type='text/css'>
-    <meta property="og:title" content="Guice Usage in Elasticsearch" />
-<meta property="og:description" content="The motivation of using Guice lists here: Motivation.
-To create bindings, extend AbstractModule and override its configure method. In the method body, call bind() to specify each binding. These methods are type checked so the compiler can report errors if you use the wrong types. Once you&rsquo;ve created your modules, pass them as arguments to Guice.createInjector() to build an injector.
-Elasticsearch has a ModulesBuilder which is responsible for assembling modules." />
+    <meta property="og:title" content="The Difference between range and xrange" />
+<meta property="og:description" content="Short answer:
+ range creates a list, so if you do range(1, 10000000) it creates a list in memory with 9999999 elements. This will become an expensive operation on very large ranges. xrange is a sequence object that evaluates lazily(it will only compute the next value when needed).  For performance, especially when you&rsquo;re iterating over a large range, xrange() is usually better. However, there are still a few cases why you might prefer range():" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://hellokangning.github.io/2017/08/04/guice-usage-in-elasticsearch/" />
+<meta property="og:url" content="https://hellokangning.github.io/2017/09/01/the-difference-between-range-and-xrange/" />
 
 
 
-<meta property="article:published_time" content="2017-08-04T15:58:27&#43;08:00"/>
-<meta property="article:modified_time" content="2017-08-04T15:58:27&#43;08:00"/>
+<meta property="article:published_time" content="2017-09-01T16:22:27&#43;08:00"/>
+<meta property="article:modified_time" content="2017-09-01T16:22:27&#43;08:00"/>
 
 
 
@@ -44,14 +43,13 @@ Elasticsearch has a ModulesBuilder which is responsible for assembling modules."
 
     
     
-<meta itemprop="name" content="Guice Usage in Elasticsearch">
-<meta itemprop="description" content="The motivation of using Guice lists here: Motivation.
-To create bindings, extend AbstractModule and override its configure method. In the method body, call bind() to specify each binding. These methods are type checked so the compiler can report errors if you use the wrong types. Once you&rsquo;ve created your modules, pass them as arguments to Guice.createInjector() to build an injector.
-Elasticsearch has a ModulesBuilder which is responsible for assembling modules.">
+<meta itemprop="name" content="The Difference between range and xrange">
+<meta itemprop="description" content="Short answer:
+ range creates a list, so if you do range(1, 10000000) it creates a list in memory with 9999999 elements. This will become an expensive operation on very large ranges. xrange is a sequence object that evaluates lazily(it will only compute the next value when needed).  For performance, especially when you&rsquo;re iterating over a large range, xrange() is usually better. However, there are still a few cases why you might prefer range():">
 
 
-<meta itemprop="dateModified" content="2017-08-04T15:58:27&#43;08:00" />
-<meta itemprop="wordCount" content="426">
+<meta itemprop="dateModified" content="2017-09-01T16:22:27&#43;08:00" />
+<meta itemprop="wordCount" content="194">
 
 
 
@@ -63,11 +61,10 @@ Elasticsearch has a ModulesBuilder which is responsible for assembling modules."
 
 
 
-<meta name="twitter:text:title" content="Guice Usage in Elasticsearch"/>
-<meta name="twitter:title" content="Guice Usage in Elasticsearch"/>
-<meta name="twitter:description" content="The motivation of using Guice lists here: Motivation.
-To create bindings, extend AbstractModule and override its configure method. In the method body, call bind() to specify each binding. These methods are type checked so the compiler can report errors if you use the wrong types. Once you&rsquo;ve created your modules, pass them as arguments to Guice.createInjector() to build an injector.
-Elasticsearch has a ModulesBuilder which is responsible for assembling modules."/>
+<meta name="twitter:text:title" content="The Difference between range and xrange"/>
+<meta name="twitter:title" content="The Difference between range and xrange"/>
+<meta name="twitter:description" content="Short answer:
+ range creates a list, so if you do range(1, 10000000) it creates a list in memory with 9999999 elements. This will become an expensive operation on very large ranges. xrange is a sequence object that evaluates lazily(it will only compute the next value when needed).  For performance, especially when you&rsquo;re iterating over a large range, xrange() is usually better. However, there are still a few cases why you might prefer range():"/>
 
 
     
@@ -255,13 +252,11 @@ Elasticsearch has a ModulesBuilder which is responsible for assembling modules."
     <article id="page-undefined" class="article article-type-page" itemscope="" itemprop="blogPost">
     <div class="article-inner">
         
-            <img src="https://hellokangning.github.io/banners/guice.jpg" class="article-banner">
-        
 
         <header class="article-header">
-    <a href="https://hellokangning.github.io/2017/08/04/guice-usage-in-elasticsearch/">
+    <a href="https://hellokangning.github.io/2017/09/01/the-difference-between-range-and-xrange/">
     <h1 class="article-title" itemprop="name">
-        Guice Usage in Elasticsearch
+        The Difference between range and xrange
     </h1>
     </a>
     <div class="article-meta">
@@ -269,12 +264,12 @@ Elasticsearch has a ModulesBuilder which is responsible for assembling modules."
         
         <div class="article-date">
             <i class="fa fa-calendar"></i>
-            <time datetime="2017-08-04 15:58:27 &#43;0800 CST" itemprop="datePublished">August 04, 2017</time>
+            <time datetime="2017-09-01 16:22:27 &#43;0800 CST" itemprop="datePublished">September 01, 2017</time>
             &middot;
-            426
+            194
             words
             &middot;
-            2
+            1
             minute read
         </div>
         
@@ -285,7 +280,7 @@ Elasticsearch has a ModulesBuilder which is responsible for assembling modules."
                 <i class="fa fa-folder"></i>
                 
                 
-                <a class="article-category-link" href="https://hellokangning.github.io/categories/elasticsearch">Elasticsearch</a>
+                <a class="article-category-link" href="https://hellokangning.github.io/categories/python">Python</a>
                 
                 
             </div>
@@ -297,156 +292,34 @@ Elasticsearch has a ModulesBuilder which is responsible for assembling modules."
 </header>
 
         <div class="article-entry" itemprop="articleBody">
-            <p>The motivation of using Guice lists here: <a href="https://github.com/google/guice/wiki/Motivation">Motivation</a>.</p>
+            <p>Short answer:</p>
 
-<p>To create bindings, extend <code>AbstractModule</code> and override its <code>configure</code> method. In the method body, call <code>bind()</code> to specify each binding. These methods are type checked so the compiler can report errors if you use the wrong types. Once you&rsquo;ve created your modules, pass them as arguments to <code>Guice.createInjector()</code> to build an injector.</p>
+<ul>
+<li><code>range</code> creates a list, so if you do <code>range(1, 10000000)</code> it creates a list in memory with 9999999 elements. This will become an expensive operation on very large ranges.</li>
+<li><code>xrange</code> is a sequence object that <em>evaluates lazily</em>(it will only compute the next value when needed).</li>
+</ul>
 
-<p>Elasticsearch has a <code>ModulesBuilder</code> which is responsible for assembling modules.</p>
+<p>For performance, especially when you&rsquo;re iterating over a large range, xrange() is usually better. However, there are still a few cases why you might prefer <code>range()</code>:</p>
 
-<pre><code class="language-java">public class ModulesBuilder implements Iterable&lt;Module&gt; {
+<ul>
+<li>In python 3, <code>range()</code> does what <code>xrange()</code> used to do and <code>xrange()</code> does not exist. If you want to write code that will run on both Python 2 and Python 3, you can&rsquo;t use <code>xrange()</code>.</li>
+<li><code>range()</code> can actually be faster in some cases - eg. if iterating over the same sequence multiple times.  <code>xrange()</code> has to reconstruct the integer object every time, but <code>range()</code> will have real integer objects. (It will always perform worse in terms of memory however)</li>
+<li><code>xrange()</code> isn&rsquo;t usable in all cases where a real list is needed. For instance, it doesn&rsquo;t support slices, or any list methods.</li>
+</ul>
 
-    // container for all Module
-    private final List&lt;Module&gt; modules = new ArrayList&lt;&gt;();
+<p>References:</p>
 
-    // add new Modules into container
-    public ModulesBuilder add(Module... newModules) {
-        Collections.addAll(modules, newModules);
-        return this;
-    }
-
-    @Override
-    public Iterator&lt;Module&gt; iterator() {
-        return modules.iterator();
-    }
-
-    public Injector createInjector() {
-        Injector injector = Guice.createInjector(modules);
-        ((InjectorImpl) injector).clearCache();
-        // in ES, we always create all instances as if they are eager singletons
-        // this allows for considerable memory savings (no need to store construction info) as well as cycles
-        ((InjectorImpl) injector).readOnlyAllSingletons();
-        return injector;
-    }
-}
-</code></pre>
-
-<p>A <code>Node</code> represents a node within a cluster. <code>Node</code> is made up of many <code>Modules</code> with the help of <code>ModulesBuilder</code>. Here is the short version of <code>Node</code> class.</p>
-
-<pre><code class="language-java">public class Node implements Closeable {
-    private final Injector injector;
-    
-    protected Node(final Environment environment, Collection&lt;Class&lt;? extends Plugin&gt;&gt; classpathPlugins) {
-        ModulesBuilder modules = new ModulesBuilder();
-        modules.add(pluginModule)        
-        modules.add(clusterModule);
-        modules.add(indicesModule);
-        modules.add(actionModule);
-        modules.add(new GatewayModule());
-        modules.add(settingsModule);
-        modules.add(new RepositoriesModule(this.environment, pluginsService.filterPlugins(RepositoryPlugin.class), xContentRegistry));
-        modules.add(b -&gt; {
-                    b.bind(Node.class).toInstance(this);
-                    b.bind(NodeService.class).toInstance(nodeService);
-                    b.bind(NamedXContentRegistry.class).toInstance(xContentRegistry);
-                    b.bind(PluginsService.class).toInstance(pluginsService);
-                    b.bind(Client.class).toInstance(client);
-                    b.bind(NodeClient.class).toInstance(client);
-                    b.bind(Environment.class).toInstance(this.environment);
-                    b.bind(ThreadPool.class).toInstance(threadPool);
-                    b.bind(NodeEnvironment.class).toInstance(nodeEnvironment);
-                    b.bind(TribeService.class).toInstance(tribeService);
-                    b.bind(ResourceWatcherService.class).toInstance(resourceWatcherService);
-                    b.bind(CircuitBreakerService.class).toInstance(circuitBreakerService);
-                    b.bind(BigArrays.class).toInstance(bigArrays);
-                    b.bind(ScriptService.class).toInstance(scriptModule.getScriptService());
-                    b.bind(AnalysisRegistry.class).toInstance(analysisModule.getAnalysisRegistry());
-                    b.bind(IngestService.class).toInstance(ingestService);
-                    b.bind(UsageService.class).toInstance(usageService);
-                    b.bind(NamedWriteableRegistry.class).toInstance(namedWriteableRegistry);
-                    b.bind(MetaDataUpgrader.class).toInstance(metaDataUpgrader);
-                    b.bind(MetaStateService.class).toInstance(metaStateService);
-                    b.bind(IndicesService.class).toInstance(indicesService);
-                    b.bind(SearchService.class).toInstance(newSearchService(clusterService, indicesService,
-                        threadPool, scriptModule.getScriptService(), bigArrays, searchModule.getFetchPhase(),
-                        responseCollectorService));
-                    b.bind(SearchTransportService.class).toInstance(searchTransportService);
-                    b.bind(SearchPhaseController.class).toInstance(new SearchPhaseController(settings, bigArrays,
-                            scriptModule.getScriptService()));
-                    b.bind(Transport.class).toInstance(transport);
-                    b.bind(TransportService.class).toInstance(transportService);
-                    b.bind(NetworkService.class).toInstance(networkService);
-                    b.bind(UpdateHelper.class).toInstance(new UpdateHelper(settings, scriptModule.getScriptService()));
-                    b.bind(MetaDataIndexUpgradeService.class).toInstance(new MetaDataIndexUpgradeService(settings, xContentRegistry,
-                        indicesModule.getMapperRegistry(), settingsModule.getIndexScopedSettings(), indexMetaDataUpgraders));
-                    b.bind(ClusterInfoService.class).toInstance(clusterInfoService);
-                    b.bind(Discovery.class).toInstance(discoveryModule.getDiscovery());
-                    {
-                        RecoverySettings recoverySettings = new RecoverySettings(settings, settingsModule.getClusterSettings());
-                        processRecoverySettings(settingsModule.getClusterSettings(), recoverySettings);
-                        b.bind(PeerRecoverySourceService.class).toInstance(new PeerRecoverySourceService(settings, transportService,
-                                indicesService, recoverySettings));
-                        b.bind(PeerRecoveryTargetService.class).toInstance(new PeerRecoveryTargetService(settings, threadPool,
-                                transportService, recoverySettings, clusterService));
-                                }
-                    httpBind.accept(b);
-                    pluginComponents.stream().forEach(p -&gt; b.bind((Class) p.getClass()).toInstance(p));
-                }
-            );
-
-        // at this point, modules finishs its mission,
-        // and injector would take over.
-        // since we've got the injector, we can build objects.
-        injector = modules.createInjector();
-    }
-
-    public Node start() throws NodeValidationException {
-        // get any instance from injector, and call its method if you want
-        injector.getInstance(IndicesServer.class).start();
-        injector.getInstance(SearchService.class).start();
-        // ...
-    }
-
-    private Node stop() {
-        injector.getInstance(TribeService.class).stop();
-        injector.getInstance(SnapshotsService.class).stop();
-        // ...
-    }
-}
-</code></pre>
-
-<p>In order to better understanding of <code>Module</code>, take <code>indicesModule</code> for penetration.</p>
-
-<pre><code class="language-java">/**
- * Configures classes and services that are shared by indices on each node.
- */
-public class IndicesModule extends AbstractModule {
-
-    /**
-     * Guice needs to be configured to build the dependency graph exactly.
-     */
-    @Override
-    protected void configure() {
-        bind(IndicesStore.class).asEagerSingleton();
-        bind(IndicesClusterStateService.class).asEagerSingleton();
-        bind(SyncedFlushService.class).asEagerSingleton();
-        bind(TransportNodesListShardStoreMetaData.class).asEagerSingleton();
-        bind(GlobalCheckpointSyncAction.class).asEagerSingleton();
-        bind(TransportResyncReplicationAction.class).asEagerSingleton();
-        bind(PrimaryReplicaSyncer.class).asEagerSingleton();
-    }
-}
-</code></pre>
-
-<p>End. Hope it helps.</p>
+<p><a href="https://stackoverflow.com/questions/94935/what-is-the-difference-between-range-and-xrange-functions-in-python-2-x">What is the difference between range and xrange functions in Python 2.X?</a>
+<a href="https://stackoverflow.com/questions/135041/should-you-always-favor-xrange-over-range">Should you always favor xrange() over range()?</a></p>
 
         </div>
         <footer class="article-footer">
-    <a data-url="https://hellokangning.github.io/2017/08/04/guice-usage-in-elasticsearch/" data-id="074185e63ace76f179a9f988a5440441" class="article-share-link">
+    <a data-url="https://hellokangning.github.io/2017/09/01/the-difference-between-range-and-xrange/" data-id="8e2fb42f50ef585cfd16dfb522849aa4" class="article-share-link">
         <i class="fa fa-share"></i>
         Share
     </a>
     
-    <a href="https://hellokangning.github.io/2017/08/04/guice-usage-in-elasticsearch/#disqus_thread" class="article-comment-link">
+    <a href="https://hellokangning.github.io/2017/09/01/the-difference-between-range-and-xrange/#disqus_thread" class="article-comment-link">
         Comments
     </a>
     
@@ -522,21 +395,14 @@ public class IndicesModule extends AbstractModule {
     
 <nav id="article-nav">
     
-    <a href="https://hellokangning.github.io/2017/08/03/pip-install-ipython-exception-on-ei-capitan/" id="article-nav-older" class="article-nav-link-wrap">
+    <a href="https://hellokangning.github.io/2017/08/31/a-dive-into-__slots__/" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">
           Older
       </strong>
-      <div class="article-nav-title">Pip Install ipython Exception on EI Capitan</div>
+      <div class="article-nav-title">A Dive into __slots__</div>
     </a>
     
 
-    
-    <a href="https://hellokangning.github.io/2017/08/07/document-in-lucene/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">
-          Newer
-      </strong>
-      <div class="article-nav-title">Document in Lucene</div>
-    </a>
     
 </nav>
 
