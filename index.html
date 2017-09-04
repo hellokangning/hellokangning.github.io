@@ -30,7 +30,7 @@
 
 
 
-<meta property="og:updated_time" content="2017-09-01T16:47:37&#43;08:00"/>
+<meta property="og:updated_time" content="2017-09-04T16:22:03&#43;08:00"/>
 
 
 
@@ -148,7 +148,7 @@
     </div>
     <div class="article-info profile-block">
       <div class="article-info-block">
-        7
+        8
         <span>Posts</span>
       </div>
       <div class="article-info-block">
@@ -231,6 +231,142 @@
     <section id="main">
     
     
+
+<article class="article article-type-post" itemscope="" itemprop="blogPost">
+    <div class="article-inner">
+        
+        </a>
+
+        <header class="article-header">
+    <a href="https://hellokangning.github.io/2017/09/04/when-finally-really-executes/">
+    <h1 class="article-title" itemprop="name">
+        When finally Really Executes
+    </h1>
+    </a>
+    <div class="article-meta">
+
+        
+        <div class="article-date">
+            <i class="fa fa-calendar"></i>
+            <time datetime="2017-09-04 16:22:03 &#43;0800 CST" itemprop="datePublished">September 04, 2017</time>
+            &middot;
+            615
+            words
+            &middot;
+            3
+            minute read
+        </div>
+        
+        
+            
+            
+            <div class="article-category">
+                <i class="fa fa-folder"></i>
+                
+                
+                <a class="article-category-link" href="https://hellokangning.github.io/categories/python">Python</a>
+                
+                
+            </div>
+            
+        
+
+        
+    </div>
+</header>
+
+        <div class="article-entry" itemprop="articleBody">
+            <p>
+                Let&rsquo;s be forthright, what will the following code print ?
+def func(): try: 100/0 except ZeroDivisionError as e: print 'Zero cannot be divisor' return finally: print 'finally' if __name__ == &quot;__main__&quot;: func()  The answer is:
+Zero cannot be divisor finally  It seems that finally executes after the return statement. Is it a truth? We&rsquo;s better change the code a little to penetrate the result.
+#!/usr/bin/env python2 # coding=utf-8 from dis import dis def func(): try: 100/0 except ZeroDivisionError as e: print 'Zero cannot be divisor' return finally: print 'finally' if __name__ == &quot;__main__&quot;: dis(func)  Next point, we can see,
+            </p>
+            <p class="article-more-link">
+                <a href="https://hellokangning.github.io/2017/09/04/when-finally-really-executes/">
+                    Read more
+                </a>
+            </p>
+        </div>
+        <footer class="article-footer">
+    <a data-url="https://hellokangning.github.io/2017/09/04/when-finally-really-executes/" data-id="39af582ddbf52156c9c55d4e04f7d2b7" class="article-share-link">
+        <i class="fa fa-share"></i>
+        Share
+    </a>
+    
+    <a href="https://hellokangning.github.io/2017/09/04/when-finally-really-executes/#disqus_thread" class="article-comment-link">
+        Comments
+    </a>
+    
+
+    <script>
+    (function ($) {
+        
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+    </script>
+</footer>
+
+    </div>
+</article>
 
 <article class="article article-type-post" itemscope="" itemprop="blogPost">
     <div class="article-inner">
@@ -1232,7 +1368,7 @@ OS X EI Capition shipped a security feature named System Integrity Protection, w
                 <a class="category-list-link" href="https://hellokangning.github.io/categories/python">
                     python
                 </a>
-                <span class="category-list-count">4</span>
+                <span class="category-list-count">5</span>
             </li>
             
         </ul>

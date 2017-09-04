@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-us">
 <head>
-    <title>Exit Options in Python &middot; Guoqing Geng</title>
+    <title>When finally Really Executes &middot; Guoqing Geng</title>
     <meta name="generator" content="Hugo 0.25.1" />
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -10,7 +10,7 @@
       <meta name="description" content="say something">
     
     
-    <link rel="canonical" href="https://hellokangning.github.io/2017/09/01/exit-options-in-python/"/>
+    <link rel="canonical" href="https://hellokangning.github.io/2017/09/04/when-finally-really-executes/"/>
     <link rel="icon" href="https://hellokangning.github.io/favicon.ico">
     <link rel="apple-touch-icon" href="https://hellokangning.github.io/apple-touch-icon.png"/>
     <link rel="stylesheet" href="https://hellokangning.github.io/css/style.css">
@@ -20,17 +20,18 @@
     
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400italic,400,600' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Source+Code+Pro' rel='stylesheet' type='text/css'>
-    <meta property="og:title" content="Exit Options in Python" />
-<meta property="og:description" content="First candidate is os._exit, which exits without calling cleanup handlers, flushing stdio buffers, etc. (and which should normally only be used in the child process after a fork()).
-Second, sys.exit is intended for use in programs. According to official document:
- This is implemented by raising the SystemExit exception, so cleanup actions specified by finally clauses of try statements are honored, and it is possible to intercept the exit attempt at an outer level." />
+    <meta property="og:title" content="When finally Really Executes" />
+<meta property="og:description" content="Let&rsquo;s be forthright, what will the following code print ?
+def func(): try: 100/0 except ZeroDivisionError as e: print &#39;Zero cannot be divisor&#39; return finally: print &#39;finally&#39; if __name__ == &quot;__main__&quot;: func()  The answer is:
+Zero cannot be divisor finally  It seems that finally executes after the return statement. Is it a truth? We&rsquo;s better change the code a little to penetrate the result.
+#!/usr/bin/env python2 # coding=utf-8 from dis import dis def func(): try: 100/0 except ZeroDivisionError as e: print &#39;Zero cannot be divisor&#39; return finally: print &#39;finally&#39; if __name__ == &quot;__main__&quot;: dis(func)  Next point, we can see," />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://hellokangning.github.io/2017/09/01/exit-options-in-python/" />
+<meta property="og:url" content="https://hellokangning.github.io/2017/09/04/when-finally-really-executes/" />
 
 
 
-<meta property="article:published_time" content="2017-09-01T16:47:37&#43;08:00"/>
-<meta property="article:modified_time" content="2017-09-01T16:47:37&#43;08:00"/>
+<meta property="article:published_time" content="2017-09-04T16:22:03&#43;08:00"/>
+<meta property="article:modified_time" content="2017-09-04T16:22:03&#43;08:00"/>
 
 
 
@@ -44,14 +45,15 @@ Second, sys.exit is intended for use in programs. According to official document
 
     
     
-<meta itemprop="name" content="Exit Options in Python">
-<meta itemprop="description" content="First candidate is os._exit, which exits without calling cleanup handlers, flushing stdio buffers, etc. (and which should normally only be used in the child process after a fork()).
-Second, sys.exit is intended for use in programs. According to official document:
- This is implemented by raising the SystemExit exception, so cleanup actions specified by finally clauses of try statements are honored, and it is possible to intercept the exit attempt at an outer level.">
+<meta itemprop="name" content="When finally Really Executes">
+<meta itemprop="description" content="Let&rsquo;s be forthright, what will the following code print ?
+def func(): try: 100/0 except ZeroDivisionError as e: print &#39;Zero cannot be divisor&#39; return finally: print &#39;finally&#39; if __name__ == &quot;__main__&quot;: func()  The answer is:
+Zero cannot be divisor finally  It seems that finally executes after the return statement. Is it a truth? We&rsquo;s better change the code a little to penetrate the result.
+#!/usr/bin/env python2 # coding=utf-8 from dis import dis def func(): try: 100/0 except ZeroDivisionError as e: print &#39;Zero cannot be divisor&#39; return finally: print &#39;finally&#39; if __name__ == &quot;__main__&quot;: dis(func)  Next point, we can see,">
 
 
-<meta itemprop="dateModified" content="2017-09-01T16:47:37&#43;08:00" />
-<meta itemprop="wordCount" content="125">
+<meta itemprop="dateModified" content="2017-09-04T16:22:03&#43;08:00" />
+<meta itemprop="wordCount" content="615">
 
 
 
@@ -63,11 +65,12 @@ Second, sys.exit is intended for use in programs. According to official document
 
 
 
-<meta name="twitter:text:title" content="Exit Options in Python"/>
-<meta name="twitter:title" content="Exit Options in Python"/>
-<meta name="twitter:description" content="First candidate is os._exit, which exits without calling cleanup handlers, flushing stdio buffers, etc. (and which should normally only be used in the child process after a fork()).
-Second, sys.exit is intended for use in programs. According to official document:
- This is implemented by raising the SystemExit exception, so cleanup actions specified by finally clauses of try statements are honored, and it is possible to intercept the exit attempt at an outer level."/>
+<meta name="twitter:text:title" content="When finally Really Executes"/>
+<meta name="twitter:title" content="When finally Really Executes"/>
+<meta name="twitter:description" content="Let&rsquo;s be forthright, what will the following code print ?
+def func(): try: 100/0 except ZeroDivisionError as e: print &#39;Zero cannot be divisor&#39; return finally: print &#39;finally&#39; if __name__ == &quot;__main__&quot;: func()  The answer is:
+Zero cannot be divisor finally  It seems that finally executes after the return statement. Is it a truth? We&rsquo;s better change the code a little to penetrate the result.
+#!/usr/bin/env python2 # coding=utf-8 from dis import dis def func(): try: 100/0 except ZeroDivisionError as e: print &#39;Zero cannot be divisor&#39; return finally: print &#39;finally&#39; if __name__ == &quot;__main__&quot;: dis(func)  Next point, we can see,"/>
 
 
     
@@ -257,9 +260,9 @@ Second, sys.exit is intended for use in programs. According to official document
         
 
         <header class="article-header">
-    <a href="https://hellokangning.github.io/2017/09/01/exit-options-in-python/">
+    <a href="https://hellokangning.github.io/2017/09/04/when-finally-really-executes/">
     <h1 class="article-title" itemprop="name">
-        Exit Options in Python
+        When finally Really Executes
     </h1>
     </a>
     <div class="article-meta">
@@ -267,12 +270,12 @@ Second, sys.exit is intended for use in programs. According to official document
         
         <div class="article-date">
             <i class="fa fa-calendar"></i>
-            <time datetime="2017-09-01 16:47:37 &#43;0800 CST" itemprop="datePublished">September 01, 2017</time>
+            <time datetime="2017-09-04 16:22:03 &#43;0800 CST" itemprop="datePublished">September 04, 2017</time>
             &middot;
-            125
+            615
             words
             &middot;
-            1
+            3
             minute read
         </div>
         
@@ -295,31 +298,202 @@ Second, sys.exit is intended for use in programs. According to official document
 </header>
 
         <div class="article-entry" itemprop="articleBody">
-            <p>First candidate is <code>os._exit</code>, which exits without calling cleanup handlers, flushing stdio buffers, etc. (and which should normally only be used in the child process after a <code>fork()</code>).</p>
+            <p>Let&rsquo;s be forthright, what will the following code print ?</p>
 
-<p>Second, <code>sys.exit</code> is intended for use in programs. According to official document:</p>
+<pre><code class="language-python">def func():
+    try:
+        100/0
+    except ZeroDivisionError as e:
+        print 'Zero cannot be divisor'
+        return
+    finally:
+        print 'finally'
+
+if __name__ == &quot;__main__&quot;:
+    func()
+</code></pre>
+
+<p>The answer is:</p>
+
+<pre><code>Zero cannot be divisor
+finally
+</code></pre>
+
+<p>It seems that <code>finally</code> executes after the <code>return</code> statement. Is it a truth? We&rsquo;s better change the code a little to penetrate the result.</p>
+
+<pre><code class="language-python">#!/usr/bin/env python2
+# coding=utf-8
+from dis import dis
+
+def func():
+    try:
+        100/0
+    except ZeroDivisionError as e:
+        print 'Zero cannot be divisor'
+        return
+    finally:
+        print 'finally'
+
+if __name__ == &quot;__main__&quot;:
+    dis(func)
+</code></pre>
+
+<p>Next point, we can see,</p>
+
+<pre><code>  6           0 SETUP_FINALLY           44 (to 47)
+              3 SETUP_EXCEPT            12 (to 18)
+
+  7           6 LOAD_CONST               1 (100)
+              9 LOAD_CONST               2 (0)
+             12 BINARY_DIVIDE
+             13 POP_TOP
+             14 POP_BLOCK
+             15 JUMP_FORWARD            25 (to 43)
+
+  8     &gt;&gt;   18 DUP_TOP
+             19 LOAD_GLOBAL              0 (ZeroDivisionError)
+             22 COMPARE_OP              10 (exception match)
+             25 POP_JUMP_IF_FALSE       42
+             28 POP_TOP
+             29 STORE_FAST               0 (e)
+             32 POP_TOP
+
+  9          33 LOAD_CONST               3 ('Zero cannot be divisor')
+             36 PRINT_ITEM
+             37 PRINT_NEWLINE
+
+ 10          38 LOAD_CONST               0 (None)
+             41 RETURN_VALUE
+        &gt;&gt;   42 END_FINALLY
+        &gt;&gt;   43 POP_BLOCK
+             44 LOAD_CONST               0 (None)
+
+ 12     &gt;&gt;   47 LOAD_CONST               4 ('finally')
+             50 PRINT_ITEM
+             51 PRINT_NEWLINE
+             52 END_FINALLY
+             53 LOAD_CONST               0 (None)
+             56 RETURN_VALUE
+</code></pre>
+
+<p>For those who didn&rsquo;t use <code>dis</code> module before:</p>
 
 <blockquote>
-<p>This is implemented by raising the <code>SystemExit</code> exception, so cleanup actions specified by finally clauses of try statements are honored, and it is possible to intercept the exit attempt at an outer level. Since <code>exit()</code> ultimately “only” raises an exception, it will only exit the process when called from the main thread, and the exception is not intercepted.</p>
+<p>The dis module supports the analysis of CPython bytecode by disassembling it. According to the above output, first column is line number, the second is offset of bytecode, followed by the name of bytecode. The forth column presents parameter and the one in parenthesis is the result after bytecode&rsquo;s processing parameter.</p>
 </blockquote>
 
-<p>Third, <code>exit</code> is a helper for the interactive shell and will also throw <code>SystemExit</code> exception.</p>
+<p>As we can see, after <code>RETURN_VALUE</code> in line 10, the <code>END_FINALLY</code> would be executed. That doesn&rsquo;t meet our expectation. What&rsquo;s more wierd, there is another <code>RETURN_VALUE</code> in line 12 after <code>END_FINALLY</code>. Since we get here, the source code is the only thing that we can ask for help.</p>
 
-<p><strong>Reference</strong>:</p>
+<pre><code class="language-c">// ceval.c
+        TARGET_NOARG(RETURN_VALUE)
+        {
+            retval = POP();
+            why = WHY_RETURN;
+            goto fast_block_end;
+        }
 
-<ul>
-<li><a href="https://stackoverflow.com/questions/6501121/difference-between-exit-and-sys-exit-in-python">Difference between exit() and sys.exit() in Python</a></li>
-<li><a href="https://docs.python.org/2/library/sys.html">System-specific parameters and functions</a></li>
-</ul>
+fast_block_end:
+        while (why != WHY_NOT &amp;&amp; f-&gt;f_iblock &gt; 0) {
+            /* Peek at the current block. */
+            PyTryBlock *b = &amp;f-&gt;f_blockstack[f-&gt;f_iblock - 1];
+
+            assert(why != WHY_YIELD);
+            if (b-&gt;b_type == SETUP_LOOP &amp;&amp; why == WHY_CONTINUE) {
+                why = WHY_NOT;
+                JUMPTO(PyInt_AS_LONG(retval));
+                Py_DECREF(retval);
+                break;
+            }
+
+            /* Now we have to pop the block. */
+            f-&gt;f_iblock--;
+
+            while (STACK_LEVEL() &gt; b-&gt;b_level) {
+                v = POP();
+                Py_XDECREF(v);
+            }
+            if (b-&gt;b_type == SETUP_LOOP &amp;&amp; why == WHY_BREAK) {
+                why = WHY_NOT;
+                JUMPTO(b-&gt;b_handler);
+                break;
+            }
+            if (b-&gt;b_type == SETUP_FINALLY ||
+                (b-&gt;b_type == SETUP_EXCEPT &amp;&amp;
+                 why == WHY_EXCEPTION) ||
+                b-&gt;b_type == SETUP_WITH) {
+                if (why == WHY_EXCEPTION) {
+                    PyObject *exc, *val, *tb;
+                    PyErr_Fetch(&amp;exc, &amp;val, &amp;tb);
+                    if (val == NULL) {
+                        val = Py_None;
+                        Py_INCREF(val);
+                    }
+                    /* Make the raw exception data
+                       available to the handler,
+                       so a program can emulate the
+                       Python main loop.  Don't do
+                       this for 'finally'. */
+                    if (b-&gt;b_type == SETUP_EXCEPT ||
+                        b-&gt;b_type == SETUP_WITH) {
+                        PyErr_NormalizeException(
+                            &amp;exc, &amp;val, &amp;tb);
+                        set_exc_info(tstate,
+                                     exc, val, tb);
+                    }
+                    if (tb == NULL) {
+                        Py_INCREF(Py_None);
+                        PUSH(Py_None);
+                    } else
+                        PUSH(tb);
+                    PUSH(val);
+                    PUSH(exc);
+                }
+                else {
+                    if (why &amp; (WHY_RETURN | WHY_CONTINUE))
+                        PUSH(retval);
+                    v = PyInt_FromLong((long)why);
+                    PUSH(v);
+                }
+                why = WHY_NOT;
+                JUMPTO(b-&gt;b_handler);
+                break;
+            }
+        } /* unwind stack */
+
+        /* End the loop if we still have an error (or return) */
+
+        if (why != WHY_NOT)
+            break;
+        READ_TIMESTAMP(loop1);
+
+    } /* main loop */
+
+    assert(why != WHY_YIELD);
+    /* Pop remaining stack entries. */
+    while (!EMPTY()) {
+        v = POP();
+        Py_XDECREF(v);
+    }
+
+    if (why != WHY_RETURN)
+        retval = NULL;
+
+</code></pre>
+
+<p><code>RETURN_VALUE</code> does not return really, it simply assgins popped value from stack to <code>retval</code>, set <code>why</code> to <code>WHY_RETURN</code>, then go to <code>fast_block_end</code>. This pathetic scapegoat would push <code>retval</code> from <code>RETURN_VALUE</code> into stack, convert <code>why</code> to <code>Long</code> and push it into stack too.</p>
+
+<p><strong>Reference</strong></p>
+
+<p><a href="http://mp.weixin.qq.com/s?__biz=MzA4MjEyNTA5Mw==&amp;mid=2652566146&amp;idx=2&amp;sn=8f3258c0d6a06f6370e104db89a6d3b5&amp;chksm=8464dac8b31353def4d8a0939b1bbb0409f2567b79805b9aab95d41b1403a4726292fd87fa96&amp;mpshare=1&amp;scene=1&amp;srcid=0903h2p9HDv0NeZqLkXll9Xs#rd">Python :浅析 return 和 finally 共同挖的坑</a></p>
 
         </div>
         <footer class="article-footer">
-    <a data-url="https://hellokangning.github.io/2017/09/01/exit-options-in-python/" data-id="db4002b5fe5cacaf1fa38d440401f4bc" class="article-share-link">
+    <a data-url="https://hellokangning.github.io/2017/09/04/when-finally-really-executes/" data-id="39af582ddbf52156c9c55d4e04f7d2b7" class="article-share-link">
         <i class="fa fa-share"></i>
         Share
     </a>
     
-    <a href="https://hellokangning.github.io/2017/09/01/exit-options-in-python/#disqus_thread" class="article-comment-link">
+    <a href="https://hellokangning.github.io/2017/09/04/when-finally-really-executes/#disqus_thread" class="article-comment-link">
         Comments
     </a>
     
@@ -395,21 +569,14 @@ Second, sys.exit is intended for use in programs. According to official document
     
 <nav id="article-nav">
     
-    <a href="https://hellokangning.github.io/2017/09/01/the-difference-between-range-and-xrange/" id="article-nav-older" class="article-nav-link-wrap">
+    <a href="https://hellokangning.github.io/2017/09/01/exit-options-in-python/" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">
           Older
       </strong>
-      <div class="article-nav-title">The Difference between range and xrange</div>
+      <div class="article-nav-title">Exit Options in Python</div>
     </a>
     
 
-    
-    <a href="https://hellokangning.github.io/2017/09/04/when-finally-really-executes/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">
-          Newer
-      </strong>
-      <div class="article-nav-title">When finally Really Executes</div>
-    </a>
     
 </nav>
 
