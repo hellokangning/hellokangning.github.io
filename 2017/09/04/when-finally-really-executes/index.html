@@ -53,7 +53,7 @@ Zero cannot be divisor finally  It seems that finally executes after the return 
 
 
 <meta itemprop="dateModified" content="2017-09-04T16:22:03&#43;08:00" />
-<meta itemprop="wordCount" content="615">
+<meta itemprop="wordCount" content="842">
 
 
 
@@ -272,10 +272,10 @@ Zero cannot be divisor finally  It seems that finally executes after the return 
             <i class="fa fa-calendar"></i>
             <time datetime="2017-09-04 16:22:03 &#43;0800 CST" itemprop="datePublished">September 04, 2017</time>
             &middot;
-            615
+            842
             words
             &middot;
-            3
+            4
             minute read
         </div>
         
@@ -480,7 +480,79 @@ fast_block_end:
 
 </code></pre>
 
-<p><code>RETURN_VALUE</code> does not return really, it simply assgins popped value from stack to <code>retval</code>, set <code>why</code> to <code>WHY_RETURN</code>, then go to <code>fast_block_end</code>. This pathetic scapegoat would push <code>retval</code> from <code>RETURN_VALUE</code> into stack, convert <code>why</code> to <code>Long</code> and push it into stack too.</p>
+<p><code>RETURN_VALUE</code> does not return really, it simply assgins popped value from stack to <code>retval</code>, set <code>why</code> to <code>WHY_RETURN</code>, then go to <code>fast_block_end</code>. This pathetic scapegoat would push <code>retval</code> from <code>RETURN_VALUE</code> into stack, convert <code>why</code> to <code>Long</code> and push it into stack too, then jump to <code>b-&gt;b_handler</code>. Well, what&rsquo;s <code>b_handler</code> pointing to?</p>
+
+<pre><code class="language-c">
+// ceval.c
+        // SETUP_FINALLY
+        TARGET_WITH_IMPL(SETUP_LOOP, _setup_finally)
+        TARGET_WITH_IMPL(SETUP_EXCEPT, _setup_finally)
+        TARGET(SETUP_FINALLY)
+        _setup_finally:
+        {
+            /* NOTE: If you add any new block-setup opcodes that
+               are not try/except/finally handlers, you may need
+               to update the PyGen_NeedsFinalizing() function.
+               */
+
+            PyFrame_BlockSetup(f, opcode, INSTR_OFFSET() + oparg,
+                               STACK_LEVEL());
+            DISPATCH();
+        }
+
+        // END_FINALLY
+        PREDICTED(END_FINALLY);
+        TARGET_NOARG(END_FINALLY)
+        {
+            v = POP();
+            if (PyInt_Check(v)) {
+                why = (enum why_code) PyInt_AS_LONG(v);
+                assert(why != WHY_YIELD);
+                if (why == WHY_RETURN ||
+                    why == WHY_CONTINUE)
+                    retval = POP();
+            }
+            else if (PyExceptionClass_Check(v) ||
+                     PyString_Check(v)) {
+                w = POP();
+                u = POP();
+                PyErr_Restore(v, w, u);
+                why = WHY_RERAISE;
+                break;
+            }
+            else if (v != Py_None) {
+                PyErr_SetString(PyExc_SystemError,
+                    &quot;'finally' pops bad exception&quot;);
+                why = WHY_EXCEPTION;
+            }
+            Py_DECREF(v);
+            break;
+        }
+
+// frameobject.c
+
+/* Block management */
+void
+PyFrame_BlockSetup(PyFrameObject *f, int type, int handler, int level)
+{
+    PyTryBlock *b;
+    if (f-&gt;f_iblock &gt;= CO_MAXBLOCKS)
+        Py_FatalError(&quot;XXX block stack overflow&quot;);
+    b = &amp;f-&gt;f_blockstack[f-&gt;f_iblock++];
+    b-&gt;b_type = type;
+    b-&gt;b_level = level;
+    b-&gt;b_handler = handler;
+}
+</code></pre>
+
+<p><code>SETUP_FINALLY</code> calls <code>PyFrame_BlockSetup</code> to setup a block with type, level, handler. From the output of <code>dis</code>(notice the arrows before <code>END_FINALLY</code>), we can guess this handler is <code>END_FINALLY</code>. <code>END_FINALLY</code> gets <code>retval</code> and <code>why</code>, pushed by <code>RETURN_VALUE</code>, from stack, and returns.</p>
+
+<p>Now we can articulate  all the scratch:</p>
+
+<ul>
+<li>return doesn&rsquo;t really return, it pushs value to stack, then jumps to finally, which <code>SETUP_FINALLY</code> setupped before.</li>
+<li>after executing finally, <code>END_FINALLY</code> returns.</li>
+</ul>
 
 <p><strong>Reference</strong></p>
 
