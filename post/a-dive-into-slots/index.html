@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>A Dive into __slots__ - Guoqing Geng</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Guoqing Geng" />
+  <meta name="description" content="Every class have instance attributes, no matter what kind of programming language. By default, Python uses a dict(__dict__) to store an object&amp;rsquo;s instance attributes, which allows you setting arbitary new attributes at runtime handily.
+class Bird(object): fly = True def __init__(self, age): self.age = age print Bird.__dict # {&#39;fly&#39;: True, &#39;__module__&#39;: &#39;__main__&#39;, &#39;__dict__&#39;: &amp;lt;attribute &#39;__dict__&#39; of &#39;Bird&#39; objects&amp;gt;, &#39;__weakref__&#39;: &amp;lt;attribute &#39;__weakref__&#39; of &#39;Bird&#39; objects&amp;gt;, &#39;__doc__&#39;: None, &#39;__init__&#39;: &amp;lt;function __init__ at 0x1052cbf50&amp;gt;} larry = Bird(2) print larry." />
+
+  <meta name="keywords" content="elasticsearch, python, hbase" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.26" />
+
+
+<link rel="canonical" href="https://hellokangning.github.io/post/a-dive-into-slots/" />
+
+<link rel="apple-touch-icon" sizes="180x180" href="https://hellokangning.github.io/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://hellokangning.github.io/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://hellokangning.github.io/favicon-16x16.png">
+<link rel="icon" href="https://hellokangning.github.io/favicon.ico" />
+<link rel="manifest" href="https://hellokangning.github.io/manifest.json">
+<link rel="mask-icon" href="https://hellokangning.github.io/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="https://hellokangning.github.io/dist/even.v2.5.0.css" rel="stylesheet">
+<link href="https://cdn.bootcss.com/fancybox/3.1.20/jquery.fancybox.min.css" rel="stylesheet">
+
+
+<meta property="og:title" content="A Dive into __slots__" />
+<meta property="og:description" content="Every class have instance attributes, no matter what kind of programming language. By default, Python uses a dict(__dict__) to store an object&rsquo;s instance attributes, which allows you setting arbitary new attributes at runtime handily.
+class Bird(object): fly = True def __init__(self, age): self.age = age print Bird.__dict # {&#39;fly&#39;: True, &#39;__module__&#39;: &#39;__main__&#39;, &#39;__dict__&#39;: &lt;attribute &#39;__dict__&#39; of &#39;Bird&#39; objects&gt;, &#39;__weakref__&#39;: &lt;attribute &#39;__weakref__&#39; of &#39;Bird&#39; objects&gt;, &#39;__doc__&#39;: None, &#39;__init__&#39;: &lt;function __init__ at 0x1052cbf50&gt;} larry = Bird(2) print larry." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hellokangning.github.io/post/a-dive-into-slots/" />
+
+
+
+<meta property="article:published_time" content="2017-08-31T14:25:37&#43;08:00"/>
+<meta property="article:modified_time" content="2017-08-31T14:25:37&#43;08:00"/>
+
+
+
+
+
+
+
+
+
+
+
+<meta itemprop="name" content="A Dive into __slots__">
+<meta itemprop="description" content="Every class have instance attributes, no matter what kind of programming language. By default, Python uses a dict(__dict__) to store an object&rsquo;s instance attributes, which allows you setting arbitary new attributes at runtime handily.
+class Bird(object): fly = True def __init__(self, age): self.age = age print Bird.__dict # {&#39;fly&#39;: True, &#39;__module__&#39;: &#39;__main__&#39;, &#39;__dict__&#39;: &lt;attribute &#39;__dict__&#39; of &#39;Bird&#39; objects&gt;, &#39;__weakref__&#39;: &lt;attribute &#39;__weakref__&#39; of &#39;Bird&#39; objects&gt;, &#39;__doc__&#39;: None, &#39;__init__&#39;: &lt;function __init__ at 0x1052cbf50&gt;} larry = Bird(2) print larry.">
+
+
+<meta itemprop="dateModified" content="2017-08-31T14:25:37&#43;08:00" />
+<meta itemprop="wordCount" content="490">
+
+
+
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="A Dive into __slots__"/>
+<meta name="twitter:description" content="Every class have instance attributes, no matter what kind of programming language. By default, Python uses a dict(__dict__) to store an object&rsquo;s instance attributes, which allows you setting arbitary new attributes at runtime handily.
+class Bird(object): fly = True def __init__(self, age): self.age = age print Bird.__dict # {&#39;fly&#39;: True, &#39;__module__&#39;: &#39;__main__&#39;, &#39;__dict__&#39;: &lt;attribute &#39;__dict__&#39; of &#39;Bird&#39; objects&gt;, &#39;__weakref__&#39;: &lt;attribute &#39;__weakref__&#39; of &#39;Bird&#39; objects&gt;, &#39;__doc__&#39;: None, &#39;__init__&#39;: &lt;function __init__ at 0x1052cbf50&gt;} larry = Bird(2) print larry."/>
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+  <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="https://hellokangning.github.io/" class="logo">Guoqing Geng</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="https://hellokangning.github.io/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="https://hellokangning.github.io/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="https://hellokangning.github.io/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="https://hellokangning.github.io/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="https://hellokangning.github.io/about/">
+        <li class="mobile-menu-item">About</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="https://hellokangning.github.io/" class="logo">Guoqing Geng</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="https://hellokangning.github.io/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="https://hellokangning.github.io/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="https://hellokangning.github.io/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="https://hellokangning.github.io/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="https://hellokangning.github.io/about/">About</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">A Dive into __slots__</h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2017-08-31
+        </span>
+        <div class="post-category">
+            <a href="https://hellokangning.github.io/categories/python/">Python</a>
+          </div>
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content">
+      
+  </div>
+</div>
+
+    
+    <div class="post-content">
+      <p>Every class have instance attributes, no matter what kind of programming language. By default, Python uses a dict(<code>__dict__</code>) to store an object&rsquo;s instance attributes, which allows you setting arbitary new attributes at runtime handily.</p>
+
+<pre><code class="language-python">class Bird(object):
+    fly = True
+    def __init__(self, age):
+        self.age = age
+
+print Bird.__dict # {'fly': True, '__module__': '__main__', '__dict__': &lt;attribute '__dict__' of 'Bird' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'Bird' objects&gt;, '__doc__': None, '__init__': &lt;function __init__ at 0x1052cbf50&gt;}
+
+larry = Bird(2)
+print larry.__dict__ # {'age': 2}
+
+larry.__dict__['shoot'] = True
+print larry.__dict__ # {'age': 2, 'shoot': True}
+
+Bird.__dict__['three'] = 'excellent'  # TypeError: 'dictproxy' object does not support item assignment
+</code></pre>
+
+<p>Nevertheless, the <code>__dict__</code> is not versatile, it wastes memory. Python can’t just allocate a static amount of memory at object creation to store all the attributes, since more may be added. <code>__slots__</code> tells interpreter not to use a dict, and only allocate space for a fixed set of attributes.</p>
+
+<pre><code class="language-python">class Penny(object):
+    __slots__ = ['shoot', 'assist']
+    def __init__(self, shoot, assist):
+        self.shoot = shoot
+        self.assist = assist
+
+# {'shoot': &lt;member 'shoot' of 'Penny' objects&gt;, '__module__': '__main__', 'assist': &lt;member 'assist' of 'Penny' objects&gt;, '__slots__': ['shoot', 'assist'], '__doc__': None, '__init__': &lt;function __init__ at 0x105376c08&gt;}
+print Penny.__dict__
+
+p = Penny(True, 'top')
+print p.__dict__ # AttributeError: 'Penny' object has no attribute '__dict__'
+
+</code></pre>
+
+<p>Without a <code>__dict__</code> variable, instances cannot be assigned new variables not listed in the <code>__slots__</code> definition. Attempts to assign to an unlisted variable name raise an <code>AttributeError</code>.</p>
+
+<p>Without a <code>__weakref__</code> variable for each instance, classes defining <code>__slots__</code> do not support weak references to its instances. If weak reference support is needed, then add <code>__weakref__</code> to the sequence of strings in the <code>__slots__</code>  declaration. Likewise, add <code>__dict__</code>&rsquo; to <code>__slots__</code>, so you can get dynamic assignment.</p>
+
+<pre><code class="language-python">from weakref import ref
+
+class A(object):
+    __slots__ = ['b']
+    def __init__(self):
+        self.b = 1
+
+
+class B(object):
+    __slots__ = ['b', '__weakref__']
+    def __init__(self):
+        self.b = 1
+
+a = A()
+r = ref(a) # TypeError: cannot create weak reference to 'A' object
+
+b = B()
+r = ref(b) 
+r # &lt;weakref at 0x10468ff70; to 'type' at 0x7fde5d978430 (B)&gt;
+</code></pre>
+
+<p>What will it be like if we invlove inheritance? Let&rsquo;s try:</p>
+
+<pre><code class="language-python">class Base(object):
+    __slots__ = ['desc']
+    def __init__(self):
+        self.desc = &quot;Base&quot;
+
+class Derived(Base):
+    def __init__(self):
+        pass
+
+d = Derived()
+d.__dict__ # {}
+d.__slots__ # ['desc']
+</code></pre>
+
+<p>As you can see, you don&rsquo;t even need to declare <code>__slots__</code> in your subclass, and you will still use slots from the parents, but not restrict the creation of a <code>__dict__</code>.</p>
+
+<p>How about multiple inheritance?</p>
+
+<pre><code class="language-python">class BaseA(object): __slots__ = ['a']
+class BaseB(object): __slots__ = ['b']
+
+# TypeError: Error when calling the metaclass bases
+#    multiple bases have instance lay-out conflict
+class Derived(BaseA, BaseB): pass
+</code></pre>
+
+<p>Using an empty <code>__slots__</code> in the parent seems to provide the most flexibility, allowing the child to choose to prevent or allow (by adding <code>__dict__</code> to get dynamic assignment, see section above) the creation of a <code>__dict__</code>.</p>
+
+<pre><code class="language-python">class BaseA(object): __slots__ = []
+class BaseB(object): __slots__ = []
+class Derived(BaseA, BaseB): __slots__ = ['a', 'b']
+</code></pre>
+
+    </div>
+
+    
+    
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author: </span>
+    <span>Guoqing Geng</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod: </span>
+    2017-08-31
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">Link: </span>
+    <a href="https://hellokangning.github.io/post/a-dive-into-slots/">https://hellokangning.github.io/post/a-dive-into-slots/</a>
+  </p>
+  
+  <p class="copyright-item lincese">
+    <span class="item-title">License: </span>
+    <a rel="license" href="https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License" target="_blank">Creative Commons Attribution-ShareAlike License</a>
+  </p>
+</div>
+
+    
+    
+
+    <footer class="post-footer">
+      
+
+      
+      <nav class="post-nav">
+        
+          <a class="prev" href="https://hellokangning.github.io/post/difference-between-range-and-xrange/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">The Difference between range and xrange</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        
+          <a class="next" href="https://hellokangning.github.io/post/how-to-read-english-books/">
+            <span class="next-text nav-default">How to Read English Books</span>
+            <span class="prev-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+    (function() {
+        
+        
+        if (window.location.hostname === 'localhost') return;
+
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        var disqus_shortname = 'guoqing';
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com/" class="dsq-brlink" target="_blank">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+  
+      </div>  
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+        <a href="mailto:hellokangning@hotmail.com" class="iconfont icon-email" title="email"></a>
+        <a href="https://www.linkedin.com/in/guoqing-geng-9032b820/" class="iconfont icon-linkedin" title="linkedin"></a>
+        <a href="https://github.com/hellokangning" class="iconfont icon-github" title="github"></a>
+  <a href="https://hellokangning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">
+    &copy; 
+    2017
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Guoqing Geng</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+
+<script src="https://hellokangning.github.io/lib/highlight/highlight.pack.js"></script>
+
+  <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+  <script type="text/javascript" src="https://cdn.bootcss.com/slideout/1.0.1/slideout.min.js"></script>
+  <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/3.1.20/jquery.fancybox.min.js"></script>
+  <script type="text/javascript" src="https://hellokangning.github.io/dist/even.v2.5.0.js"></script>
+
+
+<script async src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML'></script>
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-105833321-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+
+</body>
+</html>
