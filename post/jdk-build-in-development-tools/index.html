@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>JDK Build-in Development Tools - Guoqing Geng</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Guoqing Geng" />
+  <meta name="description" content="The following documents contain important information you will need to know to get the most out of the JDK tools.
+
+" />
+
+  <meta name="keywords" content="elasticsearch, python, hbase" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.26" />
+
+
+<link rel="canonical" href="https://hellokangning.github.io/post/jdk-build-in-development-tools/" />
+
+<link rel="apple-touch-icon" sizes="180x180" href="https://hellokangning.github.io/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://hellokangning.github.io/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://hellokangning.github.io/favicon-16x16.png">
+<link rel="icon" href="https://hellokangning.github.io/favicon.ico" />
+<link rel="manifest" href="https://hellokangning.github.io/manifest.json">
+<link rel="mask-icon" href="https://hellokangning.github.io/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="https://hellokangning.github.io/dist/even.min.css?v=2.6.0" rel="stylesheet">
+<link href="https://hellokangning.github.io/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+<meta property="og:title" content="JDK Build-in Development Tools" />
+<meta property="og:description" content="The following documents contain important information you will need to know to get the most out of the JDK tools.
+
+" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hellokangning.github.io/post/jdk-build-in-development-tools/" />
+
+
+
+<meta property="article:published_time" content="2017-09-14T16:20:46&#43;08:00"/>
+<meta property="article:modified_time" content="2017-09-14T16:20:46&#43;08:00"/>
+
+
+
+
+
+
+
+
+
+
+
+<meta itemprop="name" content="JDK Build-in Development Tools">
+<meta itemprop="description" content="The following documents contain important information you will need to know to get the most out of the JDK tools.
+
+">
+
+
+<meta itemprop="dateModified" content="2017-09-14T16:20:46&#43;08:00" />
+<meta itemprop="wordCount" content="963">
+
+
+
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="JDK Build-in Development Tools"/>
+<meta name="twitter:description" content="The following documents contain important information you will need to know to get the most out of the JDK tools.
+
+"/>
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js" integrity="sha256-9uAoNWHdszsUDhSXf/rVcWOqKPfi5/8V5R4UdbZle2A=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js" crossorigin="anonymous"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="https://hellokangning.github.io/" class="logo">Guoqing Geng</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="https://hellokangning.github.io/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="https://hellokangning.github.io/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="https://hellokangning.github.io/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="https://hellokangning.github.io/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="https://hellokangning.github.io/about/">
+        <li class="mobile-menu-item">About</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="https://hellokangning.github.io/" class="logo">Guoqing Geng</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="https://hellokangning.github.io/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="https://hellokangning.github.io/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="https://hellokangning.github.io/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="https://hellokangning.github.io/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="https://hellokangning.github.io/about/">About</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">JDK Build-in Development Tools</h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          Sep 14, 2017
+        </span>
+        <div class="post-category">
+            <a href="https://hellokangning.github.io/categories/java/">java</a>
+          </div>
+        <span class="more-meta"> 963 word </span>
+        <span class="more-meta"> 5 min read </span>
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content">
+      <nav id="TableOfContents">
+<ul>
+<li><a href="#jps"><code>jps</code></a></li>
+<li><a href="#jmap"><code>jmap</code></a></li>
+<li><a href="#jstack"><code>jstack</code></a></li>
+<li><a href="#jstat"><code>jstat</code></a></li>
+<li><a href="#jcmd"><code>jcmd</code></a></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    
+    <div class="post-content">
+      <p>The following documents contain important information you will need to know to get the most out of the JDK tools.</p>
+
+<p></p>
+
+<h1 id="jps"><code>jps</code></h1>
+
+<p>This utility lists the instrumented Java HotSpot VMs on the target system. The utility is very useful in environments where the VM is embedded, that is, it is started using the JNI Invocation API rather than the <code>java</code> launcher.</p>
+
+<pre><code>jps [ options ] [ hostid ]
+</code></pre>
+
+<p>The output of the jps command follows the following pattern:</p>
+
+<pre><code>lvmid [ [ classname | JARfilename | &quot;Unknown&quot;] [ arg* ] [ jvmarg* ] ]
+</code></pre>
+
+<p>For example,</p>
+
+<pre><code>$ jps
+32515 LogPuller
+17461 SparkServerKt
+17770 SparkServerKt
+31163 UploadToHDFS
+9308 Jps
+893 MainKt
+26991 Logmgr
+26303 LogAdmin
+6703 jar
+</code></pre>
+
+<p>The utility lists the virtual machines for which the user has access rights. This is determined by <strong>access-control mechanisms specific to the operating system</strong>. On Oracle Solaris operating system, for example, if a non-root user executes the jps utility, then the output is a list of the virtual machines that were started with that user&rsquo;s uid.</p>
+
+<p>If the jps command is run without specifying a <code>hostid</code>, then it searches for instrumented JVMs on the local host. If started with a <code>hostid</code>, then it searches for JVMs on the indicated host, using the specified protocol and port. A <code>jstatd</code> process is assumed to be running on the target host.</p>
+
+<h1 id="jmap"><code>jmap</code></h1>
+
+<p>This utility can obtain memory map information, including a heap histogram, from a Java process, a core file, or a remote debug server.</p>
+
+<pre><code>jmap [ options ] pid
+jmap [ options ] executable core
+jmap [ options ] [ pid ] server-id@ ] remote-hostname-or-IP
+</code></pre>
+
+<pre><code>$ jmap -heap 32515
+Attaching to process ID 32515, please wait...
+Debugger attached successfully.
+Server compiler detected.
+JVM version is 25.112-b15
+
+using thread-local object allocation.
+Parallel GC with 23 thread(s)
+
+Heap Configuration:
+   MinHeapFreeRatio         = 0
+   MaxHeapFreeRatio         = 100
+   MaxHeapSize              = 17179869184 (16384.0MB)
+   NewSize                  = 2863136768 (2730.5MB)
+   MaxNewSize               = 5726273536 (5461.0MB)
+   OldSize                  = 5726797824 (5461.5MB)
+   NewRatio                 = 2
+   SurvivorRatio            = 8
+   MetaspaceSize            = 21807104 (20.796875MB)
+   CompressedClassSpaceSize = 1073741824 (1024.0MB)
+   MaxMetaspaceSize         = 17592186044415 MB
+   G1HeapRegionSize         = 0 (0.0MB)
+
+Heap Usage:
+PS Young Generation
+Eden Space:
+   capacity = 2733113344 (2606.5MB)
+   used     = 479095272 (456.9008560180664MB)
+   free     = 2254018072 (2149.5991439819336MB)
+   17.529286630273024% used
+From Space:
+   capacity = 25690112 (24.5MB)
+   used     = 25681312 (24.491607666015625MB)
+   free     = 8800 (0.008392333984375MB)
+   99.96574557557398% used
+To Space:
+   capacity = 65011712 (62.0MB)
+   used     = 0 (0.0MB)
+   free     = 65011712 (62.0MB)
+   0.0% used
+PS Old Generation
+   capacity = 5726797824 (5461.5MB)
+   used     = 4829785576 (4606.042457580566MB)
+   free     = 897012248 (855.4575424194336MB)
+   84.33658257952149% used
+
+15987 interned Strings occupying 1405880 bytes.
+</code></pre>
+
+<p>The <code>-heap</code> option is used to obtain the following Java heap information:</p>
+
+<ul>
+<li>Information specific to the garbage collection (GC) algorithm, including the name of the GC algorithm (for example, parallel GC) and algorithm-specific details (such as number of threads for parallel GC).</li>
+<li>Heap configuration that might have been specified as command-line options or selected by the VM based on the machine configuration.</li>
+<li>Heap usage summary: For each generation (area of the heap), the tool prints the total heap capacity, in-use memory, and available free memory. If a generation is organized as a collection of spaces (for example, the new generation), then a space specific memory size summary is included.</li>
+</ul>
+
+<h1 id="jstack"><code>jstack</code></h1>
+
+<p>The <code>jstack</code> command-line utility attaches to the specified process or core file and prints the stack traces of all threads that are attached to the virtual machine, including Java threads and VM internal threads, and optionally native stack frames. The utility also performs deadlock detection.</p>
+
+<p>The utility can also use the jsadebugd daemon to query a process or core file on a remote machine.</p>
+
+<pre><code>$ jstack -F 8321
+Attaching to process ID 8321, please wait...
+Debugger attached successfully.
+Client compiler detected.
+JVM version is 1.6.0-rc-b100
+Deadlock Detection:
+
+Found one Java-level deadlock:
+=============================
+
+&quot;Thread2&quot;:
+  waiting to lock Monitor@0x000af398 (Object@0xf819aa10, a java/lang/String),
+  which is held by &quot;Thread1&quot;
+&quot;Thread1&quot;:
+  waiting to lock Monitor@0x000af400 (Object@0xf819aa48, a java/lang/String),
+  which is held by &quot;Thread2&quot;
+
+Found a total of 1 deadlock.
+
+Thread t@2: (state = BLOCKED)
+
+Thread t@11: (state = BLOCKED)
+ - Deadlock$DeadlockMakerThread.run() @bci=108, line=32 (Interpreted frame)
+
+Thread t@10: (state = BLOCKED)
+ - Deadlock$DeadlockMakerThread.run() @bci=108, line=32 (Interpreted frame)
+
+Thread t@6: (state = BLOCKED)
+
+Thread t@5: (state = BLOCKED)
+ - java.lang.Object.wait(long) @bci=-1107318896 (Interpreted frame)
+ - java.lang.Object.wait(long) @bci=0 (Interpreted frame)
+ - java.lang.ref.ReferenceQueue.remove(long) @bci=44, line=116 (Interpreted frame)
+ - java.lang.ref.ReferenceQueue.remove() @bci=2, line=132 (Interpreted frame)
+ - java.lang.ref.Finalizer$FinalizerThread.run() @bci=3, line=159 (Interpreted frame)
+
+Thread t@4: (state = BLOCKED)
+ - java.lang.Object.wait(long) @bci=0 (Interpreted frame)
+ - java.lang.Object.wait(long) @bci=0 (Interpreted frame)
+ - java.lang.Object.wait() @bci=2, line=485 (Interpreted frame)
+ - java.lang.ref.Reference$ReferenceHandler.run() @bci=46, line=116 (Interpreted frame)
+</code></pre>
+
+<h1 id="jstat"><code>jstat</code></h1>
+
+<p>This utility uses the built-in instrumentation in Java to provide information about performance and resource consumption of running applications. The tool can be used when diagnosing performance issues, especially those related to heap sizing and garbage collection.</p>
+
+<p>The jstat utility does not require the VM to be started with any special options. The built-in instrumentation in the Java HotSpot VM is enabled by default.</p>
+
+<pre><code>$ jstat -gcutil 2834 250 7
+  S0     S1     E      O      M     YGC     YGCT    FGC    FGCT     GCT   
+  0.00  99.74  13.49   7.86  95.82      3    0.124     0    0.000    0.124
+  0.00  99.74  13.49   7.86  95.82      3    0.124     0    0.000    0.124
+  0.00  99.74  13.49   7.86  95.82      3    0.124     0    0.000    0.124
+  0.00  99.74  13.49   7.86  95.82      3    0.124     0    0.000    0.124
+  0.00  99.74  13.49   7.86  95.82      3    0.124     0    0.000    0.124
+  0.00  99.74  13.49   7.86  95.82      3    0.124     0    0.000    0.124
+  0.00  99.74  13.49   7.86  95.82      3    0.124     0    0.000    0.124
+</code></pre>
+
+<h1 id="jcmd"><code>jcmd</code></h1>
+
+<p>The <code>jcmd</code> utility is used to send diagnostic command requests to the JVM, where these requests are useful for controlling Java Flight Recordings. The JFRs are used to troubleshoot and diagnose JVM and Java Applications with flight recording events.</p>
+
+<p>A special command <code>jcmd &lt;process id/main class&gt; PerfCounter.print</code> prints all performance counters in the process.</p>
+
+<p>See more: <a href="https://docs.oracle.com/javase/8/docs/technotes/guides/troubleshoot/tooldescr006.html#BABEHABG">The jcmd Utility</a></p>
+
+<p><strong>Reference</strong></p>
+
+<ul>
+<li><a href="http://docs.oracle.com/javase/7/docs/technotes/tools/index.html">JDK Tools and Utilities</a></li>
+<li><a href="https://docs.oracle.com/javase/8/docs/technotes/guides/troubleshoot/tooldescr025.html">Monitoring Tools</a></li>
+</ul>
+    </div>
+
+    
+    
+
+    
+    
+
+    <footer class="post-footer">
+      
+
+      
+      <nav class="post-nav">
+        
+        
+          <a class="next" href="https://hellokangning.github.io/post/args-and-kwargs-usage-in-python/">
+            <span class="next-text nav-default">*args and **kwargs Usage in Python</span>
+            <span class="prev-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+    (function() {
+        
+        
+        if (window.location.hostname === 'localhost') return;
+
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        var disqus_shortname = 'guoqing';
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com/" class="dsq-brlink" target="_blank">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+  
+      </div>  
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+        <a href="mailto:hellokangning@hotmail.com" class="iconfont icon-email" title="email"></a>
+        <a href="https://www.linkedin.com/in/guoqing-geng-9032b820/" class="iconfont icon-linkedin" title="linkedin"></a>
+        <a href="https://github.com/hellokangning" class="iconfont icon-github" title="github"></a>
+  <a href="https://hellokangning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">
+    &copy; 
+    2017
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Guoqing Geng</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+<script src="https://hellokangning.github.io/lib/highlight/highlight.pack.js"></script>
+<script type="text/javascript" src="https://hellokangning.github.io/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="https://hellokangning.github.io/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="https://hellokangning.github.io/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+<script type="text/javascript" src="https://hellokangning.github.io/dist/even.min.js?v=2.6.0"></script>
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-105833321-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+
+</body>
+</html>
