@@ -17,10 +17,9 @@
 
 
 <meta name="author" content="Guoqing Geng" />
-  <meta name="description" content="Let&amp;rsquo;s be forthright, what will the following code print?
-def func(): try: 100/0 except ZeroDivisionError as e: print &#39;Zero cannot be divisor&#39; return finally: print &#39;finally&#39; if __name__ == &amp;quot;__main__&amp;quot;: func()  The answer is:
-Zero cannot be divisor finally  It seems that finally executes after the return statement. Is it a truth? We&amp;rsquo;s better change the code a little to penetrate the result.
-#!/usr/bin/env python2 # coding=utf-8 from dis import dis def func(): try: 100/0 except ZeroDivisionError as e: print &#39;Zero cannot be divisor&#39; return finally: print &#39;finally&#39; if __name__ == &amp;quot;__main__&amp;quot;: dis(func)  Next point, we can see," />
+  <meta name="description" content="Epitome:
+ return doesn&amp;rsquo;t really return, it pushs value to stack, then jumps to finally, which SETUP_FINALLY setupped before. after executing finally, END_FINALLY returns.  
+" />
 
   <meta name="keywords" content="elasticsearch, python, hbase" />
 
@@ -46,10 +45,14 @@ Zero cannot be divisor finally  It seems that finally executes after the return 
 <link href="https://hellokangning.github.io/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
 
 <meta property="og:title" content="When finally Really Executes" />
-<meta property="og:description" content="Let&rsquo;s be forthright, what will the following code print?
-def func(): try: 100/0 except ZeroDivisionError as e: print &#39;Zero cannot be divisor&#39; return finally: print &#39;finally&#39; if __name__ == &quot;__main__&quot;: func()  The answer is:
-Zero cannot be divisor finally  It seems that finally executes after the return statement. Is it a truth? We&rsquo;s better change the code a little to penetrate the result.
-#!/usr/bin/env python2 # coding=utf-8 from dis import dis def func(): try: 100/0 except ZeroDivisionError as e: print &#39;Zero cannot be divisor&#39; return finally: print &#39;finally&#39; if __name__ == &quot;__main__&quot;: dis(func)  Next point, we can see," />
+<meta property="og:description" content="Epitome:
+
+
+return doesn&rsquo;t really return, it pushs value to stack, then jumps to finally, which SETUP_FINALLY setupped before.
+after executing finally, END_FINALLY returns.
+
+
+" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hellokangning.github.io/post/when-finally-really-executes/" />
 
@@ -69,23 +72,31 @@ Zero cannot be divisor finally  It seems that finally executes after the return 
 
 
 <meta itemprop="name" content="When finally Really Executes">
-<meta itemprop="description" content="Let&rsquo;s be forthright, what will the following code print?
-def func(): try: 100/0 except ZeroDivisionError as e: print &#39;Zero cannot be divisor&#39; return finally: print &#39;finally&#39; if __name__ == &quot;__main__&quot;: func()  The answer is:
-Zero cannot be divisor finally  It seems that finally executes after the return statement. Is it a truth? We&rsquo;s better change the code a little to penetrate the result.
-#!/usr/bin/env python2 # coding=utf-8 from dis import dis def func(): try: 100/0 except ZeroDivisionError as e: print &#39;Zero cannot be divisor&#39; return finally: print &#39;finally&#39; if __name__ == &quot;__main__&quot;: dis(func)  Next point, we can see,">
+<meta itemprop="description" content="Epitome:
+
+
+return doesn&rsquo;t really return, it pushs value to stack, then jumps to finally, which SETUP_FINALLY setupped before.
+after executing finally, END_FINALLY returns.
+
+
+">
 
 
 <meta itemprop="dateModified" content="2017-09-04T16:22:03&#43;08:00" />
-<meta itemprop="wordCount" content="841">
+<meta itemprop="wordCount" content="864">
 
 
 
 <meta itemprop="keywords" content="" />
 <meta name="twitter:card" content="summary"/><meta name="twitter:title" content="When finally Really Executes"/>
-<meta name="twitter:description" content="Let&rsquo;s be forthright, what will the following code print?
-def func(): try: 100/0 except ZeroDivisionError as e: print &#39;Zero cannot be divisor&#39; return finally: print &#39;finally&#39; if __name__ == &quot;__main__&quot;: func()  The answer is:
-Zero cannot be divisor finally  It seems that finally executes after the return statement. Is it a truth? We&rsquo;s better change the code a little to penetrate the result.
-#!/usr/bin/env python2 # coding=utf-8 from dis import dis def func(): try: 100/0 except ZeroDivisionError as e: print &#39;Zero cannot be divisor&#39; return finally: print &#39;finally&#39; if __name__ == &quot;__main__&quot;: dis(func)  Next point, we can see,"/>
+<meta name="twitter:description" content="Epitome:
+
+
+return doesn&rsquo;t really return, it pushs value to stack, then jumps to finally, which SETUP_FINALLY setupped before.
+after executing finally, END_FINALLY returns.
+
+
+"/>
 
 <!--[if lt IE 9]>
   <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js" integrity="sha256-9uAoNWHdszsUDhSXf/rVcWOqKPfi5/8V5R4UdbZle2A=" crossorigin="anonymous"></script>
@@ -157,8 +168,8 @@ Zero cannot be divisor finally  It seems that finally executes after the return 
         <div class="post-category">
             <a href="https://hellokangning.github.io/categories/python/">Python</a>
           </div>
-        <span class="more-meta"> 841 word </span>
-        <span class="more-meta"> 4 min read </span>
+        <span class="more-meta"> 864 word </span>
+        <span class="more-meta"> 5 min read </span>
       </div>
     </header>
 
@@ -167,7 +178,16 @@ Zero cannot be divisor finally  It seems that finally executes after the return 
 
     
     <div class="post-content">
-      <p>Let&rsquo;s be forthright, what will the following code print?</p>
+      <p>Epitome:</p>
+
+<ul>
+<li>return doesn&rsquo;t really return, it pushs value to stack, then jumps to finally, which <code>SETUP_FINALLY</code> setupped before.</li>
+<li>after executing finally, <code>END_FINALLY</code> returns.</li>
+</ul>
+
+<p></p>
+
+<p>Let&rsquo;s be forthright, what will the following code print?</p>
 
 <pre><code class="language-python">def func():
     try:
@@ -425,8 +445,9 @@ PyFrame_BlockSetup(PyFrameObject *f, int type, int handler, int level)
 
 <p><strong>Reference</strong></p>
 
-<p><a href="http://mp.weixin.qq.com/s?__biz=MzA4MjEyNTA5Mw==&amp;mid=2652566146&amp;idx=2&amp;sn=8f3258c0d6a06f6370e104db89a6d3b5&amp;chksm=8464dac8b31353def4d8a0939b1bbb0409f2567b79805b9aab95d41b1403a4726292fd87fa96&amp;mpshare=1&amp;scene=1&amp;srcid=0903h2p9HDv0NeZqLkXll9Xs#rd">Python :浅析 return 和 finally 共同挖的坑</a></p>
-
+<ul>
+<li><a href="http://mp.weixin.qq.com/s?__biz=MzA4MjEyNTA5Mw==&amp;mid=2652566146&amp;idx=2&amp;sn=8f3258c0d6a06f6370e104db89a6d3b5&amp;chksm=8464dac8b31353def4d8a0939b1bbb0409f2567b79805b9aab95d41b1403a4726292fd87fa96&amp;mpshare=1&amp;scene=1&amp;srcid=0903h2p9HDv0NeZqLkXll9Xs#rd">Python :浅析 return 和 finally 共同挖的坑</a></li>
+</ul>
     </div>
 
     

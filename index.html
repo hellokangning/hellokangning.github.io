@@ -282,17 +282,21 @@
       <div class="post-category">
           <a href="https://hellokangning.github.io/categories/python/">Python</a>
         </div>
-      <span class="more-meta"> 841 word </span>
-      <span class="more-meta"> 4 min read </span>
+      <span class="more-meta"> 864 word </span>
+      <span class="more-meta"> 5 min read </span>
     </div>
   </header>
   
   <div class="post-content">
     <div class="post-summary">
-      Let&rsquo;s be forthright, what will the following code print?
-def func(): try: 100/0 except ZeroDivisionError as e: print 'Zero cannot be divisor' return finally: print 'finally' if __name__ == &quot;__main__&quot;: func()  The answer is:
-Zero cannot be divisor finally  It seems that finally executes after the return statement. Is it a truth? We&rsquo;s better change the code a little to penetrate the result.
-#!/usr/bin/env python2 # coding=utf-8 from dis import dis def func(): try: 100/0 except ZeroDivisionError as e: print 'Zero cannot be divisor' return finally: print 'finally' if __name__ == &quot;__main__&quot;: dis(func)  Next point, we can see,
+      <p>Epitome:</p>
+
+<ul>
+<li>return doesn&rsquo;t really return, it pushs value to stack, then jumps to finally, which <code>SETUP_FINALLY</code> setupped before.</li>
+<li>after executing finally, <code>END_FINALLY</code> returns.</li>
+</ul>
+
+<p></p>
     </div>
     <div class="read-more">
       <a href="https://hellokangning.github.io/post/when-finally-really-executes/" class="read-more-link">Read more..</a>
