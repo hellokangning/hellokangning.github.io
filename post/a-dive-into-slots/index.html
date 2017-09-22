@@ -17,8 +17,9 @@
 
 
 <meta name="author" content="Guoqing Geng" />
-  <meta name="description" content="Every class have instance attributes, no matter what kind of programming language. By default, Python uses a dict(__dict__) to store an object&amp;rsquo;s instance attributes, which allows you setting arbitary new attributes at runtime handily.
-class Bird(object): fly = True def __init__(self, age): self.age = age print Bird.__dict # {&#39;fly&#39;: True, &#39;__module__&#39;: &#39;__main__&#39;, &#39;__dict__&#39;: &amp;lt;attribute &#39;__dict__&#39; of &#39;Bird&#39; objects&amp;gt;, &#39;__weakref__&#39;: &amp;lt;attribute &#39;__weakref__&#39; of &#39;Bird&#39; objects&amp;gt;, &#39;__doc__&#39;: None, &#39;__init__&#39;: &amp;lt;function __init__ at 0x1052cbf50&amp;gt;} larry = Bird(2) print larry." />
+  <meta name="description" content="__slots__ tells interpreter not to use a dict, and only allocate space for a fixed set of attributes.
+
+" />
 
   <meta name="keywords" content="elasticsearch, python, hbase" />
 
@@ -44,8 +45,9 @@ class Bird(object): fly = True def __init__(self, age): self.age = age print Bir
 <link href="https://hellokangning.github.io/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
 
 <meta property="og:title" content="A Dive into __slots__" />
-<meta property="og:description" content="Every class have instance attributes, no matter what kind of programming language. By default, Python uses a dict(__dict__) to store an object&rsquo;s instance attributes, which allows you setting arbitary new attributes at runtime handily.
-class Bird(object): fly = True def __init__(self, age): self.age = age print Bird.__dict # {&#39;fly&#39;: True, &#39;__module__&#39;: &#39;__main__&#39;, &#39;__dict__&#39;: &lt;attribute &#39;__dict__&#39; of &#39;Bird&#39; objects&gt;, &#39;__weakref__&#39;: &lt;attribute &#39;__weakref__&#39; of &#39;Bird&#39; objects&gt;, &#39;__doc__&#39;: None, &#39;__init__&#39;: &lt;function __init__ at 0x1052cbf50&gt;} larry = Bird(2) print larry." />
+<meta property="og:description" content="__slots__ tells interpreter not to use a dict, and only allocate space for a fixed set of attributes.
+
+" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hellokangning.github.io/post/a-dive-into-slots/" />
 
@@ -65,19 +67,21 @@ class Bird(object): fly = True def __init__(self, age): self.age = age print Bir
 
 
 <meta itemprop="name" content="A Dive into __slots__">
-<meta itemprop="description" content="Every class have instance attributes, no matter what kind of programming language. By default, Python uses a dict(__dict__) to store an object&rsquo;s instance attributes, which allows you setting arbitary new attributes at runtime handily.
-class Bird(object): fly = True def __init__(self, age): self.age = age print Bird.__dict # {&#39;fly&#39;: True, &#39;__module__&#39;: &#39;__main__&#39;, &#39;__dict__&#39;: &lt;attribute &#39;__dict__&#39; of &#39;Bird&#39; objects&gt;, &#39;__weakref__&#39;: &lt;attribute &#39;__weakref__&#39; of &#39;Bird&#39; objects&gt;, &#39;__doc__&#39;: None, &#39;__init__&#39;: &lt;function __init__ at 0x1052cbf50&gt;} larry = Bird(2) print larry.">
+<meta itemprop="description" content="__slots__ tells interpreter not to use a dict, and only allocate space for a fixed set of attributes.
+
+">
 
 
 <meta itemprop="dateModified" content="2017-08-31T14:25:37&#43;08:00" />
-<meta itemprop="wordCount" content="490">
+<meta itemprop="wordCount" content="508">
 
 
 
 <meta itemprop="keywords" content="" />
 <meta name="twitter:card" content="summary"/><meta name="twitter:title" content="A Dive into __slots__"/>
-<meta name="twitter:description" content="Every class have instance attributes, no matter what kind of programming language. By default, Python uses a dict(__dict__) to store an object&rsquo;s instance attributes, which allows you setting arbitary new attributes at runtime handily.
-class Bird(object): fly = True def __init__(self, age): self.age = age print Bird.__dict # {&#39;fly&#39;: True, &#39;__module__&#39;: &#39;__main__&#39;, &#39;__dict__&#39;: &lt;attribute &#39;__dict__&#39; of &#39;Bird&#39; objects&gt;, &#39;__weakref__&#39;: &lt;attribute &#39;__weakref__&#39; of &#39;Bird&#39; objects&gt;, &#39;__doc__&#39;: None, &#39;__init__&#39;: &lt;function __init__ at 0x1052cbf50&gt;} larry = Bird(2) print larry."/>
+<meta name="twitter:description" content="__slots__ tells interpreter not to use a dict, and only allocate space for a fixed set of attributes.
+
+"/>
 
 <!--[if lt IE 9]>
   <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js" integrity="sha256-9uAoNWHdszsUDhSXf/rVcWOqKPfi5/8V5R4UdbZle2A=" crossorigin="anonymous"></script>
@@ -149,7 +153,7 @@ class Bird(object): fly = True def __init__(self, age): self.age = age print Bir
         <div class="post-category">
             <a href="https://hellokangning.github.io/categories/python/">Python</a>
           </div>
-        <span class="more-meta"> 490 word </span>
+        <span class="more-meta"> 508 word </span>
         <span class="more-meta"> 3 min read </span>
       </div>
     </header>
@@ -159,7 +163,11 @@ class Bird(object): fly = True def __init__(self, age): self.age = age print Bir
 
     
     <div class="post-content">
-      <p>Every class have instance attributes, no matter what kind of programming language. By default, Python uses a dict(<code>__dict__</code>) to store an object&rsquo;s instance attributes, which allows you setting arbitary new attributes at runtime handily.</p>
+      <p><code>__slots__</code> tells interpreter not to use a dict, and only allocate space for a fixed set of attributes.</p>
+
+<p></p>
+
+<p>Every class have instance attributes, no matter what kind of programming language. By default, Python uses a dict(<code>__dict__</code>) to store an object&rsquo;s instance attributes, which allows you setting arbitary new attributes at runtime handily.</p>
 
 <pre><code class="language-python">class Bird(object):
     fly = True
@@ -252,7 +260,6 @@ class Derived(BaseA, BaseB): pass
 class BaseB(object): __slots__ = []
 class Derived(BaseA, BaseB): __slots__ = ['a', 'b']
 </code></pre>
-
     </div>
 
     

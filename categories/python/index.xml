@@ -62,8 +62,14 @@ Second, sys.exit is intended for use in programs. According to official document
       <pubDate>Fri, 01 Sep 2017 16:22:27 +0800</pubDate>
       
       <guid>https://hellokangning.github.io/post/difference-between-range-and-xrange/</guid>
-      <description>Short answer:
- range creates a list, so if you do range(1, 10000000) it creates a list in memory with 9999999 elements. This will become an expensive operation on very large ranges. xrange is a sequence object that evaluates lazily(it will only compute the next value when needed).  For performance, especially when you&amp;rsquo;re iterating over a large range, xrange() is usually better. However, there are still a few cases why you might prefer range():</description>
+      <description>&lt;p&gt;Short answer:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;range&lt;/code&gt; creates a list, so if you do &lt;code&gt;range(1, 10000000)&lt;/code&gt; it creates a list in memory with 9999999 elements. This will become an expensive operation on very large ranges.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;xrange&lt;/code&gt; is a sequence object that &lt;em&gt;evaluates lazily&lt;/em&gt;(it will only compute the next value when needed).&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -72,8 +78,9 @@ Second, sys.exit is intended for use in programs. According to official document
       <pubDate>Thu, 31 Aug 2017 14:25:37 +0800</pubDate>
       
       <guid>https://hellokangning.github.io/post/a-dive-into-slots/</guid>
-      <description>Every class have instance attributes, no matter what kind of programming language. By default, Python uses a dict(__dict__) to store an object&amp;rsquo;s instance attributes, which allows you setting arbitary new attributes at runtime handily.
-class Bird(object): fly = True def __init__(self, age): self.age = age print Bird.__dict # {&#39;fly&#39;: True, &#39;__module__&#39;: &#39;__main__&#39;, &#39;__dict__&#39;: &amp;lt;attribute &#39;__dict__&#39; of &#39;Bird&#39; objects&amp;gt;, &#39;__weakref__&#39;: &amp;lt;attribute &#39;__weakref__&#39; of &#39;Bird&#39; objects&amp;gt;, &#39;__doc__&#39;: None, &#39;__init__&#39;: &amp;lt;function __init__ at 0x1052cbf50&amp;gt;} larry = Bird(2) print larry.</description>
+      <description>&lt;p&gt;&lt;code&gt;__slots__&lt;/code&gt; tells interpreter not to use a dict, and only allocate space for a fixed set of attributes.&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
     </item>
     
     <item>
