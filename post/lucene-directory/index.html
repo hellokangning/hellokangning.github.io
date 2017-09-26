@@ -41,7 +41,8 @@
 <link rel="mask-icon" href="https://hellokangning.github.io/safari-pinned-tab.svg" color="#5bbad5">
 
 
-<link href="https://hellokangning.github.io/dist/even.min.css?v=2.6.0" rel="stylesheet">
+
+<link href="https://hellokangning.github.io/dist/even.v2.5.0.css" rel="stylesheet">
 <link href="https://hellokangning.github.io/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
 
 <meta property="og:title" content="Directory in Lucene" />
@@ -73,7 +74,7 @@
 
 
 <meta itemprop="dateModified" content="2017-09-05T16:26:31&#43;08:00" />
-<meta itemprop="wordCount" content="1342">
+<meta itemprop="wordCount" content="2733">
 
 
 
@@ -84,8 +85,8 @@
 "/>
 
 <!--[if lt IE 9]>
-  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js" integrity="sha256-9uAoNWHdszsUDhSXf/rVcWOqKPfi5/8V5R4UdbZle2A=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+  <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
 <![endif]-->
 
 </head>
@@ -153,8 +154,6 @@
         <div class="post-category">
             <a href="https://hellokangning.github.io/categories/elasticsearch/">Elasticsearch</a>
           </div>
-        <span class="more-meta"> 1342 word </span>
-        <span class="more-meta"> 7 min read </span>
       </div>
     </header>
 
@@ -171,7 +170,14 @@
 <li><a href="#ramdirectory">RAMDirectory</a></li>
 <li><a href="#fsdirectory">FSDirectory</a></li>
 </ul></li>
-<li><a href="#indexinput">IndexInput</a></li>
+<li><a href="#indexinput">IndexInput</a>
+<ul>
+<li><a href="#bufferedindexinput">BufferedIndexInput</a></li>
+</ul></li>
+<li><a href="#indexoutput">IndexOutput</a>
+<ul>
+<li><a href="#ramoutputstream">RAMOutputStream</a></li>
+</ul></li>
 </ul>
 </nav>
   </div>
@@ -546,7 +552,301 @@
 
 <h2 id="fsdirectory">FSDirectory</h2>
 
+<p><code>FSDirectory</code> is another base class for <code>Directory</code> implementation that store index files in the file system.</p>
+
+<pre><code class="language-java">public abstract class FSDirectory extends BaseDirectory {
+  protected final Path directory; // The underlying filesystem directory
+
+  protected FSDirectory(Path path, LockFactory lockFactory) throws IOException {
+    super(lockFactory);
+    // If only read access is permitted, createDirectories fails even if the directory already exists.
+    if (!Files.isDirectory(path)) {
+      Files.createDirectories(path);  // create directory, if it doesn't exist
+    }
+    directory = path.toRealPath();
+  }
+
+  /** Just like {@link #open(Path)}, but allows you to
+   *  also specify a custom {@link LockFactory}. */
+  public static FSDirectory open(Path path, LockFactory lockFactory) throws IOException {
+    if (Constants.JRE_IS_64BIT &amp;&amp; MMapDirectory.UNMAP_SUPPORTED) {
+      return new MMapDirectory(path, lockFactory);
+    } else if (Constants.WINDOWS) {
+      return new SimpleFSDirectory(path, lockFactory);
+    } else {
+      return new NIOFSDirectory(path, lockFactory);
+    }
+  }
+
+  private static String[] listAll(Path dir, Set&lt;String&gt; skipNames) throws IOException {
+    List&lt;String&gt; entries = new ArrayList&lt;&gt;();
+    
+    try (DirectoryStream&lt;Path&gt; stream = Files.newDirectoryStream(dir)) {
+      for (Path path : stream) {
+        String name = path.getFileName().toString();
+        if (skipNames == null || skipNames.contains(name) == false) {
+          entries.add(name);
+        }
+      }
+    }
+
+    String[] array = entries.toArray(new String[entries.size()]);
+    // Directory.listAll javadocs state that we sort the results here, so we don't let filesystem
+    // specifics leak out of this abstraction:
+    Arrays.sort(array);
+    return array;
+  }
+}
+</code></pre>
+
+<p>In <code>FSDirectory</code>, a nested <code>FSIndexOutput</code> is responsible for index output.</p>
+
+<pre><code class="language-java">final class FSIndexOutput extends OutputStreamIndexOutput {
+  static final int CHUNK_SIZE = 8192;
+  
+  FSIndexOutput(String name, OpenOption... options) throws IOException {
+    super(&quot;FSIndexOutput(path=\&quot;&quot; + directory.resolve(name) + &quot;\&quot;)&quot;, name, new FilterOutputStream(Files.newOutputStream(directory.resolve(name), options)) {
+      // This implementation ensures, that we never write more than CHUNK_SIZE bytes:
+      @Override
+      public void write(byte[] b, int offset, int length) throws IOException {
+        while (length &gt; 0) {
+          final int chunk = Math.min(length, CHUNK_SIZE);
+          out.write(b, offset, chunk);
+          length -= chunk;
+          offset += chunk;
+        }
+      }
+    }, CHUNK_SIZE);
+  }
+}
+</code></pre>
+
+<p>Since <code>FSDirectory</code> is abstract, There are currently three core subclasses that can be instantiated:</p>
+
+<ol>
+<li><code>SimpleFSDirectory</code>, a straightforward implementation using Files.newByteChannel. However, it has poor concurrent performance (multiple threads will bottleneck) as it synchronizes when multiple threads read from the same file.</li>
+<li><code>NIOFSDirectory</code>, uses java.nio&rsquo;s FileChannel&rsquo;s positional io when reading to avoid synchronization when reading from the same file.</li>
+<li><code>MMapDirectory</code>, uses memory-mapped IO when reading. This is a good choice if you have plenty of virtual memory relative to your index size.</li>
+</ol>
+
 <h1 id="indexinput">IndexInput</h1>
+
+<p><code>IndexInput</code> extends <code>DataInput</code>, abstract base class for performing read operations of Lucene&rsquo;s low-level data types. which provides:</p>
+
+<pre><code class="language-java">public void readBytes(byte[] b, int offset, int len, boolean useBuffer) throws IOException;
+public short readShort() throws IOException;
+public int readInt() throws IOException;
+public String readString() throws IOException;
+public void skipBytes(final long numBytes) throws IOException;
+</code></pre>
+
+<p><code>IndexInput</code> is an abstract base class for input from a file in <code>Directory</code>. It&rsquo;s a random-access input stream, for all Lucene index input operations.</p>
+
+<pre><code class="language-java">public abstract class IndexInput extends DataInput implements Cloneable,Closeable {
+  // Returns the current position in this file
+  public abstract long getFilePointer();
+
+  // Sets current position in this file
+  public abstract void seek(long pos) throws IOException;
+
+  // Creates a slice of this index input, with the given description, offset, and length
+  public abstract IndexInput slice(String sliceDescription, long offset, long length) throws IOException;
+
+  // Creates a random-access slice of this index input, with the given offset and length
+   public RandomAccessInput randomAccessSlice(long offset, long length) throws IOException;
+}
+</code></pre>
+
+<h2 id="bufferedindexinput">BufferedIndexInput</h2>
+
+<p><code>BufferedIndexInput</code> is a implementation class for buffered <code>InputInput</code>, it also implemenets <code>RandomAccessInput</code> interface.</p>
+
+<pre><code class="language-java">/** 
+ * Random Access Index API.
+ * Unlike {@link IndexInput}, this has no concept of file position, all reads
+ * are absolute. However, like IndexInput, it is only intended for use by a single thread.
+ */
+public interface RandomAccessInput {
+  public byte readByte(long pos) throws IOException;
+  public short readShort(long pos) throws IOException;
+  public int readInt(long pos) throws IOException;
+}
+</code></pre>
+
+<p>The subclasses of <code>FSDirectory</code> has its own nested <code>XXXIndexInput</code> which extends <code>BufferedIndexInput</code>. So we must make out what it does.</p>
+
+<pre><code class="language-java">public abstract class BufferedIndexInput extends IndexInput implements RandomAccessInput {
+  protected byte[] buffer;
+  
+  private long bufferStart = 0;       // position in file of buffer
+  private int bufferLength = 0;       // end of valid bytes
+  private int bufferPosition = 0;     // next byte to read
+
+  /** Change the buffer size used by this IndexInput */
+  public final void setBufferSize(int newSize) {
+    assert buffer == null || bufferSize == buffer.length: &quot;buffer=&quot; + buffer + &quot; bufferSize=&quot; + bufferSize + &quot; buffer.length=&quot; + (buffer != null ? buffer.length : 0);
+    if (newSize != bufferSize) {
+      checkBufferSize(newSize);
+      bufferSize = newSize;
+      if (buffer != null) {
+        // Resize the existing buffer and carefully save as
+        // many bytes as possible starting from the current
+        // bufferPosition
+        byte[] newBuffer = new byte[newSize];
+        final int leftInBuffer = bufferLength-bufferPosition;
+        final int numToCopy;
+        if (leftInBuffer &gt; newSize)
+          numToCopy = newSize;
+        else
+          numToCopy = leftInBuffer;
+        System.arraycopy(buffer, bufferPosition, newBuffer, 0, numToCopy);
+        bufferStart += bufferPosition;
+        bufferPosition = 0;
+        bufferLength = numToCopy;
+        newBuffer(newBuffer);
+      }
+    }
+  }
+
+  private void checkBufferSize(int bufferSize) {
+    if (bufferSize &lt; MIN_BUFFER_SIZE)
+      throw new IllegalArgumentException(&quot;bufferSize must be at least MIN_BUFFER_SIZE (got &quot; + bufferSize + &quot;)&quot;);
+  }
+
+  @Override
+  public final void readBytes(byte[] b, int offset, int len, boolean useBuffer) throws IOException {
+    int available = bufferLength - bufferPosition;
+    if(len &lt;= available){
+      // the buffer contains enough data to satisfy this request
+      if(len&gt;0) // to allow b to be null if len is 0...
+        System.arraycopy(buffer, bufferPosition, b, offset, len);
+      bufferPosition+=len;
+    } else {
+      // the buffer does not have enough data. First serve all we've got.
+      if(available &gt; 0){
+        System.arraycopy(buffer, bufferPosition, b, offset, available);
+        offset += available;
+        len -= available;
+        bufferPosition += available;
+      }
+      // and now, read the remaining 'len' bytes:
+      if (useBuffer &amp;&amp; len&lt;bufferSize){
+        // If the amount left to read is small enough, and
+        // we are allowed to use our buffer, do it in the usual
+        // buffered way: fill the buffer and copy from it:
+        refill();
+        if(bufferLength&lt;len){
+          // Throw an exception when refill() could not read len bytes:
+          System.arraycopy(buffer, 0, b, offset, bufferLength);
+          throw new EOFException(&quot;read past EOF: &quot; + this);
+        } else {
+          System.arraycopy(buffer, 0, b, offset, len);
+          bufferPosition=len;
+        }
+      } else {
+        // The amount left to read is larger than the buffer
+        // or we've been asked to not use our buffer -
+        // there's no performance reason not to read it all
+        // at once. Note that unlike the previous code of
+        // this function, there is no need to do a seek
+        // here, because there's no need to reread what we
+        // had in the buffer.
+        long after = bufferStart+bufferPosition+len;
+        if(after &gt; length())
+          throw new EOFException(&quot;read past EOF: &quot; + this);
+        readInternal(b, offset, len);
+        bufferStart = after;
+        bufferPosition = 0;
+        bufferLength = 0;                    // trigger refill() on read
+      }
+    }
+  }
+
+  @Override
+  public final short readShort() throws IOException {
+    if (2 &lt;= (bufferLength-bufferPosition)) {
+      return (short) (((buffer[bufferPosition++] &amp; 0xFF) &lt;&lt;  8) |  (buffer[bufferPosition++] &amp; 0xFF));
+    } else {
+      return super.readShort();
+    }
+  }
+}
+</code></pre>
+
+<p><code>readInt</code>, <code>readLong</code> and so on, similar with <code>readShort</code>, read data from <code>buffer</code> array and convert to target type with bit operation.</p>
+
+<h1 id="indexoutput">IndexOutput</h1>
+
+<p><code>IndexOutput</code> extends <code>DataOutput</code>, an abstract base class for performing write operations of Lucene&rsquo;s low-level data types.</p>
+
+<pre><code class="language-java">public abstract class DataOutput {
+  public abstract void writeByte(byte b) throws IOException;
+  public void writeInt(int i) throws IOException {
+    writeByte((byte)(i &gt;&gt; 24));
+    writeByte((byte)(i &gt;&gt; 16));
+    writeByte((byte)(i &gt;&gt;  8));
+    writeByte((byte) i);
+  }
+}
+</code></pre>
+
+<p>Derived from <code>DataOutput</code>, <code>IndexOutput</code> outputs a file in <code>Directory</code>, which is used for all Lucene index output operations.</p>
+
+<pre><code class="language-java">public abstract class IndexOutput extends DataOutput implements Closeable {
+  // Returns the current position in this file, where the next write will occur.
+  public abstract long getFilePointer();
+}
+</code></pre>
+
+<h2 id="ramoutputstream">RAMOutputStream</h2>
+
+<p>Eash subclass of <code>Directory</code> has corresponding <code>IndexOutput</code> implementation, for example, <code>RAMDirecotry</code> and <code>RAMOutputStream</code>.</p>
+
+<pre><code class="language-java">public class RAMOutputStream extends IndexOutput implements Accountable {
+  private final RAMFile file;
+
+  private byte[] currentBuffer;
+  private int currentBufferIndex;
+  
+  private int bufferPosition;
+  private long bufferStart;
+  private int bufferLength;
+
+  /** Copy the current contents of this buffer to the provided {@link DataOutput}. */
+  public void writeTo(DataOutput out) throws IOException {
+    flush();
+    final long end = file.length;
+    long pos = 0;
+    int buffer = 0;
+    while (pos &lt; end) {
+      int length = BUFFER_SIZE;
+      long nextPos = pos + length;
+      if (nextPos &gt; end) {                        // at the last buffer
+        length = (int)(end - pos);
+      }
+      out.writeBytes(file.getBuffer(buffer++), length);
+      pos = nextPos;
+    }
+  }
+
+  @Override
+  public void writeByte(byte b) throws IOException {
+    if (bufferPosition == bufferLength) {
+      currentBufferIndex++;
+      switchCurrentBuffer();
+    }
+    if (crc != null) {
+      crc.update(b);
+    }
+    currentBuffer[bufferPosition++] = b;
+  }
+
+  @Override
+  public long getFilePointer() {
+    return currentBufferIndex &lt; 0 ? 0 : bufferStart + bufferPosition;
+  }
+}
+</code></pre>
 
 <p><strong>Reference</strong></p>
 
@@ -642,11 +942,14 @@
     </div>
   </div>
   
+
 <script src="https://hellokangning.github.io/lib/highlight/highlight.pack.js"></script>
 <script type="text/javascript" src="https://hellokangning.github.io/lib/jquery/jquery-3.2.1.min.js"></script>
   <script type="text/javascript" src="https://hellokangning.github.io/lib/slideout/slideout-1.0.1.min.js"></script>
   <script type="text/javascript" src="https://hellokangning.github.io/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
-<script type="text/javascript" src="https://hellokangning.github.io/dist/even.min.js?v=2.6.0"></script>
+  <script type="text/javascript" src="https://hellokangning.github.io/dist/even.v2.5.0.js"></script>
+
+
 
 
 <script>
