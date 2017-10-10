@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Fixing Elasticsearch with Red Status - Guoqing Geng</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Guoqing Geng" />
+  <meta name="description" content="Elasticsearch&amp;rsquo;s red status means at least one primary shard (and all of its replicas) is missing. This reminds you of missing data: searches will return partial results, and indexing into that shard will return an exception.
+
+" />
+
+  <meta name="keywords" content="elasticsearch, python, hbase" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.26" />
+
+
+<link rel="canonical" href="https://hellokangning.github.io/post/fixing-elasticsearch-with-red-status/" />
+
+<link rel="apple-touch-icon" sizes="180x180" href="https://hellokangning.github.io/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://hellokangning.github.io/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://hellokangning.github.io/favicon-16x16.png">
+<link rel="icon" href="https://hellokangning.github.io/favicon.ico" />
+<link rel="manifest" href="https://hellokangning.github.io/manifest.json">
+<link rel="mask-icon" href="https://hellokangning.github.io/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="https://hellokangning.github.io/dist/even.min.css?v=2.6.1" rel="stylesheet">
+<link href="https://hellokangning.github.io/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+<meta property="og:title" content="Fixing Elasticsearch with Red Status" />
+<meta property="og:description" content="Elasticsearch&rsquo;s red status means at least one primary shard (and all of its replicas) is missing. This reminds you of missing data: searches will return partial results, and indexing into that shard will return an exception.
+
+" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hellokangning.github.io/post/fixing-elasticsearch-with-red-status/" />
+
+
+
+<meta property="article:published_time" content="2017-10-10T10:05:01&#43;08:00"/>
+<meta property="article:modified_time" content="2017-10-10T10:05:01&#43;08:00"/>
+
+
+
+
+
+
+
+
+
+
+
+<meta itemprop="name" content="Fixing Elasticsearch with Red Status">
+<meta itemprop="description" content="Elasticsearch&rsquo;s red status means at least one primary shard (and all of its replicas) is missing. This reminds you of missing data: searches will return partial results, and indexing into that shard will return an exception.
+
+">
+
+
+<meta itemprop="dateModified" content="2017-10-10T10:05:01&#43;08:00" />
+<meta itemprop="wordCount" content="606">
+
+
+
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Fixing Elasticsearch with Red Status"/>
+<meta name="twitter:description" content="Elasticsearch&rsquo;s red status means at least one primary shard (and all of its replicas) is missing. This reminds you of missing data: searches will return partial results, and indexing into that shard will return an exception.
+
+"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="https://hellokangning.github.io/" class="logo">Guoqing Geng</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="https://hellokangning.github.io/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="https://hellokangning.github.io/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="https://hellokangning.github.io/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="https://hellokangning.github.io/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="https://hellokangning.github.io/about/">
+        <li class="mobile-menu-item">About</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="https://hellokangning.github.io/" class="logo">Guoqing Geng</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="https://hellokangning.github.io/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="https://hellokangning.github.io/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="https://hellokangning.github.io/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="https://hellokangning.github.io/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="https://hellokangning.github.io/about/">About</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Fixing Elasticsearch with Red Status</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> Oct 10, 2017 </span>
+        <div class="post-category">
+            <a href="https://hellokangning.github.io/categories/elasticsearch/">Elasticsearch</a>
+          </div>
+        <span class="more-meta"> 606 word </span>
+        <span class="more-meta"> 3 min read </span>
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content">
+      <nav id="TableOfContents">
+<ul>
+<li><a href="#x-pack-bug">x-pack bug</a></li>
+<li><a href="#explain-api">Explain API</a></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    
+    <div class="post-content">
+      <p>Elasticsearch&rsquo;s red status means at least one primary shard (and all of its replicas) is missing. This reminds you of missing data: searches will return partial results, and indexing into that shard will return an exception.</p>
+
+<p></p>
+
+<h1 id="x-pack-bug">x-pack bug</h1>
+
+<p>When I open kibana Web UI this morning, I find this page:</p>
+
+<p><img src="https://hellokangning.github.io/images/x-pack-error.png" alt="" /></p>
+
+<p>Don&rsquo;t panic since I have handled this many times. There must be some unassigned shards used by <code>x-pack</code> plugin. Let&rsquo;s see what these index are.</p>
+
+<pre><code class="language-bash">curl -XGET http://xs333:19201/_cluster/health?level=indices | json_pp
+</code></pre>
+
+<p>The output is abbreviated so that we can address monitor index only.</p>
+
+<pre><code class="language-json">{
+{
+  &quot;cluster_name&quot;: &quot;fusiones-v2&quot;,
+  &quot;status&quot;: &quot;red&quot;,
+  &quot;timed_out&quot;: false,
+  &quot;number_of_nodes&quot;: 38,
+  &quot;number_of_data_nodes&quot;: 28,
+  &quot;active_primary_shards&quot;: 5043,
+  &quot;active_shards&quot;: 5064,
+  &quot;relocating_shards&quot;: 0,
+  &quot;initializing_shards&quot;: 0,
+  &quot;unassigned_shards&quot;: 165,
+  &quot;delayed_unassigned_shards&quot;: 0,
+  &quot;number_of_pending_tasks&quot;: 0,
+  &quot;number_of_in_flight_fetch&quot;: 0,
+  &quot;task_max_waiting_in_queue_millis&quot;: 0,
+  &quot;active_shards_percent_as_number&quot;: 96.84452094090649,
+  &quot;indices&quot;: {
+     &quot;.monitoring-kibana-6-2017.08.04&quot; : {
+       &quot;active_shards&quot; : 0,
+       &quot;unassigned_shards&quot; : 2,
+       &quot;relocating_shards&quot; : 0,
+       &quot;number_of_shards&quot; : 1,
+       &quot;active_primary_shards&quot; : 0,
+       &quot;number_of_replicas&quot; : 1,
+       &quot;status&quot; : &quot;red&quot;,
+       &quot;initializing_shards&quot; : 0
+      },
+    &quot;.monitoring-es-6-2017.08.04&quot; : {
+       &quot;initializing_shards&quot; : 0,
+       &quot;status&quot; : &quot;red&quot;,
+       &quot;number_of_replicas&quot; : 1,
+       &quot;active_primary_shards&quot; : 0,
+       &quot;number_of_shards&quot; : 1,
+       &quot;relocating_shards&quot; : 0,
+       &quot;unassigned_shards&quot; : 2,
+       &quot;active_shards&quot; : 0
+      }
+  }
+}
+</code></pre>
+
+<p><code>x-pack</code> reserves monitor index of recent 7 days by default, How does the index of 2017.08.04 still exist and become unassigned? I can only speculate this is a bug of <code>x-pack</code>, and delete these red shards.</p>
+
+<pre><code class="language-bash">curl -XDELETE http://xs333:19201/.monitoring-kibana-6-2017.08.04
+curl -XDELETE http://xs333:19201/.monitoring-es-6-2017.08.04
+</code></pre>
+
+<p>After these commands, We can see normal Kibana, like this.</p>
+
+<p><img src="https://hellokangning.github.io/images/normal-kibana.png" alt="" /></p>
+
+<p>Unfortunately, the status is still red, and there are 165 unassigned shards.</p>
+
+<h1 id="explain-api">Explain API</h1>
+
+<p><code>GET _cluster/health?level=indices</code> told us which index is red, to explain the allocation of its shard,</p>
+
+<pre><code>GET _cluster/allocation/explain
+
+{
+  &quot;index&quot;: &quot;rtlogindex_2017-10-09-21_part-00008&quot;,
+  &quot;shard&quot;: 0,
+  &quot;primary&quot;: true
+}
+</code></pre>
+
+<p>Specify the <code>index</code> and <code>shard id</code> of the shard you would like an explanation for, as well as the primary flag to indicate whether to explain the primary shard for the given shard id or one of its replica shards. These three request parameters are required.</p>
+
+<p>The upper request produces the following output:</p>
+
+<pre><code class="language-json">{
+  &quot;index&quot;: &quot;rtlogindex_2017-10-09-21_part-00008&quot;,
+  &quot;shard&quot;: 0,
+  &quot;primary&quot;: true,
+  &quot;current_state&quot;: &quot;unassigned&quot;,
+  &quot;unassigned_info&quot;: {
+    &quot;reason&quot;: &quot;INDEX_CREATED&quot;,
+    &quot;at&quot;: &quot;2017-10-09T18:39:56.971Z&quot;,
+    &quot;last_allocation_status&quot;: &quot;no&quot;
+  },
+  &quot;can_allocate&quot;: &quot;no&quot;,
+  &quot;allocate_explanation&quot;: &quot;cannot allocate because allocation is not permitted to any of the nodes&quot;,
+  &quot;node_allocation_decisions&quot;: [
+    {
+      &quot;node_id&quot;: &quot;SLcx_8U7S-C-5aaS39-iTw&quot;,
+      &quot;node_name&quot;: &quot;xs328-i3&quot;,
+      &quot;transport_address&quot;: &quot;10.34.41.52:39301&quot;,
+      &quot;node_attributes&quot;: {
+        &quot;rack&quot;: &quot;xs-r1&quot;,
+        &quot;ml.enabled&quot;: &quot;true&quot;
+      },
+      &quot;node_decision&quot;: &quot;no&quot;,
+      &quot;weight_ranking&quot;: 1,
+      &quot;deciders&quot;: [
+        {
+          &quot;decider&quot;: &quot;filter&quot;,
+          &quot;decision&quot;: &quot;NO&quot;,
+          &quot;explanation&quot;: &quot;&quot;&quot;node does not match index setting [index.routing.allocation.include] filters [_name:&quot;xs393-i4&quot;]&quot;&quot;&quot;
+        }
+      ]
+    }
+  ]
+}
+</code></pre>
+
+<p>The explain API found the primary shard 0 of <code>rtlogindex_2017-10-10-03_part-0002</code> to explain,</p>
+
+<ol>
+<li>which is in the unassigned state (see <code>current_state</code>) due to the index having just been created (see <code>unassigned_info</code>).</li>
+<li>The shard cannot be allocated (see <code>can_allocate</code>) due to none of the nodes permitting allocation of the shard (see <code>allocate_explanation</code>).<br /></li>
+<li>When drilling down to each node’s decision (see <code>node_allocation_decisions</code>), we observe that node <code>xs328-i3</code> received a decision not to allocate (see <code>node_decision</code>) due to the filter decider (see <code>decider</code>) preventing allocation with the reason that node does not match index setting <code>index.routing.allocation.include</code> (see <code>explanation</code> inside the <code>deciders</code> section).  The explanation also contains the exact setting to change to allow the shard to be allocated in the cluster.</li>
+</ol>
+
+<p>For more information of <code>allocator</code> and <code>decider</code>, allocators try to find the best nodes to hold the shard, and deciders make the decision if allocating to a node is allowed.</p>
+
+<p>In consideration of the reason, we&rsquo;d better update index&rsquo;s settings by,</p>
+
+<pre><code>PUT rtlogindex_2017-10-09-21_part-00008/_settings
+{
+  &quot;index.routing.allocation.include._name&quot;: null
+}
+</code></pre>
+
+<p>Afterwards, this index become green,</p>
+
+<p><img src="https://hellokangning.github.io/images/index-green.png" alt="" /></p>
+
+<p>So far, we fixed the <code>Unassigned Primary Shards</code> of index, the solution also works on <code>Unassigned Replica Shards</code> and <code>Assigned Shards</code>.</p>
+
+<p><strong>Reference</strong></p>
+
+<ul>
+<li><a href="https://www.elastic.co/blog/red-elasticsearch-cluster-panic-no-longer">RED Elasticsearch Cluster? Panic no longer</a></li>
+<li><a href="https://qbox.io/blog/how-to-diagnose-red-elasticsearch-cluster">How to Diagnose Red Elasticsearch Clusters</a></li>
+</ul>
+    </div>
+
+    
+    
+
+    
+    
+
+    <footer class="post-footer">
+      
+
+      
+      <nav class="post-nav">
+        
+        
+          <a class="next" href="https://hellokangning.github.io/post/understanding-python-decorator/">
+            <span class="next-text nav-default">Understanding Python Decorator</span>
+            <span class="prev-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+    (function() {
+        
+        
+        if (window.location.hostname === 'localhost') return;
+
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        var disqus_shortname = 'guoqing';
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com/" class="dsq-brlink" target="_blank">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+  
+      </div>  
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="hellokangning@hotmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://www.linkedin.com/in/guoqing-geng-9032b820/" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="https://github.com/hellokangning" class="iconfont icon-github" title="github"></a>
+  <a href="https://hellokangning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">
+    &copy; 
+    2017
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Guoqing Geng</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+<script src="https://hellokangning.github.io/lib/highlight/highlight.pack.js"></script>
+<script type="text/javascript" src="https://hellokangning.github.io/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="https://hellokangning.github.io/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="https://hellokangning.github.io/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+<script type="text/javascript" src="https://hellokangning.github.io/dist/even.min.js?v=2.6.1"></script>
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-105833321-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+
+</body>
+</html>
