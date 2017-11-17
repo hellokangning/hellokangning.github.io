@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Hbase Storage Internals - Guoqing Geng</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Guoqing Geng" />
+  <meta name="description" content="Overview
+ An HBase Table consists of multiple rows. Table will be splited into Regions based on rows&amp;rsquo; lexicographical order. A Store corresponds to a column family for a table for a given region. A Store hosts a MemStore and 0 or more StoreFiles (HFiles). The MemStore holds in-memory modifications to the Store. StoreFiles are composed of Blocks.  
+" />
+<meta name="keywords" content="HBase" />
+
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.26" />
+
+
+<link rel="canonical" href="https://hellokangning.github.io/post/hbase-storage-internals/" />
+
+<link rel="apple-touch-icon" sizes="180x180" href="https://hellokangning.github.io/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://hellokangning.github.io/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://hellokangning.github.io/favicon-16x16.png">
+<link rel="icon" href="https://hellokangning.github.io/favicon.ico" />
+<link rel="manifest" href="https://hellokangning.github.io/manifest.json">
+<link rel="mask-icon" href="https://hellokangning.github.io/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+<link href="https://hellokangning.github.io/dist/even.min.css?v=2.6.6" rel="stylesheet">
+<link href="https://hellokangning.github.io/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+<meta property="og:title" content="Hbase Storage Internals" />
+<meta property="og:description" content="Overview
+
+
+An HBase Table consists of multiple rows.
+Table will be splited into Regions based on rows&rsquo; lexicographical order.
+A Store corresponds to a column family for a table for a given region.
+A Store hosts a MemStore and 0 or more StoreFiles (HFiles).
+The MemStore holds in-memory modifications to the Store.
+StoreFiles are composed of Blocks.
+
+
+" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hellokangning.github.io/post/hbase-storage-internals/" />
+
+
+
+<meta property="article:published_time" content="2017-11-16T11:34:49&#43;08:00"/>
+<meta property="article:modified_time" content="2017-11-16T11:34:49&#43;08:00"/>
+
+
+
+
+
+
+
+
+
+
+
+<meta itemprop="name" content="Hbase Storage Internals">
+<meta itemprop="description" content="Overview
+
+
+An HBase Table consists of multiple rows.
+Table will be splited into Regions based on rows&rsquo; lexicographical order.
+A Store corresponds to a column family for a table for a given region.
+A Store hosts a MemStore and 0 or more StoreFiles (HFiles).
+The MemStore holds in-memory modifications to the Store.
+StoreFiles are composed of Blocks.
+
+
+">
+
+
+<meta itemprop="dateModified" content="2017-11-16T11:34:49&#43;08:00" />
+<meta itemprop="wordCount" content="786">
+
+
+
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Hbase Storage Internals"/>
+<meta name="twitter:description" content="Overview
+
+
+An HBase Table consists of multiple rows.
+Table will be splited into Regions based on rows&rsquo; lexicographical order.
+A Store corresponds to a column family for a table for a given region.
+A Store hosts a MemStore and 0 or more StoreFiles (HFiles).
+The MemStore holds in-memory modifications to the Store.
+StoreFiles are composed of Blocks.
+
+
+"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="https://hellokangning.github.io/" class="logo">Guoqing Geng</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="https://hellokangning.github.io/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="https://hellokangning.github.io/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="https://hellokangning.github.io/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="https://hellokangning.github.io/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="https://hellokangning.github.io/about/">
+        <li class="mobile-menu-item">About</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="https://hellokangning.github.io/" class="logo">Guoqing Geng</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="https://hellokangning.github.io/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="https://hellokangning.github.io/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="https://hellokangning.github.io/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="https://hellokangning.github.io/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="https://hellokangning.github.io/about/">About</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Hbase Storage Internals</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> Nov 16, 2017 </span>
+        <div class="post-category">
+            
+              <a href="https://hellokangning.github.io/categories/hbase/"> HBase </a>
+            
+          </div>
+        <span class="more-meta"> 786 word </span>
+        <span class="more-meta"> 4 min read </span>
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content">
+      <nav id="TableOfContents">
+<ul>
+<li><a href="#region">Region</a></li>
+<li><a href="#store">Store</a></li>
+<li><a href="#memstore">MemStore</a></li>
+<li><a href="#storefile-hfile">StoreFile (HFile)</a></li>
+<li><a href="#block">Block</a></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    
+    <div class="post-content">
+      <p>Overview</p>
+
+<ul>
+<li>An HBase <code>Table</code> consists of multiple rows.</li>
+<li>Table will be splited into <code>Regions</code> based on rows&rsquo; lexicographical order.</li>
+<li>A <code>Store</code> corresponds to a column family for a table for a given region.</li>
+<li>A Store hosts a <code>MemStore</code> and 0 or more <code>StoreFiles (HFiles)</code>.</li>
+<li>The MemStore holds in-memory modifications to the Store.</li>
+<li>StoreFiles are composed of <code>Blocks</code>.</li>
+</ul>
+
+<p></p>
+
+<p>A widespread graph of HBase architecture lists as following.</p>
+
+<p><img src="https://hellokangning.github.io/images/hbase-architecture.jpg" alt="HBase Architecture" /></p>
+
+<p>I drawed a simplified version from region&rsquo;s viewpoint.</p>
+
+<p><img src="https://hellokangning.github.io/images/hbase-region-structure.png" alt="Region" /></p>
+
+<h1 id="region">Region</h1>
+
+<p>HBase stores rows of data in tables. For high performace and availability, Tables are split into “regions”.  A region contains a continuous range of rows. Since rows are sorted lexicographically, it&rsquo;s easy to deduce that all rows within the scope of the region&rsquo;s start key and end key are stored in the same region. A single row belongs to exactly one region at any time. A region is only served by one single RegionServer, one RegionServer can hold many regions at the same time. Regions are distributed across the cluster, requests from client can be processed by RegionServer process independently.</p>
+
+<p>A HBase table can be pre-split into regions when creation. After that, regions split when they reach a configured threshold. You can also force split manually at will, but there are some rules of thumb needs to be respected. On the contrary, regions can be merged if too many regions exists.</p>
+
+<p>Ok, Let source code tell the truth.</p>
+
+<p><img src="https://hellokangning.github.io/images/hbase-region-class.png" alt="" /></p>
+
+<pre><code class="language-java">public interface Region extends ConfigurationObserver {
+    /**
+    * @return a list of the Stores managed by this region
+    */
+    List&lt;? extends Store&gt; getStores();
+
+    /**
+    * @return the Store for the given family
+    */
+    Store getStore(byte[] family);
+
+    /**
+    * Check the region's underlying store files, open the files that have not
+    * been opened yet, and remove the store file readers for store files no
+    * longer available.
+    * @throws IOException
+    */
+    boolean refreshStoreFiles() throws IOException;
+
+    /**
+    * @return memstore size for this region, in bytes. It just accounts data size of cells added to
+    *         the memstores of this Region. Means size in bytes for key, value and tags within Cells.
+    *         It wont consider any java heap overhead for the cell objects or any other.
+    */
+    long getMemStoreSize();
+
+    /**
+    * Puts some data in the table.
+    * @param put
+    * @throws IOException
+    */
+    void put(Put put) throws IOException;
+
+    /**
+    * Perform one or more increment operations on a row.
+    * @param increment
+    * @return result of the operation
+    * @throws IOException
+    */
+    Result increment(Increment increment) throws IOException;
+
+    /**
+    * Do a get based on the get parameter.
+    * @param get query parameters
+    * @return result of the operation
+    */
+    Result get(Get get) throws IOException;
+}
+
+public class HRegion implements HeapSize, PropagatingConfigurationObserver, Region {
+    private final WAL wal;
+    private final HRegionFileSystem fs;
+
+
+    protected final Map&lt;byte[], HStore&gt; stores =
+     new ConcurrentSkipListMap&lt;&gt;(Bytes.BYTES_RAWCOMPARATOR);
+}
+</code></pre>
+
+<h1 id="store">Store</h1>
+
+<p>A Store corresponds to a column family for a table for a given region.</p>
+
+<pre><code class="language-java">public interface Store {
+    Collection&lt;? extends StoreFile&gt; getStorefiles();
+
+    FileSystem getFileSystem();
+
+    /**
+    * @return The size of this store's memstore.
+    */
+    MemStoreSize getMemStoreSize();
+}
+
+public class HStore implements Store, HeapSize, StoreConfigInformation, PropagatingConfigurationObserver {
+    protected final MemStore memstore;
+    // This stores directory in the filesystem.
+    protected final HRegion region;
+    private final ColumnFamilyDescriptor family;
+    private final HRegionFileSystem fs;
+}
+</code></pre>
+
+<h1 id="memstore">MemStore</h1>
+
+<p>A Store hosts a MemStore and 0 or more StoreFiles (HFiles). The MemStore holds in-memory modifications to the Store. Modifications are Cells/KeyValues.</p>
+
+<p>When the MemStore reaches a given size (<code>hbase.hregion.memstore.flush.size</code>), it flushes its contents to a StoreFile.</p>
+
+<pre><code class="language-java">public interface MemStore {
+    /**
+    * Write the updates
+    * @param cells
+    * @param memstoreSizing The delta in memstore size will be passed back via this.
+    *        This will include both data size and heap overhead delta.
+    */
+    void add(Iterable&lt;Cell&gt; cells, MemStoreSizing memstoreSizing);
+}
+</code></pre>
+
+<h1 id="storefile-hfile">StoreFile (HFile)</h1>
+
+<p>StoreFiles are where your data lives. The HFile file format is based on the SSTable file described in the BigTable [2006] paper and on Hadoop’s TFile.</p>
+
+<pre><code class="language-java">public interface StoreFile {
+    /**
+    * @return True if this is HFile.
+    */
+    boolean isHFile();
+
+    /**
+    * Get the first key in this store file.
+    */
+    Optional&lt;Cell&gt; getFirstKey(); 
+}
+
+/**
+ * A Store data file.  Stores usually have one or more of these files.  They
+ * are produced by flushing the memstore to disk.
+ */
+public class HStoreFile implements StoreFile {
+    private final StoreFileInfo fileInfo;
+    private final FileSystem fs;
+
+    // firstKey, lastkey and cellComparator will be set when openReader.
+    private Optional&lt;Cell&gt; firstKey;
+    private Optional&lt;Cell&gt; lastKey;
+    private CellComparator comparator;
+
+    /**
+    * Bloom filter type specified in column family configuration. Does not
+    * necessarily correspond to the Bloom filter type present in the HFile.
+    */
+    private final BloomType cfBloomType;
+}
+</code></pre>
+
+<h1 id="block">Block</h1>
+
+<p>StoreFiles are composed of blocks. The blocksize is configured on a per-ColumnFamily basis.</p>
+
+<p><strong>Reference</strong></p>
+
+<ul>
+<li><a href="http://blog.javachen.com/2013/06/15/hbase-note-about-data-structure.html">HBase笔记：存储结构</a></li>
+<li><a href="http://hbase.apache.org/book.html#regions.arch">Regions</a></li>
+<li><a href="https://sreejithrpillai.wordpress.com/2015/01/04/hbase-architecture/">HBASE ARCHITECTURE</a></li>
+<li><a href="http://hbasefly.com/2016/03/23/hbase-memstore-flush/">HBase – Memstore Flush深度解析</a></li>
+</ul>
+    </div>
+
+    
+    
+
+    
+    
+
+    <footer class="post-footer">
+      
+
+      
+      <nav class="post-nav">
+        
+        
+          <a class="next" href="https://hellokangning.github.io/post/fixing-elasticsearch-with-red-status/">
+            <span class="next-text nav-default">Fixing Elasticsearch with Red Status</span>
+            <span class="prev-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+    (function() {
+        
+        
+        if (window.location.hostname === 'localhost') return;
+
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        var disqus_shortname = 'guoqing';
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com/" class="dsq-brlink" target="_blank">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+  
+      </div>  
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="hellokangning@hotmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://www.linkedin.com/in/guoqing-geng-9032b820/" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="https://github.com/hellokangning" class="iconfont icon-github" title="github"></a>
+  <a href="https://hellokangning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">
+    &copy; 
+    2017
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Guoqing Geng</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+<script src="https://hellokangning.github.io/lib/highlight/highlight.pack.js?v=20171001"></script>
+<script type="text/javascript" src="https://hellokangning.github.io/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="https://hellokangning.github.io/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="https://hellokangning.github.io/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+<script type="text/javascript" src="https://hellokangning.github.io/dist/even.min.js?v=2.6.6"></script>
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-105833321-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+
+</body>
+</html>
