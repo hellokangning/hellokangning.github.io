@@ -93,7 +93,7 @@ StoreFiles are composed of Blocks.
 
 
 <meta itemprop="dateModified" content="2017-11-16T11:34:49&#43;08:00" />
-<meta itemprop="wordCount" content="786">
+<meta itemprop="wordCount" content="1187">
 
 
 
@@ -186,8 +186,8 @@ StoreFiles are composed of Blocks.
               <a href="https://hellokangning.github.io/categories/hbase/"> HBase </a>
             
           </div>
-        <span class="more-meta"> 786 word </span>
-        <span class="more-meta"> 4 min read </span>
+        <span class="more-meta"> 1187 word </span>
+        <span class="more-meta"> 6 min read </span>
       </div>
     </header>
 
@@ -343,7 +343,7 @@ public class HStore implements Store, HeapSize, StoreConfigInformation, Propagat
 
 <h1 id="storefile-hfile">StoreFile (HFile)</h1>
 
-<p>StoreFiles are where your data lives. The HFile file format is based on the SSTable file described in the BigTable [2006] paper and on Hadoop’s TFile.</p>
+<p>StoreFiles are where your data lives. The HFile file format is based on the SSTable file described in the BigTable [2006] paper and on Hadoop’s TFile. StoreFile wraps HFile, a file of sorted key/value pairs. Both keys and values are byte arrays.</p>
 
 <pre><code class="language-java">public interface StoreFile {
     /**
@@ -378,6 +378,47 @@ public class HStoreFile implements StoreFile {
 }
 </code></pre>
 
+<p>The following describes the evolution of the HFile format. It is useful to give a short overview of the original (HFile version 1) format.</p>
+
+<p><img src="https://hellokangning.github.io/images/hbase-hfile-v1.png" alt="" /></p>
+
+<p>The block index in version 1 is very straightforward. For each entry, it contains:</p>
+
+<ul>
+<li>Offset (long)</li>
+<li>Uncompressed size (int)</li>
+<li>Key (a serialized byte array written using Bytes.writeByteArray)</li>
+<li>Key length as a variable-length integer (VInt)</li>
+<li>Key bytes</li>
+</ul>
+
+<p>The number of entries in the block index is stored in the fixed file trailer, and has to be passed in to the method that reads the block index. One of the limitations of the block index in version 1 is that it does not provide the compressed size of a block, which turns out to be necessary for decompression.</p>
+
+<p>HFile version 2 fixed this limitation, and be introduced in in HBase 0.92.</p>
+
+<p><img src="https://hellokangning.github.io/images/hbase-hfile-v2.png" alt="" /></p>
+
+<p>In the version 2 every block in the data section contains the following fields:</p>
+
+<ol>
+<li>8 bytes: Block type, a sequence of bytes equivalent to version 1’s &ldquo;magic records&rdquo;. Supported block types are:</li>
+<li>Compressed size of the block’s data, not including the header (int).
+Can be used for skipping the current data block when scanning HFile data.</li>
+<li>Uncompressed size of the block’s data, not including the header (int)
+This is equal to the compressed size if the compression algorithm is NONE</li>
+<li>File offset of the previous block of the same type (long)
+Can be used for seeking to the previous data/index block</li>
+<li>Compressed data (or uncompressed data if the compression algorithm is NONE).</li>
+</ol>
+
+<p>The above format of blocks is used in the following HFile sections:
+- Scanned block section
+    The section is named so because it contains all data blocks that need to be read when an HFile is scanned sequentially. Also contains leaf block index and Bloom chunk blocks.
+- Non-scanned block section
+    This section still contains unified-format v2 blocks but it does not have to be read when doing a sequential scan. This section contains &ldquo;meta&rdquo; blocks and intermediate-level index blocks.</p>
+
+<p>We are supporting &ldquo;meta&rdquo; blocks in version 2 the same way they were supported in version 1, even though we do not store Bloom filter data in these blocks anymore.</p>
+
 <h1 id="block">Block</h1>
 
 <p>StoreFiles are composed of blocks. The blocksize is configured on a per-ColumnFamily basis.</p>
@@ -389,6 +430,12 @@ public class HStoreFile implements StoreFile {
 <li><a href="http://hbase.apache.org/book.html#regions.arch">Regions</a></li>
 <li><a href="https://sreejithrpillai.wordpress.com/2015/01/04/hbase-architecture/">HBASE ARCHITECTURE</a></li>
 <li><a href="http://hbasefly.com/2016/03/23/hbase-memstore-flush/">HBase – Memstore Flush深度解析</a></li>
+<li><a href="http://www.binospace.com/index.php/hfile-file-format-to-read-and-write-with-hbase/">HFile文件格式与HBase读写</a></li>
+<li><a href="https://hbase.apache.org/devapidocs/org/apache/hadoop/hbase/io/hfile/HFile.html">HFile</a></li>
+<li><a href="http://cloudepr.blogspot.com/2009/09/hfile-block-indexed-file-format-to.html">HFile: A Block-Indexed File Format to Store Sorted Key-Value Pairs</a></li>
+<li><a href="http://th30z.blogspot.com/2011/02/hbase-io-hfile.html?spref=tw">HBase I/O: HFile</a></li>
+<li><a href="http://hbase.apache.org/book.html#hfilev2">HBase file format with inline blocks (version 2)</a></li>
+<li><a href="https://mapr.com/blog/in-depth-look-hbase-architecture/">An In-Depth Look at the HBase Architecture</a></li>
 </ul>
     </div>
 
