@@ -93,7 +93,7 @@ StoreFiles are composed of Blocks.
 
 
 <meta itemprop="dateModified" content="2017-11-16T11:34:49&#43;08:00" />
-<meta itemprop="wordCount" content="1187">
+<meta itemprop="wordCount" content="1233">
 
 
 
@@ -186,7 +186,7 @@ StoreFiles are composed of Blocks.
               <a href="https://hellokangning.github.io/categories/hbase/"> HBase </a>
             
           </div>
-        <span class="more-meta"> 1187 word </span>
+        <span class="more-meta"> 1233 word </span>
         <span class="more-meta"> 6 min read </span>
       </div>
     </header>
@@ -401,7 +401,7 @@ public class HStoreFile implements StoreFile {
 <p>In the version 2 every block in the data section contains the following fields:</p>
 
 <ol>
-<li>8 bytes: Block type, a sequence of bytes equivalent to version 1’s &ldquo;magic records&rdquo;. Supported block types are:</li>
+<li>8 bytes: Block type, a sequence of bytes equivalent to version 1&rsquo;s &ldquo;magic records&rdquo;.</li>
 <li>Compressed size of the block’s data, not including the header (int).
 Can be used for skipping the current data block when scanning HFile data.</li>
 <li>Uncompressed size of the block’s data, not including the header (int)
@@ -415,7 +415,7 @@ Can be used for seeking to the previous data/index block</li>
 - Scanned block section
     The section is named so because it contains all data blocks that need to be read when an HFile is scanned sequentially. Also contains leaf block index and Bloom chunk blocks.
 - Non-scanned block section
-    This section still contains unified-format v2 blocks but it does not have to be read when doing a sequential scan. This section contains &ldquo;meta&rdquo; blocks and intermediate-level index blocks.</p>
+    This section still contains unified-format v2 blocks but it does not have to be read when doing a sequential scan. This section contains <strong>&ldquo;meta&rdquo; blocks and intermediate-level index blocks</strong>.</p>
 
 <p>We are supporting &ldquo;meta&rdquo; blocks in version 2 the same way they were supported in version 1, even though we do not store Bloom filter data in these blocks anymore.</p>
 
@@ -423,9 +423,13 @@ Can be used for seeking to the previous data/index block</li>
 
 <p>StoreFiles are composed of blocks. The blocksize is configured on a per-ColumnFamily basis.</p>
 
+<p>HFile doesn&rsquo;t know anything about key and value struct/type (row key, qualifier, family, timestamp, …). As Hadoop&rsquo; SequenceFile (Block-Compressed), keys and values are grouped in blocks, and blocks contains records. Each record has two Int Values that contains Key Length and Value Length followed by key and value byte-array <sup>[8]</sup>.</p>
+
+<p><img src="hfile-block-record.png" alt="" /></p>
+
 <p><strong>Reference</strong></p>
 
-<ul>
+<ol>
 <li><a href="http://blog.javachen.com/2013/06/15/hbase-note-about-data-structure.html">HBase笔记：存储结构</a></li>
 <li><a href="http://hbase.apache.org/book.html#regions.arch">Regions</a></li>
 <li><a href="https://sreejithrpillai.wordpress.com/2015/01/04/hbase-architecture/">HBASE ARCHITECTURE</a></li>
@@ -436,7 +440,7 @@ Can be used for seeking to the previous data/index block</li>
 <li><a href="http://th30z.blogspot.com/2011/02/hbase-io-hfile.html?spref=tw">HBase I/O: HFile</a></li>
 <li><a href="http://hbase.apache.org/book.html#hfilev2">HBase file format with inline blocks (version 2)</a></li>
 <li><a href="https://mapr.com/blog/in-depth-look-hbase-architecture/">An In-Depth Look at the HBase Architecture</a></li>
-</ul>
+</ol>
     </div>
 
     
