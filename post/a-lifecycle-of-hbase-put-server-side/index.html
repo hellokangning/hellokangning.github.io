@@ -17,7 +17,7 @@
 
 
 <meta name="author" content="Guoqing Geng" />
-  <meta name="description" content="Following the preceding , this post will figure out how a Put request does its mutation on HRegionServer. The whole process involves WAL, MemStore, and Coprocessor etc. After reading this post, hope you make their roles clear.
+  <meta name="description" content="Following the preceding A Lifecycle of HBase&amp;rsquo;s Put: Client-side, this post will figure out how a Put request does its mutation on HRegionServer. The whole process involves WAL, MemStore, and Coprocessor etc. After reading this post, hope you make their roles clear.
 
 " />
 <meta name="keywords" content="HBase" />
@@ -47,7 +47,7 @@
 <link href="https://hellokangning.github.io/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
 
 <meta property="og:title" content="A Lifecycle of HBase&#39;s Put: Server-side" />
-<meta property="og:description" content="Following the preceding , this post will figure out how a Put request does its mutation on HRegionServer. The whole process involves WAL, MemStore, and Coprocessor etc. After reading this post, hope you make their roles clear.
+<meta property="og:description" content="Following the preceding A Lifecycle of HBase&rsquo;s Put: Client-side, this post will figure out how a Put request does its mutation on HRegionServer. The whole process involves WAL, MemStore, and Coprocessor etc. After reading this post, hope you make their roles clear.
 
 " />
 <meta property="og:type" content="article" />
@@ -69,19 +69,19 @@
 
 
 <meta itemprop="name" content="A Lifecycle of HBase&#39;s Put: Server-side">
-<meta itemprop="description" content="Following the preceding , this post will figure out how a Put request does its mutation on HRegionServer. The whole process involves WAL, MemStore, and Coprocessor etc. After reading this post, hope you make their roles clear.
+<meta itemprop="description" content="Following the preceding A Lifecycle of HBase&rsquo;s Put: Client-side, this post will figure out how a Put request does its mutation on HRegionServer. The whole process involves WAL, MemStore, and Coprocessor etc. After reading this post, hope you make their roles clear.
 
 ">
 
 
 <meta itemprop="dateModified" content="2017-12-05T15:14:28&#43;08:00" />
-<meta itemprop="wordCount" content="2294">
+<meta itemprop="wordCount" content="2339">
 
 
 
 <meta itemprop="keywords" content="" />
 <meta name="twitter:card" content="summary"/><meta name="twitter:title" content="A Lifecycle of HBase&#39;s Put: Server-side"/>
-<meta name="twitter:description" content="Following the preceding , this post will figure out how a Put request does its mutation on HRegionServer. The whole process involves WAL, MemStore, and Coprocessor etc. After reading this post, hope you make their roles clear.
+<meta name="twitter:description" content="Following the preceding A Lifecycle of HBase&rsquo;s Put: Client-side, this post will figure out how a Put request does its mutation on HRegionServer. The whole process involves WAL, MemStore, and Coprocessor etc. After reading this post, hope you make their roles clear.
 
 "/>
 
@@ -159,7 +159,7 @@
               <a href="https://hellokangning.github.io/categories/hbase/"> HBase </a>
             
           </div>
-        <span class="more-meta"> 2294 word </span>
+        <span class="more-meta"> 2339 word </span>
         <span class="more-meta"> 11 min read </span>
       </div>
     </header>
@@ -185,7 +185,7 @@
 
     
     <div class="post-content">
-      <p>Following the preceding <img src="https://hellokangning.github.io/post/a-lifecycle-of-hbase-put-client-side/" alt="A Lifecycle of HBase's Put: Client-side" />, this post will figure out how a <code>Put</code> request does its mutation on <code>HRegionServer</code>. The whole process involves WAL, MemStore, and Coprocessor etc. After reading this post, hope you make their roles clear.</p>
+      <p>Following the preceding <a href="https://hellokangning.github.io/post/a-lifecycle-of-hbase-put-client-side/">A Lifecycle of HBase&rsquo;s Put: Client-side</a>, this post will figure out how a <code>Put</code> request does its mutation on <code>HRegionServer</code>. The whole process involves WAL, MemStore, and Coprocessor etc. After reading this post, hope you make their roles clear.</p>
 
 <p></p>
 
@@ -466,7 +466,7 @@ class MemStoreFlusher implements FlushRequester {
 <p>Hope this graph tells the complete steps of <code>doMiniBatchMutate</code>. A sketch lists here:</p>
 
 <ol>
-<li>Try to acquire as many read locks as we can, and ensure we acquire at least one. Why read locks? See more <img src="https://issues.apache.org/jira/browse/HBASE-18474" alt="Document how HRegion#doMiniBatchMutation is acquiring read row locks" />.</li>
+<li>Try to acquire as many read locks as we can, and ensure we acquire at least one. Why read locks? See more <a href="https://issues.apache.org/jira/browse/HBASE-18474">Document how HRegion#doMiniBatchMutation is acquiring read row locks</a>.</li>
 <li>Update any LATEST_TIMESTAMP timestamps.</li>
 <li>Build WAL edit.</li>
 <li>Append the final edit to WAL and sync, begin mvcc if no <code>WriteEntry</code>.</li>
@@ -777,13 +777,13 @@ public class HRegion implements HeapSize, PropagatingConfigurationObserver, Regi
 <p><strong>Reference</strong></p>
 
 <ol>
-<li><img src="http://hbasefly.com/2016/03/23/hbase_writer/" alt="HBase － 数据写入流程解析" /></li>
-<li><img src="http://blog.javachen.com/2014/06/13/hbase-code-about-htable-put.html" alt="HBase源码分析：HTable put过程" /></li>
-<li><img src="http://hongs-yang.iteye.com/blog/2046222" alt="hbase put 流程分析regionserver端" /></li>
-<li><img src="http://blog.csdn.net/bryce123phy/article/details/51279878" alt="HBase的put流程源码分析" /></li>
-<li><img src="https://issues.apache.org/jira/browse/HBASE-18474" alt="Document how HRegion#doMiniBatchMutation is acquiring read row locks" /></li>
-<li><img src="https://issues.apache.org/jira/browse/HBASE-16992" alt="The usage of mutation from CP is weird." /></li>
-<li><img src="https://issues.apache.org/jira/browse/HBASE-18703" alt="Inconsistent behavior for preBatchMutate in doMiniBatchMutate and processRowsWithLocks" /></li>
+<li><a href="http://hbasefly.com/2016/03/23/hbase_writer/">HBase － 数据写入流程解析</a></li>
+<li><a href="http://blog.javachen.com/2014/06/13/hbase-code-about-htable-put.html">HBase源码分析：HTable put过程</a></li>
+<li><a href="http://hongs-yang.iteye.com/blog/2046222">hbase put 流程分析regionserver端</a></li>
+<li><a href="http://blog.csdn.net/bryce123phy/article/details/51279878">HBase的put流程源码分析</a></li>
+<li><a href="https://issues.apache.org/jira/browse/HBASE-18474">Document how HRegion#doMiniBatchMutation is acquiring read row locks</a></li>
+<li><a href="https://issues.apache.org/jira/browse/HBASE-16992">The usage of mutation from CP is weird.</a></li>
+<li><a href="https://issues.apache.org/jira/browse/HBASE-18703">Inconsistent behavior for preBatchMutate in doMiniBatchMutate and processRowsWithLocks</a></li>
 </ol>
     </div>
 
