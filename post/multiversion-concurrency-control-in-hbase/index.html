@@ -213,7 +213,7 @@
 <li>Update MemStore: write each data cell [the (row, column) pair] to the memstore.</li>
 </ol>
 
-<p>Now, assume we have no concurrency control over the writes and consider the following order of events:</p>
+<p>Then, assume we have no concurrency control over the writes and consider the following order of events:</p>
 
 <p><img src="https://hellokangning.github.io/images/hbase-write-possible-order.png" alt="" /></p>
 
@@ -306,7 +306,7 @@ public class MultiVersionConcurrencyControl {
 <li><code>complete</code></li>
 </ol>
 
-<p>Now, let&rsquo;s see what these methods do.</p>
+<p>Next, let&rsquo;s see what these methods do.</p>
 
 <h2 id="begin"><code>begin</code></h2>
 
@@ -498,7 +498,7 @@ public class MultiVersionConcurrencyControl {
   }
 </code></pre>
 
-<p>notice the input parameter <code>KeyValueScanner</code>. One of its child <code>StoreFileScanner</code>&rsquo;s <code>next</code> method is called to every time get a new cell.</p>
+<p>Notice the input parameter <code>KeyValueScanner</code>. One of its child <code>StoreFileScanner</code>&rsquo;s <code>next</code> method is called to every time get a new cell.</p>
 
 <pre><code class="language-java">// StoreFileScanner.java
 
