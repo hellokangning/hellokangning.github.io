@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>HBase Batch Puts without BufferedMutator - Guoqing Geng</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Guoqing Geng" />
+  <meta name="description" content="For batch puts, it&amp;rsquo;s better if you construct a list of puts and then call HTable.put(final List&amp;lt;Put&amp;gt; puts), because it uses a single RPC call to commit the batch, but depending on the size of the list write buffer may flush it all or not.
+In this post, BufferedMutator is excluded. It will be discussed in the near future.
+
+" />
+<meta name="keywords" content="HBase, Asynchronous" />
+
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.26" />
+
+
+<link rel="canonical" href="https://hellokangning.github.io/post/hbase-batch-puts-without-bufferedmutator/" />
+
+<link rel="apple-touch-icon" sizes="180x180" href="https://hellokangning.github.io/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://hellokangning.github.io/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://hellokangning.github.io/favicon-16x16.png">
+<link rel="icon" href="https://hellokangning.github.io/favicon.ico" />
+<link rel="manifest" href="https://hellokangning.github.io/manifest.json">
+<link rel="mask-icon" href="https://hellokangning.github.io/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+<link href="https://hellokangning.github.io/dist/even.min.css?v=2.6.6" rel="stylesheet">
+<link href="https://hellokangning.github.io/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+<meta property="og:title" content="HBase Batch Puts without BufferedMutator" />
+<meta property="og:description" content="For batch puts, it&rsquo;s better if you construct a list of puts and then call HTable.put(final List&lt;Put&gt; puts), because it uses a single RPC call to commit the batch, but depending on the size of the list write buffer may flush it all or not.
+
+In this post, BufferedMutator is excluded. It will be discussed in the near future.
+
+" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hellokangning.github.io/post/hbase-batch-puts-without-bufferedmutator/" />
+
+
+
+<meta property="article:published_time" content="2018-01-09T11:33:34&#43;08:00"/>
+<meta property="article:modified_time" content="2018-01-11T16:33:34&#43;08:00"/>
+
+
+
+
+
+
+
+
+
+
+
+<meta itemprop="name" content="HBase Batch Puts without BufferedMutator">
+<meta itemprop="description" content="For batch puts, it&rsquo;s better if you construct a list of puts and then call HTable.put(final List&lt;Put&gt; puts), because it uses a single RPC call to commit the batch, but depending on the size of the list write buffer may flush it all or not.
+
+In this post, BufferedMutator is excluded. It will be discussed in the near future.
+
+">
+
+
+<meta itemprop="dateModified" content="2018-01-09T11:33:34&#43;08:00" />
+<meta itemprop="wordCount" content="781">
+
+
+
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="HBase Batch Puts without BufferedMutator"/>
+<meta name="twitter:description" content="For batch puts, it&rsquo;s better if you construct a list of puts and then call HTable.put(final List&lt;Put&gt; puts), because it uses a single RPC call to commit the batch, but depending on the size of the list write buffer may flush it all or not.
+
+In this post, BufferedMutator is excluded. It will be discussed in the near future.
+
+"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="https://hellokangning.github.io/" class="logo">Guoqing Geng</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="https://hellokangning.github.io/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="https://hellokangning.github.io/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="https://hellokangning.github.io/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="https://hellokangning.github.io/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="https://hellokangning.github.io/about/">
+        <li class="mobile-menu-item">About</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="https://hellokangning.github.io/" class="logo">Guoqing Geng</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="https://hellokangning.github.io/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="https://hellokangning.github.io/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="https://hellokangning.github.io/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="https://hellokangning.github.io/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="https://hellokangning.github.io/about/">About</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">HBase Batch Puts without BufferedMutator</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> Jan 09, 2018 </span>
+        <div class="post-category">
+            
+              <a href="https://hellokangning.github.io/categories/hbase/"> HBase </a>
+            
+          </div>
+        <span class="more-meta"> 781 word </span>
+        <span class="more-meta"> 4 min read </span>
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content">
+      <nav id="TableOfContents">
+<ul>
+<li><a href="#htable"><code>HTable</code></a></li>
+<li><a href="#asyncprocesstask"><code>AsyncProcessTask</code></a></li>
+<li><a href="#asyncprocess"><code>AsyncProcess</code></a></li>
+<li><a href="#asyncrequestfutureimpl"><code>AsyncRequestFutureImpl</code></a></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    
+    <div class="post-content">
+      <p>For batch puts, it&rsquo;s better if you construct a list of puts and then call <code>HTable.put(final List&lt;Put&gt; puts)</code>, because it uses a single RPC call to commit the batch, but depending on the size of the list write buffer may flush it all or not.</p>
+
+<p>In this post, <code>BufferedMutator</code> is excluded. It will be discussed in the near future.</p>
+
+<p></p>
+
+<h1 id="htable"><code>HTable</code></h1>
+
+<p><code>batch</code> method does essential job for batch puts, we can see this fact in <code>HTable.java</code>.</p>
+
+<pre><code class="language-java">// HTable.java
+
+  public void put(final List&lt;Put&gt; puts) throws IOException {
+    for (Put put : puts) {
+      validatePut(put);
+    }
+    Object[] results = new Object[puts.size()];
+    try {
+      batch(puts, results, writeRpcTimeoutMs);
+    } catch (InterruptedException e) {
+      throw (InterruptedIOException) new InterruptedIOException().initCause(e);
+    }
+  }
+</code></pre>
+
+<p>The interaction of <code>batch</code> lists in the following,</p>
+
+<p><img src="https://hellokangning.github.io/images/hbase-batch-put-interaction.png" alt="" /></p>
+
+<p>Classes involved includes,</p>
+
+<ul>
+<li><code>AsyncProcessTask</code></li>
+<li><code>AsyncProcess</code></li>
+<li><code>RequestController</code></li>
+<li><code>ClusterConnection</code></li>
+<li><code>AsyncRequestFuture</code></li>
+<li><code>RpcRetryingCaller</code></li>
+</ul>
+
+<p>And the class diagram declares its appearance,</p>
+
+<p><img src="https://hellokangning.github.io/images/hbase-batch-put-class.png" alt="" /></p>
+
+<p>Then, let&rsquo;s take look at source code of <code>batch</code> method.</p>
+
+<pre><code class="language-java">// HTable.java
+
+  public void batch(final List&lt;? extends Row&gt; actions, final Object[] results, int rpcTimeout)
+      throws InterruptedException, IOException {
+    AsyncProcessTask task = AsyncProcessTask.newBuilder()
+            .setPool(pool)
+            .setTableName(tableName)
+            .setRowAccess(actions)
+            .setResults(results)
+            .setRpcTimeout(rpcTimeout)
+            .setOperationTimeout(operationTimeoutMs)
+            .setSubmittedRows(AsyncProcessTask.SubmittedRows.ALL)
+            .build();
+    AsyncRequestFuture ars = multiAp.submit(task);
+    ars.waitUntilDone();
+    if (ars.hasError()) {
+      throw ars.getErrors();
+    }
+  }
+</code></pre>
+
+<p><code>batch</code> method will</p>
+
+<ol>
+<li>Create a <code>AsyncProcessTask</code>.</li>
+<li>Submit new task to <code>AsyncProcess</code>.</li>
+<li>Wait until <code>AsyncRequestFuture</code> is done.</li>
+</ol>
+
+<h1 id="asyncprocesstask"><code>AsyncProcessTask</code></h1>
+
+<p><code>AsyncProcessTask</code> contains the attributes of a task which will be executed by <code>AsyncProcess</code>. A new <code>Builder</code> is instantiated carrying these attributes,</p>
+
+<ul>
+<li>Table name</li>
+<li>Rows</li>
+<li>Callbacks</li>
+<li>Timeout limitation</li>
+</ul>
+
+<pre><code class="language-java">// AsyncProcessTask.java
+
+public class AsyncProcessTask&lt;T&gt; {
+  public static Builder newBuilder() {
+    return new Builder();
+  }
+
+  public static class Builder&lt;T&gt; {
+
+    private ExecutorService pool;
+    private TableName tableName;
+    private RowAccess&lt;? extends Row&gt; rows;
+    private SubmittedRows submittedRows = SubmittedRows.ALL;
+    private Batch.Callback&lt;T&gt; callback;
+    private boolean needResults;
+    private int rpcTimeout;
+    private int operationTimeout;
+    private CancellableRegionServerCallable callable;
+    private Object[] results;
+
+    // getters and setters
+  }
+}
+</code></pre>
+
+<h1 id="asyncprocess"><code>AsyncProcess</code></h1>
+
+<p>The new <code>AsyncProcessTask</code> will be submitted to <code>AsyncProcess</code> after initialization. <code>AsyncProcess</code> allows a continuous flow of requests from caller.</p>
+
+<p>This class extracts from this list the operations it can send, i.e. the operations that are on region that are not considered as busy. The process is asynchronous, i.e. it returns immediately when if has finished to iterate on the list. If, and only if, the maximum number of current task is reached, the call to submit will block. Alternatively, the caller can call submitAll, in which case all the operations will be sent. Each call to submit returns a future-like object that can be used to track operation progress.</p>
+
+<p>The class manages internally the retries.</p>
+
+<pre><code class="language-java">// AsyncProcess.java
+
+class AsyncProcess {
+
+  private &lt;CResult&gt; AsyncRequestFuture submit(AsyncProcessTask&lt;CResult&gt; task,
+    boolean atLeastOne) throws InterruptedIOException {
+      // ...
+    }
+}
+</code></pre>
+
+<p>Steps of <code>submit</code> method,</p>
+
+<ol>
+<li>Wait until there is at least one slot for a new task.</li>
+<li>Locate regions using <code>ClusterConnection</code>. Detail here: <a href="https://hellokangning.github.io/post/how-does-client-find-the-region/">How Does Client Find the Region</a>.</li>
+<li>Group the actions per region server.</li>
+<li>Send multiply action by calling <code>AsyncRequestFutureImpl</code></li>
+</ol>
+
+<p>Then, give the stage to <code>AsyncRequestFutureImpl</code>.</p>
+
+<h1 id="asyncrequestfutureimpl"><code>AsyncRequestFutureImpl</code></h1>
+
+<p>Note on how this class (one AP submit) works. Initially, all requests are split into groups by server. Request is sent to each server in parallel; the RPC calls are <strong>not async so a thread per server is used</strong>. Every time some actions fail, regions/locations might have changed, so we re-group them by server and region again and send these groups in parallel too. The result, in case of retries, is a &ldquo;tree&rdquo; of threads, with parent exiting after scheduling children. This is why lots of code doesn&rsquo;t require any synchronization.</p>
+
+<pre><code class="language-java">// AsyncRequestFutureImpl.java
+
+class AsyncRequestFutureImpl&lt;CResult&gt; implements AsyncRequestFuture {
+  void sendMultiAction(Map&lt;ServerName, MultiAction&gt; actionsByServer,
+                               int numAttempt, List&lt;Action&gt; actionsForReplicaThread, boolean reuseThread) {
+    Collection&lt;? extends Runnable&gt; runnables = getNewMultiActionRunnable(server, multiAction,
+          numAttempt);
+
+      // run  all the runnables
+      for (Runnable runnable : runnables) {
+        runnable.run()
+      }     
+    }
+  }
+
+  private Collection&lt;? extends Runnable&gt; getNewMultiActionRunnable(ServerName server,
+                                                                   MultiAction multiAction,
+                                                                   int numAttempt) {
+
+    // ...
+
+    Map&lt;Long, DelayingRunner&gt; actions = new HashMap&lt;&gt;(multiAction.size());
+    List&lt;Runnable&gt; toReturn = new ArrayList&lt;&gt;(actions.size());
+    for (DelayingRunner runner : actions.values()) {
+      Runnable runnable = createSingleServerRequest(runner.getActions(), numAttempt, server, callsInProgress);
+      // use a delay runner only if we need to sleep for some time
+      if (runner.getSleepTime() &gt; 0) {
+        runner.setRunner(runnable);
+        traceText = &quot;AsyncProcess.clientBackoff.sendMultiAction&quot;;
+        runnable = runner;
+      } else {
+        if (asyncProcess.connection.getConnectionMetrics() != null) {asyncProcess.connection.getConnectionMetrics().incrNormalRunners();
+        }
+      }
+
+      runnable = Trace.wrap(traceText, runnable);
+      toReturn.add(runnable);
+    }
+
+    return toReturn;
+  }
+}
+</code></pre>
+
+<p><code>SingleServerRequestRunnable</code>, nested class of <code>AsyncRequestFutureImpl</code>, is <code>Runnable</code> (that can be submitted to thread pool) that submits <code>MultiAction</code> to a single server. The server call is <strong>synchronous</strong>, therefore we do it on a thread pool.</p>
+
+<pre><code class="language-java">// AsyncRequestFutureImpl.java
+final class SingleServerRequestRunnable implements Runnable {
+  private final MultiAction multiAction;
+  private final int numAttempt;
+  private final ServerName server;
+  private final Set&lt;CancellableRegionServerCallable&gt; callsInProgress;
+
+  @Override
+  public void run() {
+    // for short
+    callable = createCallable(server, tableName, multiAction);
+    RpcRetryingCaller&lt;AbstractResponse&gt; caller = asyncProcess.createCaller(callable,rpcTimeout);
+    caller.callWithoutRetries(callable, operationTimeout);
+  }
+}
+</code></pre>
+
+<p>Finally, all requests are sent by <code>RpcRetryingCaller</code>. For more about <a href="https://hellokangning.github.io/post/a-lifecycle-of-hbase-put-client-side/#rpcretryingcaller">RpcRetryingCaller</a>.</p>
+    </div>
+
+    
+    
+
+    
+    
+
+    <footer class="post-footer">
+      
+
+      
+      <nav class="post-nav">
+        
+        
+          <a class="next" href="https://hellokangning.github.io/post/2017-in-review-look-ahead/">
+            <span class="next-text nav-default">2017 in Review and Look Ahead</span>
+            <span class="prev-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+    (function() {
+        
+        
+        if (window.location.hostname === 'localhost') return;
+
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        var disqus_shortname = 'guoqing';
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com/" class="dsq-brlink" target="_blank">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+  
+      </div>  
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="hellokangning@hotmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://www.linkedin.com/in/guoqing-geng-9032b820/" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="https://github.com/hellokangning" class="iconfont icon-github" title="github"></a>
+  <a href="https://hellokangning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">
+    &copy; 
+    
+      2017 - 
+    2018
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Guoqing Geng</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+<script src="https://hellokangning.github.io/lib/highlight/highlight.pack.js?v=20171001"></script>
+<script type="text/javascript" src="https://hellokangning.github.io/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="https://hellokangning.github.io/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="https://hellokangning.github.io/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+<script type="text/javascript" src="https://hellokangning.github.io/dist/even.min.js?v=2.6.6"></script>
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-105833321-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+
+</body>
+</html>
