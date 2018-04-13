@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Java String - Guoqing Geng</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Guoqing Geng" />
+  <meta name="description" content="String is one of the most common type of data in computer languages. A Java string is a series of characters gathered together, such as &amp;ldquo;abc&amp;rdquo;. Strings are constant, which means their value cannot be changed after created.
+This post introduces the basic of Java string, includes methods for examining individual characters of the sequence, for comparing strings, for searching strings, for extracting substrings and so on.
+
+" />
+<meta name="keywords" content="string, java" />
+
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.26" />
+
+
+<link rel="canonical" href="https://hellokangning.github.io/post/java-string/" />
+
+<link rel="apple-touch-icon" sizes="180x180" href="https://hellokangning.github.io/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://hellokangning.github.io/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://hellokangning.github.io/favicon-16x16.png">
+<link rel="icon" href="https://hellokangning.github.io/favicon.ico" />
+<link rel="manifest" href="https://hellokangning.github.io/manifest.json">
+<link rel="mask-icon" href="https://hellokangning.github.io/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+<link href="https://hellokangning.github.io/dist/even.min.css?v=2.6.6" rel="stylesheet">
+<link href="https://hellokangning.github.io/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+<meta property="og:title" content="Java String" />
+<meta property="og:description" content="String is one of the most common type of data in computer languages. A Java string is a series of characters gathered together, such as &ldquo;abc&rdquo;. Strings are constant, which means their value cannot be changed after created.
+
+This post introduces the basic of Java string, includes methods for examining individual characters of the sequence, for comparing strings, for searching strings, for extracting substrings and so on.
+
+" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hellokangning.github.io/post/java-string/" />
+
+
+
+<meta property="article:published_time" content="2018-04-13T11:33:34&#43;08:00"/>
+<meta property="article:modified_time" content="2018-04-13T15:33:34&#43;08:00"/>
+
+
+
+
+
+
+
+
+
+
+
+<meta itemprop="name" content="Java String">
+<meta itemprop="description" content="String is one of the most common type of data in computer languages. A Java string is a series of characters gathered together, such as &ldquo;abc&rdquo;. Strings are constant, which means their value cannot be changed after created.
+
+This post introduces the basic of Java string, includes methods for examining individual characters of the sequence, for comparing strings, for searching strings, for extracting substrings and so on.
+
+">
+
+
+<meta itemprop="dateModified" content="2018-04-13T11:33:34&#43;08:00" />
+<meta itemprop="wordCount" content="1282">
+
+
+
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Java String"/>
+<meta name="twitter:description" content="String is one of the most common type of data in computer languages. A Java string is a series of characters gathered together, such as &ldquo;abc&rdquo;. Strings are constant, which means their value cannot be changed after created.
+
+This post introduces the basic of Java string, includes methods for examining individual characters of the sequence, for comparing strings, for searching strings, for extracting substrings and so on.
+
+"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="https://hellokangning.github.io/" class="logo">Guoqing Geng</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="https://hellokangning.github.io/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="https://hellokangning.github.io/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="https://hellokangning.github.io/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="https://hellokangning.github.io/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="https://hellokangning.github.io/about/">
+        <li class="mobile-menu-item">About</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="https://hellokangning.github.io/" class="logo">Guoqing Geng</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="https://hellokangning.github.io/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="https://hellokangning.github.io/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="https://hellokangning.github.io/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="https://hellokangning.github.io/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="https://hellokangning.github.io/about/">About</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Java String</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> Apr 13, 2018 </span>
+        <div class="post-category">
+            
+              <a href="https://hellokangning.github.io/categories/java/"> java </a>
+            
+          </div>
+        <span class="more-meta"> 1282 word </span>
+        <span class="more-meta"> 7 min read </span>
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content">
+      <nav id="TableOfContents">
+<ul>
+<li><a href="#member-variables">Member Variables</a></li>
+<li><a href="#member-functions">Member Functions</a>
+<ul>
+<li><a href="#constructor">Constructor</a></li>
+<li><a href="#length"><code>length()</code></a></li>
+<li><a href="#isempty"><code>isEmpty()</code></a></li>
+<li><a href="#charat-int"><code>charAt(int)</code></a></li>
+<li><a href="#equals-object"><code>equals(Object)</code></a></li>
+<li><a href="#startswith-string-int"><code>startsWith(String, int)</code></a></li>
+<li><a href="#indexof-int-int"><code>indexOf(int, int)</code></a></li>
+<li><a href="#indexof-string"><code>indexOf(String)</code></a></li>
+<li><a href="#substring-int-int"><code>substring(int, int)</code></a></li>
+<li><a href="#concat-string"><code>concat(String)</code></a></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    
+    <div class="post-content">
+      <p><code>String</code> is one of the most common type of data in computer languages. A Java string is a series of characters gathered together, such as &ldquo;abc&rdquo;. Strings are constant, which means their value cannot be changed after created.</p>
+
+<p>This post introduces the basic of Java string, includes methods for examining individual characters of the sequence, for comparing strings, for searching strings, for extracting substrings and so on.</p>
+
+<p></p>
+
+<p>The code of <code>String</code> is located in <code>java.lang.String</code>. All classes in the <code>java.lang</code> package are imported by default. Thus you do not need to <code>import java.lang.*</code>.</p>
+
+<blockquote>
+<p>All codes in this post are based on jdk10.</p>
+</blockquote>
+
+<h1 id="member-variables">Member Variables</h1>
+
+<pre><code class="language-java">public final class String
+    implements java.io.Serializable, Comparable&lt;String&gt;, CharSequence {
+    @Stable
+    private final byte[] value;
+
+    private final byte coder;
+    private int hash; 
+
+    static final boolean COMPACT_STRINGS;
+    static {
+        COMPACT_STRINGS = true;
+    }
+}
+</code></pre>
+
+<ul>
+<li><code>value</code> is used for character storage. It is marked with <code>Stable</code> to trust the contents of the array, because value is never null.</li>
+<li><code>coder</code> is identifier of the encoding used to encode the bytes in <code>value</code>. The supported values in this implementation are <code>LATIN1</code> and <code>UTF16</code>.</li>
+<li><code>hash</code> caches the hash code for the string.</li>
+<li><code>COMPACT_STRINGS</code> indicates whether String compaction is disabled. if disabled, the bytes in <code>value</code> are always endcoded in UTF16.</li>
+</ul>
+
+<p>For simplicity, We will consider <code>LATIN1</code> only.</p>
+
+<h1 id="member-functions">Member Functions</h1>
+
+<h2 id="constructor">Constructor</h2>
+
+<pre><code class="language-java">// String.java
+
+/*
+ Initiliazes a newly created String object 
+ so that it represents the same sequence of characters as the argument
+ */
+public String(String original) {
+    this.value = original.value;
+    this.coder = original.coder;
+    this.hash = original.hash;
+}
+
+/*
+    Constructs a new String by decoding the specified subarray of
+    bytes using the specified charset. 
+ */
+public String(byte bytes[], int offset, int length, String charsetName)
+        throws UnsupportedEncodingException {
+    if (charsetName == null)
+        throw new NullPointerException(&quot;charsetName&quot;);
+    checkBoundsOffCount(offset, length, bytes.length);
+    StringCoding.Result ret =
+        StringCoding.decode(charsetName, bytes, offset, length);
+    this.value = ret.value;
+    this.coder = ret.coder;
+}
+
+// StringEncoding.java
+static Result decode(String charsetName, byte[] ba, int off, int len)
+        throws UnsupportedEncodingException {
+    Charset cs = lookupCharset(csn);        
+    if (cs == ISO_8859_1) {
+        return decodeLatin1(ba, off, len);
+    }
+
+    // ...
+}
+
+
+// If a String is constructed from byte[], Arrays.copyOfRange copies the specified range of the specified array into a new array.
+private static Result decodeLatin1(byte[] ba, int off, int len) {
+       Result result = resultCached.get();
+       if (COMPACT_STRINGS) {
+           return result.with(Arrays.copyOfRange(ba, off, off + len), LATIN1);
+       } else {
+           return result.with(StringLatin1.inflate(ba, off, len), UTF16);
+       }
+    }
+}    
+</code></pre>
+
+<h2 id="length"><code>length()</code></h2>
+
+<pre><code class="language-java">// String.java
+byte coder() {
+    return COMPACT_STRINGS ? coder : UTF16;
+}
+
+// for LATIN1, coder is 0
+public int length() {
+    return value.length &gt;&gt; coder();
+}
+</code></pre>
+
+<h2 id="isempty"><code>isEmpty()</code></h2>
+
+<p><code>isEmpty()</code> checks if <code>length()</code> is 0.</p>
+
+<pre><code class="language-java">// String.java
+public boolean isEmpty() {
+    return value.length == 0;
+}
+</code></pre>
+
+<h2 id="charat-int"><code>charAt(int)</code></h2>
+
+<p><code>charAt(int)</code> returns the char value at the specified index.</p>
+
+<pre><code class="language-java">// String.java
+public char charAt(int index) {
+    if (isLatin1()) {
+        return StringLatin1.charAt(value, index);
+    } else {
+        return StringUTF16.charAt(value, index);
+    }
+}
+
+// StringLatin1.java
+public static char charAt(byte[] value, int index) {
+    if (index &lt; 0 || index &gt;= value.length) {
+        throw new StringIndexOutOfBoundsException(index);
+    }
+    return (char)(value[index] &amp; 0xff);
+}
+</code></pre>
+
+<p><code>StringLatin1</code> returns the index of <code>value</code>.</p>
+
+<h2 id="equals-object"><code>equals(Object)</code></h2>
+
+<p><code>equals(Object)</code> compares this string to the specified object.</p>
+
+<pre><code class="language-java">// String.java
+public boolean equals(Object anObject) {
+    if (this == anObject) {
+        return true;
+    }
+    if (anObject instanceof String) {
+        String aString = (String)anObject;
+        if (coder() == aString.coder()) {
+            return isLatin1() ? StringLatin1.equals(value, aString.value)
+                              : StringUTF16.equals(value, aString.value);
+        }
+    }
+    return false;
+}
+
+// StringLatin1.java
+public static boolean equals(byte[] value, byte[] other) {
+    if (value.length == other.length) {
+        for (int i = 0; i &lt; value.length; i++) {
+            if (value[i] != other[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+    return false;
+}
+</code></pre>
+
+<p>String is equal to another <code>Object</code> when,</p>
+
+<ul>
+<li>another object is an instance of <code>String</code></li>
+<li>and <code>coder</code> is same</li>
+<li>and each bytes at same index of this <code>Object</code> is equal to specified <code>String</code></li>
+</ul>
+
+<h2 id="startswith-string-int"><code>startsWith(String, int)</code></h2>
+
+<p><code>startsWith(String, int)</code> tests if the substring of this string beginning at the specified index starts with the specified prefix.</p>
+
+<pre><code class="language-java">// String.java
+public boolean startsWith(String prefix, int toffset) {
+    // Note: toffset might be near -1&gt;&gt;&gt;1.
+    if (toffset &lt; 0 || toffset &gt; length() - prefix.length()) {
+        return false;
+    }
+    byte ta[] = value;
+    byte pa[] = prefix.value;
+    int po = 0;
+    int pc = pa.length;
+    if (coder() == prefix.coder()) {
+        int to = isLatin1() ? toffset : toffset &lt;&lt; 1;
+        while (po &lt; pc) {
+            if (ta[to++] != pa[po++]) {
+                return false;
+            }
+        }
+    } else {
+        if (isLatin1()) {  // &amp;&amp; pcoder == UTF16
+            return false;
+        }
+        // coder == UTF16 &amp;&amp; pcoder == LATIN1)
+        while (po &lt; pc) {
+            if (StringUTF16.getChar(ta, toffset++) != (pa[po++] &amp; 0xff)) {
+                return false;
+           }
+        }
+    }
+    return true;
+}
+</code></pre>
+
+<p>First, make sure two strings shares same coder. Then compare two <code>byte</code> one by one.</p>
+
+<h2 id="indexof-int-int"><code>indexOf(int, int)</code></h2>
+
+<p><code>indexOf(int, int)</code> returns the index within this string of the first occurrence of the specified character, starting the search at the specified index.</p>
+
+<pre><code class="language-java">// String.java
+
+public int indexOf(int ch, int fromIndex) {
+    return isLatin1() ? StringLatin1.indexOf(value, ch, fromIndex)
+                     : StringUTF16.indexOf(value, ch, fromIndex);
+}
+
+// StringLatin1.java
+public static int indexOf(byte[] value, int ch, int fromIndex) {
+    if (!canEncode(ch)) {
+        return -1;
+    }
+    int max = value.length;
+    if (fromIndex &lt; 0) {
+        fromIndex = 0;
+    } else if (fromIndex &gt;= max) {
+        // Note: fromIndex might be near -1&gt;&gt;&gt;1.
+        return -1;
+    }
+    byte c = (byte)ch;
+    for (int i = fromIndex; i &lt; max; i++) {
+        if (value[i] == c) {
+           return i;
+        }
+    }
+    return -1;
+}
+</code></pre>
+
+<p>From start to end, <code>indexOf</code> returns the index if the element at this index is same to int <code>ch</code>.</p>
+
+<h2 id="indexof-string"><code>indexOf(String)</code></h2>
+
+<p><code>indexOf(String)</code> returns the index within this string of the first occurrence of the specified substring.</p>
+
+<pre><code class="language-java">// String.java
+
+public int indexOf(String str) {
+    if (coder() == str.coder()) {
+        return isLatin1() ? StringLatin1.indexOf(value, str.value)
+                          : StringUTF16.indexOf(value, str.value);
+    }
+    if (coder() == LATIN1) {  // str.coder == UTF16
+        return -1;
+    }
+    return StringUTF16.indexOfLatin1(value, str.value);
+}
+
+// StringLatin1.java
+public static int indexOf(byte[] value, int valueCount, byte[] str, int strCount, int fromIndex) {
+    byte first = str[0];
+    int max = (valueCount - strCount);
+    for (int i = fromIndex; i &lt;= max; i++) {
+        // Look for first character.
+        if (value[i] != first) {
+            while (++i &lt;= max &amp;&amp; value[i] != first);
+        }
+        // Found first character, now look at the rest of value
+        if (i &lt;= max) {
+            int j = i + 1;
+            int end = j + strCount - 1;
+            for (int k = 1; j &lt; end &amp;&amp; value[j] == str[k]; j++, k++);
+            if (j == end) {
+                // Found whole string.
+                return i;
+            }
+        }
+    }
+    return -1;
+}
+</code></pre>
+
+<p>It seems <code>indexOf(byte[, int, byte[], int, int)</code> uses brute force, that&rsquo;s interesting.</p>
+
+<h2 id="substring-int-int"><code>substring(int, int)</code></h2>
+
+<p><code>substring(int, int)</code> returns a string that is a substring of this string.</p>
+
+<pre><code class="language-java">// String.java
+public String substring(int beginIndex, int endIndex) {
+    int length = length();
+    checkBoundsBeginEnd(beginIndex, endIndex, length);
+    int subLen = endIndex - beginIndex;
+    if (beginIndex == 0 &amp;&amp; endIndex == length) {
+        return this;
+    }
+    return isLatin1() ? StringLatin1.newString(value, beginIndex, subLen)
+                      : StringUTF16.newString(value, beginIndex, subLen);
+}
+
+// StringLatin1.java
+public static String newString(byte[] val, int index, int len) {
+    return new String(Arrays.copyOfRange(val, index, index + len),
+                      LATIN1);
+}
+</code></pre>
+
+<p><code>Arrays.copyOfRange</code> again, and a new <code>String</code> will be allocated.</p>
+
+<h2 id="concat-string"><code>concat(String)</code></h2>
+
+<p><code>concat(String)</code> concatenates the specified string to the end of this string.</p>
+
+<pre><code class="language-java">// String.java
+
+public String concat(String str) {
+    int olen = str.length();
+    if (olen == 0) {
+        return this;
+    }
+    if (coder() == str.coder()) {
+        byte[] val = this.value;
+        byte[] oval = str.value;
+        int len = val.length + oval.length;
+        byte[] buf = Arrays.copyOf(val, len);
+        System.arraycopy(oval, 0, buf, val.length, oval.length);
+        return new String(buf, coder);
+    }
+    int len = length();
+    byte[] buf = StringUTF16.newBytesFor(len + olen);
+    getBytes(buf, 0, UTF16);
+    str.getBytes(buf, len, UTF16);
+    return new String(buf, UTF16);
+}
+</code></pre>
+
+<p><code>System.arraycopy</code> copies two <code>byte[]</code> together beneath.</p>
+    </div>
+
+    
+    
+
+    
+    
+
+    <footer class="post-footer">
+      
+
+      
+      <nav class="post-nav">
+        
+        
+          <a class="next" href="https://hellokangning.github.io/post/jvm-series-oop-klass/">
+            <span class="next-text nav-default">JVM Series: Oop and Klass</span>
+            <span class="prev-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+    (function() {
+        
+        
+        if (window.location.hostname === 'localhost') return;
+
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        var disqus_shortname = 'guoqing';
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com/" class="dsq-brlink" target="_blank">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+  
+      </div>  
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:hellokangning@hotmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://www.linkedin.com/in/guoqing-geng-9032b820/" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="https://github.com/hellokangning" class="iconfont icon-github" title="github"></a>
+  <a href="https://hellokangning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">
+    &copy; 
+    
+      2017 - 
+    2018
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Guoqing Geng</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+<script src="https://hellokangning.github.io/lib/highlight/highlight.pack.js?v=20171001"></script>
+<script type="text/javascript" src="https://hellokangning.github.io/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="https://hellokangning.github.io/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="https://hellokangning.github.io/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+<script type="text/javascript" src="https://hellokangning.github.io/dist/even.min.js?v=2.6.6"></script>
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-105833321-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+
+</body>
+</html>
