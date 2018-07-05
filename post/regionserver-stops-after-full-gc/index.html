@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>RegionServer stops after Full GC - Guoqing Geng</title>
+  <title>RegionServer Stops After Full GC - Guoqing Geng</title>
   <meta name="renderer" content="webkit" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 
@@ -46,7 +46,7 @@
 <link href="https://hellokangning.github.io/dist/even.min.css?v=2.6.6" rel="stylesheet">
 <link href="https://hellokangning.github.io/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
 
-<meta property="og:title" content="RegionServer stops after Full GC" />
+<meta property="og:title" content="RegionServer Stops After Full GC" />
 <meta property="og:description" content="One of the most devastating and unpredictable latency intruders is the Java Virtual Machine’s &ldquo;stop the world&rdquo; pauses for garbage collection (memory clean-up). This post troubleshoots an unexpected shutdown of RegionServer fundamentally caused by Full GC and makes the whole process clear.
 
 " />
@@ -68,7 +68,7 @@
 
 
 
-<meta itemprop="name" content="RegionServer stops after Full GC">
+<meta itemprop="name" content="RegionServer Stops After Full GC">
 <meta itemprop="description" content="One of the most devastating and unpredictable latency intruders is the Java Virtual Machine’s &ldquo;stop the world&rdquo; pauses for garbage collection (memory clean-up). This post troubleshoots an unexpected shutdown of RegionServer fundamentally caused by Full GC and makes the whole process clear.
 
 ">
@@ -80,7 +80,7 @@
 
 
 <meta itemprop="keywords" content="" />
-<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="RegionServer stops after Full GC"/>
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="RegionServer Stops After Full GC"/>
 <meta name="twitter:description" content="One of the most devastating and unpredictable latency intruders is the Java Virtual Machine’s &ldquo;stop the world&rdquo; pauses for garbage collection (memory clean-up). This post troubleshoots an unexpected shutdown of RegionServer fundamentally caused by Full GC and makes the whole process clear.
 
 "/>
@@ -150,7 +150,7 @@
           <article class="post">
     
     <header class="post-header">
-      <h1 class="post-title">RegionServer stops after Full GC</h1>
+      <h1 class="post-title">RegionServer Stops After Full GC</h1>
 
       <div class="post-meta">
         <span class="post-time"> Jul 05, 2018 </span>
@@ -224,7 +224,7 @@
 <ol>
 <li>the heartbeat between <code>RegionServer</code> and Zookeeper stops when Full GC on <code>RegionServer</code></li>
 <li>ZooKeeper deletes node corresponding to the unbearable <code>RegionServer</code></li>
-<li><code>ServerManager</code> on <code>HMaster</code> finds there must be something wrong with this <code>RegionServer</code>, and hand over to <code>ServerShutdownHandler</code></li>
+<li><code>ServerManager</code> on <code>HMaster</code> finds there must be something wrong with this <code>RegionServer</code>, and hands over to <code>ServerShutdownHandler</code></li>
 <li><code>SplitLogManager</code> on <code>HMaster</code> and its slave, <code>SplitLogWorker</code> on <code>RegionServer</code> start log splitting. For details, see <a href="http://www.cloudera.com/blog/2012/07/hbase-log-splitting/">Apache HBase Log Splitting</a></li>
 <li><code>AssignmentManager</code> on <code>HMaster</code> assigns moribund regions to another <code>RegionServer</code>. The logs are replayed by reading the edits and saving them to the <code>MemStore</code>. After all edit files are replayed, the contents of the memstore are written to disk (HFile) and the edit files are deleted.</li>
 <li>the reborn regions begin to be available</li>
