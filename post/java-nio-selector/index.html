@@ -96,7 +96,7 @@ Here is an illustration of a thread using a Selector to handle 3 Channels:
 
 <meta itemprop="datePublished" content="2018-07-21T17:54:50&#43;08:00" />
 <meta itemprop="dateModified" content="2018-07-21T17:54:50&#43;08:00" />
-<meta itemprop="wordCount" content="1770">
+<meta itemprop="wordCount" content="1776">
 
 
 
@@ -187,7 +187,7 @@ Here is an illustration of a thread using a Selector to handle 3 Channels:
               <a href="https://hellokangning.github.io/categories/java/"> Java </a>
             
           </div>
-        <span class="more-meta"> 1770 words </span>
+        <span class="more-meta"> 1776 words </span>
         <span class="more-meta"> 9 mins read </span>
         
       </div>
@@ -255,7 +255,9 @@ public abstract class Selector implements Closeable {
 
 <p>Regarding to <code>SelectorProvider#openSelector</code>, is also abstract, but instantiates a system-default provider class.</p>
 
-<pre><code class="language-java">public abstract class SelectorProvider {
+<pre><code class="language-java">// SelectorProvider.java
+
+public abstract class SelectorProvider {
     private static SelectorProvider provider = null;
 
     public abstract AbstractSelector openSelector()
@@ -477,7 +479,9 @@ boolean isInterestedInWrite   = interestSet &amp; SelectionKey.OP_WRITE;
 
 <p>The implementation of <code>interestOps</code> lies in SelectionKeyImpl.</p>
 
-<pre><code class="language-java">public class SelectionKeyImpl
+<pre><code class="language-java">// SelectionKeyImpl.java
+
+public class SelectionKeyImpl
     extends AbstractSelectionKey
 {
 	final SelChImpl channel; 
@@ -541,7 +545,9 @@ Selector selector = selectionKey.selector();
 
 <p>Remember the structure of SelectionKeyImpl? It has a package-private member named <code>channel</code> and  a public one <code>selector</code>.</p>
 
-<pre><code class="language-java">public class SelectionKeyImpl
+<pre><code class="language-java">// SelectionKeyImpl.java
+
+public class SelectionKeyImpl
     extends AbstractSelectionKey
 {
 	final SelChImpl channel;                            // package-private
