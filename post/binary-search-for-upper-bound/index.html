@@ -18,7 +18,7 @@
 
 <meta name="author" content="Guoqing Geng" />
   <meta name="description" content="A frequent question I ask when interviewing some candidates is binary search. It cannot be more easier to write a binary search, but the variant may be challenging. For example, upper bound for the given target. When should I shrink my scope to left?
-This post elucidates the steps of binary search by sloving a problem in LeetCode. And I will reminds what should be paid more attention when doing search.
+This post elucidates the steps of binary search by illustrating some common mistakes and sloving a problem in LeetCode. And I will remind what should be paid more attention when doing search.
 
 " />
 <meta name="keywords" content="Algorithm, Binary Search" />
@@ -55,7 +55,7 @@ This post elucidates the steps of binary search by sloving a problem in LeetCode
 <meta property="og:title" content="Binary Search for Upper Bound" />
 <meta property="og:description" content="A frequent question I ask when interviewing some candidates is binary search. It cannot be more easier to write a binary search, but the variant may be challenging. For example, upper bound for the given target. When should I shrink my scope to left?
 
-This post elucidates the steps of binary search by sloving a problem in LeetCode. And I will reminds what should be paid more attention when doing search.
+This post elucidates the steps of binary search by illustrating some common mistakes and sloving a problem in LeetCode. And I will remind what should be paid more attention when doing search.
 
 " />
 <meta property="og:type" content="article" />
@@ -80,14 +80,14 @@ This post elucidates the steps of binary search by sloving a problem in LeetCode
 <meta itemprop="name" content="Binary Search for Upper Bound">
 <meta itemprop="description" content="A frequent question I ask when interviewing some candidates is binary search. It cannot be more easier to write a binary search, but the variant may be challenging. For example, upper bound for the given target. When should I shrink my scope to left?
 
-This post elucidates the steps of binary search by sloving a problem in LeetCode. And I will reminds what should be paid more attention when doing search.
+This post elucidates the steps of binary search by illustrating some common mistakes and sloving a problem in LeetCode. And I will remind what should be paid more attention when doing search.
 
 ">
 
 
 <meta itemprop="datePublished" content="2018-08-03T10:55:27&#43;08:00" />
 <meta itemprop="dateModified" content="2018-08-03T10:55:27&#43;08:00" />
-<meta itemprop="wordCount" content="620">
+<meta itemprop="wordCount" content="627">
 
 
 
@@ -96,7 +96,7 @@ This post elucidates the steps of binary search by sloving a problem in LeetCode
 <meta name="twitter:title" content="Binary Search for Upper Bound"/>
 <meta name="twitter:description" content="A frequent question I ask when interviewing some candidates is binary search. It cannot be more easier to write a binary search, but the variant may be challenging. For example, upper bound for the given target. When should I shrink my scope to left?
 
-This post elucidates the steps of binary search by sloving a problem in LeetCode. And I will reminds what should be paid more attention when doing search.
+This post elucidates the steps of binary search by illustrating some common mistakes and sloving a problem in LeetCode. And I will remind what should be paid more attention when doing search.
 
 "/>
 
@@ -174,7 +174,7 @@ This post elucidates the steps of binary search by sloving a problem in LeetCode
               <a href="https://hellokangning.github.io/categories/algorithm/"> Algorithm </a>
             
           </div>
-        <span class="more-meta"> 620 words </span>
+        <span class="more-meta"> 627 words </span>
         <span class="more-meta"> 3 mins read </span>
         
       </div>
@@ -204,15 +204,15 @@ This post elucidates the steps of binary search by sloving a problem in LeetCode
     <div class="post-content">
       <p>A frequent question I ask when interviewing some candidates is binary search. It cannot be more easier to write a binary search, but the variant may be challenging. For example, upper bound for the given target. When should I shrink my scope to left?</p>
 
-<p>This post elucidates the steps of binary search by sloving a problem in LeetCode. And I will reminds what should be paid more attention when doing search.</p>
+<p>This post elucidates the steps of binary search by illustrating some common mistakes and sloving a problem in LeetCode. And I will remind what should be paid more attention when doing search.</p>
 
 <p></p>
 
-<p>The Problem lists as following <a href="https://leetcode.com/problems/find-smallest-letter-greater-than-target/description/">Find Smallest Letter Greater Than Target</a>, which is obvious a case of binary search.</p>
+<p>The Problem lists as the following <a href="https://leetcode.com/problems/find-smallest-letter-greater-than-target/description/">Find Smallest Letter Greater Than Target</a>, which is obvious a case of binary search.</p>
 
 <h1 id="terminal-condition-for-loop">Terminal Condition for Loop</h1>
 
-<p>Some candidate wrote the following code confidently.</p>
+<p>Some candidates wrote the following code confidently.</p>
 
 <pre><code class="language-python">class Solution:
     def nextGreatestLetter(self, letters, target):
@@ -233,9 +233,9 @@ This post elucidates the steps of binary search by sloving a problem in LeetCode
         return double[start] if double[start] &gt; target else double[start + 1]
 </code></pre>
 
-<p>A skilled programmer can detect the endless loop by <code>while start &lt;= end</code>. If the condtion goes to <code>else: end = mid</code>. the <code>end</code> is equal to <code>start</code> perpetually.</p>
+<p>A skilled programmer can detect the endless loop by <code>while start &lt;= end</code>. If the condtion goes to <code>else: end = mid</code>, the <code>end</code> is equal to <code>start</code> perpetually.</p>
 
-<p>This is manifest mistake, but few people may not notice.</p>
+<p>This is a manifest mistake, but few people may not notice.</p>
 
 <h1 id="shrink-searching-scope">Shrink Searching Scope</h1>
 
@@ -312,7 +312,7 @@ if __name__ == '__main__':
         return double[start] if double[start] &gt; target else double[start + 1]
 </code></pre>
 
-<p>The title of this section may hints you that the condition for moving index <code>double[mid] &lt; target</code> is wrong. Yes it is. when <code>double[mid] == target</code> in this case, you move the <code>end</code> to <code>mid</code>, which may include the element equal to the given target. The correct operation is moving <code>start</code> to <code>mid + 1</code>.</p>
+<p>The title of this section may hint you that the condition for moving index <code>double[mid] &lt; target</code> is wrong. Yes it is. when <code>double[mid] == target</code> in this case, you move the <code>end</code> to <code>mid</code>, which may include the element equal to the given target. The correct operation is moving <code>start</code> to <code>mid + 1</code>.</p>
 
 <h1 id="accepted-version">Accepted Version</h1>
 
