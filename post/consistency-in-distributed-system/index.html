@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Consistency Models and Protocols in Distributed System - Guoqing Geng</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Guoqing Geng" />
+  <meta name="description" content="Data replication is a vital feature in Distrubtued System, but brings in an inevitable price to be paid: consistency mantenance. The consistency model specifies a contract between programmer and system, wherein the system guarantees that if the programmer follows the rules, memory will be consistent and the results of reading, writing, or updating memory will be predictable.
+In Chinese, &amp;ldquo;consistency&amp;rdquo; often mixes up with &amp;ldquo;consensus&amp;rdquo; because of their similiar translations. The consensus problem requires agreement among a number of processes for a single data value. Some of the processes may fail or be unreliable in other ways, so consensus protocols must be fault tolerant or resilient.
+This post focus on consistency only, enumerating various common types of consistency models and illuminating some consistency protocols.
+
+" />
+<meta name="keywords" content="Consistency Model, Distributed System" />
+
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.44" />
+
+
+<link rel="canonical" href="https://hellokangning.github.io/post/consistency-in-distributed-system/" />
+
+<link rel="apple-touch-icon" sizes="180x180" href="https://hellokangning.github.io/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://hellokangning.github.io/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://hellokangning.github.io/favicon-16x16.png">
+<link rel="manifest" href="https://hellokangning.github.io/manifest.json">
+<link rel="mask-icon" href="https://hellokangning.github.io/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+
+<link href="https://hellokangning.github.io/dist/even.min.css?v=3.2.0" rel="stylesheet">
+<link href="https://hellokangning.github.io/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+
+
+
+<meta property="og:title" content="Consistency Models and Protocols in Distributed System" />
+<meta property="og:description" content="Data replication is a vital feature in Distrubtued System, but brings in an inevitable price to be paid: consistency mantenance. The consistency model specifies a contract between programmer and system, wherein the system guarantees that if the programmer follows the rules, memory will be consistent and the results of reading, writing, or updating memory will be predictable.
+
+In Chinese, &ldquo;consistency&rdquo; often mixes up with &ldquo;consensus&rdquo; because of their similiar translations. The consensus problem requires agreement among a number of processes for a single data value. Some of the processes may fail or be unreliable in other ways, so consensus protocols must be fault tolerant or resilient.
+
+This post focus on consistency only, enumerating various common types of consistency models and illuminating some consistency protocols.
+
+" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hellokangning.github.io/post/consistency-in-distributed-system/" />
+
+
+
+<meta property="article:published_time" content="2018-08-14T17:03:05&#43;08:00"/>
+
+<meta property="article:modified_time" content="2018-08-14T17:03:05&#43;08:00"/>
+
+
+
+
+
+
+
+
+
+
+
+<meta itemprop="name" content="Consistency Models and Protocols in Distributed System">
+<meta itemprop="description" content="Data replication is a vital feature in Distrubtued System, but brings in an inevitable price to be paid: consistency mantenance. The consistency model specifies a contract between programmer and system, wherein the system guarantees that if the programmer follows the rules, memory will be consistent and the results of reading, writing, or updating memory will be predictable.
+
+In Chinese, &ldquo;consistency&rdquo; often mixes up with &ldquo;consensus&rdquo; because of their similiar translations. The consensus problem requires agreement among a number of processes for a single data value. Some of the processes may fail or be unreliable in other ways, so consensus protocols must be fault tolerant or resilient.
+
+This post focus on consistency only, enumerating various common types of consistency models and illuminating some consistency protocols.
+
+">
+
+
+<meta itemprop="datePublished" content="2018-08-14T17:03:05&#43;08:00" />
+<meta itemprop="dateModified" content="2018-08-14T17:03:05&#43;08:00" />
+<meta itemprop="wordCount" content="1279">
+
+
+
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Consistency Models and Protocols in Distributed System"/>
+<meta name="twitter:description" content="Data replication is a vital feature in Distrubtued System, but brings in an inevitable price to be paid: consistency mantenance. The consistency model specifies a contract between programmer and system, wherein the system guarantees that if the programmer follows the rules, memory will be consistent and the results of reading, writing, or updating memory will be predictable.
+
+In Chinese, &ldquo;consistency&rdquo; often mixes up with &ldquo;consensus&rdquo; because of their similiar translations. The consensus problem requires agreement among a number of processes for a single data value. Some of the processes may fail or be unreliable in other ways, so consensus protocols must be fault tolerant or resilient.
+
+This post focus on consistency only, enumerating various common types of consistency models and illuminating some consistency protocols.
+
+"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="https://hellokangning.github.io/" class="logo">Guoqing Geng</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="https://hellokangning.github.io/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="https://hellokangning.github.io/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="https://hellokangning.github.io/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="https://hellokangning.github.io/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="https://hellokangning.github.io/about/">
+        <li class="mobile-menu-item">About</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="https://hellokangning.github.io/" class="logo">Guoqing Geng</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="https://hellokangning.github.io/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="https://hellokangning.github.io/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="https://hellokangning.github.io/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="https://hellokangning.github.io/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="https://hellokangning.github.io/about/">About</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Consistency Models and Protocols in Distributed System</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> Aug 14, 2018 </span>
+        <div class="post-category">
+            
+              <a href="https://hellokangning.github.io/categories/distributed-system/"> Distributed System </a>
+            
+          </div>
+        <span class="more-meta"> 1279 words </span>
+        <span class="more-meta"> 7 mins read </span>
+        
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+<ul>
+<li><a href="#example">Example</a></li>
+<li><a href="#types">Types</a>
+<ul>
+<li><a href="#strict-consistency">Strict Consistency</a></li>
+<li><a href="#sequential-consistency">Sequential Consistency</a></li>
+<li><a href="#causal-consistency">Causal Consistency</a></li>
+<li><a href="#eventual-consistency">Eventual Consistency</a></li>
+<li><a href="#monotonic-reads-consistency">Monotonic Reads Consistency</a></li>
+<li><a href="#monotonic-writes-consistency">Monotonic Writes Consistency</a></li>
+<li><a href="#read-your-writes-consistency">Read-your-writes Consistency</a></li>
+</ul></li>
+<li><a href="#writes-follow-reads-consistency">Writes-follow-reads Consistency</a></li>
+<li><a href="#fifo-consistency">FIFO Consistency</a></li>
+<li><a href="#consistency-protocols">Consistency Protocols</a>
+<ul>
+<li><a href="#primary-based-protocols">Primary-based Protocols</a>
+<ul>
+<li><a href="#remote-write-protocols">Remote-write Protocols</a></li>
+<li><a href="#local-write-protocols">Local-write Protocols</a></li>
+</ul></li>
+<li><a href="#replicated-write-protocols">Replicated-write Protocols</a>
+<ul>
+<li><a href="#active-replication">Active Replication</a></li>
+<li><a href="#quorum-based-protocols">Quorum-based Protocols</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    
+    
+
+    
+    <div class="post-content">
+      <p>Data replication is a vital feature in Distrubtued System, but brings in an inevitable price to be paid: consistency mantenance. The consistency model specifies a contract between programmer and system, wherein the system guarantees that if the programmer follows the rules, memory will be consistent and the results of reading, writing, or updating memory will be predictable.</p>
+
+<p>In Chinese, &ldquo;consistency&rdquo; often mixes up with &ldquo;consensus&rdquo; because of their similiar translations. The consensus problem requires <strong>agreement among a number of processes for a single data value</strong>. Some of the processes may fail or be unreliable in other ways, so consensus protocols must be fault tolerant or resilient.</p>
+
+<p>This post focus on consistency only, enumerating various common types of consistency models and illuminating some consistency protocols.</p>
+
+<p></p>
+
+<p>An overview of distributed system lists here for a whole picture, in which we know what a role consistency plays.</p>
+
+<p><img src="https://hellokangning.github.io/images/distributed-overview.png" alt="" /></p>
+
+<h1 id="example">Example</h1>
+
+<p>Take replication for example, several processors read data from different nodes for high performance.</p>
+
+<p><img src="https://hellokangning.github.io/images/distributed-replication.png" alt="" /></p>
+
+<p>Assume that the following case occurs:</p>
+
+<ul>
+<li>The row X is replicated on nodes M and N</li>
+<li>The client A writes row X to node M</li>
+<li>After a period of time t, client B reads row X from node N</li>
+</ul>
+
+<p>The consistency model has to determine whether client B sees the write from client A or not.</p>
+
+<h1 id="types">Types</h1>
+
+<p>Two methods are introduced to define and categorize consistency models:</p>
+
+<ul>
+<li>issue: Issue method describes the <em>restrictions that define how a process can issue operations</em>.</li>
+<li>view. View method defines <em>the order of operations visible to processes</em>.</li>
+</ul>
+
+<p>For example, a consistency model can define that a process is not allowed to issue an operation until all previously issued operations are completed.</p>
+
+<p>Different consistency models enforce different conditions. One consistency model can be considered stronger than another if it requires all conditions of that model and more. In other words, a model with fewer constraints is considered a weaker consistency model.</p>
+
+<h2 id="strict-consistency">Strict Consistency</h2>
+
+<p>Strict consistency, the strongest model, satisfies the normal expection: any read on a data item X returns a value corresponding to the result of the most recent write on X. In other words, a write to a variable by any processor needs to be seen instantaneously by all processors.</p>
+
+<p><img src="https://hellokangning.github.io/images/distributed-consist-model-strict.png" alt="" /></p>
+
+<p>In the above diagrams,</p>
+
+<ul>
+<li>a) A strictly consistent store</li>
+<li>b) A store that is non-stricy consistent</li>
+</ul>
+
+<p>The strict model need time constraint, which is hardly implemented without a global clock. Absolute time can be physically impossible because it takes time to propagate the copy information.</p>
+
+<h2 id="sequential-consistency">Sequential Consistency</h2>
+
+<p>The sequential consistency model is a weaker memory model than strict consistency meaning A write to a variable does not have to be seen instantaneously. The result of any execution is the same as if the (read and write) operations by all processes on the data store were executed in some <strong>sequential order</strong> and <strong>the operations of each individual process</strong> appear in this sequence <strong>in the order specified by its program</strong>.</p>
+
+<p><img src="https://hellokangning.github.io/images/distributed-consist-model-sequential.png" alt="" /></p>
+
+<p>Sequential consistency can produce non-deterministic results. This is because the sequence of sequential operations between processors can be different during different runs of the program. All memory operations need to happen in the program order.</p>
+
+<p><strong>Linearizability</strong> can be defined as sequential consistency with the real-time constraint.</p>
+
+<h2 id="causal-consistency">Causal Consistency</h2>
+
+<p>Causal consistency is a weakening model of sequential consistency by <em>categorizing events into those causally related and those that are not</em>. It defines that only write operations that are causally related need to be seen in the same order by all processes. Concurrent writes may be seen in a different order on different machines.</p>
+
+<p>A sequence is allowed with a causally-consistent store, but not with sequentially or strictly consistent store.</p>
+
+<p><img src="https://hellokangning.github.io/images/distributed-consist-model-causal.png" alt="" /></p>
+
+<h2 id="eventual-consistency">Eventual Consistency</h2>
+
+<p>An eventual consistency is a weak consistency model in the system with the lack of simultaneous updates. It defines that if no update takes a very long time, all replicas eventually become consistent.</p>
+
+<p>The most popular system that implements eventual consistency is DNS (Domain Name System). Updates to a name are distributed according to a configured pattern and in combination with time-controlled caches; eventually, all clients will see the update.</p>
+
+<h2 id="monotonic-reads-consistency">Monotonic Reads Consistency</h2>
+
+<p>If a process has seen a particular value for the object, any subsequent accesses will never return any previous values.</p>
+
+<p><img src="https://hellokangning.github.io/images/distributed-consist-model-monotonic-reads.png" alt="" /></p>
+
+<h2 id="monotonic-writes-consistency">Monotonic Writes Consistency</h2>
+
+<p>In this case the system guarantees to serialize the writes by the same process. Systems that do not guarantee this level of consistency are notoriously hard to program.</p>
+
+<p><img src="https://hellokangning.github.io/images/distributed-consist-model-monotonic-writes.png" alt="" /></p>
+
+<h2 id="read-your-writes-consistency">Read-your-writes Consistency</h2>
+
+<p>The effect of a write operation by a process on data item X will always be seen by a successive read operation on X by the same process.</p>
+
+<p><img src="https://hellokangning.github.io/images/distributed-consist-model-read-your-writes.png" alt="" /></p>
+
+<h1 id="writes-follow-reads-consistency">Writes-follow-reads Consistency</h1>
+
+<p>In Writes-follow-reads consistency, updates are propagated after performing the previous read operations. A write operation by a process on a data item x following a previous read operation on x by the same process is guaranteed to take place on the same or a more recent value of x that was read.</p>
+
+<p><img src="https://hellokangning.github.io/images/distributed-consist-model-writes-follows-reads.png" alt="" /></p>
+
+<h1 id="fifo-consistency">FIFO Consistency</h1>
+
+<p>In FIFO consistency, writes done by a single process are seen by all other processes in the order in which whey were issued, <strong>but</strong> writes from different processes may be seen in a different order by different processes.</p>
+
+<p><img src="https://hellokangning.github.io/images/distributed-consist-model-fifo.png" alt="" /></p>
+
+<h1 id="consistency-protocols">Consistency Protocols</h1>
+
+<p>Consistency protocol is the implementation of a consistency model. Some main approaches include:</p>
+
+<ul>
+<li>primary-based protocols (remote write, local write)</li>
+<li>replicated-write protocols (active replication, quorum based)</li>
+</ul>
+
+<h2 id="primary-based-protocols">Primary-based Protocols</h2>
+
+<p>Primary-based protocols can be considered as a class of consistency protocols that are simpler to implement. For instance, sequential ordering is a popular consistency model when consistent ordering of operations is considered. The sequential ordering can be determined as primary-based protocol. In these protocols, there is an associated primary for each data item in a data store to coordinate write operations on that data item.</p>
+
+<h3 id="remote-write-protocols">Remote-write Protocols</h3>
+
+<p>In the primary-backup protocol, the simplest primary-based protocol, write operations are routed to a single server and read operations can be performed locally.</p>
+
+<p><img src="https://hellokangning.github.io/images/distributed-consist-protocol-primary-backup.gif" alt="" /></p>
+
+<h3 id="local-write-protocols">Local-write Protocols</h3>
+
+<p>In local-write protocols, primary copy moves between processes willing to perform an update. To update a data item, a process first moves it to its location. As a result, in this approach, successive write operations can be performed locally while each process can read their local copy of data items. After the primary finishes its update, the update is forwarded to other replicas and all perform the update locally.</p>
+
+<p><img src="https://hellokangning.github.io/images/distributed-consist-protocol-local-write.gif" alt="" /></p>
+
+<h2 id="replicated-write-protocols">Replicated-write Protocols</h2>
+
+<p>Unlike the primary-based protocol, all updates are carried out to all replicas in Replicated-write protocols.</p>
+
+<h3 id="active-replication">Active Replication</h3>
+
+<p>In active replication, updates are sent to each replica in the form of an operation in order to be executed. All updates need to be performed in the same order in all replicas.</p>
+
+<p>In order to make all the servers receive the same sequence of operations, an atomic broadcast protocol must be used. An atomic broadcast protocol guarantees that either all the servers receive a message or none, plus that they all receive messages in the same order.</p>
+
+<h3 id="quorum-based-protocols">Quorum-based Protocols</h3>
+
+<p>Voting can be another approach in replicated-write protocols. In this approach, a client requests and receives permission from multiple servers in order to read and write a replicated data.</p>
+
+<p>As an example, suppose in a distributed file system, a file is replicated on N servers. To update a file, a client must send a request to more than N/2 in order to make their agreement to perform an update. After the agreement, changes are applied on the file and a new version number is assigned to the updated file.</p>
+
+<p>Similarly, for reading replicated file, a client sends a request to N/2+1 servers in order to receive the associated version number from those servers. Read operation is completed if all received version numbers are the most recent version.</p>
+
+<p><img src="https://hellokangning.github.io/images/distributed-consist-protocol-quorum-based.png" alt="" /></p>
+
+<p><strong>Reference</strong></p>
+
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Consistency_model">Consistency model</a></li>
+<li><a href="https://www.cs.helsinki.fi/webfm_send/1256">Distributed Systems: Replication and Consistency</a></li>
+<li><a href="https://www.allthingsdistributed.com/2008/12/eventually_consistent.html">Eventually Consistent - Revisited</a></li>
+</ul>
+    </div>
+
+    
+    
+
+    
+    
+
+    <footer class="post-footer">
+      
+
+      
+      <nav class="post-nav">
+        
+        
+          <a class="next" href="https://hellokangning.github.io/post/retrospect-design-pattern/">
+            <span class="next-text nav-default">A Quick Retrospect of Design Pattern</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+    (function() {
+      
+      
+      if (window.location.hostname === 'localhost') return;
+
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      var disqus_shortname = 'guoqing';
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:hellokangning@hotmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://www.linkedin.com/in/guoqing-geng-9032b820/" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="https://github.com/hellokangning" class="iconfont icon-github" title="github"></a>
+  <a href="https://hellokangning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    
+      2016 - 
+    2018
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Guoqing Geng</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+<script src="https://hellokangning.github.io/lib/highlight/highlight.pack.js?v=20171001"></script><script type="text/javascript" src="https://hellokangning.github.io/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="https://hellokangning.github.io/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="https://hellokangning.github.io/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+
+
+<script type="text/javascript" src="https://hellokangning.github.io/dist/even.min.js?v=3.2.0"></script>
+
+
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-105833321-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>
