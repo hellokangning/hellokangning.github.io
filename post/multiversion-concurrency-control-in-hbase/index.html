@@ -335,17 +335,17 @@ public class MultiVersionConcurrencyControl {
 
 <pre><code class="language-java">// MultiVersionConcurrencyControl.java
 
-  private final LinkedList&lt;WriteEntry&gt; writeQueue = new LinkedList&lt;&gt;();
+private final LinkedList&lt;WriteEntry&gt; writeQueue = new LinkedList&lt;&gt;();
 
-  public WriteEntry begin(Runnable action) {
-    synchronized (writeQueue) {
-      long nextWriteNumber = writePoint.incrementAndGet();
-      WriteEntry e = new WriteEntry(nextWriteNumber);
-      writeQueue.add(e);
-      action.run();
-      return e;
-    }
+public WriteEntry begin(Runnable action) {
+  synchronized (writeQueue) {
+    long nextWriteNumber = writePoint.incrementAndGet();
+    WriteEntry e = new WriteEntry(nextWriteNumber);
+    writeQueue.add(e);
+    action.run();
+    return e;
   }
+}
 </code></pre>
 
 <h2 id="completeandwait"><code>completeAndWait</code></h2>
@@ -354,42 +354,42 @@ public class MultiVersionConcurrencyControl {
 
 <pre><code class="language-java">// MultiVersionConcurrencyControl.java
 
-  public void completeAndWait(WriteEntry e) {
-    if (!complete(e)) {
-      waitForRead(e);
-    }
+public void completeAndWait(WriteEntry e) {
+  if (!complete(e)) {
+    waitForRead(e);
   }
+}
 </code></pre>
 
 <p>Take <code>waitForRead(WriteEntry)</code> first if you don&rsquo;t mind, since <code>complete(WriteEntry)</code> will be penetrated later.</p>
 
 <pre><code class="language-java">// MultiVersionConcurrencyControl.java
 
-  private final Object readWaiters = new Object();
+private final Object readWaiters = new Object();
 
-  // Wait for the global readPoint to advance up to the passed in write entry number.
-  void waitForRead(WriteEntry e) {
-    boolean interrupted = false;
-    int count = 0;
-    synchronized (readWaiters) {
-      while (readPoint.get() &lt; e.getWriteNumber()) {
-        if (count % 100 == 0 &amp;&amp; count &gt; 0) {
-          LOG.warn(&quot;STUCK: &quot; + this);
-        }
-        count++;
-        try {
-          readWaiters.wait(10);
-        } catch (InterruptedException ie) {
-          // We were interrupted... finish the loop -- i.e. cleanup --and then
-          // on our way out, reset the interrupt flag.
-          interrupted = true;
-        }
+// Wait for the global readPoint to advance up to the passed in write entry number.
+void waitForRead(WriteEntry e) {
+  boolean interrupted = false;
+  int count = 0;
+  synchronized (readWaiters) {
+    while (readPoint.get() &lt; e.getWriteNumber()) {
+      if (count % 100 == 0 &amp;&amp; count &gt; 0) {
+        LOG.warn(&quot;STUCK: &quot; + this);
+      }
+      count++;
+      try {
+        readWaiters.wait(10);
+      } catch (InterruptedException ie) {
+        // We were interrupted... finish the loop -- i.e. cleanup --and then
+        // on our way out, reset the interrupt flag.
+        interrupted = true;
       }
     }
-    if (interrupted) {
-      Thread.currentThread().interrupt();
-    }
   }
+  if (interrupted) {
+    Thread.currentThread().interrupt();
+  }
+}
 </code></pre>
 
 <h2 id="advanceto"><code>advanceTo</code></h2>
@@ -398,41 +398,41 @@ public class MultiVersionConcurrencyControl {
 
 <pre><code class="language-java">// MultiVersionConcurrencyControl.java
 
-  public void advanceTo(long newStartPoint) {
-    while (true) {
-      long seqId = this.getWritePoint();
-      if (seqId &gt;= newStartPoint) break;
-      if (this.tryAdvanceTo(/* newSeqId = */ newStartPoint, /* expected = */ seqId)) break;
-    }
+public void advanceTo(long newStartPoint) {
+  while (true) {
+    long seqId = this.getWritePoint();
+    if (seqId &gt;= newStartPoint) break;
+    if (this.tryAdvanceTo(/* newSeqId = */ newStartPoint, /* expected = */ seqId)) break;
   }
+}
 
-  /*
-   * @param newStartPoint Point to move read and write points to.
-   * @param expected If not -1 (#NONE)
-   * @return Returns false if expected is not equal to the
-   * current readPoint or if startPoint is less than current readPoint
-  */
-  boolean tryAdvanceTo(long newStartPoint, long expected) {
-    synchronized (writeQueue) {
-      long currentRead = this.readPoint.get();
-      long currentWrite = this.writePoint.get();
-      if (currentRead != currentWrite) {
-        throw new RuntimeException(&quot;Already used this mvcc; currentRead=&quot; + currentRead +
-          &quot;, currentWrite=&quot; + currentWrite + &quot;; too late to tryAdvanceTo&quot;);
-      }
-      if (expected != NONE &amp;&amp; expected != currentRead) {
-        return false;
-      }
-
-      if (newStartPoint &lt; currentRead) {
-        return false;
-      }
-
-      readPoint.set(newStartPoint);
-      writePoint.set(newStartPoint);
+/*
+ + @param newStartPoint Point to move read and write points to.
+ + @param expected If not -1 (#NONE)
+ + @return Returns false if expected is not equal to the
+ + current readPoint or if startPoint is less than current readPoint
+*/
+boolean tryAdvanceTo(long newStartPoint, long expected) {
+  synchronized (writeQueue) {
+    long currentRead = this.readPoint.get();
+    long currentWrite = this.writePoint.get();
+    if (currentRead != currentWrite) {
+      throw new RuntimeException(&quot;Already used this mvcc; currentRead=&quot; + currentRead +
+        &quot;, currentWrite=&quot; + currentWrite + &quot;; too late to tryAdvanceTo&quot;);
     }
-    return true;
+    if (expected != NONE &amp;&amp; expected != currentRead) {
+      return false;
+    }
+
+    if (newStartPoint &lt; currentRead) {
+      return false;
+    }
+
+    readPoint.set(newStartPoint);
+    writePoint.set(newStartPoint);
   }
+  return true;
+}
 </code></pre>
 
 <h2 id="complete"><code>complete</code></h2>
@@ -443,45 +443,45 @@ public class MultiVersionConcurrencyControl {
 
 <pre><code class="language-java">// MultiVersionConcurrencyControl.java
 
-  private final LinkedList&lt;WriteEntry&gt; writeQueue = new LinkedList&lt;&gt;();
+private final LinkedList&lt;WriteEntry&gt; writeQueue = new LinkedList&lt;&gt;();
 
-  public boolean complete(WriteEntry writeEntry) {
-    synchronized (writeQueue) {
-      writeEntry.markCompleted();
-      long nextReadValue = NONE;
-      boolean ranOnce = false;
-      while (!writeQueue.isEmpty()) {
-        ranOnce = true;
-        WriteEntry queueFirst = writeQueue.getFirst();
-
-        if (nextReadValue &gt; 0) {
-          if (nextReadValue + 1 != queueFirst.getWriteNumber()) {
-            throw new RuntimeException(&quot;Invariant in complete violated, nextReadValue=&quot;
-                + nextReadValue + &quot;, writeNumber=&quot; + queueFirst.getWriteNumber());
-          }
-        }
-
-        if (queueFirst.isCompleted()) {
-          nextReadValue = queueFirst.getWriteNumber();
-          writeQueue.removeFirst();
-        } else {
-          break;
-        }
-      }
-
-      if (!ranOnce) {
-        throw new RuntimeException(&quot;There is no first!&quot;);
-      }
+public boolean complete(WriteEntry writeEntry) {
+  synchronized (writeQueue) {
+    writeEntry.markCompleted();
+    long nextReadValue = NONE;
+    boolean ranOnce = false;
+    while (!writeQueue.isEmpty()) {
+      ranOnce = true;
+      WriteEntry queueFirst = writeQueue.getFirst();
 
       if (nextReadValue &gt; 0) {
-        synchronized (readWaiters) {
-          readPoint.set(nextReadValue);
-          readWaiters.notifyAll();
+        if (nextReadValue + 1 != queueFirst.getWriteNumber()) {
+          throw new RuntimeException(&quot;Invariant in complete violated, nextReadValue=&quot;
+              + nextReadValue + &quot;, writeNumber=&quot; + queueFirst.getWriteNumber());
         }
       }
-      return readPoint.get() &gt;= writeEntry.getWriteNumber();
+
+      if (queueFirst.isCompleted()) {
+        nextReadValue = queueFirst.getWriteNumber();
+        writeQueue.removeFirst();
+      } else {
+        break;
+      }
     }
+
+    if (!ranOnce) {
+      throw new RuntimeException(&quot;There is no first!&quot;);
+    }
+
+    if (nextReadValue &gt; 0) {
+      synchronized (readWaiters) {
+        readPoint.set(nextReadValue);
+        readWaiters.notifyAll();
+      }
+    }
+    return readPoint.get() &gt;= writeEntry.getWriteNumber();
   }
+}
 </code></pre>
 
 <h1 id="where-mvcc-is-used">Where MVCC is used</h1>
@@ -505,57 +505,57 @@ public class MultiVersionConcurrencyControl {
 
 <pre><code class="language-java">// HRegion.java
 
-  public RegionScannerImpl getScanner(Scan scan, List&lt;KeyValueScanner&gt; additionalScanners)
-      throws IOException {
-    return getScanner(scan, additionalScanners, HConstants.NO_NONCE, HConstants.NO_NONCE);
-  }
+public RegionScannerImpl getScanner(Scan scan, List&lt;KeyValueScanner&gt; additionalScanners)
+    throws IOException {
+  return getScanner(scan, additionalScanners, HConstants.NO_NONCE, HConstants.NO_NONCE);
+}
 </code></pre>
 
 <p>Notice the input parameter <code>KeyValueScanner</code>. One of its child <code>StoreFileScanner</code>&rsquo;s <code>next</code> method is called to every time get a new cell.</p>
 
 <pre><code class="language-java">// StoreFileScanner.java
 
-  public Cell next() throws IOException {
-    Cell retKey = cur;
+public Cell next() throws IOException {
+  Cell retKey = cur;
 
-    try {
-      // only seek if we aren't at the end. cur == null implies 'end'.
-      if (cur != null) {
-        hfs.next();
-        setCurrentCell(hfs.getCell());
-        if (hasMVCCInfo || this.reader.isBulkLoaded()) {
-          skipKVsNewerThanReadpoint();
-        }
-      }
-    } catch (FileNotFoundException e) {
-      throw e;
-    } catch(IOException e) {
-      throw new IOException(&quot;Could not iterate &quot; + this, e);
-    }
-    return retKey;
-  }
-
-  protected boolean skipKVsNewerThanReadpoint() throws IOException {
-    // We want to ignore all key-values that are newer than our current
-    // readPoint
-    Cell startKV = cur;
-    while(enforceMVCC
-        &amp;&amp; cur != null
-        &amp;&amp; (cur.getSequenceId() &gt; readPt)) {
-      boolean hasNext = hfs.next();
+  try {
+    // only seek if we aren't at the end. cur == null implies 'end'.
+    if (cur != null) {
+      hfs.next();
       setCurrentCell(hfs.getCell());
-      if (hasNext &amp;&amp; this.stopSkippingKVsIfNextRow
-          &amp;&amp; getComparator().compareRows(cur, startKV) &gt; 0) {
-        return false;
+      if (hasMVCCInfo || this.reader.isBulkLoaded()) {
+        skipKVsNewerThanReadpoint();
       }
     }
+  } catch (FileNotFoundException e) {
+    throw e;
+  } catch(IOException e) {
+    throw new IOException(&quot;Could not iterate &quot; + this, e);
+  }
+  return retKey;
+}
 
-    if (cur == null) {
+protected boolean skipKVsNewerThanReadpoint() throws IOException {
+  // We want to ignore all key-values that are newer than our current
+  // readPoint
+  Cell startKV = cur;
+  while(enforceMVCC
+      &amp;&amp; cur != null
+      &amp;&amp; (cur.getSequenceId() &gt; readPt)) {
+    boolean hasNext = hfs.next();
+    setCurrentCell(hfs.getCell());
+    if (hasNext &amp;&amp; this.stopSkippingKVsIfNextRow
+        &amp;&amp; getComparator().compareRows(cur, startKV) &gt; 0) {
       return false;
     }
-
-    return true;
   }
+
+  if (cur == null) {
+    return false;
+  }
+
+  return true;
+}
 </code></pre>
 
 <p><strong>Reference</strong></p>
