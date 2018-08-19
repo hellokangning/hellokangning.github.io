@@ -17,7 +17,7 @@
 
 
 <meta name="author" content="Guoqing Geng" />
-  <meta name="description" content="Channels are similiar to streams available for blocking IO with a few differences:
+  <meta name="description" content="Channels are similar to streams available for blocking IO with a few differences:
  You can both read and write to Channels. Streams are typically one-way (read or write). Channels can be read and written asynchronously. Channels always read to, or write from, a Buffer.  The Channels have multiple implementations depending on the data to be read or written:
  FileChannel: Used to read and write data from and to the files DatagramChannel: Used for data exchange over network using UDP packets SocketChannel: TCP channel to exchange data over TCP sockets ServerSocketChannel: An implementation similar to a web server listening to requests over a specific TCP port. It creates a new SocketChannel instance for every new connection  This post will take FileChannel for further exploration, from example to implementation.
 
@@ -54,7 +54,7 @@
 
 
 <meta property="og:title" content="Java NIO: Channel" />
-<meta property="og:description" content="Channels are similiar to streams available for blocking IO with a few differences:
+<meta property="og:description" content="Channels are similar to streams available for blocking IO with a few differences:
 
 
 You can both read and write to Channels. Streams are typically one-way (read or write).
@@ -94,7 +94,7 @@ This post will take FileChannel for further exploration, from example to impleme
 
 
 <meta itemprop="name" content="Java NIO: Channel">
-<meta itemprop="description" content="Channels are similiar to streams available for blocking IO with a few differences:
+<meta itemprop="description" content="Channels are similar to streams available for blocking IO with a few differences:
 
 
 You can both read and write to Channels. Streams are typically one-way (read or write).
@@ -125,7 +125,7 @@ This post will take FileChannel for further exploration, from example to impleme
 <meta itemprop="keywords" content="java.nio," />
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Java NIO: Channel"/>
-<meta name="twitter:description" content="Channels are similiar to streams available for blocking IO with a few differences:
+<meta name="twitter:description" content="Channels are similar to streams available for blocking IO with a few differences:
 
 
 You can both read and write to Channels. Streams are typically one-way (read or write).
@@ -249,7 +249,7 @@ This post will take FileChannel for further exploration, from example to impleme
 
     
     <div class="post-content">
-      <p>Channels are similiar to streams available for blocking IO with a few differences:</p>
+      <p>Channels are similar to streams available for blocking IO with a few differences:</p>
 
 <ul>
 <li>You can both read and write to Channels. Streams are typically one-way (read or write).</li>
@@ -303,7 +303,7 @@ aFile.close();
 <li>A &ldquo;gathering write&rdquo; writes data from more than one buffer into a single channel.</li>
 </ul>
 
-<p>For more explation about scatter and gather, see <a href="http://tutorials.jenkov.com/java-nio/scatter-gather.html">Java NIO Scatter / Gather
+<p>For more explanation about scatter and gather, see <a href="http://tutorials.jenkov.com/java-nio/scatter-gather.html">Java NIO Scatter / Gather
 </a>. In this post, I consider the interaction between one channel and one buffer only for briefness.</p>
 
 <p><img src="https://hellokangning.github.io/images/java-nio-channel-class.png" alt="" /></p>
@@ -551,7 +551,7 @@ while(buf.hasRemaining()) {
 }
 </code></pre>
 
-<p>Because of no guarantee of how many bytes the <code>write()</code> method writes to the FileChannel, <code>write()</code> is called repeatly until the buffer has no further bytes to write.</p>
+<p>Because of no guarantee of how many bytes the <code>write()</code> method writes to the FileChannel, <code>write()</code> is called repeatedly until the buffer has no further bytes to write.</p>
 
 <p>The steps of <code>write()</code> of FileChannel is similar with <code>read()</code> concerning position check and native operation.</p>
 

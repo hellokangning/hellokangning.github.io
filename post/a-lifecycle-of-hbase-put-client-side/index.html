@@ -17,7 +17,7 @@
 
 
 <meta name="author" content="Guoqing Geng" />
-  <meta name="description" content="Put is used to perform insert or update a single row of HBase table. It&amp;rsquo;s essential to understand its lifecycle, which can be breaked into two pieces,
+  <meta name="description" content="Put is used to perform insert or update a single row of HBase table. It&amp;rsquo;s essential to understand its lifecycle, which can be broke into two pieces,
  Client-side, How the put request is built up and sent to the right RegionServer. Server-side, How the RegionServer handle the Put request and update one row.  In view of the limitation of one single post, the client-side is discussed only.
 
 " />
@@ -53,7 +53,7 @@
 
 
 <meta property="og:title" content="A Lifecycle of HBase&#39;s Put: Client-side" />
-<meta property="og:description" content="Put is used to perform insert or update a single row of HBase table. It&rsquo;s essential to understand its lifecycle, which can be breaked into two pieces,
+<meta property="og:description" content="Put is used to perform insert or update a single row of HBase table. It&rsquo;s essential to understand its lifecycle, which can be broke into two pieces,
 
 
 Client-side, How the put request is built up and sent to the right RegionServer.
@@ -83,7 +83,7 @@ In view of the limitation of one single post, the client-side is discussed only.
 
 
 <meta itemprop="name" content="A Lifecycle of HBase&#39;s Put: Client-side">
-<meta itemprop="description" content="Put is used to perform insert or update a single row of HBase table. It&rsquo;s essential to understand its lifecycle, which can be breaked into two pieces,
+<meta itemprop="description" content="Put is used to perform insert or update a single row of HBase table. It&rsquo;s essential to understand its lifecycle, which can be broke into two pieces,
 
 
 Client-side, How the put request is built up and sent to the right RegionServer.
@@ -104,7 +104,7 @@ In view of the limitation of one single post, the client-side is discussed only.
 <meta itemprop="keywords" content="" />
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="A Lifecycle of HBase&#39;s Put: Client-side"/>
-<meta name="twitter:description" content="Put is used to perform insert or update a single row of HBase table. It&rsquo;s essential to understand its lifecycle, which can be breaked into two pieces,
+<meta name="twitter:description" content="Put is used to perform insert or update a single row of HBase table. It&rsquo;s essential to understand its lifecycle, which can be broke into two pieces,
 
 
 Client-side, How the put request is built up and sent to the right RegionServer.
@@ -218,7 +218,7 @@ In view of the limitation of one single post, the client-side is discussed only.
 
     
     <div class="post-content">
-      <p><code>Put</code> is used to perform insert or update a single row of HBase table. It&rsquo;s essential to understand its lifecycle, which can be breaked into two pieces,</p>
+      <p><code>Put</code> is used to perform insert or update a single row of HBase table. It&rsquo;s essential to understand its lifecycle, which can be broke into two pieces,</p>
 
 <ol>
 <li>Client-side, How the <code>put</code> request is built up and sent to the right <code>RegionServer</code>.</li>
@@ -238,9 +238,9 @@ In view of the limitation of one single post, the client-side is discussed only.
 <ul>
 <li><code>HTable</code>, launch a <code>Put</code> operation.</li>
 <li><code>ServerCallable</code>, is newed in <code>HTable</code>, then it builds up mutation request.</li>
-<li><code>RpcRetryingCaller</code>, takes the following responsiblity after <code>callWithRetries</code> method is called. it coordinates other classes.</li>
+<li><code>RpcRetryingCaller</code>, takes the following responsibility after <code>callWithRetries</code> method is called. it coordinates other classes.</li>
 <li><code>Connection</code>, finds the destination <code>RegionServer</code> and return it to <code>RpcRetryingCaller</code>.</li>
-<li><code>RpcController</code>, set the RPC properities before it is sent.</li>
+<li><code>RpcController</code>, set the RPC properties before it is sent.</li>
 </ul>
 
 <p>So far, A more complicated class diagram is needed,</p>
@@ -269,9 +269,9 @@ public interface Table extends Closeable {
 }
 </code></pre>
 
-<p><code>HTable</code> is an implemntation of <code>Table</code> and overrides these two methods. It&rsquo;s very lightweight(Many thanks to <code>ThreadPoolExecutor</code>). Get as needed and just close when done.</p>
+<p><code>HTable</code> is an implementation of <code>Table</code> and overrides these two methods. It&rsquo;s very lightweight(Many thanks to <code>ThreadPoolExecutor</code>). Get as needed and just close when done.</p>
 
-<p>In this post, it exludes batch puts which is a totally different story in contrast with single row&rsquo;s put.</p>
+<p>In this post, it excludes batch puts which is a totally different story in contrast with single row&rsquo;s put.</p>
 
 <pre><code class="language-java">// HTable.java
 
@@ -325,7 +325,7 @@ public class HTable implements Table {
 <li>new a <code>RpcRetryingCaller</code> from <code>RpcCallerFactory</code> and call the caller&rsquo;s <code>callWithRetries</code>, passing callable, initialized from step 2, to it.</li>
 </ol>
 
-<p>Take a glimplse on <code>validatePut</code>. It checks if this put is empty, then iterates all the values, if non-empty, to make sure the they are all smaller than maximum Key-Value size, which is configured before.</p>
+<p>Take a glimpse on <code>validatePut</code>. It checks if this put is empty, then iterates all the values, if non-empty, to make sure the they are all smaller than maximum Key-Value size, which is configured before.</p>
 
 <p>Let&rsquo;s skip <code>ServerCallable</code>, which we will take a close look later, and deep into <code>RpcRetryingCaller</code> first, considering <code>callWithRetries</code> method in <code>RpcRetryingCaller</code> takes <code>ServerCallable</code> as an input parameter.</p>
 

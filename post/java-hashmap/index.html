@@ -19,7 +19,7 @@
 <meta name="author" content="Guoqing Geng" />
   <meta name="description" content="It&amp;rsquo;s necessary to learn with questions. Otherwise, you may distract your focus when something you don&amp;rsquo;t know appears, whether should I go deeper or not. With preliminary doubts in your mind, this would not be a problem. Learning can be direct, clear and fruitful, which brings you more sense of achievement.
 For this post about the source code of HashMap, few questions need answers:
- data structure underneath why HashMap permites nulls and unsynchronized does it make guarantees as to the order of the map what happens when I put and get a key with value, and time complexity how the map shrink or expand when size changes  
+ data structure underneath why HashMap permits nulls and unsynchronized does it make guarantees as to the order of the map what happens when I put and get a key with value, and time complexity how the map shrink or expand when size changes  
 " />
 <meta name="keywords" content="Java, HashMap" />
 
@@ -59,7 +59,7 @@ For this post about the source code of HashMap, few questions need answers:
 
 
 data structure underneath
-why HashMap permites nulls and unsynchronized
+why HashMap permits nulls and unsynchronized
 does it make guarantees as to the order of the map
 what happens when I put and get a key with value, and time complexity
 how the map shrink or expand when size changes
@@ -92,7 +92,7 @@ For this post about the source code of HashMap, few questions need answers:
 
 
 data structure underneath
-why HashMap permites nulls and unsynchronized
+why HashMap permits nulls and unsynchronized
 does it make guarantees as to the order of the map
 what happens when I put and get a key with value, and time complexity
 how the map shrink or expand when size changes
@@ -116,7 +116,7 @@ For this post about the source code of HashMap, few questions need answers:
 
 
 data structure underneath
-why HashMap permites nulls and unsynchronized
+why HashMap permits nulls and unsynchronized
 does it make guarantees as to the order of the map
 what happens when I put and get a key with value, and time complexity
 how the map shrink or expand when size changes
@@ -233,7 +233,7 @@ how the map shrink or expand when size changes
 
 <ul>
 <li>data structure underneath</li>
-<li>why <code>HashMap</code> permites nulls and unsynchronized</li>
+<li>why <code>HashMap</code> permits nulls and unsynchronized</li>
 <li>does it make guarantees as to the order of the map</li>
 <li>what happens when I put and get a key with value, and time complexity</li>
 <li>how the map shrink or expand when size changes</li>
@@ -281,7 +281,7 @@ static class Node&lt;K,V&gt; implements Map.Entry&lt;K,V&gt; {
 }
 </code></pre>
 
-<p><code>key</code>, <code>hash</code>,<code>value</code> is easy to understand, and the <code>next</code>? It is used for handling key confilict.</p>
+<p><code>key</code>, <code>hash</code>,<code>value</code> is easy to understand, and the <code>next</code>? It is used for handling key conflict.</p>
 
 <p>Let&rsquo;s see its <code>equals</code> method with compare order:</p>
 
@@ -373,7 +373,7 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
 
 <h1 id="resize"><code>resize</code></h1>
 
-<p>As we can see from putting a new key-value into <code>HashMap</code>, it is possible to triger <code>resize</code>, which would double table size. The elements from each bin must either stay at same index, or move with a power of two offset in the new table.</p>
+<p>As we can see from putting a new key-value into <code>HashMap</code>, it is possible to trigger <code>resize</code>, which would double table size. The elements from each bin must either stay at same index, or move with a power of two offset in the new table.</p>
 
 <pre><code class="language-java">// HashMap.java
 
@@ -471,13 +471,13 @@ final Node&lt;K,V&gt; getNode(int hash, Object key) {
 
 <h1 id="conclusion">Conclusion</h1>
 
-<p>Now, we can answer the questions metioned at the beginning of this post.</p>
+<p>Now, we can answer the questions mentioned at the beginning of this post.</p>
 
 <p><strong>data structure underneath</strong></p>
 
 <p>Beneath the <code>HashMap</code>, an array with its elements <code>Node</code> is used for storage, and it is friendly to random access.</p>
 
-<p><strong>why <code>HashMap</code> permites nulls and unsynchronized</strong></p>
+<p><strong>why <code>HashMap</code> permits nulls and unsynchronized</strong></p>
 
 <p>When putting a new key-value, <code>newNode</code> is called, which does not check nulls.</p>
 
@@ -489,7 +489,7 @@ final Node&lt;K,V&gt; getNode(int hash, Object key) {
 
 <p><strong>what happens when I put and get a key with value, and time complexity</strong></p>
 
-<p><code>put</code> may lead to resize of the map, so it&rsquo;s time complexity is O(n). While the element can be located with index, so <code>get</code> costs O(1) for the optimal situation. If key confilcts, it needs to iterate the whole list sharing the same key.</p>
+<p><code>put</code> may lead to resize of the map, so it&rsquo;s time complexity is O(n). While the element can be located with index, so <code>get</code> costs O(1) for the optimal situation. If key conflicts, it needs to iterate the whole list sharing the same key.</p>
 
 <p><strong>how the map shrink or expand when size changes</strong></p>
 

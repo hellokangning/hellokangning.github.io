@@ -18,7 +18,7 @@
 
 <meta name="author" content="Guoqing Geng" />
   <meta name="description" content="Overview
- An HBase Table consists of multiple rows. Table will be splited into Regions based on rows&amp;rsquo; lexicographical order. A Store corresponds to a column family for a table for a given region. A Store hosts a MemStore and 0 or more StoreFiles (HFiles). The MemStore holds in-memory modifications to the Store. StoreFiles are composed of Blocks.  
+ An HBase Table consists of multiple rows. Table will be split into Regions based on rows&amp;rsquo; lexicographical order. A Store corresponds to a column family for a table for a given region. A Store hosts a MemStore and 0 or more StoreFiles (HFiles). The MemStore holds in-memory modifications to the Store. StoreFiles are composed of Blocks.  
 " />
 <meta name="keywords" content="HBase" />
 
@@ -56,7 +56,7 @@
 
 
 An HBase Table consists of multiple rows.
-Table will be splited into Regions based on rows&rsquo; lexicographical order.
+Table will be split into Regions based on rows&rsquo; lexicographical order.
 A Store corresponds to a column family for a table for a given region.
 A Store hosts a MemStore and 0 or more StoreFiles (HFiles).
 The MemStore holds in-memory modifications to the Store.
@@ -88,7 +88,7 @@ StoreFiles are composed of Blocks.
 
 
 An HBase Table consists of multiple rows.
-Table will be splited into Regions based on rows&rsquo; lexicographical order.
+Table will be split into Regions based on rows&rsquo; lexicographical order.
 A Store corresponds to a column family for a table for a given region.
 A Store hosts a MemStore and 0 or more StoreFiles (HFiles).
 The MemStore holds in-memory modifications to the Store.
@@ -111,7 +111,7 @@ StoreFiles are composed of Blocks.
 
 
 An HBase Table consists of multiple rows.
-Table will be splited into Regions based on rows&rsquo; lexicographical order.
+Table will be split into Regions based on rows&rsquo; lexicographical order.
 A Store corresponds to a column family for a table for a given region.
 A Store hosts a MemStore and 0 or more StoreFiles (HFiles).
 The MemStore holds in-memory modifications to the Store.
@@ -227,7 +227,7 @@ StoreFiles are composed of Blocks.
 
 <ul>
 <li>An HBase <code>Table</code> consists of multiple rows.</li>
-<li>Table will be splited into <code>Regions</code> based on rows&rsquo; lexicographical order.</li>
+<li>Table will be split into <code>Regions</code> based on rows&rsquo; lexicographical order.</li>
 <li>A <code>Store</code> corresponds to a column family for a table for a given region.</li>
 <li>A Store hosts a <code>MemStore</code> and 0 or more <code>StoreFiles (HFiles)</code>.</li>
 <li>The MemStore holds in-memory modifications to the Store.</li>
@@ -240,17 +240,17 @@ StoreFiles are composed of Blocks.
 
 <p><img src="https://hellokangning.github.io/images/hbase-architecture.jpg" alt="HBase Architecture" /></p>
 
-<p>I drawed a simplified version from region&rsquo;s viewpoint.</p>
+<p>I drew a simplified version from region&rsquo;s viewpoint.</p>
 
 <p><img src="https://hellokangning.github.io/images/hbase-region-structure.png" alt="Region" /></p>
 
 <h1 id="region">Region</h1>
 
-<p>HBase stores rows of data in tables. For high performace and availability, Tables are split into “regions”.  A region contains a continuous range of rows. Since rows are sorted lexicographically, it&rsquo;s easy to deduce that all rows within the scope of the region&rsquo;s start key and end key are stored in the same region. A single row belongs to exactly one region at any time. A region is only served by one single RegionServer, one RegionServer can hold many regions at the same time. Regions are distributed across the cluster, requests from client can be processed by RegionServer process independently.</p>
+<p>HBase stores rows of data in tables. For high performance and availability, Tables are split into “regions”.  A region contains a continuous range of rows. Since rows are sorted lexicographically, it&rsquo;s easy to deduce that all rows within the scope of the region&rsquo;s start key and end key are stored in the same region. A single row belongs to exactly one region at any time. A region is only served by one single RegionServer, one RegionServer can hold many regions at the same time. Regions are distributed across the cluster, requests from client can be processed by RegionServer process independently.</p>
 
 <p>A HBase table can be pre-split into regions when creation. After that, regions split when they reach a configured threshold. You can also force split manually at will, but there are some rules of thumb needs to be respected. On the contrary, regions can be merged if too many regions exists.</p>
 
-<p>Ok, Let source code tell the truth.</p>
+<p>OK, Let source code tell the truth.</p>
 
 <p><img src="https://hellokangning.github.io/images/hbase-hregion-class.png" alt="" /></p>
 
