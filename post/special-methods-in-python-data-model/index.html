@@ -87,7 +87,7 @@ In this post, I will enumerate some special methods that can change the behavior
 
 <meta itemprop="datePublished" content="2018-10-16T15:19:05&#43;08:00" />
 <meta itemprop="dateModified" content="2018-10-16T15:19:05&#43;08:00" />
-<meta itemprop="wordCount" content="354">
+<meta itemprop="wordCount" content="466">
 
 
 
@@ -174,8 +174,8 @@ In this post, I will enumerate some special methods that can change the behavior
               <a href="https://hellokangning.github.io/categories/python/"> Python </a>
             
           </div>
-        <span class="more-meta"> 354 words </span>
-        <span class="more-meta"> 2 mins read </span>
+        <span class="more-meta"> 466 words </span>
+        <span class="more-meta"> 3 mins read </span>
         
       </div>
     </header>
@@ -195,6 +195,7 @@ In this post, I will enumerate some special methods that can change the behavior
 <li><a href="#len"><code>__len__</code></a></li>
 <li><a href="#getitem"><code>__getitem__</code></a></li>
 <li><a href="#missing"><code>__missing__</code></a></li>
+<li><a href="#iadd"><code>__iadd__</code></a></li>
 </ul>
 </nav>
   </div>
@@ -250,6 +251,23 @@ print(c) # print a -&gt; b
 
 <p><code>__bool__()</code> by the built-in <code>bool()</code> is called to implement truth value testing. When this method is not defined, <code>__len__()</code> is called.</p>
 
+<pre><code class="language-python">class Element:
+    def __init__(self, k, v):
+        self.key = k
+        self.value = v
+
+    def __bool__(self):
+        return self.key != 0
+
+a = Element(0, 'a')
+if a: # False
+    print('a') 
+
+b = Element(1, 'b')
+if b: # True
+    print('b')
+</code></pre>
+
 <h1 id="len"><code>__len__</code></h1>
 
 <p><code>__len__()</code> is called to implemented the build-in function <code>len()</code>. It should return the length of the object.</p>
@@ -283,10 +301,33 @@ print(len(d)) # print 52
 
 <p><code>__missing__(self, key)</code> is called by <code>dict.__getitem__()</code> when key is not present.</p>
 
+<h1 id="iadd"><code>__iadd__</code></h1>
+
+<p><code>__iadd__(self, other)</code> implements addition with assignment. For instance, for <code>a += b</code>, <code>__iadd__</code> might return <code>a + b</code>, which would be assigned to <code>a</code>.</p>
+
+<pre><code class="language-python">class Element:
+    def __init__(self, k, v):
+        self.key = k
+        self.value = v
+
+    def __iadd__(self, other):
+        self.key += other.key
+        self.value += other.value
+        return self
+
+    def __str__(self):
+        return '%d -&gt; %s' % (self.key, self.value)
+
+a = Element(1, 'a')
+a += Element(2, 'b')
+print(a) # 3 -&gt; ab
+</code></pre>
+
 <p><strong>Reference</strong></p>
 
 <ul>
 <li><a href="https://docs.python.org/3.8/reference/datamodel.html">Data Model</a></li>
+<li><a href="https://rszalski.github.io/magicmethods/">A Guide to Python&rsquo;s Magic Methods</a></li>
 </ul>
     </div>
 
