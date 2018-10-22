@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>What Happens When Starting Redis - Guoqing Geng</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Guoqing Geng" />
+  <meta name="description" content="Redis is a great example of high-performance server. When I worked as a backend developer, my mentor recommended that I should read the code of Redis. And so I did, it&amp;rsquo;s rewarding. As the time goes by, the ideas behind Redis are still cutting-edge, so I think it&amp;rsquo;s time to retrospect the implementation of Redis. This post is a good beginning.
+It&amp;rsquo;s my habit to start from the entry when meeting a big project. In Redis, server.c is responsible for bootstrap, that&amp;rsquo;s what I pay close attention to in this post.
+
+" />
+
+  <meta name="keywords" content="elasticsearch, python, hbase" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.44" />
+
+
+<link rel="canonical" href="https://hellokangning.github.io/post/what-happens-when-starting-redis/" />
+
+<link rel="apple-touch-icon" sizes="180x180" href="https://hellokangning.github.io/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://hellokangning.github.io/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://hellokangning.github.io/favicon-16x16.png">
+<link rel="manifest" href="https://hellokangning.github.io/manifest.json">
+<link rel="mask-icon" href="https://hellokangning.github.io/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+
+<link href="https://hellokangning.github.io/dist/even.min.css?v=3.2.0" rel="stylesheet">
+<link href="https://hellokangning.github.io/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+
+
+
+<meta property="og:title" content="What Happens When Starting Redis" />
+<meta property="og:description" content="Redis is a great example of high-performance server. When I worked as a backend developer, my mentor recommended that I should read the code of Redis. And so I did, it&rsquo;s rewarding. As the time goes by, the ideas behind Redis are still cutting-edge, so I think it&rsquo;s time to retrospect the implementation of Redis. This post is a good beginning.
+
+It&rsquo;s my habit to start from the entry when meeting a big project. In Redis, server.c is responsible for bootstrap, that&rsquo;s what I pay close attention to in this post.
+
+" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hellokangning.github.io/post/what-happens-when-starting-redis/" />
+
+
+
+<meta property="article:published_time" content="2018-10-22T17:23:59&#43;08:00"/>
+
+<meta property="article:modified_time" content="2018-10-22T17:23:59&#43;08:00"/>
+
+
+
+
+
+
+
+
+
+
+
+<meta itemprop="name" content="What Happens When Starting Redis">
+<meta itemprop="description" content="Redis is a great example of high-performance server. When I worked as a backend developer, my mentor recommended that I should read the code of Redis. And so I did, it&rsquo;s rewarding. As the time goes by, the ideas behind Redis are still cutting-edge, so I think it&rsquo;s time to retrospect the implementation of Redis. This post is a good beginning.
+
+It&rsquo;s my habit to start from the entry when meeting a big project. In Redis, server.c is responsible for bootstrap, that&rsquo;s what I pay close attention to in this post.
+
+">
+
+
+<meta itemprop="datePublished" content="2018-10-22T17:23:59&#43;08:00" />
+<meta itemprop="dateModified" content="2018-10-22T17:23:59&#43;08:00" />
+<meta itemprop="wordCount" content="752">
+
+
+
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="What Happens When Starting Redis"/>
+<meta name="twitter:description" content="Redis is a great example of high-performance server. When I worked as a backend developer, my mentor recommended that I should read the code of Redis. And so I did, it&rsquo;s rewarding. As the time goes by, the ideas behind Redis are still cutting-edge, so I think it&rsquo;s time to retrospect the implementation of Redis. This post is a good beginning.
+
+It&rsquo;s my habit to start from the entry when meeting a big project. In Redis, server.c is responsible for bootstrap, that&rsquo;s what I pay close attention to in this post.
+
+"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="https://hellokangning.github.io/" class="logo">Guoqing Geng</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="https://hellokangning.github.io/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="https://hellokangning.github.io/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="https://hellokangning.github.io/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="https://hellokangning.github.io/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="https://hellokangning.github.io/about/">
+        <li class="mobile-menu-item">About</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="https://hellokangning.github.io/" class="logo">Guoqing Geng</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="https://hellokangning.github.io/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="https://hellokangning.github.io/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="https://hellokangning.github.io/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="https://hellokangning.github.io/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="https://hellokangning.github.io/about/">About</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">What Happens When Starting Redis</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> Oct 22, 2018 </span>
+        <div class="post-category">
+            
+              <a href="https://hellokangning.github.io/categories/redis/"> Redis </a>
+            
+          </div>
+        <span class="more-meta"> 752 words </span>
+        <span class="more-meta"> 4 mins read </span>
+        
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+<ul>
+<li><a href="#init-redisserver-struct">Init <code>redisServer</code> struct</a></li>
+<li><a href="#parsing-configuration-file">Parsing configuration file</a></li>
+<li><a href="#init-the-state-of-server">Init the state of server</a></li>
+<li><a href="#load-aof-rdb-file">Load AOF/RDB file</a></li>
+<li><a href="#jump-to-event-loop">Jump to event loop</a></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    
+    
+
+    
+    <div class="post-content">
+      <p>Redis is a great example of high-performance server. When I worked as a backend developer, my mentor recommended that I should read the code of Redis. And so I did, it&rsquo;s rewarding. As the time goes by, the ideas behind Redis are still cutting-edge, so I think it&rsquo;s time to retrospect the implementation of Redis. This post is a good beginning.</p>
+
+<p>It&rsquo;s my habit to start from the entry when meeting a big project. In Redis, <code>server.c</code> is responsible for bootstrap, that&rsquo;s what I pay close attention to in this post.</p>
+
+<p></p>
+
+<blockquote>
+<p>The code analyzed here is based on 5.0.0</p>
+</blockquote>
+
+<p>A global variable named <code>server</code> with type <code>redisServer</code> holds the state for Redis server.</p>
+
+<p><code>struct redisServer server;</code></p>
+
+<p>The fields of <code>redisServer</code> can be found in <code>server.h</code>, and we only focus on some ones that are used when starting.</p>
+
+<pre><code class="language-c">struct redisServer {
+    char *configfile;           /* Absolute config file path, or NULL */
+    char *executable;           /* Absolute executable file path. */
+    char **exec_argv;           /* Executable argv vector (copy). */
+
+    dict *commands;             /* Command table */
+    dict *orig_commands;        /* Command table before command renaming. */
+
+    int port;                   /* TCP listening port */
+</code></pre>
+
+<p>The whole process of launching is implemented in <code>main()</code> method, and the first step is initializing <code>redisServer</code>, which is done by calling <code>initServerConfig()</code> method.</p>
+
+<h1 id="init-redisserver-struct">Init <code>redisServer</code> struct</h1>
+
+<p>Let&rsquo;s see what <code>initServerConfig()</code> does.</p>
+
+<pre><code class="language-c">void initServerConfig(void) {
+
+    // mutex
+    pthread_mutex_init(&amp;server.next_client_id_mutex,NULL);
+    pthread_mutex_init(&amp;server.lruclock_mutex,NULL);
+    pthread_mutex_init(&amp;server.unixtime_mutex,NULL);
+
+
+    // run id
+    getRandomHexChars(server.runid,CONFIG_RUN_ID_SIZE);
+    server.runid[CONFIG_RUN_ID_SIZE] = '\0';
+
+    // default port, 9379
+    server.port = CONFIG_DEFAULT_SERVER_PORT;    
+
+    // LRU clock
+    unsigned int lruclock = getLRUClock();
+    atomicSet(server.lruclock,lruclock);
+    resetServerSaveParams();
+
+    // replication
+    server.masterhost = NULL;
+    server.masterport = 6379;
+    server.repl_state = REPL_STATE_NONE;
+    server_slave_priority = CONFIG_DEFAULT_SLAVE_PRIORITY;
+
+
+    // command table
+    server.commands = dictCreate(&amp;commandTableDictType,NULL);
+    server.orig_commands = dictCreate(&amp;commandTableDictType,NULL);
+    populateCommandTable();
+
+    // slow log
+    server.slowlog_log_slower_than = CONFIG_DEFAULT_SLOWLOG_LOG_SLOWER_THAN;
+    server.slowlog_max_len = CONFIG_DEFAULT_SLOWLOG_MAX_LEN;
+}
+</code></pre>
+
+<p>After <code>initServerConfig()</code>, Redis will store the executable path and arguments for restarting the server later.</p>
+
+<pre><code class="language-c">server.executable = getAbsolutePath(argv[0]);
+server.exec_argv = zmalloc(sizeof(char*)*(argc+1));
+server.exec_argv[argc] = NULL;
+for (j = 0; j &lt; argc; j++) server.exec_argv[j] = zstrdup(argv[j]);
+</code></pre>
+
+<p>If Sentinel model is enabled, the following operations will be performed.</p>
+
+<pre><code class="language-c">if (server.sentinel_mode) {
+    initSentinelConfig();
+    initSentinel();
+}
+</code></pre>
+
+<p>The reason to init sentinel here is parsing the configuration file in Sentinel model will have the effect of populating the sentinel data structures with master nodes to monitor.</p>
+
+<h1 id="parsing-configuration-file">Parsing configuration file</h1>
+
+<p>Then, Redis parses and loads the server configuration from specified filename by <code>loadServerConfig(char *filename, char *options)</code>.</p>
+
+<p>I simplify the original code for easy understanding.</p>
+
+<pre><code class="language-c">void loadServerConfig(char *filename, char *options) {
+    sds config = sdsempty();
+    char buf[CONFIG_MAX_LINE+1];
+
+    while(fgets(buf,CONFIG_MAX_LINE+1,fp) != NULL)
+            config = sdscat(config,buf);
+
+   loadServerConfigFromString(config);
+    sdsfree(config);    
+}
+</code></pre>
+
+<p>A new data structure named <code>sds</code> appears first, and we can deduce that it is something related to <code>String</code> from the statement <code>loadServerConfigFromString(config);</code>. Yes, it is short for &ldquo;Simple Dynamic String&rdquo;, and a representation for <code>String</code> in Redis.</p>
+
+<p><code>loadServerConfigFromString</code> method is full of string manipulations, such as,</p>
+
+<ul>
+<li>Skip comments and black lines</li>
+<li>Split into arguments</li>
+<li>Skip the line if the resulting command vector is empty</li>
+</ul>
+
+<h1 id="init-the-state-of-server">Init the state of server</h1>
+
+<p>Up to now, many variables in <code>redisServer</code> struct is still dangling and need to be assigned dynamically. <code>initServer()</code> is responsible for doing this.</p>
+
+<pre><code class="language-c">void initServer(void) {
+    // process id
+    server.pid = getpid();
+
+    // clients list
+    server.clients = listCreate();
+
+    // slaves list
+    server.slaves = listCreate();
+
+    // shared objects for common values
+    createSharedObjects();
+
+    // event loop
+    server.el = aeCreateEventLoop(server.maxclients+CONFIG_FDSET_INCR);
+
+    // open TCP listening socket for user
+    if (server.port != 0 &amp;&amp;
+        listenToPort(server.port,server.ipfd,&amp;server.ipfd_count) == C_ERR)
+        exit(1);
+
+    // create and init databases
+    server.db = zmalloc(sizeof(redisDb)*server.dbnum);
+    for (j = 0; j &lt; server.dbnum; j++) {
+        server.db[j].dict = dictCreate(&amp;dbDictType,NULL);
+        server.db[j].expires = dictCreate(&amp;keyptrDictType,NULL);
+        server.db[j].blocking_keys = dictCreate(&amp;keylistDictType,NULL);
+        server.db[j].ready_keys = dictCreate(&amp;objectKeyPointerValueDictType,NULL);
+        server.db[j].watched_keys = dictCreate(&amp;keylistDictType,NULL);
+        server.db[j].id = j;
+    }
+
+    // create timers for serverCron
+    if (aeCreateTimeEvent(server.el, 1, serverCron, NULL, NULL) == AE_ERR) {
+        serverPanic(&quot;Can't create event loop timers.&quot;);
+        exit(1);
+    }
+
+    // Open the AOF file
+    server.aof_fd = open(server.aof_filename,
+                               O_WRONLY|O_APPEND|O_CREAT,0644);
+
+    // slow log
+    slowlogInit();
+
+    // background system, spawning the thread
+    bioInit();
+}
+</code></pre>
+
+<h1 id="load-aof-rdb-file">Load AOF/RDB file</h1>
+
+<p><code>loadDataFromDisk()</code> is a function called startup to load AOF or RDB file in memory.</p>
+
+<pre><code class="language-c">void loadDataFromDisk(void) {
+    // if AOF is on
+    if (server.aof_state == AOF_ON) {
+        loadAppendOnlyFile(server.aof_filename)
+    } else {
+        // if RDF is on
+        rdbLoad(server.rdb_filename,&amp;rsi)
+    }
+}
+</code></pre>
+
+<p>The detail of AOF or RDB load is out of scope, and I will explain it later.</p>
+
+<h1 id="jump-to-event-loop">Jump to event loop</h1>
+
+<p>At last, Redis assigns the callbacks <code>beforeSleep</code> and <code>afterSeleep</code> for event loop, then start the loop with <code>asMain()</code>, which is an endless loop for listening and handling events.</p>
+
+<pre><code class="language-c">aeSetBeforeSleepProc(server.el,beforeSleep);
+aeSetAfterSleepProc(server.el,afterSleep);
+aeMain(server.el);
+aeDeleteEventLoop(server.el);
+
+void aeMain(aeEventLoop *eventLoop) {
+    eventLoop-&gt;stop = 0;
+    while (!eventLoop-&gt;stop) {
+        if (eventLoop-&gt;beforesleep != NULL)
+            eventLoop-&gt;beforesleep(eventLoop);
+        aeProcessEvents(eventLoop, AE_ALL_EVENTS|AE_CALL_AFTER_SLEEP);
+    }
+}
+</code></pre>
+
+<p><strong>Reference</strong></p>
+
+<ul>
+<li><a href="http://www.hoohack.me/2018/05/26/read-redis-src-how-server-start">［Redis源码阅读］当你启动Redis的时候，Redis做了什么</a></li>
+</ul>
+    </div>
+
+    
+    
+
+    
+    
+
+    <footer class="post-footer">
+      
+
+      
+      <nav class="post-nav">
+        
+        
+          <a class="next" href="https://hellokangning.github.io/post/using-mixins-with-python/">
+            <span class="next-text nav-default">Using Mixins with Python</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+    (function() {
+      
+      
+      if (window.location.hostname === 'localhost') return;
+
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      var disqus_shortname = 'guoqing';
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:hellokangning@hotmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://www.linkedin.com/in/guoqing-geng-9032b820/" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="https://github.com/hellokangning" class="iconfont icon-github" title="github"></a>
+  <a href="https://hellokangning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    
+      2016 - 
+    2018
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Guoqing Geng</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+<script src="https://hellokangning.github.io/lib/highlight/highlight.pack.js?v=20171001"></script><script type="text/javascript" src="https://hellokangning.github.io/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="https://hellokangning.github.io/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="https://hellokangning.github.io/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+
+
+<script type="text/javascript" src="https://hellokangning.github.io/dist/even.min.js?v=3.2.0"></script>
+
+
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-105833321-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>
