@@ -87,7 +87,7 @@ It&rsquo;s my habit to start from the entry when meeting a big project. In Redis
 
 <meta itemprop="datePublished" content="2018-10-22T17:23:59&#43;08:00" />
 <meta itemprop="dateModified" content="2018-10-22T17:23:59&#43;08:00" />
-<meta itemprop="wordCount" content="752">
+<meta itemprop="wordCount" content="830">
 
 
 
@@ -174,7 +174,7 @@ It&rsquo;s my habit to start from the entry when meeting a big project. In Redis
               <a href="https://hellokangning.github.io/categories/redis/"> Redis </a>
             
           </div>
-        <span class="more-meta"> 752 words </span>
+        <span class="more-meta"> 830 words </span>
         <span class="more-meta"> 4 mins read </span>
         
       </div>
@@ -224,10 +224,26 @@ It&rsquo;s my habit to start from the entry when meeting a big project. In Redis
     char *executable;           /* Absolute executable file path. */
     char **exec_argv;           /* Executable argv vector (copy). */
 
+    redisDb *db;
     dict *commands;             /* Command table */
     dict *orig_commands;        /* Command table before command renaming. */
 
     int port;                   /* TCP listening port */
+
+    char runid[CONFIG_RUN_ID_SIZE+1];  /* ID always different at every exec. */
+
+    char *masterhost;               /* Hostname of master */
+    int masterport;                 /* Port of master */
+
+    long long slowlog_entry_id;     /* SLOWLOG current entry ID */
+    long long slowlog_log_slower_than; /* SLOWLOG time limit (to get logged) */
+    unsigned long slowlog_max_len;     /* SLOWLOG max number of items logged */
+
+    list *clients;              /* List of active clients */
+    list *slaves, *monitors;    /* List of slaves and MONITORs */
+
+    aeEventLoop *el;
+}
 </code></pre>
 
 <p>The whole process of launching is implemented in <code>main()</code> method, and the first step is initializing <code>redisServer</code>, which is done by calling <code>initServerConfig()</code> method.</p>
