@@ -17,7 +17,7 @@
 
 
 <meta name="author" content="Guoqing Geng" />
-  <meta name="description" content="__slots__ tells interpreter not to use a dict, and only allocate space for a fixed set of attributes.
+  <meta name="description" content="__slots__ tells the interpreter not to use a dict, and only allocate space for a fixed set of attributes.
 
 " />
 
@@ -52,7 +52,7 @@
 
 
 <meta property="og:title" content="A Dive into __slots__" />
-<meta property="og:description" content="__slots__ tells interpreter not to use a dict, and only allocate space for a fixed set of attributes.
+<meta property="og:description" content="__slots__ tells the interpreter not to use a dict, and only allocate space for a fixed set of attributes.
 
 " />
 <meta property="og:type" content="article" />
@@ -75,21 +75,21 @@
 
 
 <meta itemprop="name" content="A Dive into __slots__">
-<meta itemprop="description" content="__slots__ tells interpreter not to use a dict, and only allocate space for a fixed set of attributes.
+<meta itemprop="description" content="__slots__ tells the interpreter not to use a dict, and only allocate space for a fixed set of attributes.
 
 ">
 
 
 <meta itemprop="datePublished" content="2017-08-31T14:25:37&#43;08:00" />
 <meta itemprop="dateModified" content="2017-08-31T14:25:37&#43;08:00" />
-<meta itemprop="wordCount" content="508">
+<meta itemprop="wordCount" content="512">
 
 
 
 <meta itemprop="keywords" content="" />
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="A Dive into __slots__"/>
-<meta name="twitter:description" content="__slots__ tells interpreter not to use a dict, and only allocate space for a fixed set of attributes.
+<meta name="twitter:description" content="__slots__ tells the interpreter not to use a dict, and only allocate space for a fixed set of attributes.
 
 "/>
 
@@ -167,7 +167,7 @@
               <a href="https://hellokangning.github.io/categories/python/"> Python </a>
             
           </div>
-        <span class="more-meta"> 508 words </span>
+        <span class="more-meta"> 512 words </span>
         <span class="more-meta"> 3 mins read </span>
         
       </div>
@@ -181,11 +181,11 @@
 
     
     <div class="post-content">
-      <p><code>__slots__</code> tells interpreter not to use a dict, and only allocate space for a fixed set of attributes.</p>
+      <p><code>__slots__</code> tells the interpreter not to use a <code>dict</code>, and only allocate space for a fixed set of attributes.</p>
 
 <p></p>
 
-<p>Every class have instance attributes, no matter what kind of programming language. By default, Python uses a dict(<code>__dict__</code>) to store an object&rsquo;s instance attributes, which allows you setting arbitrary new attributes at runtime handily.</p>
+<p>Every class have instance attributes, no matter what kind of programming language is. By default, Python uses a dict(<code>__dict__</code>) to store instance attributes of an object, which allows you to set arbitrary new attributes at runtime handily.</p>
 
 <pre><code class="language-python">class Bird(object):
     fly = True
@@ -203,7 +203,7 @@ print larry.__dict__ # {'age': 2, 'shoot': True}
 Bird.__dict__['three'] = 'excellent'  # TypeError: 'dictproxy' object does not support item assignment
 </code></pre>
 
-<p>Nevertheless, the <code>__dict__</code> is not versatile, it wastes memory. Python can’t just allocate a static amount of memory at object creation to store all the attributes, since more may be added. <code>__slots__</code> tells interpreter not to use a dict, and only allocate space for a fixed set of attributes.</p>
+<p>Nevertheless, the <code>__dict__</code> is not versatile, it wastes memory. Python can&rsquo;t just allocate a static amount of memory at object creation to store all the attributes, since more may be added. <code>__slots__</code> tells interpreter not to use a dict, and only allocate space for a fixed set of attributes.</p>
 
 <pre><code class="language-python">class Penny(object):
     __slots__ = ['shoot', 'assist']
