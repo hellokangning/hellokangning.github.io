@@ -17,7 +17,8 @@
 
 
 <meta name="author" content="Guoqing Geng" />
-  <meta name="description" content="Python allows operator overloading, which let us to define the custom behavior for a class. For instance, if a class defines a __str__(), then it can return a readable string representation of an object.
+  <meta name="description" content="You can think of the Data Model as a description of Python as a framework. It formalizes the interfaces of the building blocks of the languages itself, such as sequences, iterators, functions, classes, context managers and so on.
+Python allows operator overloading, which let us to define the custom behavior for a class. For instance, if a class defines a __str__(), then it can return a readable string representation of an object.
 In this post, I will enumerate some special methods that can change the behavior of an object and may putted into practice in daily work.
 
 " />
@@ -53,7 +54,9 @@ In this post, I will enumerate some special methods that can change the behavior
 
 
 <meta property="og:title" content="Special Methods in Python Data Model" />
-<meta property="og:description" content="Python allows operator overloading, which let us to define the custom behavior for a class. For instance, if a class defines a __str__(), then it can return a readable string representation of an object.
+<meta property="og:description" content="You can think of the Data Model as a description of Python as a framework. It formalizes the interfaces of the building blocks of the languages itself, such as sequences, iterators, functions, classes, context managers and so on.
+
+Python allows operator overloading, which let us to define the custom behavior for a class. For instance, if a class defines a __str__(), then it can return a readable string representation of an object.
 
 In this post, I will enumerate some special methods that can change the behavior of an object and may putted into practice in daily work.
 
@@ -78,7 +81,9 @@ In this post, I will enumerate some special methods that can change the behavior
 
 
 <meta itemprop="name" content="Special Methods in Python Data Model">
-<meta itemprop="description" content="Python allows operator overloading, which let us to define the custom behavior for a class. For instance, if a class defines a __str__(), then it can return a readable string representation of an object.
+<meta itemprop="description" content="You can think of the Data Model as a description of Python as a framework. It formalizes the interfaces of the building blocks of the languages itself, such as sequences, iterators, functions, classes, context managers and so on.
+
+Python allows operator overloading, which let us to define the custom behavior for a class. For instance, if a class defines a __str__(), then it can return a readable string representation of an object.
 
 In this post, I will enumerate some special methods that can change the behavior of an object and may putted into practice in daily work.
 
@@ -87,14 +92,16 @@ In this post, I will enumerate some special methods that can change the behavior
 
 <meta itemprop="datePublished" content="2018-10-16T15:19:05&#43;08:00" />
 <meta itemprop="dateModified" content="2018-10-16T15:19:05&#43;08:00" />
-<meta itemprop="wordCount" content="466">
+<meta itemprop="wordCount" content="721">
 
 
 
 <meta itemprop="keywords" content="" />
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Special Methods in Python Data Model"/>
-<meta name="twitter:description" content="Python allows operator overloading, which let us to define the custom behavior for a class. For instance, if a class defines a __str__(), then it can return a readable string representation of an object.
+<meta name="twitter:description" content="You can think of the Data Model as a description of Python as a framework. It formalizes the interfaces of the building blocks of the languages itself, such as sequences, iterators, functions, classes, context managers and so on.
+
+Python allows operator overloading, which let us to define the custom behavior for a class. For instance, if a class defines a __str__(), then it can return a readable string representation of an object.
 
 In this post, I will enumerate some special methods that can change the behavior of an object and may putted into practice in daily work.
 
@@ -174,8 +181,8 @@ In this post, I will enumerate some special methods that can change the behavior
               <a href="https://hellokangning.github.io/categories/python/"> Python </a>
             
           </div>
-        <span class="more-meta"> 466 words </span>
-        <span class="more-meta"> 3 mins read </span>
+        <span class="more-meta"> 721 words </span>
+        <span class="more-meta"> 4 mins read </span>
         
       </div>
     </header>
@@ -196,6 +203,8 @@ In this post, I will enumerate some special methods that can change the behavior
 <li><a href="#getitem"><code>__getitem__</code></a></li>
 <li><a href="#missing"><code>__missing__</code></a></li>
 <li><a href="#iadd"><code>__iadd__</code></a></li>
+<li><a href="#abs"><code>__abs__</code></a></li>
+<li><a href="#iter"><code>__iter__</code></a></li>
 </ul>
 </nav>
   </div>
@@ -206,17 +215,21 @@ In this post, I will enumerate some special methods that can change the behavior
 
     
     <div class="post-content">
-      <p>Python allows operator overloading, which let us to define the custom behavior for a class. For instance, if a class defines a <code>__str__()</code>, then it can return a readable string representation of an object.</p>
+      <p>You can think of the Data Model as a description of Python as a framework. It formalizes the interfaces of the building blocks of the languages itself, such as sequences, iterators, functions, classes, context managers and so on.</p>
+
+<p>Python allows operator overloading, which let us to define the custom behavior for a class. For instance, if a class defines a <code>__str__()</code>, then it can return a readable string representation of an object.</p>
 
 <p>In this post, I will enumerate some special methods that can change the behavior of an object and may putted into practice in daily work.</p>
 
 <p></p>
 
+<p>The special names are always spelled with leading and trailing double underscore, i.e. <code>__str__</code>.</p>
+
 <h1 id="str"><code>__str__</code></h1>
 
 <p><code>__str()__</code> is called by <code>str(object)</code> and built-in functions such as <code>format()</code> and <code>print()</code> for a nicely printable string of an object. the return value must be a <code>string</code> object.</p>
 
-<p>The default implementation defined by the built-in type object calls <code>__repr()</code>.</p>
+<p>The default implementation defined by the built-in type object calls <code>__repr()__</code>.</p>
 
 <pre><code class="language-python">class Element:
     def __init__(self, k, v):
@@ -272,6 +285,10 @@ if b: # True
 
 <p><code>__len__()</code> is called to implemented the build-in function <code>len()</code>. It should return the length of the object.</p>
 
+<blockquote>
+<p>For built-in types like <code>list</code>, <code>str</code>, <code>bytearray</code> etc., the interpreter takes a shortcut: the CPython implementation of <code>len()</code> actually returns the value of the <code>ob_size</code> field in the <code>PyVarObject</code> struct that represents any variable-sized built-in object in memory.</p>
+</blockquote>
+
 <h1 id="getitem"><code>__getitem__</code></h1>
 
 <p><code>__getitem__(self, key)</code> is called to implement evaluation of <code>self[key]</code>. For sequence types, the accepted keys should be integers and slice objects.</p>
@@ -295,6 +312,17 @@ class Deck:
 
 d = Deck()
 print(len(d)) # print 52
+</code></pre>
+
+<p>By implementing the special methods <code>__len__</code> and <code>__getitem__</code>, our <code>Deck</code> behaves like a standard Python sequence, allowing it to benefit from the core language features - like iteration and slicing.</p>
+
+<pre><code class="language-python">d = Deck()
+
+# [Card(rank='2', suit='spades'), Card(rank='3', suit='spades'), Card(rank='4', suit='spades')]
+print(d[:3]) 
+
+for card in reversed(d):
+    print(card)
 </code></pre>
 
 <h1 id="missing"><code>__missing__</code></h1>
@@ -321,6 +349,39 @@ print(len(d)) # print 52
 a = Element(1, 'a')
 a += Element(2, 'b')
 print(a) # 3 -&gt; ab
+</code></pre>
+
+<h1 id="abs"><code>__abs__</code></h1>
+
+<p>The <code>abs</code> built-in function returns the absolute value of integers and floats, and the magnitude of <code>complex</code> number. Actually, it is <code>__abs__</code> that takes effect underneath.</p>
+
+<pre><code class="language-python">from math import hypot
+class Vector:
+    def __init__(self, x=0,y=0):
+        self.x = x
+        self.y = y
+    def __abs__(self):
+        return hypot(self.x, self.y)
+
+v = Vector(3, 4)
+print(abs(v)) # 5.0
+</code></pre>
+
+<h1 id="iter"><code>__iter__</code></h1>
+
+<p>This method is called when an iterator is required for a container. This method should return a new iterator object that can iterate over all the objects in the container.</p>
+
+<pre><code class="language-python">class Vector:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __iter__(self):
+        return (i for i in (self.x, self.y))
+
+v = Vector(2, 3)
+x, y = v
+print(x, y) # 2 3
 </code></pre>
 
 <p><strong>Reference</strong></p>
