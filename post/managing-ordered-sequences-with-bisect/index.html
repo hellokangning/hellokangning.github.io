@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>A List Comprehension Puzzler - Guoqing Geng</title>
+  <title>Managing Ordered Sequences With bisect - Guoqing Geng</title>
   <meta name="renderer" content="webkit" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 
@@ -17,12 +17,11 @@
 
 
 <meta name="author" content="Guoqing Geng" />
-  <meta name="description" content="Sometimes, we need to initialize a list with a certain number of nested lists, for example, a list with 3 lists of length 3 that can represent a Tic-tac-toe board.
-&amp;gt;&amp;gt;&amp;gt; board = [[&#39;&#39;] * 3] * 3 &amp;gt;&amp;gt; board [[&#39;&#39;, &#39;&#39;, &#39;&#39;], [&#39;&#39;, &#39;&#39;, &#39;&#39;], [&#39;&#39;, &#39;&#39;, &#39;&#39;]] &amp;gt;&amp;gt; board[1][2] = &#39;X&#39; &amp;gt;&amp;gt; board [[&#39;&#39;, &#39;&#39;, &#39;X&#39;], [&#39;&#39;, &#39;&#39;, &#39;X&#39;], [&#39;&#39;, &#39;&#39;, &#39;X&#39;]]  The output is not expected, why?
+  <meta name="description" content="The bisect module offers two main functions - bisect and insort - that use the binary search algorithm to quickly find an d insert items in any sorted sequence.
 
 " />
+<meta name="keywords" content="Python, Binary Search" />
 
-  <meta name="keywords" content="elasticsearch, python, hbase" />
 
 
 
@@ -32,7 +31,7 @@
 <meta name="generator" content="Hugo 0.44" />
 
 
-<link rel="canonical" href="https://hellokangning.github.io/post/a-list-comprehension-puzzler/" />
+<link rel="canonical" href="https://hellokangning.github.io/post/managing-ordered-sequences-with-bisect/" />
 
 <link rel="apple-touch-icon" sizes="180x180" href="https://hellokangning.github.io/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="https://hellokangning.github.io/favicon-32x32.png">
@@ -52,32 +51,18 @@
 
 
 
-<meta property="og:title" content="A List Comprehension Puzzler" />
-<meta property="og:description" content="Sometimes, we need to initialize a list with a certain number of nested lists, for example, a list with 3 lists of length 3 that can represent a Tic-tac-toe board.
-
-&gt;&gt;&gt; board = [[&#39;&#39;] * 3] * 3
-&gt;&gt; board
-[[&#39;&#39;, &#39;&#39;, &#39;&#39;], [&#39;&#39;, &#39;&#39;, &#39;&#39;], [&#39;&#39;, &#39;&#39;, &#39;&#39;]]
-&gt;&gt; board[1][2] = &#39;X&#39;
-&gt;&gt; board
-[[&#39;&#39;, &#39;&#39;, &#39;X&#39;], [&#39;&#39;, &#39;&#39;, &#39;X&#39;], [&#39;&#39;, &#39;&#39;, &#39;X&#39;]]
-
-
-The output is not expected, why?
+<meta property="og:title" content="Managing Ordered Sequences With bisect" />
+<meta property="og:description" content="The bisect module offers two main functions - bisect and insort - that use the binary search algorithm to quickly find an d insert items in any sorted sequence.
 
 " />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://hellokangning.github.io/post/a-list-comprehension-puzzler/" />
+<meta property="og:url" content="https://hellokangning.github.io/post/managing-ordered-sequences-with-bisect/" />
 
 
 
-<meta property="article:published_time" content="2018-10-24T11:19:09&#43;08:00"/>
+<meta property="article:published_time" content="2018-10-24T14:16:14&#43;08:00"/>
 
-<meta property="article:modified_time" content="2018-10-24T11:19:09&#43;08:00"/>
-
-
-
-
+<meta property="article:modified_time" content="2018-10-24T14:16:14&#43;08:00"/>
 
 
 
@@ -85,42 +70,26 @@ The output is not expected, why?
 
 
 
-<meta itemprop="name" content="A List Comprehension Puzzler">
-<meta itemprop="description" content="Sometimes, we need to initialize a list with a certain number of nested lists, for example, a list with 3 lists of length 3 that can represent a Tic-tac-toe board.
-
-&gt;&gt;&gt; board = [[&#39;&#39;] * 3] * 3
-&gt;&gt; board
-[[&#39;&#39;, &#39;&#39;, &#39;&#39;], [&#39;&#39;, &#39;&#39;, &#39;&#39;], [&#39;&#39;, &#39;&#39;, &#39;&#39;]]
-&gt;&gt; board[1][2] = &#39;X&#39;
-&gt;&gt; board
-[[&#39;&#39;, &#39;&#39;, &#39;X&#39;], [&#39;&#39;, &#39;&#39;, &#39;X&#39;], [&#39;&#39;, &#39;&#39;, &#39;X&#39;]]
 
 
-The output is not expected, why?
+
+
+<meta itemprop="name" content="Managing Ordered Sequences With bisect">
+<meta itemprop="description" content="The bisect module offers two main functions - bisect and insort - that use the binary search algorithm to quickly find an d insert items in any sorted sequence.
 
 ">
 
 
-<meta itemprop="datePublished" content="2018-10-24T11:19:09&#43;08:00" />
-<meta itemprop="dateModified" content="2018-10-24T11:19:09&#43;08:00" />
-<meta itemprop="wordCount" content="225">
+<meta itemprop="datePublished" content="2018-10-24T14:16:14&#43;08:00" />
+<meta itemprop="dateModified" content="2018-10-24T14:16:14&#43;08:00" />
+<meta itemprop="wordCount" content="308">
 
 
 
 <meta itemprop="keywords" content="" />
 <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="A List Comprehension Puzzler"/>
-<meta name="twitter:description" content="Sometimes, we need to initialize a list with a certain number of nested lists, for example, a list with 3 lists of length 3 that can represent a Tic-tac-toe board.
-
-&gt;&gt;&gt; board = [[&#39;&#39;] * 3] * 3
-&gt;&gt; board
-[[&#39;&#39;, &#39;&#39;, &#39;&#39;], [&#39;&#39;, &#39;&#39;, &#39;&#39;], [&#39;&#39;, &#39;&#39;, &#39;&#39;]]
-&gt;&gt; board[1][2] = &#39;X&#39;
-&gt;&gt; board
-[[&#39;&#39;, &#39;&#39;, &#39;X&#39;], [&#39;&#39;, &#39;&#39;, &#39;X&#39;], [&#39;&#39;, &#39;&#39;, &#39;X&#39;]]
-
-
-The output is not expected, why?
+<meta name="twitter:title" content="Managing Ordered Sequences With bisect"/>
+<meta name="twitter:description" content="The bisect module offers two main functions - bisect and insort - that use the binary search algorithm to quickly find an d insert items in any sorted sequence.
 
 "/>
 
@@ -189,7 +158,7 @@ The output is not expected, why?
           <article class="post">
     
     <header class="post-header">
-      <h1 class="post-title">A List Comprehension Puzzler</h1>
+      <h1 class="post-title">Managing Ordered Sequences With bisect</h1>
 
       <div class="post-meta">
         <span class="post-time"> Oct 24, 2018 </span>
@@ -198,7 +167,7 @@ The output is not expected, why?
               <a href="https://hellokangning.github.io/categories/python/"> Python </a>
             
           </div>
-        <span class="more-meta"> 225 words </span>
+        <span class="more-meta"> 308 words </span>
         <span class="more-meta"> 2 mins read </span>
         
       </div>
@@ -206,59 +175,91 @@ The output is not expected, why?
 
     
     
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+<ul>
+<li><a href="#searching-with-bisect">Searching with <code>bisect</code></a></li>
+<li><a href="#inserting-with-bisect-insort">Inserting with <code>bisect.insort</code></a></li>
+</ul>
+</nav>
+  </div>
+</div>
 
     
     
 
     
     <div class="post-content">
-      <p>Sometimes, we need to initialize a list with a certain number of nested lists, for example, a list with 3 lists of length 3 that can represent a Tic-tac-toe board.</p>
-
-<pre><code>&gt;&gt;&gt; board = [[''] * 3] * 3
-&gt;&gt; board
-[['', '', ''], ['', '', ''], ['', '', '']]
-&gt;&gt; board[1][2] = 'X'
-&gt;&gt; board
-[['', '', 'X'], ['', '', 'X'], ['', '', 'X']]
-</code></pre>
-
-<p>The output is not expected, why?</p>
+      <p>The <code>bisect</code> module offers two main functions - <code>bisect</code> and <code>insort</code> - that use the binary search algorithm to quickly find an d insert items in any sorted sequence.</p>
 
 <p></p>
 
-<p>Because the outer list is made of three references to the same inner list, a fact that you can see from <code>id(board[0]) == id(board[1])</code> is <code>True</code>. While it is unchanged, all seems right. After placing a mark in row 1, column 2, it reveals that all rows are alias referring to the same object.</p>
+<h1 id="searching-with-bisect">Searching with <code>bisect</code></h1>
 
-<p>In essence, the above code behaves like:</p>
+<p><code>bisect(haystack, needle)</code> does a binary search for <code>needle</code> in <code>haystack</code>, which must be sorted.</p>
 
-<pre><code class="language-python">row = [''] * 3
-board = []
-for _ in range(3):
-    board.append(row)
+<p><code>bisect</code> is actually an alias for <code>bisect_right</code>, and there is a sister function named <code>bisect_left</code>. Their difference is apparent only when the needle compares equal to an item in the list: <code>bisect_right</code> returns an insertion pointer after the existing item, while <code>bisect_left</code> returns the position of the existing item, so insertion would occur before it.</p>
+
+<pre><code class="language-python">import bisect
+
+haystack = [1,4,4,5,6,8,12]
+needles = [0,1,2,4,8,10]
+
+for n in needles:
+    l = bisect.bisect_left(haystack, n)
+    r = bisect.bisect(haystack, n)
+
+    &quot;&quot;&quot;
+    0 0
+    0 1
+    1 1
+    1 3
+    5 6
+    6 6
+    &quot;&quot;&quot;
+    print(l, r)
 </code></pre>
 
-<p>It is much obvious that the same <code>row</code> is appended 3 times to <code>board</code>.</p>
+<p>The <code>bisect()</code> function can be useful for numeric table lookups. This example uses <code>bisect()</code> to look up a letter grade for an exam score (say) based on a set of ordered numeric breakpoints: 90 and up is an ‘A’, 80 to 89 is a ‘B’, and so on:</p>
 
-<p>The correct way to achieve our goal is:</p>
+<pre><code class="language-python">def grade(score, breakpoints=[60, 70, 80, 90], grades='FDCBA'):
+    i = bisect(breakpoints, score)
+    return grades[i]
 
-<pre><code>&gt;&gt;&gt; board = [[''] * 3 for _ in range(3)]
-&gt;&gt; board
-[['', '', ''], ['', '', ''], ['', '', '']]
-&gt;&gt; board[1][2] = 'X'
-&gt;&gt; board
-[['', '', ''], ['', '', 'X'], ['', '', '']]
+# ['F', 'A', 'C', 'C', 'B', 'A', 'A']
+[grade(score) for score in [33, 99, 77, 70, 89, 90, 100]]
 </code></pre>
 
-<p>Actually, it is equivalent to this code:</p>
+<h1 id="inserting-with-bisect-insort">Inserting with <code>bisect.insort</code></h1>
 
-<pre><code class="language-python">board = []
-for _ in range(3):
-    row = [''] * 3
-    board.append(row)
+<p><code>insort(seq, item)</code> inserts <code>item</code> to <code>seq</code> so as to keep <code>seq</code> in ascending order.</p>
+
+<pre><code class="language-python">import bisect
+import random
+
+SIZE = 7
+random.seed(1902)
+
+lst = []
+for _ in range(SIZE):
+    item = random.randrange(SIZE*2)
+    bisect.insort(lst, item)
+    print('%2d -&gt; ' % item, lst)
 </code></pre>
 
-<p><strong>Reference</strong></p>
+<p>The output of above code is:</p>
 
-<p><a href="https://book.douban.com/subject/26278021/">Fluent Python</a></p>
+<pre><code> 0 -&gt;  [0]
+ 0 -&gt;  [0, 0]
+ 7 -&gt;  [0, 0, 7]
+ 8 -&gt;  [0, 0, 7, 8]
+12 -&gt;  [0, 0, 7, 8, 12]
+ 7 -&gt;  [0, 0, 7, 7, 8, 12]
+ 3 -&gt;  [0, 0, 3, 7, 7, 8, 12]
+</code></pre>
     </div>
 
     
@@ -273,14 +274,9 @@ for _ in range(3):
       
       <nav class="post-nav">
         
-          <a class="prev" href="https://hellokangning.github.io/post/managing-ordered-sequences-with-bisect/">
-            <i class="iconfont icon-left"></i>
-            <span class="prev-text nav-default">Managing Ordered Sequences With bisect</span>
-            <span class="prev-text nav-mobile">Prev</span>
-          </a>
         
-          <a class="next" href="https://hellokangning.github.io/post/what-happens-when-starting-redis/">
-            <span class="next-text nav-default">What Happens When Starting Redis</span>
+          <a class="next" href="https://hellokangning.github.io/post/a-list-comprehension-puzzler/">
+            <span class="next-text nav-default">A List Comprehension Puzzler</span>
             <span class="next-text nav-mobile">Next</span>
             <i class="iconfont icon-right"></i>
           </a>
