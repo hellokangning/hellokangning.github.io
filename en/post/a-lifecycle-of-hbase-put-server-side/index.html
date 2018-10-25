@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>A Lifecycle of HBase&#39;s Put: Server-side - Guoqing Geng</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Guoqing Geng" />
+  <meta name="description" content="Following the preceding A Lifecycle of HBase&amp;rsquo;s Put: Client-side, this post will figure out how a Put request does its mutation on HRegionServer. The whole process involves WAL, MemStore, and Coprocessor etc. After reading this post, hope you make their roles clear.
+
+" />
+<meta name="keywords" content="HBase" />
+
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.44" />
+
+
+<link rel="canonical" href="https://hellokangning.github.io/en/post/a-lifecycle-of-hbase-put-server-side/" />
+
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+
+<link href="/dist/even.min.css?v=3.2.0" rel="stylesheet">
+<link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+
+
+
+<meta property="og:title" content="A Lifecycle of HBase&#39;s Put: Server-side" />
+<meta property="og:description" content="Following the preceding A Lifecycle of HBase&rsquo;s Put: Client-side, this post will figure out how a Put request does its mutation on HRegionServer. The whole process involves WAL, MemStore, and Coprocessor etc. After reading this post, hope you make their roles clear.
+
+" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hellokangning.github.io/en/post/a-lifecycle-of-hbase-put-server-side/" />
+
+
+
+<meta property="article:published_time" content="2017-12-05T15:14:28&#43;08:00"/>
+
+<meta property="article:modified_time" content="2017-12-07T15:14:28&#43;08:00"/>
+
+
+
+
+
+
+
+
+
+
+
+<meta itemprop="name" content="A Lifecycle of HBase&#39;s Put: Server-side">
+<meta itemprop="description" content="Following the preceding A Lifecycle of HBase&rsquo;s Put: Client-side, this post will figure out how a Put request does its mutation on HRegionServer. The whole process involves WAL, MemStore, and Coprocessor etc. After reading this post, hope you make their roles clear.
+
+">
+
+
+<meta itemprop="datePublished" content="2017-12-05T15:14:28&#43;08:00" />
+<meta itemprop="dateModified" content="2017-12-05T15:14:28&#43;08:00" />
+<meta itemprop="wordCount" content="2395">
+
+
+
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="A Lifecycle of HBase&#39;s Put: Server-side"/>
+<meta name="twitter:description" content="Following the preceding A Lifecycle of HBase&rsquo;s Put: Client-side, this post will figure out how a Put request does its mutation on HRegionServer. The whole process involves WAL, MemStore, and Coprocessor etc. After reading this post, hope you make their roles clear.
+
+"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/en/" class="logo">Guoqing Geng</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/en/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/en/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/en/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="/en/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/zh/">
+        <li class="mobile-menu-item">中文</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/en/" class="logo">Guoqing Geng</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/en/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/en/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/en/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/en/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/zh/">中文</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">A Lifecycle of HBase&#39;s Put: Server-side</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> Dec 05, 2017 </span>
+        <div class="post-category">
+            
+              <a href="/en/categories/hbase/"> HBase </a>
+            
+          </div>
+        <span class="more-meta"> 2395 words </span>
+        <span class="more-meta"> 5 mins read </span>
+        
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+<ul>
+<li><a href="#hregionserver"><code>HRegionServer</code></a></li>
+<li><a href="#rsrpsservices"><code>RSRpsServices</code></a></li>
+<li><a href="#hregion"><code>HRegion</code></a>
+<ul>
+<li><a href="#requestflushifneeded"><code>requestFlushIfNeeded</code></a></li>
+<li><a href="#dominibatchmutate"><code>doMiniBatchMutate</code></a></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    
+    
+
+    
+    <div class="post-content">
+      <p>Following the preceding <a href="https://hellokangning.github.io/post/a-lifecycle-of-hbase-put-client-side/">A Lifecycle of HBase&rsquo;s Put: Client-side</a>, this post will figure out how a <code>Put</code> request does its mutation on <code>HRegionServer</code>. The whole process involves WAL, MemStore, and Coprocessor etc. After reading this post, hope you make their roles clear.</p>
+
+<p></p>
+
+<p><img src="/images/hbase-regionserver-put-interaction.png" alt="" /></p>
+
+<p>What <code>ClientServiceCallable</code> do on client-side, if you remember, is calling <code>ClientProtos.ClientService.BlockingInterface</code>&rsquo;s <code>mutate</code> method to send <code>Put</code> request to <code>RegionServer</code>.</p>
+
+<pre><code class="language-java">// ClientServiceCallable.java
+
+@InterfaceAudience.Private
+public abstract class ClientServiceCallable&lt;T&gt; extends
+    RegionServerCallable&lt;T, ClientProtos.ClientService.BlockingInterface&gt; {
+
+  @Override
+  protected void setStubByServiceName(ServerName serviceName) throws IOException {
+    setStub(getConnection().getClient(serviceName));
+  }
+
+  protected ClientProtos.MutateResponse doMutate(ClientProtos.MutateRequest request)
+  throws org.apache.hadoop.hbase.shaded.com.google.protobuf.ServiceException {
+    return getStub().mutate(getRpcController(), request);
+  }
+}
+</code></pre>
+
+<h1 id="hregionserver"><code>HRegionServer</code></h1>
+
+<p><img src="/images/hbase-hregionserver-class.png" alt="" /></p>
+
+<p>And on server-side, who will accept this request? Every <code>RegionServer</code> runs a <code>HRegionServer</code> from commandline. When <code>HregionServer</code> is initialized, it starts <code>RSRpcServices</code>. See the definition of <code>HRegionServer</code> and its constructor.</p>
+
+<pre><code class="language-java">// HRegionServer.java
+
+public class HRegionServer extends HasThread implements
+    RegionServerServices, LastSequenceId, ConfigurationObserver {
+
+  protected final RSRpcServices rpcServices;
+
+  /**
+  * Starts a HRegionServer at the default location
+  */
+  public HRegionServer(Configuration conf) throws IOException {
+    // ...
+
+    rpcServices = createRpcServices();
+    this.rpcServices.start();
+  }
+}
+</code></pre>
+
+<h1 id="rsrpsservices"><code>RSRpsServices</code></h1>
+
+<p><code>RSRpsServices</code> implements <code>ClientService.BlockingInterface</code>, and override <code>mutate</code> method of course. What <code>mutate</code> method is simple, it calls <code>put</code> method of <code>HRegion</code>, them update metrics.</p>
+
+<pre><code class="language-java">// RSRpcServices.java
+
+public class RSRpcServices implements HBaseRPCErrorHandler,
+    AdminService.BlockingInterface, ClientService.BlockingInterface, PriorityFunction,
+    ConfigurationObserver {
+
+   final RpcServerInterface rpcServer;
+
+   void start() {
+      rpcServer.start();
+    }   
+
+   /**
+   * Mutate data in a table.
+   */
+  @Override
+  public MutateResponse mutate(final RpcController rpcc,
+      final MutateRequest request) throws ServiceException {
+    // ...
+    HBaseRpcController controller = (HBaseRpcController)rpcc;
+    CellScanner cellScanner = controller != null ? controller.cellScanner() : null;
+
+    MutationProto mutation = request.getMutation();
+    Put put = ProtobufUtil.toPut(mutation, cellScanner);
+
+    HRegion region = getRegion(request.getRegion());
+    region.put(put)
+  }
+}
+</code></pre>
+
+<h1 id="hregion"><code>HRegion</code></h1>
+
+<p><img src="/images/hbase-hregion-class.png" alt="" /></p>
+
+<pre><code class="language-java">// HRegion.java
+
+public class HRegion implements HeapSize, PropagatingConfigurationObserver, Region {
+  @Override
+  public void put(Put put) throws IOException {
+    checkReadOnly();
+
+    // Do a rough check that we have resources to accept a write.  The check is
+    // 'rough' in that between the resource check and the call to obtain a
+    // read lock, resources may run out.  For now, the thought is that this
+    // will be extremely rare; we'll deal with it when it happens.
+    checkResources();
+    startRegionOperation(Operation.PUT);
+    try {
+      // All edits for the given row (across all column families) must happen atomically.
+      doBatchMutate(put);
+    } finally {
+      closeRegionOperation(Operation.PUT);
+    }
+  }
+
+  OperationStatus[] batchMutate(BatchOperation&lt;?&gt; batchOp) throws IOException {
+    boolean initialized = false;
+    Operation op = batchOp.isInReplay() ? Operation.REPLAY_BATCH_MUTATE : Operation.BATCH_MUTATE;
+    startRegionOperation(op);
+    try {
+      while (!batchOp.isDone()) {
+        if (!batchOp.isInReplay()) {
+          checkReadOnly();
+        }
+        checkResources();
+
+        if (!initialized) {
+          this.writeRequestsCount.add(batchOp.operations.length);
+          if (!batchOp.isInReplay()) {
+            callPreMutateCPHooks(batchOp);
+          }
+          // validate and prepare batch for write, after CP pre-hooks
+          batchOp.checkAndPrepare(this);
+          initialized = true;
+        }
+        doMiniBatchMutate(batchOp);
+        long newSize = this.getMemStoreSize();
+        requestFlushIfNeeded(newSize);
+      }
+    } finally {
+      closeRegionOperation(op);
+    }
+    return batchOp.retCodeDetails;
+  }
+}
+</code></pre>
+
+<p>After some validations, <code>doMiniBatchMutate</code> becomes the worker that really writes, and <code>requestFlushIfNeeded</code> will flush <code>MemStore</code> to <code>HFile</code>. Let&rsquo;s look at <code>requestFlushIfNeeded</code> first, since <code>doMiniBatchMutate</code> is more complicated and will take a large chunk of this post.</p>
+
+<h2 id="requestflushifneeded"><code>requestFlushIfNeeded</code></h2>
+
+<pre><code class="language-java">// HRegion.java
+
+public class HRegion implements HeapSize, PropagatingConfigurationObserver, Region {
+  private void requestFlushIfNeeded(long memstoreTotalSize) throws RegionTooBusyException {
+    if (memstoreTotalSize &gt; this.getMemStoreFlushSize()) {
+      requestFlush();
+    }
+  }
+
+  private void requestFlush() {
+    if (this.rsServices == null) {
+      return;
+    }
+    requestFlush0(FlushLifeCycleTracker.DUMMY);
+  }
+
+  private void requestFlush0(FlushLifeCycleTracker tracker) {
+    boolean shouldFlush = false;
+    synchronized (writestate) {
+      if (!this.writestate.isFlushRequested()) {
+        shouldFlush = true;
+        writestate.flushRequested = true;
+      }
+    }
+    if (shouldFlush) {
+      // Make request outside of synchronize block; HBASE-818.
+      this.rsServices.getFlushRequester().requestFlush(this, false, tracker);
+      if (LOG.isDebugEnabled()) {
+        LOG.debug(&quot;Flush requested on &quot; + this.getRegionInfo().getEncodedName());
+      }
+    } else {
+      tracker.notExecuted(&quot;Flush already requested on &quot; + this);
+    }
+  }
+}
+</code></pre>
+
+<p>As we can see, <code>FlushRequester</code> is called to trigger flush operation. In its Child <code>MemStoreFlusher</code>, each flush task is appended into <code>BlockingQueue</code>. At the same time, one <code>Runnable</code> named <code>FlushHandler</code> periodically flushes these cache into HDFS with the help of <code>HRegion</code>&rsquo;s <code>flushcache</code>.</p>
+
+<pre><code class="language-java">// MemStoreFlusher.java
+
+class MemStoreFlusher implements FlushRequester {
+
+  private final BlockingQueue&lt;FlushQueueEntry&gt; flushQueue = new DelayQueue&lt;&gt;();
+  private final Map&lt;Region, FlushRegionEntry&gt; regionsInQueue = new HashMap&lt;&gt;();
+  private final FlushHandler[] flushHandlers;
+  private List&lt;FlushRequestListener&gt; flushRequestListeners = new ArrayList&lt;&gt;(1);
+  private final HRegionServer server;
+
+  @Override
+  public void requestFlush(HRegion r, boolean forceFlushAllStores, FlushLifeCycleTracker tracker) {
+    r.incrementFlushesQueuedCount();
+    synchronized (regionsInQueue) {
+      if (!regionsInQueue.containsKey(r)) {
+        // This entry has no delay so it will be added at the top of the flush
+        // queue. It'll come out near immediately.
+        FlushRegionEntry fqe = new FlushRegionEntry(r, forceFlushAllStores, tracker);
+        this.regionsInQueue.put(r, fqe);
+        this.flushQueue.add(fqe);
+      } else {
+        tracker.notExecuted(&quot;Flush already requested on &quot; + r);
+      }
+    }
+  }
+
+  private boolean flushRegion(HRegion region, boolean emergencyFlush, boolean forceFlushAllStores,
+      FlushLifeCycleTracker tracker) {
+    synchronized (this.regionsInQueue) {
+      FlushRegionEntry fqe = this.regionsInQueue.remove(region);
+      // Use the start time of the FlushRegionEntry if available
+      if (fqe != null &amp;&amp; emergencyFlush) {
+        // Need to remove from region from delay queue. When NOT an
+        // emergencyFlush, then item was removed via a flushQueue.poll.
+        flushQueue.remove(fqe);
+      }
+    }
+
+    lock.readLock().lock();
+    try {
+      notifyFlushRequest(region, emergencyFlush);
+      FlushResult flushResult = region.flushcache(forceFlushAllStores, false, tracker);
+
+      // ...
+    } finally {
+      lock.readLock().unlock();
+      wakeUpIfBlocking();
+      tracker.afterExecution();
+    }
+    return true;
+  }
+
+  private class FlushHandler extends HasThread {
+    @Override
+    public void run() {
+      while (!server.isStopped()) {
+        FlushQueueEntry fqe = null;
+        try {
+          // ...
+          FlushRegionEntry fre = (FlushRegionEntry) fqe;
+          if (!flushRegion(fre)) {
+            break;
+          }
+        } catch (InterruptedException ex) {
+          continue;
+        } catch (ConcurrentModificationException ex) {
+          continue;
+        } catch (Exception ex) {
+          LOG.error(&quot;Cache flusher failed for entry &quot; + fqe, ex);
+          if (!server.checkFileSystem()) {
+            break;
+          }
+        }
+      }
+
+      synchronized (regionsInQueue) {
+        regionsInQueue.clear();
+        flushQueue.clear();
+      }
+
+      // Signal anyone waiting, so they see the close flag
+      wakeUpIfBlocking();
+      LOG.info(getName() + &quot; exiting&quot;);
+    }
+  }
+}
+</code></pre>
+
+<h2 id="dominibatchmutate"><code>doMiniBatchMutate</code></h2>
+
+<p><img src="/images/hbase-hregion-dominibatchmutate-interaction.png" alt="" /></p>
+
+<p>Hope this graph tells the complete steps of <code>doMiniBatchMutate</code>. A sketch lists here:</p>
+
+<ol>
+<li>Try to acquire as many read locks as we can, and ensure we acquire at least one. Why read locks? See more <a href="https://issues.apache.org/jira/browse/HBASE-18474">Document how HRegion#doMiniBatchMutation is acquiring read row locks</a>.</li>
+<li>Update any LATEST_TIMESTAMP timestamps.</li>
+<li>Build WAL edit.</li>
+<li>Append the final edit to WAL and sync, begin mvcc if no <code>WriteEntry</code>.</li>
+<li>Write back to memStore.</li>
+<li>Complete mvcc.</li>
+</ol>
+
+<p>Two important concepts I must emphasize,</p>
+
+<ul>
+<li>mvcc, shorted for <code>MultiVersionConcurrencyControl</code>. it manages the read/write consistency. This provides an interface for readers to determine what entries to ignore, and a mechanism for writers to obtain new write numbers, then &ldquo;commit&rdquo; the new writes for readers to read (thus forming atomic transactions).</li>
+<li><code>RegionCoprocessorHost</code>, which implements the coprocessor environment and runtime support for coprocessors loaded within a <code>Region</code>. Every step leaves some pre or post jobs to coprocessors.</li>
+</ul>
+
+<pre><code class="language-java">// HRegion.java
+
+public class HRegion implements HeapSize, PropagatingConfigurationObserver, Region {
+  private void doMiniBatchMutate(BatchOperation&lt;?&gt; batchOp) throws IOException {
+    boolean replay = batchOp.isInReplay();
+    long currentNonceGroup = HConstants.NO_NONCE;
+    long currentNonce = HConstants.NO_NONCE;
+    WALEdit walEdit = null;
+    boolean locked = false;
+    // We try to set up a batch in the range [firstIndex,lastIndexExclusive)
+    int firstIndex = batchOp.nextIndexToProcess;
+    int lastIndexExclusive = firstIndex;
+    boolean success = false;
+    boolean doneByCoprocessor = false;
+    int noOfPuts = 0;
+    int noOfDeletes = 0;
+    WriteEntry writeEntry = null;
+    int cellCount = 0;
+    /** Keep track of the locks we hold so we can release them in finally clause */
+    List&lt;RowLock&gt; acquiredRowLocks = Lists.newArrayListWithCapacity(batchOp.operations.length);
+    MemStoreSizing memStoreAccounting = new MemStoreSizing();
+    try {
+      // STEP 1. Try to acquire as many locks as we can, and ensure we acquire at least one.
+      int numReadyToWrite = 0;
+      for (; lastIndexExclusive &lt; batchOp.operations.length; lastIndexExclusive++) {
+        if (batchOp.retCodeDetails[lastIndexExclusive].getOperationStatusCode()
+            != OperationStatusCode.NOT_RUN) {
+          continue;
+        }
+        Mutation mutation = batchOp.getMutation(lastIndexExclusive);
+        // If we haven't got any rows in our batch, we should block to get the next one.
+        RowLock rowLock = null;
+        try {
+          rowLock = getRowLockInternal(mutation.getRow(), true);
+        } catch (TimeoutIOException e) {
+          // We will retry when other exceptions, but we should stop if we timeout .
+          throw e;
+        } catch (IOException ioe) {
+          LOG.warn(&quot;Failed getting lock, row=&quot; + Bytes.toStringBinary(mutation.getRow()), ioe);
+        }
+        if (rowLock == null) {
+          // We failed to grab another lock
+          break; // Stop acquiring more rows for this batch
+        } else {
+          acquiredRowLocks.add(rowLock);
+        }
+
+        numReadyToWrite++;
+        if (replay || getEffectiveDurability(mutation.getDurability()) != Durability.SKIP_WAL) {
+          for (List&lt;Cell&gt; cells : mutation.getFamilyCellMap().values()) {
+            cellCount += cells.size();
+          }
+        }
+      }
+
+      // We've now grabbed as many mutations off the list as we can
+      // Nothing to put/delete -- an exception in the above such as NoSuchColumnFamily?
+      if (numReadyToWrite &lt;= 0) {
+        return;
+      }
+
+      // STEP 2. Update any LATEST_TIMESTAMP timestamps
+      // We should record the timestamp only after we have acquired the rowLock,
+      // otherwise, newer puts/deletes are not guaranteed to have a newer timestamp
+      long now = EnvironmentEdgeManager.currentTime();
+      if (!replay) {
+        byte[] byteNow = Bytes.toBytes(now);
+        for (int i = firstIndex; i &lt; lastIndexExclusive; i++) {
+          // skip invalid
+          if (batchOp.retCodeDetails[i].getOperationStatusCode() != OperationStatusCode.NOT_RUN) {
+            // lastIndexExclusive was incremented above.
+            continue;
+          }
+
+          Mutation mutation = batchOp.getMutation(i);
+          if (mutation instanceof Put) {
+            updateCellTimestamps(batchOp.familyCellMaps[i].values(), byteNow);
+            noOfPuts++;
+          } else {
+            prepareDeleteTimestamps(mutation, batchOp.familyCellMaps[i], byteNow);
+            noOfDeletes++;
+          }
+          rewriteCellTags(batchOp.familyCellMaps[i], mutation);
+          WALEdit fromCP = batchOp.walEditsFromCoprocessors[i];
+          if (fromCP != null) {
+            cellCount += fromCP.size();
+          }
+        }
+      }
+      lock(this.updatesLock.readLock(), numReadyToWrite);
+      locked = true;
+
+      // calling the pre CP hook for batch mutation
+      if (!replay &amp;&amp; coprocessorHost != null) {
+        MiniBatchOperationInProgress&lt;Mutation&gt; miniBatchOp =
+          new MiniBatchOperationInProgress&lt;&gt;(batchOp.getMutationsForCoprocs(),
+          batchOp.retCodeDetails, batchOp.walEditsFromCoprocessors, firstIndex, lastIndexExclusive);
+        if (coprocessorHost.preBatchMutate(miniBatchOp)) {
+          doneByCoprocessor = true;
+          return;
+        } else {
+          for (int i = firstIndex; i &lt; lastIndexExclusive; i++) {
+            if (batchOp.retCodeDetails[i].getOperationStatusCode() != OperationStatusCode.NOT_RUN) {
+              // lastIndexExclusive was incremented above.
+              continue;
+            }
+            // we pass (i - firstIndex) below since the call expects a relative index
+            Mutation[] cpMutations = miniBatchOp.getOperationsFromCoprocessors(i - firstIndex);
+            if (cpMutations == null) {
+              continue;
+            }
+            Mutation mutation = batchOp.getMutation(i);
+            boolean skipWal = getEffectiveDurability(mutation.getDurability()) == Durability.SKIP_WAL;
+            // Else Coprocessor added more Mutations corresponding to the Mutation at this index.
+            for (int j = 0; j &lt; cpMutations.length; j++) {
+              Mutation cpMutation = cpMutations[j];
+              checkAndPrepareMutation(cpMutation, replay, now);
+
+              // Acquire row locks. If not, the whole batch will fail.
+              acquiredRowLocks.add(getRowLockInternal(cpMutation.getRow(), true));
+
+              // Returned mutations from coprocessor correspond to the Mutation at index i. We can
+              // directly add the cells from those mutations to the familyMaps of this mutation.
+              Map&lt;byte[], List&lt;Cell&gt;&gt; cpFamilyMap = cpMutation.getFamilyCellMap();
+              // will get added to the memStore later
+              mergeFamilyMaps(batchOp.familyCellMaps[i], cpFamilyMap);
+
+              // The durability of returned mutation is replaced by the corresponding mutation.
+              // If the corresponding mutation contains the SKIP_WAL, we shouldn't count the
+              // cells of returned mutation.
+              if (!skipWal) {
+                for (List&lt;Cell&gt; cells : cpFamilyMap.values()) {
+                  cellCount += cells.size();
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // STEP 3. Build WAL edit
+      walEdit = new WALEdit(cellCount, replay);
+      for (int i = firstIndex; i &lt; lastIndexExclusive; i++) {
+        // Skip puts that were determined to be invalid during preprocessing
+        if (batchOp.retCodeDetails[i].getOperationStatusCode() != OperationStatusCode.NOT_RUN) {
+          continue;
+        }
+
+        Mutation m = batchOp.getMutation(i);
+        // we use durability of the original mutation for the mutation passed by CP.
+        if (getEffectiveDurability(m.getDurability()) == Durability.SKIP_WAL) {
+          recordMutationWithoutWal(m.getFamilyCellMap());
+          continue;
+        }
+
+        long nonceGroup = batchOp.getNonceGroup(i);
+        long nonce = batchOp.getNonce(i);
+        // In replay, the batch may contain multiple nonces. If so, write WALEdit for each.
+        // Given how nonces are originally written, these should be contiguous.
+        // They don't have to be, it will still work, just write more WALEdits than needed.
+        if (nonceGroup != currentNonceGroup || nonce != currentNonce) {
+          // Write what we have so far for nonces out to WAL
+          appendCurrentNonces(m, replay, walEdit, now, currentNonceGroup, currentNonce);
+          walEdit = new WALEdit(cellCount, replay);
+          currentNonceGroup = nonceGroup;
+          currentNonce = nonce;
+        }
+
+        // Add WAL edits by CP
+        WALEdit fromCP = batchOp.walEditsFromCoprocessors[i];
+        if (fromCP != null) {
+          for (Cell cell : fromCP.getCells()) {
+            walEdit.add(cell);
+          }
+        }
+        addFamilyMapToWALEdit(batchOp.familyCellMaps[i], walEdit);
+      }
+
+      // STEP 4. Append the final edit to WAL and sync.
+      Mutation mutation = batchOp.getMutation(firstIndex);
+      writeEntry = doWALAppend(walEdit, batchOp.durability, mutation.getClusterIds(), now,
+          currentNonceGroup, currentNonce,
+          replay ? batchOp.getReplaySequenceId() : WALKey.NO_SEQUENCE_ID);
+      if (!replay &amp;&amp; writeEntry == null) {
+        // If no writeEntry, then not in replay and skipping WAL or some such. Begin an MVCC
+        // transaction to get sequence id.
+        writeEntry = mvcc.begin();
+      }
+
+      // STEP 5. Write back to memStore
+      for (int i = firstIndex; i &lt; lastIndexExclusive; i++) {
+        if (batchOp.retCodeDetails[i].getOperationStatusCode() != OperationStatusCode.NOT_RUN) {
+          continue;
+        }
+        // We need to update the sequence id for following reasons.
+        // 1) If the op is in replay mode, FSWALEntry#stampRegionSequenceId won't stamp sequence id.
+        // 2) If no WAL, FSWALEntry won't be used
+        // we use durability of the original mutation for the mutation passed by CP.
+        boolean updateSeqId = replay || batchOp.getMutation(i).getDurability() == Durability.SKIP_WAL;
+        if (updateSeqId) {
+          this.updateSequenceId(batchOp.familyCellMaps[i].values(),
+            replay? batchOp.getReplaySequenceId(): writeEntry.getWriteNumber());
+        }
+        applyFamilyMapToMemStore(batchOp.familyCellMaps[i], memStoreAccounting);
+      }
+
+      // update memstore size
+      this.addAndGetMemStoreSize(memStoreAccounting);
+
+      // calling the post CP hook for batch mutation
+      if (!replay &amp;&amp; coprocessorHost != null) {
+        MiniBatchOperationInProgress&lt;Mutation&gt; miniBatchOp =
+          new MiniBatchOperationInProgress&lt;&gt;(batchOp.getMutationsForCoprocs(),
+          batchOp.retCodeDetails, batchOp.walEditsFromCoprocessors, firstIndex, lastIndexExclusive);
+        coprocessorHost.postBatchMutate(miniBatchOp);
+      }
+
+      // STEP 6. Complete mvcc.
+      if (writeEntry != null) {
+        mvcc.completeAndWait(writeEntry);
+        writeEntry = null;
+      }
+      if (replay) {
+        this.mvcc.advanceTo(batchOp.getReplaySequenceId());
+      }
+
+      success = true;
+    } finally {
+      // Call complete rather than completeAndWait because we probably had error if walKey != null
+      if (writeEntry != null) mvcc.complete(writeEntry);
+
+      if (locked) {
+        this.updatesLock.readLock().unlock();
+      }
+      releaseRowLocks(acquiredRowLocks);
+
+      for (int i = firstIndex; i &lt; lastIndexExclusive; i++) {
+        if (batchOp.retCodeDetails[i] == OperationStatus.NOT_RUN) {
+          batchOp.retCodeDetails[i] =
+              success || doneByCoprocessor ? OperationStatus.SUCCESS : OperationStatus.FAILURE;
+        }
+      }
+
+      // synced so that the coprocessor contract is adhered to.
+      if (!replay &amp;&amp; coprocessorHost != null &amp;&amp; !doneByCoprocessor) {
+        for (int i = firstIndex; i &lt; lastIndexExclusive; i++) {
+          // only for successful puts
+          if (batchOp.retCodeDetails[i].getOperationStatusCode()
+              != OperationStatusCode.SUCCESS) {
+            continue;
+          }
+          Mutation m = batchOp.getMutation(i);
+          if (m instanceof Put) {
+            coprocessorHost.postPut((Put) m, walEdit, m.getDurability());
+          } else {
+            coprocessorHost.postDelete((Delete) m, walEdit, m.getDurability());
+          }
+        }
+      }
+
+      // See if the column families were consistent through the whole thing.
+      // if they were then keep them. If they were not then pass a null.
+      // null will be treated as unknown.
+      // Total time taken might be involving Puts and Deletes.
+      // Split the time for puts and deletes based on the total number of Puts and Deletes.
+
+      if (noOfPuts &gt; 0) {
+        // There were some Puts in the batch.
+        if (this.metricsRegion != null) {
+          this.metricsRegion.updatePut();
+        }
+      }
+      if (noOfDeletes &gt; 0) {
+        // There were some Deletes in the batch.
+        if (this.metricsRegion != null) {
+          this.metricsRegion.updateDelete();
+        }
+      }
+
+      if (coprocessorHost != null &amp;&amp; !batchOp.isInReplay()) {
+        // call the coprocessor hook to do any finalization steps
+        // after the put is done
+        MiniBatchOperationInProgress&lt;Mutation&gt; miniBatchOp =
+          new MiniBatchOperationInProgress&lt;&gt;(batchOp.getMutationsForCoprocs(),
+          batchOp.retCodeDetails, batchOp.walEditsFromCoprocessors, firstIndex, lastIndexExclusive);
+        coprocessorHost.postBatchMutateIndispensably(miniBatchOp, success);
+      }
+
+      batchOp.nextIndexToProcess = lastIndexExclusive;
+    }
+  }
+</code></pre>
+
+<p><strong>Reference</strong></p>
+
+<ol>
+<li><a href="http://hbasefly.com/2016/03/23/hbase_writer/">HBase － 数据写入流程解析</a></li>
+<li><a href="http://blog.javachen.com/2014/06/13/hbase-code-about-htable-put.html">HBase源码分析：HTable put过程</a></li>
+<li><a href="http://hongs-yang.iteye.com/blog/2046222">hbase put 流程分析regionserver端</a></li>
+<li><a href="http://blog.csdn.net/bryce123phy/article/details/51279878">HBase的put流程源码分析</a></li>
+<li><a href="https://issues.apache.org/jira/browse/HBASE-18474">Document how HRegion#doMiniBatchMutation is acquiring read row locks</a></li>
+<li><a href="https://issues.apache.org/jira/browse/HBASE-16992">The usage of mutation from CP is weird.</a></li>
+<li><a href="https://issues.apache.org/jira/browse/HBASE-18703">Inconsistent behavior for preBatchMutate in doMiniBatchMutate and processRowsWithLocks</a></li>
+</ol>
+    </div>
+
+    
+    
+
+    
+    
+
+    <footer class="post-footer">
+      
+
+      
+      <nav class="post-nav">
+        
+          <a class="prev" href="/en/post/multiversion-concurrency-control-in-hbase/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">Multiversion Concurrency Control in HBase</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        
+          <a class="next" href="/en/post/a-lifecycle-of-hbase-put-client-side/">
+            <span class="next-text nav-default">A Lifecycle of HBase&#39;s Put: Client-side</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+    (function() {
+      
+      
+      if (window.location.hostname === 'localhost') return;
+
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      var disqus_shortname = 'guoqing';
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:hellokangning@hotmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://www.linkedin.com/in/guoqing-geng-9032b820/" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="https://github.com/hellokangning" class="iconfont icon-github" title="github"></a>
+  <a href="https://hellokangning.github.io/en/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    
+      2016 - 
+    2018
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Guoqing Geng</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+<script src="/lib/highlight/highlight.pack.js?v=20171001"></script><script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+
+
+<script type="text/javascript" src="/dist/even.min.js?v=3.2.0"></script>
+
+
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-105833321-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>

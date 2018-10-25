@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Guoqing Geng</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Guoqing Geng" />
+  <meta name="description" content="Guoqing Geng&#39;s blog" />
+  <meta name="keywords" content="elasticsearch, python, hbase" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.44" />
+
+
+<link rel="canonical" href="https://hellokangning.github.io/en/" />
+<link href="https://hellokangning.github.io/en/index.xml" rel="alternate" type="application/rss+xml" title="Guoqing Geng" />
+  <link href="https://hellokangning.github.io/en/index.xml" rel="feed" type="application/rss+xml" title="Guoqing Geng" />
+
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+
+<link href="/dist/even.min.css?v=3.2.0" rel="stylesheet">
+<link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+
+
+
+<meta property="og:title" content="Guoqing Geng" />
+<meta property="og:description" content="Guoqing Geng&#39;s blog" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://hellokangning.github.io/en/" />
+
+
+
+<meta property="og:updated_time" content="2017-09-05T16:26:31&#43;08:00"/>
+
+
+
+
+
+
+
+
+
+
+<meta itemprop="name" content="Guoqing Geng">
+<meta itemprop="description" content="Guoqing Geng&#39;s blog">
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Guoqing Geng"/>
+<meta name="twitter:description" content="Guoqing Geng&#39;s blog"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/en/" class="logo">Guoqing Geng</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/en/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/en/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/en/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="/en/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/zh/">
+        <li class="mobile-menu-item">中文</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/en/" class="logo">Guoqing Geng</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/en/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/en/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/en/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/en/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/zh/">中文</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          
+  <section id="posts" class="posts">
+    
+    
+    
+      <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/en/post/lucene-directory/">Directory in Lucene</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> Sep 05, 2017 </span>
+      <div class="post-category">
+          
+            <a href="/en/categories/elasticsearch/"> Elasticsearch </a>
+          
+        </div>
+      <span class="more-meta"> 2733 words </span>
+      <span class="more-meta"> 13 mins read </span>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      <p><code>Directory</code> represents the storage location of the indexes and generally it is a list of files. These files are called index files. Index files are normally created once and then used for read operation or can be deleted.</p>
+
+<p></p>
+    </div>
+    <div class="read-more">
+      <a href="/en/post/lucene-directory/" class="read-more-link">Read more..</a>
+    </div>
+  </div>
+</article>
+
+    
+      <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/en/post/when-finally-really-executes/">When finally Really Executes</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> Sep 04, 2017 </span>
+      <div class="post-category">
+          
+            <a href="/en/categories/python/"> Python </a>
+          
+        </div>
+      <span class="more-meta"> 876 words </span>
+      <span class="more-meta"> 2 mins read </span>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      <p>Epitome:</p>
+
+<ul>
+<li>return doesn&rsquo;t really return, it pushs value to stack, then jumps to finally, which was set up by <code>SETUP_FINALLY</code> before.</li>
+<li>after executing finally, <code>END_FINALLY</code> returns.</li>
+</ul>
+
+<p></p>
+    </div>
+    <div class="read-more">
+      <a href="/en/post/when-finally-really-executes/" class="read-more-link">Read more..</a>
+    </div>
+  </div>
+</article>
+
+    
+      <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/en/post/exit-options-in-python/">Exit Options in Python</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> Sep 01, 2017 </span>
+      <div class="post-category">
+          
+            <a href="/en/categories/python/"> Python </a>
+          
+        </div>
+      <span class="more-meta"> 125 words </span>
+      <span class="more-meta"> 1 min read </span>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      First candidate is os._exit, which exits without calling cleanup handlers, flushing stdio buffers, etc. (and which should normally only be used in the child process after a fork()).
+Second, sys.exit is intended for use in programs. According to official document:
+ This is implemented by raising the SystemExit exception, so cleanup actions specified by finally clauses of try statements are honored, and it is possible to intercept the exit attempt at an outer level.
+    </div>
+    <div class="read-more">
+      <a href="/en/post/exit-options-in-python/" class="read-more-link">Read more..</a>
+    </div>
+  </div>
+</article>
+
+    
+      <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/en/post/difference-between-range-and-xrange/">The Difference between range and xrange</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> Sep 01, 2017 </span>
+      <div class="post-category">
+          
+            <a href="/en/categories/python/"> Python </a>
+          
+        </div>
+      <span class="more-meta"> 194 words </span>
+      <span class="more-meta"> 1 min read </span>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      <p>Short answer:</p>
+
+<ul>
+<li><code>range</code> creates a list, so if you do <code>range(1, 10000000)</code> it creates a list in memory with 9999999 elements. This will become an expensive operation on very large ranges.</li>
+<li><code>xrange</code> is a sequence object that <em>evaluates lazily</em>(it will only compute the next value when needed).</li>
+</ul>
+
+<p></p>
+    </div>
+    <div class="read-more">
+      <a href="/en/post/difference-between-range-and-xrange/" class="read-more-link">Read more..</a>
+    </div>
+  </div>
+</article>
+
+    
+      <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/en/post/a-dive-into-slots/">A Dive into __slots__</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> Aug 31, 2017 </span>
+      <div class="post-category">
+          
+            <a href="/en/categories/python/"> Python </a>
+          
+        </div>
+      <span class="more-meta"> 512 words </span>
+      <span class="more-meta"> 3 mins read </span>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      <p><code>__slots__</code> tells the interpreter not to use a <code>dict</code>, and only allocate space for a fixed set of attributes.</p>
+
+<p></p>
+    </div>
+    <div class="read-more">
+      <a href="/en/post/a-dive-into-slots/" class="read-more-link">Read more..</a>
+    </div>
+  </div>
+</article>
+
+    
+      <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/en/post/how-to-read-english-books/">How to Read English Books</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> Aug 10, 2017 </span>
+      <div class="post-category">
+          
+            <a href="/en/categories/learning-english/"> Learning English </a>
+          
+        </div>
+      <span class="more-meta"> 361 words </span>
+      <span class="more-meta"> 2 mins read </span>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      For the sake of learning English, I try to read the original version of The Power of Now and Hackers and Painters. To be honest, it&rsquo;s very difficult, two many unacquainted words and phrases. Even only one in a sentence would affect my understanding.
+Therefore, I stopped my reading and searched on the Internet for better approach to do this. After a long surfing, Here is the tips that I summarized.
+    </div>
+    <div class="read-more">
+      <a href="/en/post/how-to-read-english-books/" class="read-more-link">Read more..</a>
+    </div>
+  </div>
+</article>
+
+    
+      <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/en/post/lucene-document/">Document in Lucene</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> Aug 07, 2017 </span>
+      <div class="post-category">
+          
+            <a href="/en/categories/elasticsearch/"> Elasticsearch </a>
+          
+        </div>
+      <span class="more-meta"> 885 words </span>
+      <span class="more-meta"> 5 mins read </span>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      In Lucene, a Document is the unit of search and index.
+ An index consists of a sequence of documents. A document contains of one or more Fields. A field is a named sequence of terms. A term is a string.  In order to index data with Lucene, you must convert it to a stream of plain-text tokens firstly. Based on the stream, the document containning fields will be created.
+    </div>
+    <div class="read-more">
+      <a href="/en/post/lucene-document/" class="read-more-link">Read more..</a>
+    </div>
+  </div>
+</article>
+
+    
+      <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/en/post/guice-usage-in-es/">Guice Usage in Elasticsearch</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> Aug 04, 2017 </span>
+      <div class="post-category">
+          
+            <a href="/en/categories/elasticsearch/"> Elasticsearch </a>
+          
+        </div>
+      <span class="more-meta"> 426 words </span>
+      <span class="more-meta"> 2 mins read </span>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      The motivation of using Guice lists here: Motivation.
+To create bindings, extend AbstractModule and override its configure method. In the method body, call bind() to specify each binding. These methods are type checked so the compiler can report errors if you use the wrong types. Once you&rsquo;ve created your modules, pass them as arguments to Guice.createInjector() to build an injector.
+Elasticsearch has a ModulesBuilder which is responsible for assembling modules.
+    </div>
+    <div class="read-more">
+      <a href="/en/post/guice-usage-in-es/" class="read-more-link">Read more..</a>
+    </div>
+  </div>
+</article>
+
+    
+      <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/en/post/pip-install-ipython-exception-on-ei-capitan/">Pip Install ipython Exception on EI Capitan</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> Aug 03, 2017 </span>
+      <div class="post-category">
+          
+            <a href="/en/categories/python/"> Python </a>
+          
+        </div>
+      <span class="more-meta"> 274 words </span>
+      <span class="more-meta"> 2 mins read </span>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      <blockquote>
+<p>For those impatient: OS X EI Capitan shipped a security feature named System Integrity Protection, which would be a hinder for <code>pip</code>. Try to install IPython in user mode: <code>pip install ipython --user</code>.</p>
+</blockquote>
+
+<p></p>
+    </div>
+    <div class="read-more">
+      <a href="/en/post/pip-install-ipython-exception-on-ei-capitan/" class="read-more-link">Read more..</a>
+    </div>
+  </div>
+</article>
+
+    
+      <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/en/post/hbase-mind-map/">A Mind Map for HBase</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> Jul 01, 2017 </span>
+      <div class="post-category">
+          
+            <a href="/en/categories/hbase/"> HBase </a>
+          
+        </div>
+      <span class="more-meta"> 23 words </span>
+      <span class="more-meta"> 1 min read </span>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      <p>This map records my learning path to HBase. Every time I know something new about HBase, I will append it to this map.</p>
+
+<p></p>
+    </div>
+    <div class="read-more">
+      <a href="/en/post/hbase-mind-map/" class="read-more-link">Read more..</a>
+    </div>
+  </div>
+</article>
+
+    
+      <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/en/post/java-jvm-mind-map/">Mind Maps for Java and JVM</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> Jun 16, 2017 </span>
+      <div class="post-category">
+          
+            <a href="/en/categories/java/"> Java </a>
+          
+        </div>
+      <span class="more-meta"> 46 words </span>
+      <span class="more-meta"> 1 min read </span>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      <p>These two mind maps are drawn for the further exploration of Java and JVM. For Java I try to cover some advanced features ranging from NIO and Thread. As to JVM, few components are covered, of course, I will replenish it at any moment.</p>
+
+<p></p>
+    </div>
+    <div class="read-more">
+      <a href="/en/post/java-jvm-mind-map/" class="read-more-link">Read more..</a>
+    </div>
+  </div>
+</article>
+
+    
+      <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/en/post/redis-mind-map/">Redis Mind Map</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> Nov 06, 2016 </span>
+      <div class="post-category">
+          
+            <a href="/en/categories/redis/"> Redis </a>
+          
+        </div>
+      <span class="more-meta"> 23 words </span>
+      <span class="more-meta"> 1 min read </span>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      <p>This post includes a few mind maps for Redis ranging from quick start to implementation.</p>
+
+<p><img src="/images/redis-quick-start.png" alt="" /></p>
+
+<p></p>
+    </div>
+    <div class="read-more">
+      <a href="/en/post/redis-mind-map/" class="read-more-link">Read more..</a>
+    </div>
+  </div>
+</article>
+
+    
+      <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/en/post/java-hashtable-comparing-with-hashmap/">Differences between Hashtable and HashMap</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> Aug 05, 2016 </span>
+      <div class="post-category">
+          
+            <a href="/en/categories/java/"> Java </a>
+          
+        </div>
+      <span class="more-meta"> 1205 words </span>
+      <span class="more-meta"> 6 mins read </span>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      <p>As I mentioned before, it is vital to read code with prepared questions. Hum, How about reading code with answers? The differences between Hashtable and HashMap have been explained many times including,</p>
+
+<ul>
+<li>null key &amp; null value</li>
+<li>synchronized or not</li>
+<li>Enumeration and Iterator</li>
+<li>hash method</li>
+</ul>
+
+<p>I am wondering how these arguments are supported by code. This post will give a view of code illustrating the above confusion.</p>
+
+<p></p>
+    </div>
+    <div class="read-more">
+      <a href="/en/post/java-hashtable-comparing-with-hashmap/" class="read-more-link">Read more..</a>
+    </div>
+  </div>
+</article>
+
+    
+      <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/en/post/java-hashset/">Java HashSet</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> Aug 01, 2016 </span>
+      <div class="post-category">
+          
+            <a href="/en/categories/java/"> Java </a>
+          
+        </div>
+      <span class="more-meta"> 365 words </span>
+      <span class="more-meta"> 2 mins read </span>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      <p>For those who has no patience to look through this post, I conclude it in a word: HashSet is backed by HashMap.</p>
+
+<p>Set is a collection in which every element is unique. So does the keys in HashMap. It is reasonable to infer that the implementation of HashSet is based on HashMap, so it is. Remember <a href="https://hellokangning.github.io/post/java-hashmap/#resize">resize</a> of HashMap? it makes no guarantees as to the iteration order of the set.</p>
+
+<p>With the help of HashMap, HashSet offers constant time performance for the basic operations, like <code>add</code>, <code>remove</code>, <code>contains</code> and <code>size</code>. Iterating over this set requires time proportional to the sum of the HashSet instance&rsquo;s size (the number of elements) plus the &ldquo;capacity&rdquo; of the backing HashMap instance (the number of buckets).</p>
+
+<p></p>
+    </div>
+    <div class="read-more">
+      <a href="/en/post/java-hashset/" class="read-more-link">Read more..</a>
+    </div>
+  </div>
+</article>
+
+    
+      <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/en/post/java-treemap/">Java TreeMap</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> Jun 12, 2016 </span>
+      <div class="post-category">
+          
+            <a href="/en/categories/java/"> Java </a>
+          
+        </div>
+      <span class="more-meta"> 1084 words </span>
+      <span class="more-meta"> 6 mins read </span>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      <p>After joining the workforce, I have coded with various programming languages, like C++, Objective-C, Ruby, Python, Scala, Java, Go, etc. I ask to myself spontaneously, which language am I most skillful at? This question dismay me because I cannot answer it immediately.</p>
+
+<p>Since I choice to focus on Big Data, it&rsquo;s pragmatic to equipped with Java and Python, two powerful weapons in this field. Reading the source code of <a href="https://hellokangning.github.io/tags/java.util/">java.util</a> is a good start.</p>
+
+<p>The leading actor of this post is <code>TreeMap</code>, a Red-Black tree based <code>NavigableMap</code> implementation. It has no array underneath, as many of you think. Because <code>TreeMap</code> inherits directly <code>AbstractMap</code>, in contrast with <a href="https://hellokangning.github.io/post/java-linkedhashmap/">LinkedHashMap</a>.</p>
+
+<p>Performances differ on account of distinctive data structures. This implementation provides guaranteed log(n) time cost for the <code>containsKey</code>, <code>get</code>, <code>put</code> and <code>remove</code> operations. Now allow me to show you a close look.</p>
+
+<p></p>
+    </div>
+    <div class="read-more">
+      <a href="/en/post/java-treemap/" class="read-more-link">Read more..</a>
+    </div>
+  </div>
+</article>
+
+    
+      <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/en/post/java-linkedhashmap/">Java LinkedHashMap</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> Jun 10, 2016 </span>
+      <div class="post-category">
+          
+            <a href="/en/categories/java/"> Java </a>
+          
+        </div>
+      <span class="more-meta"> 947 words </span>
+      <span class="more-meta"> 5 mins read </span>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      <p>As its name implies, <code>LinkedHashMap</code> is a hash table and linked list implementation of the <code>Map</code> interface, with predictable iteration order. Different with <code>HashMap</code>, it maintains a doubly-linked list runing through all of its entries, which also defines the iteration ordering, same as the order in which keys were inserted into the map. This order remains if a key is re-inserted into the map.</p>
+
+<p>Like <code>HashMap</code>, <code>LinkedHashMap</code> provides constant-time performance for the basic operations <code>add</code>, <code>contains</code> and <code>remove</code>, assuming the hash function disperses elements properly among the buckets.  Performance is likely to be just slightly below that of <code>HashMap</code>, due to the added expense of maintaining the linked list,</p>
+
+<p>Thanks to the linked list, this kind of map is well-suited to building LRU caches. So my questions is how <code>LinkedHashMap</code> preserves the linked list when key changes.</p>
+
+<p></p>
+    </div>
+    <div class="read-more">
+      <a href="/en/post/java-linkedhashmap/" class="read-more-link">Read more..</a>
+    </div>
+  </div>
+</article>
+
+    
+      <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/en/post/java-hashmap/">Java HashMap</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> Jun 09, 2016 </span>
+      <div class="post-category">
+          
+            <a href="/en/categories/java/"> Java </a>
+          
+        </div>
+      <span class="more-meta"> 1188 words </span>
+      <span class="more-meta"> 6 mins read </span>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      <p>It&rsquo;s necessary to learn with questions. Otherwise, you may distract your focus when something you don&rsquo;t know appears, whether should I go deeper or not. With preliminary doubts in your mind, this would not be a problem. Learning can be direct, clear and fruitful, which brings you more sense of achievement.</p>
+
+<p>For this post about the source code of <code>HashMap</code>, few questions need answers:</p>
+
+<ul>
+<li>data structure underneath</li>
+<li>why <code>HashMap</code> permits nulls and unsynchronized</li>
+<li>does it make guarantees as to the order of the map</li>
+<li>what happens when I put and get a key with value, and time complexity</li>
+<li>how the map shrink or expand when size changes</li>
+</ul>
+
+<p></p>
+    </div>
+    <div class="read-more">
+      <a href="/en/post/java-hashmap/" class="read-more-link">Read more..</a>
+    </div>
+  </div>
+</article>
+
+    
+      <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/en/post/java-linkedlist/">Java LinkedList</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> Apr 18, 2016 </span>
+      <div class="post-category">
+          
+            <a href="/en/categories/java/"> Java </a>
+          
+        </div>
+      <span class="more-meta"> 1025 words </span>
+      <span class="more-meta"> 5 mins read </span>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      <p><code>LinkedList</code> is a doubly-linked list implementation of the <code>List</code> and <code>Deque</code> interfaces. By &ldquo;doubly-linked&rdquo;, it means we can traverse the list from the beginning to the end, and vice versa. This class is a member of Java Collections Framework, located in <code>java.util</code>. Let&rsquo;s go straight to the source code.</p>
+
+<p></p>
+    </div>
+    <div class="read-more">
+      <a href="/en/post/java-linkedlist/" class="read-more-link">Read more..</a>
+    </div>
+  </div>
+</article>
+
+    
+      <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/en/post/java-string/">Java String</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> Apr 13, 2016 </span>
+      <div class="post-category">
+          
+            <a href="/en/categories/java/"> Java </a>
+          
+        </div>
+      <span class="more-meta"> 1282 words </span>
+      <span class="more-meta"> 7 mins read </span>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      <p><code>String</code> is one of the most common type of data in computer languages. A Java string is a series of characters gathered together, such as &ldquo;abc&rdquo;. Strings are constant, which means their value cannot be changed after created.</p>
+
+<p>This post introduces the basic of Java string, includes methods for examining individual characters of the sequence, for comparing strings, for searching strings, for extracting substrings and so on.</p>
+
+<p></p>
+    </div>
+    <div class="read-more">
+      <a href="/en/post/java-string/" class="read-more-link">Read more..</a>
+    </div>
+  </div>
+</article>
+
+    
+  </section>
+  
+  <nav class="pagination">
+    
+      <a class="prev" href="/en/page/2/">
+        <i class="iconfont icon-left"></i>
+        <span class="prev-text">Prev</span>
+      </a>
+    
+  </nav>
+
+        </div>
+        
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:hellokangning@hotmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://www.linkedin.com/in/guoqing-geng-9032b820/" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="https://github.com/hellokangning" class="iconfont icon-github" title="github"></a>
+  <a href="https://hellokangning.github.io/en/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    
+      2016 - 
+    2018
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Guoqing Geng</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+<script src="/lib/highlight/highlight.pack.js?v=20171001"></script><script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+
+
+<script type="text/javascript" src="/dist/even.min.js?v=3.2.0"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      showProcessingMessages: false,
+      messageStyle: 'none'
+    };
+  </script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-105833321-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>

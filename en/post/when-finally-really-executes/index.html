@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>When finally Really Executes - Guoqing Geng</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Guoqing Geng" />
+  <meta name="description" content="Epitome:
+ return doesn&amp;rsquo;t really return, it pushs value to stack, then jumps to finally, which was set up by SETUP_FINALLY before. after executing finally, END_FINALLY returns.  
+" />
+
+  <meta name="keywords" content="elasticsearch, python, hbase" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.44" />
+
+
+<link rel="canonical" href="https://hellokangning.github.io/en/post/when-finally-really-executes/" />
+
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+
+<link href="/dist/even.min.css?v=3.2.0" rel="stylesheet">
+<link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+
+
+
+<meta property="og:title" content="When finally Really Executes" />
+<meta property="og:description" content="Epitome:
+
+
+return doesn&rsquo;t really return, it pushs value to stack, then jumps to finally, which was set up by SETUP_FINALLY before.
+after executing finally, END_FINALLY returns.
+
+
+" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hellokangning.github.io/en/post/when-finally-really-executes/" />
+
+
+
+<meta property="article:published_time" content="2017-09-04T16:22:03&#43;08:00"/>
+
+<meta property="article:modified_time" content="2017-09-04T16:22:03&#43;08:00"/>
+
+
+
+
+
+
+
+
+
+
+
+<meta itemprop="name" content="When finally Really Executes">
+<meta itemprop="description" content="Epitome:
+
+
+return doesn&rsquo;t really return, it pushs value to stack, then jumps to finally, which was set up by SETUP_FINALLY before.
+after executing finally, END_FINALLY returns.
+
+
+">
+
+
+<meta itemprop="datePublished" content="2017-09-04T16:22:03&#43;08:00" />
+<meta itemprop="dateModified" content="2017-09-04T16:22:03&#43;08:00" />
+<meta itemprop="wordCount" content="876">
+
+
+
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="When finally Really Executes"/>
+<meta name="twitter:description" content="Epitome:
+
+
+return doesn&rsquo;t really return, it pushs value to stack, then jumps to finally, which was set up by SETUP_FINALLY before.
+after executing finally, END_FINALLY returns.
+
+
+"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/en/" class="logo">Guoqing Geng</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/en/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/en/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/en/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="/en/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/zh/">
+        <li class="mobile-menu-item">中文</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/en/" class="logo">Guoqing Geng</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/en/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/en/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/en/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/en/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/zh/">中文</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">When finally Really Executes</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> Sep 04, 2017 </span>
+        <div class="post-category">
+            
+              <a href="/en/categories/python/"> Python </a>
+            
+          </div>
+        <span class="more-meta"> 876 words </span>
+        <span class="more-meta"> 2 mins read </span>
+        
+      </div>
+    </header>
+
+    
+    
+
+    
+    
+
+    
+    <div class="post-content">
+      <p>Epitome:</p>
+
+<ul>
+<li>return doesn&rsquo;t really return, it pushs value to stack, then jumps to finally, which was set up by <code>SETUP_FINALLY</code> before.</li>
+<li>after executing finally, <code>END_FINALLY</code> returns.</li>
+</ul>
+
+<p></p>
+
+<p>Let&rsquo;s be forthright, what will the following code print?</p>
+
+<pre><code class="language-python">def func():
+    try:
+        100/0
+    except ZeroDivisionError as e:
+        print 'Zero cannot be divisor'
+        return
+    finally:
+        print 'finally'
+
+if __name__ == &quot;__main__&quot;:
+    func()
+</code></pre>
+
+<p>The answer is:</p>
+
+<pre><code>Zero cannot be divisor
+finally
+</code></pre>
+
+<p>It seems that <code>finally</code> executes after the <code>return</code> statement. Is it a truth? We&rsquo;s better change the code a little to penetrate the result.</p>
+
+<pre><code class="language-python">#!/usr/bin/env python2
+# coding=utf-8
+from dis import dis
+
+def func():
+    try:
+        100/0
+    except ZeroDivisionError as e:
+        print 'Zero cannot be divisor'
+        return
+    finally:
+        print 'finally'
+
+if __name__ == &quot;__main__&quot;:
+    dis(func)
+</code></pre>
+
+<p>Next point, we can see,</p>
+
+<pre><code>  6           0 SETUP_FINALLY           44 (to 47)
+              3 SETUP_EXCEPT            12 (to 18)
+
+  7           6 LOAD_CONST               1 (100)
+              9 LOAD_CONST               2 (0)
+             12 BINARY_DIVIDE
+             13 POP_TOP
+             14 POP_BLOCK
+             15 JUMP_FORWARD            25 (to 43)
+
+  8     &gt;&gt;   18 DUP_TOP
+             19 LOAD_GLOBAL              0 (ZeroDivisionError)
+             22 COMPARE_OP              10 (exception match)
+             25 POP_JUMP_IF_FALSE       42
+             28 POP_TOP
+             29 STORE_FAST               0 (e)
+             32 POP_TOP
+
+  9          33 LOAD_CONST               3 ('Zero cannot be divisor')
+             36 PRINT_ITEM
+             37 PRINT_NEWLINE
+
+ 10          38 LOAD_CONST               0 (None)
+             41 RETURN_VALUE
+        &gt;&gt;   42 END_FINALLY
+        &gt;&gt;   43 POP_BLOCK
+             44 LOAD_CONST               0 (None)
+
+ 12     &gt;&gt;   47 LOAD_CONST               4 ('finally')
+             50 PRINT_ITEM
+             51 PRINT_NEWLINE
+             52 END_FINALLY
+             53 LOAD_CONST               0 (None)
+             56 RETURN_VALUE
+</code></pre>
+
+<p>For those who didn&rsquo;t use <code>dis</code> module before:</p>
+
+<blockquote>
+<p>The dis module supports the analysis of CPython bytecode by disassembling it. According to the above output, first column is line number, the second is offset of bytecode, followed by the name of bytecode. The forth column presents parameter and the one in parenthesis is the result after bytecode&rsquo;s processing parameter.</p>
+</blockquote>
+
+<p>As we can see, after <code>RETURN_VALUE</code> in line 10, the <code>END_FINALLY</code> would be executed. That doesn&rsquo;t meet our expectation. What&rsquo;s more wierd, there is another <code>RETURN_VALUE</code> in line 12 after <code>END_FINALLY</code>. Since we get here, the source code is the only thing that we can ask for help.</p>
+
+<pre><code class="language-c">// ceval.c
+        TARGET_NOARG(RETURN_VALUE)
+        {
+            retval = POP();
+            why = WHY_RETURN;
+            goto fast_block_end;
+        }
+
+fast_block_end:
+        while (why != WHY_NOT &amp;&amp; f-&gt;f_iblock &gt; 0) {
+            /* Peek at the current block. */
+            PyTryBlock *b = &amp;f-&gt;f_blockstack[f-&gt;f_iblock - 1];
+
+            assert(why != WHY_YIELD);
+            if (b-&gt;b_type == SETUP_LOOP &amp;&amp; why == WHY_CONTINUE) {
+                why = WHY_NOT;
+                JUMPTO(PyInt_AS_LONG(retval));
+                Py_DECREF(retval);
+                break;
+            }
+
+            /* Now we have to pop the block. */
+            f-&gt;f_iblock--;
+
+            while (STACK_LEVEL() &gt; b-&gt;b_level) {
+                v = POP();
+                Py_XDECREF(v);
+            }
+            if (b-&gt;b_type == SETUP_LOOP &amp;&amp; why == WHY_BREAK) {
+                why = WHY_NOT;
+                JUMPTO(b-&gt;b_handler);
+                break;
+            }
+            if (b-&gt;b_type == SETUP_FINALLY ||
+                (b-&gt;b_type == SETUP_EXCEPT &amp;&amp;
+                 why == WHY_EXCEPTION) ||
+                b-&gt;b_type == SETUP_WITH) {
+                if (why == WHY_EXCEPTION) {
+                    PyObject *exc, *val, *tb;
+                    PyErr_Fetch(&amp;exc, &amp;val, &amp;tb);
+                    if (val == NULL) {
+                        val = Py_None;
+                        Py_INCREF(val);
+                    }
+                    /* Make the raw exception data
+                       available to the handler,
+                       so a program can emulate the
+                       Python main loop.  Don't do
+                       this for 'finally'. */
+                    if (b-&gt;b_type == SETUP_EXCEPT ||
+                        b-&gt;b_type == SETUP_WITH) {
+                        PyErr_NormalizeException(
+                            &amp;exc, &amp;val, &amp;tb);
+                        set_exc_info(tstate,
+                                     exc, val, tb);
+                    }
+                    if (tb == NULL) {
+                        Py_INCREF(Py_None);
+                        PUSH(Py_None);
+                    } else
+                        PUSH(tb);
+                    PUSH(val);
+                    PUSH(exc);
+                }
+                else {
+                    if (why &amp; (WHY_RETURN | WHY_CONTINUE))
+                        PUSH(retval);
+                    v = PyInt_FromLong((long)why);
+                    PUSH(v);
+                }
+                why = WHY_NOT;
+                JUMPTO(b-&gt;b_handler);
+                break;
+            }
+        } /* unwind stack */
+
+        /* End the loop if we still have an error (or return) */
+
+        if (why != WHY_NOT)
+            break;
+        READ_TIMESTAMP(loop1);
+
+    } /* main loop */
+
+    assert(why != WHY_YIELD);
+    /* Pop remaining stack entries. */
+    while (!EMPTY()) {
+        v = POP();
+        Py_XDECREF(v);
+    }
+
+    if (why != WHY_RETURN)
+        retval = NULL;
+
+</code></pre>
+
+<p><code>RETURN_VALUE</code> does not return really, it simply assgins popped value from stack to <code>retval</code>, set <code>why</code> to <code>WHY_RETURN</code>, then go to <code>fast_block_end</code>. This pathetic scapegoat would push <code>retval</code> from <code>RETURN_VALUE</code> into stack, convert <code>why</code> to <code>Long</code> and push it into stack too, then jump to <code>b-&gt;b_handler</code>. Well, what&rsquo;s <code>b_handler</code> pointing to?</p>
+
+<pre><code class="language-c">
+// ceval.c
+        // SETUP_FINALLY
+        TARGET_WITH_IMPL(SETUP_LOOP, _setup_finally)
+        TARGET_WITH_IMPL(SETUP_EXCEPT, _setup_finally)
+        TARGET(SETUP_FINALLY)
+        _setup_finally:
+        {
+            /* NOTE: If you add any new block-setup opcodes that
+               are not try/except/finally handlers, you may need
+               to update the PyGen_NeedsFinalizing() function.
+               */
+
+            PyFrame_BlockSetup(f, opcode, INSTR_OFFSET() + oparg,
+                               STACK_LEVEL());
+            DISPATCH();
+        }
+
+        // END_FINALLY
+        PREDICTED(END_FINALLY);
+        TARGET_NOARG(END_FINALLY)
+        {
+            v = POP();
+            if (PyInt_Check(v)) {
+                why = (enum why_code) PyInt_AS_LONG(v);
+                assert(why != WHY_YIELD);
+                if (why == WHY_RETURN ||
+                    why == WHY_CONTINUE)
+                    retval = POP();
+            }
+            else if (PyExceptionClass_Check(v) ||
+                     PyString_Check(v)) {
+                w = POP();
+                u = POP();
+                PyErr_Restore(v, w, u);
+                why = WHY_RERAISE;
+                break;
+            }
+            else if (v != Py_None) {
+                PyErr_SetString(PyExc_SystemError,
+                    &quot;'finally' pops bad exception&quot;);
+                why = WHY_EXCEPTION;
+            }
+            Py_DECREF(v);
+            break;
+        }
+
+// frameobject.c
+
+/* Block management */
+void
+PyFrame_BlockSetup(PyFrameObject *f, int type, int handler, int level)
+{
+    PyTryBlock *b;
+    if (f-&gt;f_iblock &gt;= CO_MAXBLOCKS)
+        Py_FatalError(&quot;XXX block stack overflow&quot;);
+    b = &amp;f-&gt;f_blockstack[f-&gt;f_iblock++];
+    b-&gt;b_type = type;
+    b-&gt;b_level = level;
+    b-&gt;b_handler = handler;
+}
+</code></pre>
+
+<p><code>SETUP_FINALLY</code> calls <code>PyFrame_BlockSetup</code> to setup a block with type, level, handler. From the output of <code>dis</code>(notice the arrows before <code>END_FINALLY</code>), we can guess this handler is <code>END_FINALLY</code>. <code>END_FINALLY</code> gets <code>retval</code> and <code>why</code>, pushed by <code>RETURN_VALUE</code>, from stack, and returns.</p>
+
+<p>Now we can articulate  all the scratch:</p>
+
+<ul>
+<li>return doesn&rsquo;t really return, it pushs value to stack, then jumps to finally, which was set up by <code>SETUP_FINALLY</code> before.</li>
+<li>after executing finally, <code>END_FINALLY</code> returns.</li>
+</ul>
+
+<p><strong>Reference</strong></p>
+
+<ul>
+<li><a href="http://mp.weixin.qq.com/s?__biz=MzA4MjEyNTA5Mw==&amp;mid=2652566146&amp;idx=2&amp;sn=8f3258c0d6a06f6370e104db89a6d3b5&amp;chksm=8464dac8b31353def4d8a0939b1bbb0409f2567b79805b9aab95d41b1403a4726292fd87fa96&amp;mpshare=1&amp;scene=1&amp;srcid=0903h2p9HDv0NeZqLkXll9Xs#rd">Python :浅析 return 和 finally 共同挖的坑</a></li>
+</ul>
+    </div>
+
+    
+    
+
+    
+    
+
+    <footer class="post-footer">
+      
+
+      
+      <nav class="post-nav">
+        
+          <a class="prev" href="/en/post/lucene-directory/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">Directory in Lucene</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        
+          <a class="next" href="/en/post/exit-options-in-python/">
+            <span class="next-text nav-default">Exit Options in Python</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+    (function() {
+      
+      
+      if (window.location.hostname === 'localhost') return;
+
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      var disqus_shortname = 'guoqing';
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:hellokangning@hotmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://www.linkedin.com/in/guoqing-geng-9032b820/" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="https://github.com/hellokangning" class="iconfont icon-github" title="github"></a>
+  <a href="https://hellokangning.github.io/en/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    
+      2016 - 
+    2018
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Guoqing Geng</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+<script src="/lib/highlight/highlight.pack.js?v=20171001"></script><script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+
+
+<script type="text/javascript" src="/dist/even.min.js?v=3.2.0"></script>
+
+
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-105833321-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>
