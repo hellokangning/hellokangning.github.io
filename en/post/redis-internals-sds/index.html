@@ -92,7 +92,7 @@ This post will dive into the implementation of SDS comparing with classic C stri
 
 <meta itemprop="datePublished" content="2018-11-01T09:26:50&#43;08:00" />
 <meta itemprop="dateModified" content="2018-11-01T09:26:50&#43;08:00" />
-<meta itemprop="wordCount" content="1641">
+<meta itemprop="wordCount" content="1682">
 
 
 
@@ -181,7 +181,7 @@ This post will dive into the implementation of SDS comparing with classic C stri
               <a href="/en/categories/redis/"> Redis </a>
             
           </div>
-        <span class="more-meta"> 1641 words </span>
+        <span class="more-meta"> 1682 words </span>
         <span class="more-meta"> 4 mins read </span>
         
       </div>
@@ -336,7 +336,7 @@ struct __attribute__ ((__packed__)) sdshdr64 {
 
 <h1 id="init-a-sds">Init a SDS</h1>
 
-<p>A new SDS can be created with specified <code>init</code> pointer and <code>initLen</code>. The string is always null-terminated, even you create a sds string with <code>s = sdsnewlen(&quot;abc&quot;, 3)</code>.</p>
+<p>A new SDS can be created with specified <code>init</code> pointer and <code>initLe</code>. The string is always null-terminated, even you create a sds string with <code>s = sdsnewlen(&quot;abc&quot;, 3)</code>.</p>
 
 <p>In order to init a SDS:</p>
 
@@ -519,6 +519,14 @@ else
 </code></pre>
 
 <p>If the new length is smaller than 1MB, it will multiply by 2, or plus by 1MB.</p>
+
+<p>Back to the SDS instance <code>s</code> with value of &ldquo;Redis&rdquo;, append &ldquo; Cluster&rdquo; to it by calling <code>sdscat(s, &quot; Cluster&quot;)</code>. the new <code>alloc</code> will be <code>(5+8)*2 = 26</code>.</p>
+
+<p><img src="/images/redis-sds-sdscat-1.png" alt="" /></p>
+
+<p>Then it will not reallocate more memory if we append &ldquo; Tutorial&rdquo; again.</p>
+
+<p><img src="/images/redis-sds-sdscat-2.png" alt="" /></p>
 
 <p>The second solution is lazy release. If the SDS length shrinks, for example <code>sdstrim</code>, only the <code>len</code> variable is changed rather than deallocate the superfluous space which can be released by explicitly calling <code>sdsRemoveFreeSpace</code>. But after <code>sdsRemoveFreeSpace</code>, the next concatenation operations will require reallocation.</p>
 
