@@ -634,6 +634,38 @@ Elasticsearch has a ModulesBuilder which is responsible for assembling modules.
     
       <article class="post">
   <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/en/post/redis-internals-sds/">Redis Internals: SDS</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> Sep 28, 2016 </span>
+      <div class="post-category">
+          
+            <a href="/en/categories/redis/"> Redis </a>
+          
+        </div>
+      <span class="more-meta"> 1600 words </span>
+      <span class="more-meta"> 4 mins read </span>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      <p>C string is used only for literal constant in Redis. For the situation that the string can be modified, Redis provide a Simple Dynamic String(SDS). The key in Redis is actually a SDS, and if you insert a key-value with <code>SET msg &quot;hello world&quot;</code>, a SDS instance will be constructed for the key. In this case, the value is also a SDS instance with the content of &ldquo;hello world&rdquo;.</p>
+
+<p>Besides string, SDS is also used for buffer which can serve the AOF module and client&rsquo;s input.</p>
+
+<p>This post will dive into the implementation of SDS comparing with classic C string.</p>
+
+<p></p>
+    </div>
+    <div class="read-more">
+      <a href="/en/post/redis-internals-sds/" class="read-more-link">Read more..</a>
+    </div>
+  </div>
+</article>
+
+    
+      <article class="post">
+  <header class="post-header">
     <h1 class="post-title"><a class="post-link" href="/en/post/java-hashtable-comparing-with-hashmap/">Differences between Hashtable and HashMap</a></h1>
     <div class="post-meta">
       <span class="post-time"> Aug 05, 2016 </span>
@@ -696,40 +728,6 @@ Elasticsearch has a ModulesBuilder which is responsible for assembling modules.
     </div>
     <div class="read-more">
       <a href="/en/post/java-hashset/" class="read-more-link">Read more..</a>
-    </div>
-  </div>
-</article>
-
-    
-      <article class="post">
-  <header class="post-header">
-    <h1 class="post-title"><a class="post-link" href="/en/post/java-treemap/">Java TreeMap</a></h1>
-    <div class="post-meta">
-      <span class="post-time"> Jun 12, 2016 </span>
-      <div class="post-category">
-          
-            <a href="/en/categories/java/"> Java </a>
-          
-        </div>
-      <span class="more-meta"> 1084 words </span>
-      <span class="more-meta"> 6 mins read </span>
-    </div>
-  </header>
-  
-  <div class="post-content">
-    <div class="post-summary">
-      <p>After joining the workforce, I have coded with various programming languages, like C++, Objective-C, Ruby, Python, Scala, Java, Go, etc. I ask to myself spontaneously, which language am I most skillful at? This question dismay me because I cannot answer it immediately.</p>
-
-<p>Since I choice to focus on Big Data, it&rsquo;s pragmatic to equipped with Java and Python, two powerful weapons in this field. Reading the source code of <a href="https://hellokangning.github.io/en/tags/java.util/">java.util</a> is a good start.</p>
-
-<p>The leading actor of this post is <code>TreeMap</code>, a Red-Black tree based <code>NavigableMap</code> implementation. It has no array underneath, as many of you think. Because <code>TreeMap</code> inherits directly <code>AbstractMap</code>, in contrast with <a href="https://hellokangning.github.io/en/post/java-linkedhashmap/">LinkedHashMap</a>.</p>
-
-<p>Performances differ on account of distinctive data structures. This implementation provides guaranteed log(n) time cost for the <code>containsKey</code>, <code>get</code>, <code>put</code> and <code>remove</code> operations. Now allow me to show you a close look.</p>
-
-<p></p>
-    </div>
-    <div class="read-more">
-      <a href="/en/post/java-treemap/" class="read-more-link">Read more..</a>
     </div>
   </div>
 </article>

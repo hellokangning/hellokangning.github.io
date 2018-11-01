@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Redis Internals: SDS - Guoqing Geng</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Guoqing Geng" />
+  <meta name="description" content="C string is used only for literal constant in Redis. For the situation that the string can be modified, Redis provide a Simple Dynamic String(SDS). The key in Redis is actually a SDS, and if you insert a key-value with SET msg &amp;quot;hello world&amp;quot;, a SDS instance will be constructed for the key. In this case, the value is also a SDS instance with the content of &amp;ldquo;hello world&amp;rdquo;.
+Besides string, SDS is also used for buffer which can serve the AOF module and client&amp;rsquo;s input.
+This post will dive into the implementation of SDS comparing with classic C string.
+
+" />
+<meta name="keywords" content="Simple Dynamic String, Redis" />
+
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.44" />
+
+
+<link rel="canonical" href="https://hellokangning.github.io/en/post/redis-internals-sds/" />
+
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+
+<link href="/dist/even.min.css?v=3.2.0" rel="stylesheet">
+<link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+
+
+
+<meta property="og:title" content="Redis Internals: SDS" />
+<meta property="og:description" content="C string is used only for literal constant in Redis. For the situation that the string can be modified, Redis provide a Simple Dynamic String(SDS). The key in Redis is actually a SDS, and if you insert a key-value with SET msg &quot;hello world&quot;, a SDS instance will be constructed for the key. In this case, the value is also a SDS instance with the content of &ldquo;hello world&rdquo;.
+
+Besides string, SDS is also used for buffer which can serve the AOF module and client&rsquo;s input.
+
+This post will dive into the implementation of SDS comparing with classic C string.
+
+" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hellokangning.github.io/en/post/redis-internals-sds/" />
+
+
+
+<meta property="article:published_time" content="2016-09-28T19:26:50&#43;08:00"/>
+
+<meta property="article:modified_time" content="2018-10-30T19:26:50&#43;08:00"/>
+
+
+
+
+
+
+
+
+
+
+
+<meta itemprop="name" content="Redis Internals: SDS">
+<meta itemprop="description" content="C string is used only for literal constant in Redis. For the situation that the string can be modified, Redis provide a Simple Dynamic String(SDS). The key in Redis is actually a SDS, and if you insert a key-value with SET msg &quot;hello world&quot;, a SDS instance will be constructed for the key. In this case, the value is also a SDS instance with the content of &ldquo;hello world&rdquo;.
+
+Besides string, SDS is also used for buffer which can serve the AOF module and client&rsquo;s input.
+
+This post will dive into the implementation of SDS comparing with classic C string.
+
+">
+
+
+<meta itemprop="datePublished" content="2016-09-28T19:26:50&#43;08:00" />
+<meta itemprop="dateModified" content="2016-09-28T19:26:50&#43;08:00" />
+<meta itemprop="wordCount" content="1600">
+
+
+
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Redis Internals: SDS"/>
+<meta name="twitter:description" content="C string is used only for literal constant in Redis. For the situation that the string can be modified, Redis provide a Simple Dynamic String(SDS). The key in Redis is actually a SDS, and if you insert a key-value with SET msg &quot;hello world&quot;, a SDS instance will be constructed for the key. In this case, the value is also a SDS instance with the content of &ldquo;hello world&rdquo;.
+
+Besides string, SDS is also used for buffer which can serve the AOF module and client&rsquo;s input.
+
+This post will dive into the implementation of SDS comparing with classic C string.
+
+"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/en/" class="logo">Guoqing Geng</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/en/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/en/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/en/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="/en/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/zh/">
+        <li class="mobile-menu-item">中文</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/en/" class="logo">Guoqing Geng</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/en/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/en/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/en/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/en/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/zh/">中文</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Redis Internals: SDS</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> Sep 28, 2016 </span>
+        <div class="post-category">
+            
+              <a href="/en/categories/redis/"> Redis </a>
+            
+          </div>
+        <span class="more-meta"> 1600 words </span>
+        <span class="more-meta"> 4 mins read </span>
+        
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+<ul>
+<li><a href="#definition">Definition</a></li>
+<li><a href="#benefits-comparing-with-c-string">Benefits Comparing with C String</a></li>
+<li><a href="#init-a-sds">Init a SDS</a></li>
+<li><a href="#get-length">Get Length</a></li>
+<li><a href="#avoid-buffer-overflow">Avoid Buffer Overflow</a></li>
+<li><a href="#reallocation">Reallocation</a></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    
+    
+
+    
+    <div class="post-content">
+      <p>C string is used only for literal constant in Redis. For the situation that the string can be modified, Redis provide a Simple Dynamic String(SDS). The key in Redis is actually a SDS, and if you insert a key-value with <code>SET msg &quot;hello world&quot;</code>, a SDS instance will be constructed for the key. In this case, the value is also a SDS instance with the content of &ldquo;hello world&rdquo;.</p>
+
+<p>Besides string, SDS is also used for buffer which can serve the AOF module and client&rsquo;s input.</p>
+
+<p>This post will dive into the implementation of SDS comparing with classic C string.</p>
+
+<p></p>
+
+<blockquote>
+<p>The code analyzed in this post is based on 5.0.0</p>
+</blockquote>
+
+<h1 id="definition">Definition</h1>
+
+<p>SDS is defined in <code>sds.h</code>. The struct changed after 3.2 to save memory. Now, Redis offers five types of SDS: <code>sdshdr5</code>, <code>sdshdr8</code>, <code>sdshdr16</code>, <code>sdshdr32</code>, <code>sdshdr64</code>. The length of content determines which struct will be used.</p>
+
+<pre><code class="language-c">#define SDS_TYPE_5  0
+#define SDS_TYPE_8  1
+#define SDS_TYPE_16 2
+#define SDS_TYPE_32 3
+#define SDS_TYPE_64 4
+#define SDS_TYPE_MASK 7
+#define SDS_TYPE_BITS 3
+
+typedef char *sds;
+
+/* Note: sdshdr5 is never used, we just access the flags byte directly.
+ * However is here to document the layout of type 5 SDS strings. */
+struct __attribute__ ((__packed__)) sdshdr5 {
+    unsigned char flags; /* 3 lsb of type, and 5 msb of string length */
+    char buf[];
+};
+struct __attribute__ ((__packed__)) sdshdr8 {
+    uint8_t len; /* used */
+    uint8_t alloc; /* excluding the header and null terminator */
+    unsigned char flags; /* 3 lsb of type, 5 unused bits */
+    char buf[];
+};
+struct __attribute__ ((__packed__)) sdshdr16 {
+    uint16_t len; /* used */
+    uint16_t alloc; /* excluding the header and null terminator */
+    unsigned char flags; /* 3 lsb of type, 5 unused bits */
+    char buf[];
+};
+struct __attribute__ ((__packed__)) sdshdr32 {
+    uint32_t len; /* used */
+    uint32_t alloc; /* excluding the header and null terminator */
+    unsigned char flags; /* 3 lsb of type, 5 unused bits */
+    char buf[];
+};
+struct __attribute__ ((__packed__)) sdshdr64 {
+    uint64_t len; /* used */
+    uint64_t alloc; /* excluding the header and null terminator */
+    unsigned char flags; /* 3 lsb of type, 5 unused bits */
+    char buf[];
+};
+</code></pre>
+
+<p>Allow me to skip <code>sdshr5</code> which will never be used. The other four structures all incorporate the following member:</p>
+
+<ul>
+<li><code>len</code>: the length of this SDS.</li>
+<li><code>alloc</code> the memory allocated for this SDS, but may be used partially. The available size is <code>alloc - len</code>.</li>
+<li><code>flags</code>: 3 bits of <code>char</code> indicates the type of this SDS.</li>
+<li><code>buf</code>: the array storing the actual characters.</li>
+</ul>
+
+<p>Then you may ask how does these structures save memory? Firstly, <code>len</code> and <code>alloc</code> are <code>int</code> types with different size. Secondly, <code>__attribute__ ((__packed__))</code> tells the compiler do not add padding between fields of the struct. Redis also takes addressing into considering and implements its own <code>zmalloc</code> rather than <code>malloc</code>.</p>
+
+<p>When someone tries to instantiate a new SDS, a inline function <code>sdsReqTyp</code> will be called to select the corresponding type on account of its length.</p>
+
+<pre><code class="language-c">static inline char sdsReqType(size_t string_size) {
+    if (string_size &lt; 1&lt;&lt;5)
+        return SDS_TYPE_5; // less than 2^5
+    if (string_size &lt; 1&lt;&lt;8)
+        return SDS_TYPE_8; // less than 2^8
+    if (string_size &lt; 1&lt;&lt;16)
+        return SDS_TYPE_16;
+#if (LONG_MAX == LLONG_MAX)
+    if (string_size &lt; 1ll&lt;&lt;32)
+        return SDS_TYPE_32;
+    return SDS_TYPE_64;
+#else
+    return SDS_TYPE_32;
+#endif
+}
+</code></pre>
+
+<h1 id="benefits-comparing-with-c-string">Benefits Comparing with C String</h1>
+
+<p>What&rsquo;s the benefits of SDS comparing with C string?</p>
+
+<ul>
+<li>Get length with O(1) complexity.</li>
+<li>Avoid buffer overflow.</li>
+<li>Reduce the frequency of reallocating memory. It will trigger reallocation if you <code>strcat</code> of <code>strtrim</code> a C string.</li>
+<li>Binary safety. <code>\0</code> can be in the middle of a SDS, not in C string. Because C string use <code>\0</code> to determine the length, while SDS has the length in the header.</li>
+</ul>
+
+<p>Two useful macros must be explained because they are used widely.</p>
+
+<pre><code class="language-c">#define SDS_HDR_VAR(T,s) struct sdshdr##T *sh = (void*)((s)-(sizeof(struct sdshdr##T)));
+#define SDS_HDR(T,s) ((struct sdshdr##T *)((s)-(sizeof(struct sdshdr##T))))
+</code></pre>
+
+<p>They can return a header pointer to SDS and <code>##</code> is a connector. For example, <code>SDS_HDR(8, s)</code> will be expanded to</p>
+
+<pre><code class="language-c">((struct sdshdr8 *)((s)-(sizeof(struct sdshdr8))))
+</code></pre>
+
+<p>The tricky point is the type of <code>sds</code> is <code>char*</code> meaning it points to a char array. The advantage is enjoying the built-in functions of C String.</p>
+
+<h1 id="init-a-sds">Init a SDS</h1>
+
+<p>A new SDS can be created with specified <code>init</code> pointer and <code>initLen</code>. The string is always null-terminated, even you create a sds string with <code>s = sdsnewlen(&quot;abc&quot;, 3)</code>.</p>
+
+<p>In order to init a SDS:</p>
+
+<ol>
+<li>Decide its type according to the length</li>
+<li>Allocate memory with built-in <code>zmalloc</code></li>
+<li>Init the header of SDS</li>
+<li>Memory copy</li>
+</ol>
+
+<pre><code class="language-c">sds sdsnewlen(const void *init, size_t initlen) {
+    void *sh;
+    sds s;
+    char type = sdsReqType(initlen);
+    /* Empty strings are usually created in order to append. Use type 8
+     * since type 5 is not good at this. */
+    if (type == SDS_TYPE_5 &amp;&amp; initlen == 0) type = SDS_TYPE_8;
+    int hdrlen = sdsHdrSize(type);
+    unsigned char *fp; /* flags pointer. */
+
+    sh = s_malloc(hdrlen+initlen+1);
+    if (init==SDS_NOINIT)
+        init = NULL;
+    else if (!init)
+        memset(sh, 0, hdrlen+initlen+1);
+    if (sh == NULL) return NULL;
+    s = (char*)sh+hdrlen;
+    fp = ((unsigned char*)s)-1;
+    switch(type) {
+        case SDS_TYPE_5: {
+            *fp = type | (initlen &lt;&lt; SDS_TYPE_BITS);
+            break;
+        }
+        case SDS_TYPE_8: {
+            SDS_HDR_VAR(8,s);
+            sh-&gt;len = initlen;
+            sh-&gt;alloc = initlen;
+            *fp = type;
+            break;
+        }
+        case SDS_TYPE_16: {
+            SDS_HDR_VAR(16,s);
+            sh-&gt;len = initlen;
+            sh-&gt;alloc = initlen;
+            *fp = type;
+            break;
+        }
+        case SDS_TYPE_32: {
+            SDS_HDR_VAR(32,s);
+            sh-&gt;len = initlen;
+            sh-&gt;alloc = initlen;
+            *fp = type;
+            break;
+        }
+        case SDS_TYPE_64: {
+            SDS_HDR_VAR(64,s);
+            sh-&gt;len = initlen;
+            sh-&gt;alloc = initlen;
+            *fp = type;
+            break;
+        }
+    }
+    if (initlen &amp;&amp; init)
+        memcpy(s, init, initlen);
+    s[initlen] = '\0';
+    return s;
+}
+</code></pre>
+
+<h1 id="get-length">Get Length</h1>
+
+<p>With a variable <code>len</code>, Redis can get the length of SDS with time complexity of O(1) which C string must visit all characters until the EOL.</p>
+
+<pre><code class="language-c">static inline size_t sdslen(const sds s) {
+    unsigned char flags = s[-1];
+    switch(flags&amp;SDS_TYPE_MASK) {
+        case SDS_TYPE_5:
+            return SDS_TYPE_5_LEN(flags);
+        case SDS_TYPE_8:
+            return SDS_HDR(8,s)-&gt;len;
+        case SDS_TYPE_16:
+            return SDS_HDR(16,s)-&gt;len;
+        case SDS_TYPE_32:
+            return SDS_HDR(32,s)-&gt;len;
+        case SDS_TYPE_64:
+            return SDS_HDR(64,s)-&gt;len;
+    }
+    return 0;
+}
+</code></pre>
+
+<h1 id="avoid-buffer-overflow">Avoid Buffer Overflow</h1>
+
+<p>For C string, it may cause buffer overflow if you forget allocate enough space for the string when you update it. SDS can avoid this situation because it will check the available memory before modification.</p>
+
+<p>Take <code>sdscat</code> for example, it will append the specified null terminated C string <code>t</code> to the SDS string <code>s</code>.</p>
+
+<pre><code class="language-c">sds sdscat(sds s, const char *t) {
+    return sdscatlen(s, t, strlen(t));
+}
+
+sds sdscatlen(sds s, const void *t, size_t len) {
+    size_t curlen = sdslen(s);
+
+    s = sdsMakeRoomFor(s,len);
+    if (s == NULL) return NULL;
+    memcpy(s+curlen, t, len);
+    sdssetlen(s, curlen+len);
+    s[curlen+len] = '\0';
+    return s;
+}
+</code></pre>
+
+<p><code>sdsMakeRoomFor</code> enlarges the free space at the end of the SDS so that the caller is sure that it can overwrite up to the new SDS after this function.</p>
+
+<pre><code class="language-c">sds sdsMakeRoomFor(sds s, size_t addlen) {
+    void *sh, *newsh;
+    size_t avail = sdsavail(s);
+    size_t len, newlen;
+    char type, oldtype = s[-1] &amp; SDS_TYPE_MASK;
+    int hdrlen;
+
+    /* Return ASAP if there is enough space left. */
+    if (avail &gt;= addlen) return s;
+
+    len = sdslen(s);
+    sh = (char*)s-sdsHdrSize(oldtype);
+    newlen = (len+addlen);
+    if (newlen &lt; SDS_MAX_PREALLOC)
+        newlen *= 2;
+    else
+        newlen += SDS_MAX_PREALLOC;
+
+    type = sdsReqType(newlen);
+
+    /* Don't use type 5: the user is appending to the string and type 5 is
+     * not able to remember empty space, so sdsMakeRoomFor() must be called
+     * at every appending operation. */
+    if (type == SDS_TYPE_5) type = SDS_TYPE_8;
+
+    hdrlen = sdsHdrSize(type);
+    if (oldtype==type) {
+        newsh = s_realloc(sh, hdrlen+newlen+1);
+        if (newsh == NULL) return NULL;
+        s = (char*)newsh+hdrlen;
+    } else {
+        /* Since the header size changes, need to move the string forward,
+         * and can't use realloc */
+        newsh = s_malloc(hdrlen+newlen+1);
+        if (newsh == NULL) return NULL;
+        memcpy((char*)newsh+hdrlen, s, len+1);
+        s_free(sh);
+        s = (char*)newsh+hdrlen;
+        s[-1] = type;
+        sdssetlen(s, len);
+    }
+    sdssetalloc(s, newlen);
+    return s;
+}
+</code></pre>
+
+<p>Steps:</p>
+
+<ol>
+<li>Return ASAP if available memory is enough</li>
+<li>Reallocate memory</li>
+<li>Change header size if needed</li>
+<li>Set new length</li>
+</ol>
+
+<h1 id="reallocation">Reallocation</h1>
+
+<p>How does SDS reduce the need for reallocation? The first solution is pre-allocation in <code>sdsMakeRoomFor</code>.</p>
+
+<pre><code class="language-c">newlen = (len+addlen);
+if (newlen &lt; SDS_MAX_PREALLOC)
+    newlen *= 2;
+else
+    newlen += SDS_MAX_PREALLOC;
+</code></pre>
+
+<p>If the new length is smaller than 1MB, it will multiply by 2, or plus by 1MB.</p>
+
+<p>The second solution is lazy release. If the SDS length shrinks, for example <code>sdstrim</code>, only the <code>len</code> variable is changed rather than deallocate the superfluous space which can be released by explicitly calling <code>sdsRemoveFreeSpace</code>. But after <code>sdsRemoveFreeSpace</code>, the next concatenation operations will require reallocation.</p>
+
+<pre><code class="language-c">sds sdsRemoveFreeSpace(sds s) {
+    void *sh, *newsh;
+    char type, oldtype = s[-1] &amp; SDS_TYPE_MASK;
+    int hdrlen, oldhdrlen = sdsHdrSize(oldtype);
+    size_t len = sdslen(s);
+    sh = (char*)s-oldhdrlen;
+
+    /* Check what would be the minimum SDS header that is just good enough to
+     * fit this string. */
+    type = sdsReqType(len);
+    hdrlen = sdsHdrSize(type);
+
+    /* If the type is the same, or at least a large enough type is still
+     * required, we just realloc(), letting the allocator to do the copy
+     * only if really needed. Otherwise if the change is huge, we manually
+     * reallocate the string to use the different header type. */
+    if (oldtype==type || type &gt; SDS_TYPE_8) {
+        newsh = s_realloc(sh, oldhdrlen+len+1);
+        if (newsh == NULL) return NULL;
+        s = (char*)newsh+oldhdrlen;
+    } else {
+        newsh = s_malloc(hdrlen+len+1);
+        if (newsh == NULL) return NULL;
+        memcpy((char*)newsh+hdrlen, s, len+1);
+        s_free(sh);
+        s = (char*)newsh+hdrlen;
+        s[-1] = type;
+        sdssetlen(s, len);
+    }
+    sdssetalloc(s, len);
+    return s;
+}
+</code></pre>
+
+<p><strong>Reference</strong></p>
+
+<ul>
+<li><a href="http://czrzchao.com/redisSourceSds">redis源码解读(一):基础数据结构之SDS</a></li>
+<li><a href="http://www.hoohack.me/2017/11/13/read-redis-src-sds">［Redis源码阅读］sds字符串实现</a></li>
+</ul>
+    </div>
+
+    
+    
+
+    
+    
+
+    <footer class="post-footer">
+      
+
+      
+      <nav class="post-nav">
+        
+          <a class="prev" href="/en/post/redis-mind-map/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">Redis Mind Map</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        
+          <a class="next" href="/en/post/java-hashtable-comparing-with-hashmap/">
+            <span class="next-text nav-default">Differences between Hashtable and HashMap</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+    (function() {
+      
+      
+      if (window.location.hostname === 'localhost') return;
+
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      var disqus_shortname = 'guoqing';
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:hellokangning@hotmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://www.linkedin.com/in/guoqing-geng-9032b820/" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="https://github.com/hellokangning" class="iconfont icon-github" title="github"></a>
+      <a href="https://www.douban.com/people/hellokangning/" class="iconfont icon-douban" title="douban"></a>
+      <a href="https://www.instagram.com/hellokangning/" class="iconfont icon-instagram" title="instagram"></a>
+  <a href="https://hellokangning.github.io/en/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    
+      2016 - 
+    2018
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Guoqing Geng</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+<script src="/lib/highlight/highlight.pack.js?v=20171001"></script><script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+
+
+<script type="text/javascript" src="/dist/even.min.js?v=3.2.0"></script>
+
+
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-105833321-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>
