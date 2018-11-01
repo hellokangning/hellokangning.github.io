@@ -92,7 +92,7 @@ This post will dive into the implementation of SDS comparing with classic C stri
 
 <meta itemprop="datePublished" content="2018-11-01T09:26:50&#43;08:00" />
 <meta itemprop="dateModified" content="2018-11-01T09:26:50&#43;08:00" />
-<meta itemprop="wordCount" content="1600">
+<meta itemprop="wordCount" content="1641">
 
 
 
@@ -181,7 +181,7 @@ This post will dive into the implementation of SDS comparing with classic C stri
               <a href="/en/categories/redis/"> Redis </a>
             
           </div>
-        <span class="more-meta"> 1600 words </span>
+        <span class="more-meta"> 1641 words </span>
         <span class="more-meta"> 4 mins read </span>
         
       </div>
@@ -196,6 +196,7 @@ This post will dive into the implementation of SDS comparing with classic C stri
     <nav id="TableOfContents">
 <ul>
 <li><a href="#definition">Definition</a></li>
+<li><a href="#an-example">An Example</a></li>
 <li><a href="#benefits-comparing-with-c-string">Benefits Comparing with C String</a></li>
 <li><a href="#init-a-sds">Init a SDS</a></li>
 <li><a href="#get-length">Get Length</a></li>
@@ -272,10 +273,10 @@ struct __attribute__ ((__packed__)) sdshdr64 {
 <p>Allow me to skip <code>sdshr5</code> which will never be used. The other four structures all incorporate the following member:</p>
 
 <ul>
-<li><code>len</code>: the length of this SDS.</li>
-<li><code>alloc</code> the memory allocated for this SDS, but may be used partially. The available size is <code>alloc - len</code>.</li>
+<li><code>buf</code>: the array storing the actual characters and ends with &ldquo;\0&rdquo;.</li>
+<li><code>len</code>: the length of this SDS, it will exclude the trailing &ldquo;\0&rdquo;.</li>
+<li><code>alloc</code> the memory allocated for this SDS, but may be used partially. The available size is <code>alloc - len</code>. This variable also exclude the last &ldquo;\0&rdquo;.</li>
 <li><code>flags</code>: 3 bits of <code>char</code> indicates the type of this SDS.</li>
-<li><code>buf</code>: the array storing the actual characters.</li>
 </ul>
 
 <p>Then you may ask how does these structures save memory? Firstly, <code>len</code> and <code>alloc</code> are <code>int</code> types with different size. Secondly, <code>__attribute__ ((__packed__))</code> tells the compiler do not add padding between fields of the struct. Redis also takes addressing into considering and implements its own <code>zmalloc</code> rather than <code>malloc</code>.</p>
@@ -299,6 +300,16 @@ struct __attribute__ ((__packed__)) sdshdr64 {
 }
 </code></pre>
 
+<h1 id="an-example">An Example</h1>
+
+<p>Assume a SDS with the content of &ldquo;Redis&rdquo;, here is the illustration.</p>
+
+<p><img src="/images/redis-sds-example.png" alt="" /></p>
+
+<p>Another case is a SDS storing &ldquo;Redis&rdquo; with reluctant space.</p>
+
+<p><img src="/images/redis-sds-reluntant-space.png" alt="" /></p>
+
 <h1 id="benefits-comparing-with-c-string">Benefits Comparing with C String</h1>
 
 <p>What&rsquo;s the benefits of SDS comparing with C string?</p>
@@ -307,7 +318,7 @@ struct __attribute__ ((__packed__)) sdshdr64 {
 <li>Get length with O(1) complexity.</li>
 <li>Avoid buffer overflow.</li>
 <li>Reduce the frequency of reallocating memory. It will trigger reallocation if you <code>strcat</code> of <code>strtrim</code> a C string.</li>
-<li>Binary safety. <code>\0</code> can be in the middle of a SDS, not in C string. Because C string use <code>\0</code> to determine the length, while SDS has the length in the header.</li>
+<li>Binary safety. &ldquo;\0&rdquo; can be in the middle of a SDS, not in C string. Because C string use &ldquo;\0&rdquo; to determine the length, while SDS has the length in the header.</li>
 </ul>
 
 <p>Two useful macros must be explained because they are used widely.</p>
