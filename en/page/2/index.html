@@ -57,7 +57,7 @@
 
 
 
-<meta property="og:updated_time" content="2018-07-15T17:53:35&#43;08:00"/>
+<meta property="og:updated_time" content="2018-07-19T11:00:38&#43;08:00"/>
 
 
 
@@ -141,6 +141,51 @@
   <section id="posts" class="posts">
     
     
+    
+      <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/en/post/java-nio-channel/">Java NIO: Channel</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> Jul 19, 2018 </span>
+      <div class="post-category">
+          
+            <a href="/en/categories/java/"> Java </a>
+          
+        </div>
+      <span class="more-meta"> 1426 words </span>
+      <span class="more-meta"> 3 mins read </span>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      <p>Channels are similar to streams available for blocking IO with a few differences:</p>
+
+<ul>
+<li>You can both read and write to Channels. Streams are typically one-way (read or write).</li>
+<li>Channels can be read and written asynchronously.</li>
+<li>Channels always read to, or write from, a Buffer.</li>
+</ul>
+
+<p>The Channels have multiple implementations depending on the data to be read or written:</p>
+
+<ul>
+<li>FileChannel: Used to read and write data from and to the files</li>
+<li>DatagramChannel: Used for data exchange over network using UDP packets</li>
+<li>SocketChannel: TCP channel to exchange data over TCP sockets</li>
+<li>ServerSocketChannel: An implementation similar to a web server listening to requests over a specific TCP port. It creates a new SocketChannel instance for every new connection</li>
+</ul>
+
+<p>This post will take FileChannel for further exploration, from example to implementation.</p>
+
+<p></p>
+    </div>
+    <div class="read-more">
+      <a href="/en/post/java-nio-channel/" class="read-more-link">Read more..</a>
+    </div>
+  </div>
+</article>
+
     
       <article class="post">
   <header class="post-header">
@@ -715,43 +760,6 @@ java HelloWorld
     </div>
     <div class="read-more">
       <a href="/en/post/hbase-code-analysis-memstore/" class="read-more-link">Read more..</a>
-    </div>
-  </div>
-</article>
-
-    
-      <article class="post">
-  <header class="post-header">
-    <h1 class="post-title"><a class="post-link" href="/en/post/hbase-storage-internals/">HBase Storage Internals</a></h1>
-    <div class="post-meta">
-      <span class="post-time"> Nov 16, 2017 </span>
-      <div class="post-category">
-          
-            <a href="/en/categories/hbase/"> HBase </a>
-          
-        </div>
-      <span class="more-meta"> 1298 words </span>
-      <span class="more-meta"> 3 mins read </span>
-    </div>
-  </header>
-  
-  <div class="post-content">
-    <div class="post-summary">
-      <p>Overview</p>
-
-<ul>
-<li>An HBase <code>Table</code> consists of multiple rows.</li>
-<li>Table will be split into <code>Regions</code> based on rows&rsquo; lexicographical order.</li>
-<li>A <code>Store</code> corresponds to a column family for a table for a given region.</li>
-<li>A Store hosts a <code>MemStore</code> and 0 or more <code>StoreFiles (HFiles)</code>.</li>
-<li>The MemStore holds in-memory modifications to the Store.</li>
-<li>StoreFiles are composed of <code>Blocks</code>.</li>
-</ul>
-
-<p></p>
-    </div>
-    <div class="read-more">
-      <a href="/en/post/hbase-storage-internals/" class="read-more-link">Read more..</a>
     </div>
   </div>
 </article>
