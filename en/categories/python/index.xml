@@ -6,10 +6,27 @@
     <description>Recent content in Python on Guoqing Geng</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 01 Nov 2018 14:51:40 +0800</lastBuildDate>
+    <lastBuildDate>Mon, 05 Nov 2018 20:46:15 +0800</lastBuildDate>
     
 	<atom:link href="https://hellokangning.github.io/en/categories/python/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Weak References</title>
+      <link>https://hellokangning.github.io/en/post/objects-are-never-explicitly-destroyed/</link>
+      <pubDate>Mon, 05 Nov 2018 20:46:15 +0800</pubDate>
+      
+      <guid>https://hellokangning.github.io/en/post/objects-are-never-explicitly-destroyed/</guid>
+      <description>&lt;p&gt;In Python, objects are never explicitly destroyed. However, they may be garbage-collected when they become unreachable.&lt;/p&gt;
+
+&lt;p&gt;The &lt;code&gt;del&lt;/code&gt; statement deletes names, not objects. An object may be garbage collected as result of a &lt;code&gt;del&lt;/code&gt; command, but only if the variable deleted holds the last reference to the object, or if the object becomes unreachable.&lt;/p&gt;
+
+&lt;p&gt;In CPython, the primary algorithm for garbage collection is reference counting. Essentially each object keeps count fo how many references point to it. As soon as that &lt;code&gt;refcount&lt;/code&gt; reaches 0, the object is immediately destroyed: CPython calls the &lt;code&gt;__del__&lt;/code&gt; method on the object (if defined) and the frees the memory.&lt;/p&gt;
+
+&lt;p&gt;But sometimes, it is useful to have a reference to an object that does not keep it around longer than necessary. Week references to an object do not increase its reference count. A weak reference does not prevent the referent from being garbage collected.&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>Variables Are Labels, Not Boxes</title>
