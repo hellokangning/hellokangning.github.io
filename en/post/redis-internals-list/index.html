@@ -87,7 +87,7 @@ This post will plough into the implementation of doubly linked list.
 
 <meta itemprop="datePublished" content="2018-11-06T09:38:12&#43;08:00" />
 <meta itemprop="dateModified" content="2018-11-06T09:38:12&#43;08:00" />
-<meta itemprop="wordCount" content="1035">
+<meta itemprop="wordCount" content="1089">
 
 
 
@@ -174,8 +174,8 @@ This post will plough into the implementation of doubly linked list.
               <a href="/en/categories/redis/"> Redis </a>
             
           </div>
-        <span class="more-meta"> 1035 words </span>
-        <span class="more-meta"> 5 mins read </span>
+        <span class="more-meta"> 1089 words </span>
+        <span class="more-meta"> 6 mins read </span>
         
       </div>
     </header>
@@ -189,6 +189,7 @@ This post will plough into the implementation of doubly linked list.
     <nav id="TableOfContents">
 <ul>
 <li><a href="#node-and-list">Node and List</a></li>
+<li><a href="#functions-implemented-as-macros">Functions Implemented as Macros</a></li>
 <li><a href="#create-a-list">Create a List</a></li>
 <li><a href="#remove-all-elements">Remove All Elements</a></li>
 <li><a href="#add-a-new-head">Add a New Head</a></li>
@@ -251,6 +252,26 @@ This post will plough into the implementation of doubly linked list.
 <li>Node counter. <code>len</code> attribute is updated every times when the length changes.</li>
 <li>Polymorphism. The value of node is stored in <code>void*</code>, and <code>dup</code>, <code>free</code>, <code>match</code> can change its value to a different type.</li>
 </ul>
+
+<h1 id="functions-implemented-as-macros">Functions Implemented as Macros</h1>
+
+<p>The time complexity of these functions is O(1).</p>
+
+<pre><code class="language-c">#define listLength(l) ((l)-&gt;len)
+#define listFirst(l) ((l)-&gt;head)
+#define listLast(l) ((l)-&gt;tail)
+#define listPrevNode(n) ((n)-&gt;prev)
+#define listNextNode(n) ((n)-&gt;next)
+#define listNodeValue(n) ((n)-&gt;value)
+
+#define listSetDupMethod(l,m) ((l)-&gt;dup = (m))
+#define listSetFreeMethod(l,m) ((l)-&gt;free = (m))
+#define listSetMatchMethod(l,m) ((l)-&gt;match = (m))
+
+#define listGetDupMethod(l) ((l)-&gt;dup)
+#define listGetFree(l) ((l)-&gt;free)
+#define listGetMatchMethod(l) ((l)-&gt;match)
+</code></pre>
 
 <h1 id="create-a-list">Create a List</h1>
 
