@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Redis Internals: List - Guoqing Geng</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Guoqing Geng" />
+  <meta name="description" content="Redis provides a generic doubly linked list implementation, which is widely used in Redis. If a list key involves two many elements or there are many long strings in the list, Redis will apply linked list for it. Publish-subscribe, slow query, monitor also make use of linked list. Redis keeps the states of clients in linked list, and client&amp;rsquo;s output buffer use it too.
+This post will plough into the implementation of doubly linked list.
+
+" />
+<meta name="keywords" content="Linked List" />
+
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.44" />
+
+
+<link rel="canonical" href="https://hellokangning.github.io/en/post/redis-internals-list/" />
+
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+
+<link href="/dist/even.min.css?v=3.2.0" rel="stylesheet">
+<link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+
+
+
+<meta property="og:title" content="Redis Internals: List" />
+<meta property="og:description" content="Redis provides a generic doubly linked list implementation, which is widely used in Redis. If a list key involves two many elements or there are many long strings in the list, Redis will apply linked list for it.  Publish-subscribe, slow query, monitor also make use of linked list. Redis keeps the states of clients in linked list, and client&rsquo;s output buffer use it too.
+
+This post will plough into the implementation of doubly linked list.
+
+" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hellokangning.github.io/en/post/redis-internals-list/" />
+
+
+
+<meta property="article:published_time" content="2018-11-06T09:38:12&#43;08:00"/>
+
+<meta property="article:modified_time" content="2018-11-06T09:38:12&#43;08:00"/>
+
+
+
+
+
+
+
+
+
+
+
+<meta itemprop="name" content="Redis Internals: List">
+<meta itemprop="description" content="Redis provides a generic doubly linked list implementation, which is widely used in Redis. If a list key involves two many elements or there are many long strings in the list, Redis will apply linked list for it.  Publish-subscribe, slow query, monitor also make use of linked list. Redis keeps the states of clients in linked list, and client&rsquo;s output buffer use it too.
+
+This post will plough into the implementation of doubly linked list.
+
+">
+
+
+<meta itemprop="datePublished" content="2018-11-06T09:38:12&#43;08:00" />
+<meta itemprop="dateModified" content="2018-11-06T09:38:12&#43;08:00" />
+<meta itemprop="wordCount" content="1035">
+
+
+
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Redis Internals: List"/>
+<meta name="twitter:description" content="Redis provides a generic doubly linked list implementation, which is widely used in Redis. If a list key involves two many elements or there are many long strings in the list, Redis will apply linked list for it.  Publish-subscribe, slow query, monitor also make use of linked list. Redis keeps the states of clients in linked list, and client&rsquo;s output buffer use it too.
+
+This post will plough into the implementation of doubly linked list.
+
+"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/en/" class="logo">Guoqing Geng</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/en/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/en/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/en/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="/en/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/zh/">
+        <li class="mobile-menu-item">中文</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/en/" class="logo">Guoqing Geng</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/en/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/en/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/en/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/en/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/zh/">中文</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Redis Internals: List</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> Nov 06, 2018 </span>
+        <div class="post-category">
+            
+              <a href="/en/categories/redis/"> Redis </a>
+            
+          </div>
+        <span class="more-meta"> 1035 words </span>
+        <span class="more-meta"> 5 mins read </span>
+        
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+<ul>
+<li><a href="#node-and-list">Node and List</a></li>
+<li><a href="#create-a-list">Create a List</a></li>
+<li><a href="#remove-all-elements">Remove All Elements</a></li>
+<li><a href="#add-a-new-head">Add a New Head</a></li>
+<li><a href="#insert-a-node">Insert a Node</a></li>
+<li><a href="#remove-a-node">Remove a Node</a></li>
+<li><a href="#returns-a-list-iterator">Returns a List Iterator</a></li>
+<li><a href="#rotate-the-list">Rotate the List</a></li>
+<li><a href="#join-two-lists">Join Two Lists</a></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    
+    
+
+    
+    <div class="post-content">
+      <p>Redis provides a generic doubly linked list implementation, which is widely used in Redis. If a list key involves two many elements or there are many long strings in the list, Redis will apply linked list for it.  Publish-subscribe, slow query, monitor also make use of linked list. Redis keeps the states of clients in linked list, and client&rsquo;s output buffer use it too.</p>
+
+<p>This post will plough into the implementation of doubly linked list.</p>
+
+<p></p>
+
+<blockquote>
+<p>The code analyzed in this post is based on 5.0.0</p>
+</blockquote>
+
+<h1 id="node-and-list">Node and List</h1>
+
+<p>Each node in the doubly list is represented by a <code>listNode</code> in <code>adlist.h</code>.</p>
+
+<pre><code class="language-c">typedef struct listNode {
+    struct listNode *prev;
+    struct listNode *next;
+    void *value;
+} listNode;
+</code></pre>
+
+<p>Multiple nodes can constitute a linked list with <code>next</code> pointing to their next nodes and <code>prev</code> pointing to the previous nodes.</p>
+
+<pre><code class="language-c">typedef struct list {
+    listNode *head;
+    listNode *tail;
+    void *(*dup)(void *ptr);
+    void (*free)(void *ptr);
+    int (*match)(void *ptr, void *key);
+    unsigned long len;
+} list;
+</code></pre>
+
+<p><img src="/images/redis-list-example.png" alt="" /></p>
+
+<p>The features of this linked list can be concluded as following:</p>
+
+<ul>
+<li>Doubly with <code>prev</code> and <code>next</code> pointer. It&rsquo;s easy to get the previous or next node of a specified node.</li>
+<li>No cycle. The <code>prev</code> of head and <code>next</code> of tail point to <code>None</code>.</li>
+<li>Two pointers making it effortless to get the head or tail.</li>
+<li>Node counter. <code>len</code> attribute is updated every times when the length changes.</li>
+<li>Polymorphism. The value of node is stored in <code>void*</code>, and <code>dup</code>, <code>free</code>, <code>match</code> can change its value to a different type.</li>
+</ul>
+
+<h1 id="create-a-list">Create a List</h1>
+
+<p>When creating a new list, only the header of <code>list</code> is allocated, the other member variables are assigned to <code>NULL</code> or 0.</p>
+
+<pre><code class="language-c">// Time complexity: O(1)
+
+list *listCreate(void)
+{
+    struct list *list;
+
+    if ((list = zmalloc(sizeof(*list))) == NULL)
+        return NULL;
+    list-&gt;head = list-&gt;tail = NULL;
+    list-&gt;len = 0;
+    list-&gt;dup = NULL;
+    list-&gt;free = NULL;
+    list-&gt;match = NULL;
+    return list;
+}
+</code></pre>
+
+<p>The created list can be freed with <code>AlFreeList()</code>, but private value of every node need to be freed by the user before to call <code>AlFreeList()</code>.</p>
+
+<h1 id="remove-all-elements">Remove All Elements</h1>
+
+<p><code>listEmpty(list*)</code> is called to remove all the elements from the list but not destroy the list itself.</p>
+
+<p>It costs O(n) time complexity because it frees each node in a traversal. if <code>free</code> function is available, it will be used to release the value of every node. After that, the memory of the node will be collected.</p>
+
+<pre><code class="language-c">// Time complexity: O(n)
+
+void listEmpty(list *list)
+{
+    unsigned long len;
+    listNode *current, *next;
+
+    current = list-&gt;head;
+    len = list-&gt;len;
+    while(len--) {
+        next = current-&gt;next;
+        if (list-&gt;free) list-&gt;free(current-&gt;value);
+        zfree(current);
+        current = next;
+    }
+    list-&gt;head = list-&gt;tail = NULL;
+    list-&gt;len = 0;
+}
+</code></pre>
+
+<p>While <code>listRelease(list*)</code> free the whole list including the header.</p>
+
+<pre><code class="language-c">void listRelease(list *list)
+{
+    listEmpty(list);
+    zfree(list);
+}
+</code></pre>
+
+<h1 id="add-a-new-head">Add a New Head</h1>
+
+<p><code>listAddNodeHead</code> add a new node to the list as the new head. If the list is empty (<code>list-&gt;len == 0</code>), the new node will be the only node with <code>head</code> and <code>tail</code> pointing to it. Or, the old head will be moved after the new node and pointers should be updated too.</p>
+
+<pre><code class="language-c">// Time complexity: O(1)
+
+list *listAddNodeHead(list *list, void *value)
+{
+    listNode *node;
+
+    if ((node = zmalloc(sizeof(*node))) == NULL)
+        return NULL;
+    node-&gt;value = value;
+    if (list-&gt;len == 0) {
+        list-&gt;head = list-&gt;tail = node;
+        node-&gt;prev = node-&gt;next = NULL;
+    } else {
+        node-&gt;prev = NULL;
+        node-&gt;next = list-&gt;head;
+        list-&gt;head-&gt;prev = node;
+        list-&gt;head = node;
+    }
+    list-&gt;len++;
+    return list;
+}
+</code></pre>
+
+<h1 id="insert-a-node">Insert a Node</h1>
+
+<p>The situation becomes more complicated if you want to insert a new node. Note that <code>after</code> is indicator whether the new node is inserted before or after <code>old_node</code>.</p>
+
+<p>If you insert a node before <code>old_node</code>, you may update the <code>head</code> of the list. Whereas the <code>tail</code> of the list may be modified if you insert after <code>old_node</code>.</p>
+
+<pre><code class="language-c">// Time complexity: O(1)
+
+list *listInsertNode(list *list, listNode *old_node, void *value, int after) {
+    listNode *node;
+
+    if ((node = zmalloc(sizeof(*node))) == NULL)
+        return NULL;
+    node-&gt;value = value;
+    if (after) {
+        node-&gt;prev = old_node;
+        node-&gt;next = old_node-&gt;next;
+        if (list-&gt;tail == old_node) {
+            list-&gt;tail = node;
+        }
+    } else {
+        node-&gt;next = old_node;
+        node-&gt;prev = old_node-&gt;prev;
+        if (list-&gt;head == old_node) {
+            list-&gt;head = node;
+        }
+    }
+    if (node-&gt;prev != NULL) {
+        node-&gt;prev-&gt;next = node;
+    }
+    if (node-&gt;next != NULL) {
+        node-&gt;next-&gt;prev = node;
+    }
+    list-&gt;len++;
+    return list;
+}
+</code></pre>
+
+<h1 id="remove-a-node">Remove a Node</h1>
+
+<p>If you remove the specified node from the specified list, you need to call <code>listDelNode</code> function. Before freeing the value and memory space of the node, you must change the pointers of its previous and next nodes. And the length also should be updated after your deletion.</p>
+
+<pre><code class="language-c">// Time complexity: O(1)
+
+void listDelNode(list *list, listNode *node)
+{
+    if (node-&gt;prev)
+        node-&gt;prev-&gt;next = node-&gt;next;
+    else
+        list-&gt;head = node-&gt;next;
+    if (node-&gt;next)
+        node-&gt;next-&gt;prev = node-&gt;prev;
+    else
+        list-&gt;tail = node-&gt;prev;
+    if (list-&gt;free) list-&gt;free(node-&gt;value);
+    zfree(node);
+    list-&gt;len--;
+}
+</code></pre>
+
+<h1 id="returns-a-list-iterator">Returns a List Iterator</h1>
+
+<p><code>listGetIterator</code> returns a list iterator <code>iter</code>. After the initialization every call to <code>listNext()</code> will return the next element of the list.</p>
+
+<pre><code class="language-c">typedef struct listIter {
+    listNode *next;
+    int direction;
+} listIter;
+
+listIter *listGetIterator(list *list, int direction)
+{
+    listIter *iter;
+
+    if ((iter = zmalloc(sizeof(*iter))) == NULL) return NULL;
+    if (direction == AL_START_HEAD)
+        iter-&gt;next = list-&gt;head;
+    else
+        iter-&gt;next = list-&gt;tail;
+    iter-&gt;direction = direction;
+    return iter;
+}
+
+listNode *listNext(listIter *iter)
+{
+    listNode *current = iter-&gt;next;
+
+    if (current != NULL) {
+        if (iter-&gt;direction == AL_START_HEAD)
+            iter-&gt;next = current-&gt;next;
+        else
+            iter-&gt;next = current-&gt;prev;
+    }
+    return current;
+}
+</code></pre>
+
+<h1 id="rotate-the-list">Rotate the List</h1>
+
+<p>Rotating the list means removing the tail node and inserting it to the head.</p>
+
+<pre><code class="language-c">// Time complexity: O(1)
+
+void listRotate(list *list) {
+    listNode *tail = list-&gt;tail;
+
+    if (listLength(list) &lt;= 1) return;
+
+    /* Detach current tail */
+    list-&gt;tail = tail-&gt;prev;
+    list-&gt;tail-&gt;next = NULL;
+    /* Move it as head */
+    list-&gt;head-&gt;prev = tail;
+    tail-&gt;prev = NULL;
+    tail-&gt;next = list-&gt;head;
+    list-&gt;head = tail;
+}
+</code></pre>
+
+<h1 id="join-two-lists">Join Two Lists</h1>
+
+<p><code>listJoin(list *l, list *o)</code> adds all the elements of the list <code>o</code> at the end of the list <code>l</code>. The list <code>o</code> remains empty but otherwise valid.</p>
+
+<pre><code class="language-c">// Time complexity: O(1)
+
+void listJoin(list *l, list *o) {
+    if (o-&gt;head)
+        o-&gt;head-&gt;prev = l-&gt;tail;
+
+    if (l-&gt;tail)
+        l-&gt;tail-&gt;next = o-&gt;head;
+    else
+        l-&gt;head = o-&gt;head;
+
+    if (o-&gt;tail) l-&gt;tail = o-&gt;tail;
+    l-&gt;len += o-&gt;len;
+
+    /* Setup other as an empty list. */
+    o-&gt;head = o-&gt;tail = NULL;
+    o-&gt;len = 0;
+}
+</code></pre>
+    </div>
+
+    
+    
+
+    
+    
+
+    <footer class="post-footer">
+      
+
+      
+      <nav class="post-nav">
+        
+        
+          <a class="next" href="/en/post/weak-references-in-python/">
+            <span class="next-text nav-default">Weak References</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+    (function() {
+      
+      
+      if (window.location.hostname === 'localhost') return;
+
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      var disqus_shortname = 'guoqing';
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:hellokangning@hotmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://www.linkedin.com/in/guoqing-geng-9032b820/" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="https://github.com/hellokangning" class="iconfont icon-github" title="github"></a>
+      <a href="https://www.douban.com/people/hellokangning/" class="iconfont icon-douban" title="douban"></a>
+      <a href="https://www.instagram.com/hellokangning/" class="iconfont icon-instagram" title="instagram"></a>
+  <a href="https://hellokangning.github.io/en/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    
+      2016 - 
+    2018
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Guoqing Geng</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+<script src="/lib/highlight/highlight.pack.js?v=20171001"></script><script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+
+
+<script type="text/javascript" src="/dist/even.min.js?v=3.2.0"></script>
+
+
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-105833321-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>
