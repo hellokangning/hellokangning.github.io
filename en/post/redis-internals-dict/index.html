@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Redis Internals: Dict - Guoqing Geng</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Guoqing Geng" />
+  <meta name="description" content="Dictionary is a data structure for storing key-value pair. Each key in a dictionary is unique and has a corresponding value. Redis implement its own dictionary and use it for hash key.
+As a data structure in server side, dictionary must take memory into consideration. That&amp;rsquo;s the reason why resizing and rehashing are so significant.
+
+" />
+<meta name="keywords" content="Dictionary, Redis" />
+
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.44" />
+
+
+<link rel="canonical" href="https://hellokangning.github.io/en/post/redis-internals-dict/" />
+
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+
+<link href="/dist/even.min.css?v=3.2.0" rel="stylesheet">
+<link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+
+
+
+<meta property="og:title" content="Redis Internals: Dict" />
+<meta property="og:description" content="Dictionary is a data structure for storing key-value pair. Each key in a dictionary is unique and has a corresponding value. Redis implement its own dictionary and use it for hash key.
+
+As a data structure in server side, dictionary must take memory into consideration. That&rsquo;s the reason why resizing and rehashing are so significant.
+
+" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hellokangning.github.io/en/post/redis-internals-dict/" />
+
+
+
+<meta property="article:published_time" content="2018-11-15T19:56:57&#43;08:00"/>
+
+<meta property="article:modified_time" content="2018-11-15T19:56:57&#43;08:00"/>
+
+
+
+
+
+
+
+
+
+
+
+<meta itemprop="name" content="Redis Internals: Dict">
+<meta itemprop="description" content="Dictionary is a data structure for storing key-value pair. Each key in a dictionary is unique and has a corresponding value. Redis implement its own dictionary and use it for hash key.
+
+As a data structure in server side, dictionary must take memory into consideration. That&rsquo;s the reason why resizing and rehashing are so significant.
+
+">
+
+
+<meta itemprop="datePublished" content="2018-11-15T19:56:57&#43;08:00" />
+<meta itemprop="dateModified" content="2018-11-15T19:56:57&#43;08:00" />
+<meta itemprop="wordCount" content="1734">
+
+
+
+<meta itemprop="keywords" content="Data Structure," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Redis Internals: Dict"/>
+<meta name="twitter:description" content="Dictionary is a data structure for storing key-value pair. Each key in a dictionary is unique and has a corresponding value. Redis implement its own dictionary and use it for hash key.
+
+As a data structure in server side, dictionary must take memory into consideration. That&rsquo;s the reason why resizing and rehashing are so significant.
+
+"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/en/" class="logo">Guoqing Geng</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/en/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/en/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/en/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="/en/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/zh/">
+        <li class="mobile-menu-item">中文</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/en/" class="logo">Guoqing Geng</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/en/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/en/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/en/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/en/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/zh/">中文</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Redis Internals: Dict</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> Nov 15, 2018 </span>
+        <div class="post-category">
+            
+              <a href="/en/categories/redis/"> Redis </a>
+            
+          </div>
+        <span class="more-meta"> 1734 words </span>
+        <span class="more-meta"> 9 mins read </span>
+        
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+<ul>
+<li><a href="#dictionary">Dictionary</a></li>
+<li><a href="#create-a-dictionary">Create a Dictionary</a></li>
+<li><a href="#incremental-rehashing">Incremental Rehashing</a></li>
+<li><a href="#get-a-key">Get a Key</a></li>
+<li><a href="#resize">Resize</a></li>
+<li><a href="#add-an-element">Add an Element</a></li>
+<li><a href="#remove-an-element">Remove an element</a></li>
+<li><a href="#return-a-random-entry">Return a Random Entry</a></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    
+    
+
+    
+    <div class="post-content">
+      <p>Dictionary is a data structure for storing key-value pair. Each key in a dictionary is unique and has a corresponding value. Redis implement its own dictionary and use it for hash key.</p>
+
+<p>As a data structure in server side, dictionary must take memory into consideration. That&rsquo;s the reason why resizing and rehashing are so significant.</p>
+
+<p></p>
+
+<blockquote>
+<p>The code analyzed in this post is based on 5.0.0</p>
+</blockquote>
+
+<h1 id="dictionary">Dictionary</h1>
+
+<p>Each key-value pair is represented by <code>dictEntry</code>. The type of key is a <code>void*</code> and value is a <code>union</code> allowing more flexibility. Each key-value includes a <code>next</code> pointer for resolving key conflict.</p>
+
+<pre><code class="language-c">typedef struct dictEntry {
+    void *key;
+    union {
+        void *val;
+        uint64_t u64;
+        int64_t s64;
+        double d;
+    } v;
+    struct dictEntry *next;
+} dictEntry;
+</code></pre>
+
+<p><code>dictht</code> is our hash table structure, and every dictionary has two of this as we implementing incremental rehashing, for the old to the new table.</p>
+
+<pre><code class="language-c">typedef struct dictType {
+    uint64_t (*hashFunction)(const void *key);
+    void *(*keyDup)(void *privdata, const void *key);
+    void *(*valDup)(void *privdata, const void *obj);
+    int (*keyCompare)(void *privdata, const void *key1, const void *key2);
+    void (*keyDestructor)(void *privdata, void *key);
+    void (*valDestructor)(void *privdata, void *obj);
+} dictType;
+
+
+typedef struct dictht {
+    dictEntry **table;
+    unsigned long size; // the number of buckets
+    unsigned long sizemask; 
+    unsigned long used; // how many buckets are occupied
+} dictht;
+
+typedef struct dict {
+    dictType *type;
+    void *privdata;
+    dictht ht[2];
+    long rehashidx; /* rehashing not in progress if rehashidx == -1 */
+    unsigned long iterators; /* number of iterators currently running */
+} dict;
+</code></pre>
+
+<h1 id="create-a-dictionary">Create a Dictionary</h1>
+
+<p>For creating a dictionary, a new memory space should be allocated, then two <code>dictht</code> will be reset with their member variable <code>0</code> or <code>NULL</code>.</p>
+
+<pre><code class="language-c">static void _dictReset(dictht *ht)
+{
+    ht-&gt;table = NULL;
+    ht-&gt;size = 0;
+    ht-&gt;sizemask = 0;
+    ht-&gt;used = 0;
+}
+
+dict *dictCreate(dictType *type,
+        void *privDataPtr)
+{
+    dict *d = zmalloc(sizeof(*d));
+
+    _dictInit(d,type,privDataPtr);
+    return d;
+}
+
+int _dictInit(dict *d, dictType *type,
+        void *privDataPtr)
+{
+    _dictReset(&amp;d-&gt;ht[0]);
+    _dictReset(&amp;d-&gt;ht[1]);
+    d-&gt;type = type;
+    d-&gt;privdata = privDataPtr;
+    d-&gt;rehashidx = -1;
+    d-&gt;iterators = 0;
+    return DICT_OK;
+}
+</code></pre>
+
+<h1 id="incremental-rehashing">Incremental Rehashing</h1>
+
+<p>I&rsquo;d like to introduce <code>_dictRehashStep</code> first so that you may not surprised when it is called in <code>dictAddRaw</code>, <code>dictGenericDelete</code>, <code>dictFind</code> and <code>dictGetRandomKey</code>.</p>
+
+<p><code>_dictRehashStep</code> performs just a step of rehashing, and only if there are no safe iterators bound to our hash table.</p>
+
+<blockquote>
+<p>When we have iterators in the middle of a rehashing we can&rsquo;t mess with the two hash tables otherwise some element can be missed or duplicated.</p>
+</blockquote>
+
+<pre><code class="language-c">static void _dictRehashStep(dict *d) {
+    if (d-&gt;iterators == 0) dictRehash(d,1);
+}
+</code></pre>
+
+<p>This function is called by common lookup or update operations in the dictionary, that&rsquo;s why it&rsquo;s called incremental rehashing.</p>
+
+<p><code>ht[0]</code> and <code>ht[1]</code> is coexisting when rehashing, so two tables must be searched if you lookup. Inserting a new item is much more easy, it should be done in <code>ht[1]</code> only.</p>
+
+<p>After rehashing, <code>ht[0]</code> will be empty and reassigned to <code>ht[1]</code>, the later will be reset.</p>
+
+<pre><code class="language-c">int dictRehash(dict *d, int n) {
+    int empty_visits = n*10; /* Max number of empty buckets to visit. */
+    if (!dictIsRehashing(d)) return 0;
+
+    while(n-- &amp;&amp; d-&gt;ht[0].used != 0) {
+        dictEntry *de, *nextde;
+
+        /* Note that rehashidx can't overflow as we are sure there are more
+         * elements because ht[0].used != 0 */
+        assert(d-&gt;ht[0].size &gt; (unsigned long)d-&gt;rehashidx);
+        while(d-&gt;ht[0].table[d-&gt;rehashidx] == NULL) {
+            d-&gt;rehashidx++;
+            if (--empty_visits == 0) return 1;
+        }
+        de = d-&gt;ht[0].table[d-&gt;rehashidx];
+        /* Move all the keys in this bucket from the old to the new hash HT */
+        while(de) {
+            uint64_t h;
+
+            nextde = de-&gt;next;
+            /* Get the index in the new hash table */
+            h = dictHashKey(d, de-&gt;key) &amp; d-&gt;ht[1].sizemask;
+            de-&gt;next = d-&gt;ht[1].table[h];
+            d-&gt;ht[1].table[h] = de;
+            d-&gt;ht[0].used--;
+            d-&gt;ht[1].used++;
+            de = nextde;
+        }
+        d-&gt;ht[0].table[d-&gt;rehashidx] = NULL;
+        d-&gt;rehashidx++;
+    }
+
+    /* Check if we already rehashed the whole table... */
+    if (d-&gt;ht[0].used == 0) {
+        zfree(d-&gt;ht[0].table);
+        d-&gt;ht[0] = d-&gt;ht[1];
+        _dictReset(&amp;d-&gt;ht[1]);
+        d-&gt;rehashidx = -1;
+        return 0;
+    }
+
+    /* More to rehash... */
+    return 1;
+}
+</code></pre>
+
+<h1 id="get-a-key">Get a Key</h1>
+
+<p><code>dictFetchValue</code> returns a value corresponding to the given key.</p>
+
+<pre><code class="language-c">#define dictGetVal(he) ((he)-&gt;v.val)
+
+void *dictFetchValue(dict *d, const void *key) {
+    dictEntry *he;
+
+    he = dictFind(d,key);
+    return he ? dictGetVal(he) : NULL;
+}
+</code></pre>
+
+<p>Hash function is binding with the type of dictionary. <code>dictFind</code> locates the index of the giving key by ADDing the hash value with <code>sizemask</code>.</p>
+
+<pre><code class="language-c">#define dictHashKey(d, key) (d)-&gt;type-&gt;hashFunction(key)
+
+dictEntry *dictFind(dict *d, const void *key)
+{
+    dictEntry *he;
+    uint64_t h, idx, table;
+
+    if (d-&gt;ht[0].used + d-&gt;ht[1].used == 0) return NULL; /* dict is empty */
+    if (dictIsRehashing(d)) _dictRehashStep(d);
+    h = dictHashKey(d, key);
+    for (table = 0; table &lt;= 1; table++) {
+        idx = h &amp; d-&gt;ht[table].sizemask;
+        he = d-&gt;ht[table].table[idx];
+        while(he) {
+            if (key==he-&gt;key || dictCompareKeys(d, key, he-&gt;key))
+                return he;
+            he = he-&gt;next;
+        }
+        if (!dictIsRehashing(d)) return NULL;
+    }
+    return NULL;
+}
+</code></pre>
+
+<h1 id="resize">Resize</h1>
+
+<p>Load factor is an important measure of how full the dictionary is allowed to get before its capacity is automatically increased. Redis always tries to keep <code>USED/BUCKETS</code> ratio near to <code>&lt;=1</code>, which is done by resizing.</p>
+
+<p><code>dictResize</code> resize the table to the minimal size that contains all the elements. If the dictionary is rehashing indicated by <code>rehashidx</code>, resizing will be skipped.</p>
+
+<p>The new size of dictionary is the next power of two that is larger than current size. For example, if the present size is 30, then the brand-new size will be 32.</p>
+
+<p>Please note that the new allocated hash table is assigned to <code>ht[0]</code> or <code>ht[1]</code> depend on this is the first initialization or not. In other words, if it&rsquo;s NOT initialized firstly, <code>ht[1]</code> will be prepared for incremental rehashing.</p>
+
+<pre><code class="language-c">#define dictIsRehashing(d) ((d)-&gt;rehashidx != -1)
+
+int dictResize(dict *d)
+{
+    int minimal;
+
+    if (!dict_can_resize || dictIsRehashing(d)) return DICT_ERR;
+    minimal = d-&gt;ht[0].used;
+    if (minimal &lt; DICT_HT_INITIAL_SIZE)
+        minimal = DICT_HT_INITIAL_SIZE;
+    return dictExpand(d, minimal);
+}
+
+int dictExpand(dict *d, unsigned long size)
+{
+    /* the size is invalid if it is smaller than the number of
+     * elements already inside the hash table */
+    if (dictIsRehashing(d) || d-&gt;ht[0].used &gt; size)
+        return DICT_ERR;
+
+    dictht n; /* the new hash table */
+    unsigned long realsize = _dictNextPower(size);
+
+    /* Rehashing to the same table size is not useful. */
+    if (realsize == d-&gt;ht[0].size) return DICT_ERR;
+
+    /* Allocate the new hash table and initialize all pointers to NULL */
+    n.size = realsize;
+    n.sizemask = realsize-1;
+    n.table = zcalloc(realsize*sizeof(dictEntry*));
+    n.used = 0;
+
+    /* Is this the first initialization? If so it's not really a rehashing
+     * we just set the first hash table so that it can accept keys. */
+    if (d-&gt;ht[0].table == NULL) {
+        d-&gt;ht[0] = n;
+        return DICT_OK;
+    }
+
+    /* Prepare a second hash table for incremental rehashing */
+    d-&gt;ht[1] = n;
+    d-&gt;rehashidx = 0;
+    return DICT_OK;
+}
+</code></pre>
+
+<h1 id="add-an-element">Add an Element</h1>
+
+<pre><code class="language-c">int dictAdd(dict *d, void *key, void *val)
+{
+    dictEntry *entry = dictAddRaw(d,key,NULL);
+
+    if (!entry) return DICT_ERR;
+    dictSetVal(d, entry, val);
+    return DICT_OK;
+}
+</code></pre>
+
+<p><code>dictAddRaw</code> is the function for low level add and find. This function adds the entry but instead of setting a value returns the <code>dictEntry</code> structure to the user, that will make sure to fill the value field as he wishes.</p>
+
+<pre><code class="language-c">dictEntry *dictAddRaw(dict *d, void *key, dictEntry **existing)
+{
+    long index;
+    dictEntry *entry;
+    dictht *ht;
+
+    if (dictIsRehashing(d)) _dictRehashStep(d);
+
+    /* Get the index of the new element, or -1 if
+     * the element already exists. */
+    if ((index = _dictKeyIndex(d, key, dictHashKey(d,key), existing)) == -1)
+        return NULL;
+
+    /* Allocate the memory and store the new entry.
+     * Insert the element in top, with the assumption that in a database
+     * system it is more likely that recently added entries are accessed
+     * more frequently. */
+    ht = dictIsRehashing(d) ? &amp;d-&gt;ht[1] : &amp;d-&gt;ht[0];
+    entry = zmalloc(sizeof(*entry));
+    entry-&gt;next = ht-&gt;table[index];
+    ht-&gt;table[index] = entry;
+    ht-&gt;used++;
+
+    /* Set the hash entry fields. */
+    dictSetKey(d, entry, key);
+    return entry;
+}
+</code></pre>
+
+<p>The rehashing will not be interrupted when adding a new item, and the new element will be insert into <code>ht[1]</code> if the dictionary is rehashing.</p>
+
+<p>Here we can also find that Redis use linked list to handle key conllision, and the new key-value pair will become the new head.</p>
+
+<p>Other high level functions that use <code>dictAddRaw</code> includes:</p>
+
+<ul>
+<li><code>dictAddOrFind</code></li>
+<li><code>dictReplace</code></li>
+</ul>
+
+<h1 id="remove-an-element">Remove an element</h1>
+
+<pre><code class="language-c">int dictDelete(dict *ht, const void *key) {
+    return dictGenericDelete(ht,key,0) ? DICT_OK : DICT_ERR;
+}
+</code></pre>
+
+<p><code>dictGenericDelete</code> is an helper function for <code>dictDelete</code> and also <code>dictUnlink</code> searching and removing an element. This function will operates <code>ht[0]</code> firstly, and then  <code>ht[1]</code> if needed.</p>
+
+<p>After finding the element to be deleted, <code>dictGenericDelete</code> will unlink it from the list, then release its memory.</p>
+
+<pre><code class="language-c">static dictEntry *dictGenericDelete(dict *d, const void *key, int nofree) {
+    uint64_t h, idx;
+    dictEntry *he, *prevHe;
+    int table;
+
+    if (d-&gt;ht[0].used == 0 &amp;&amp; d-&gt;ht[1].used == 0) return NULL;
+
+    if (dictIsRehashing(d)) _dictRehashStep(d);
+    h = dictHashKey(d, key);
+
+    for (table = 0; table &lt;= 1; table++) {
+        idx = h &amp; d-&gt;ht[table].sizemask;
+        he = d-&gt;ht[table].table[idx];
+        prevHe = NULL;
+        while(he) {
+            if (key==he-&gt;key || dictCompareKeys(d, key, he-&gt;key)) {
+                /* Unlink the element from the list */
+                if (prevHe)
+                    prevHe-&gt;next = he-&gt;next;
+                else
+                    d-&gt;ht[table].table[idx] = he-&gt;next;
+                if (!nofree) {
+                    dictFreeKey(d, he);
+                    dictFreeVal(d, he);
+                    zfree(he);
+                }
+                d-&gt;ht[table].used--;
+                return he;
+            }
+            prevHe = he;
+            he = he-&gt;next;
+        }
+        if (!dictIsRehashing(d)) break;
+    }
+    return NULL; /* not found */
+}
+</code></pre>
+
+<h1 id="return-a-random-entry">Return a Random Entry</h1>
+
+<p>This function involves two <code>random()</code> calls. Firstly, it is called for get the index of buckets, then address the index of list.</p>
+
+<p>Actually, it is NOT strict random. Considering a dictionary with only 2 buckets, a bucket with only one elements in the list and the other bucket with 2 elements in the list. The element in former bucket has 50% probability to be gotten, the one in the later bucket only 25%.</p>
+
+<pre><code class="language-c">dictEntry *dictGetRandomKey(dict *d)
+{
+    dictEntry *he, *orighe;
+    unsigned long h;
+    int listlen, listele;
+
+    if (dictSize(d) == 0) return NULL;
+    if (dictIsRehashing(d)) _dictRehashStep(d);
+    if (dictIsRehashing(d)) {
+        do {
+            /* We are sure there are no elements in indexes from 0
+             * to rehashidx-1 */
+            h = d-&gt;rehashidx + (random() % (d-&gt;ht[0].size +
+                                            d-&gt;ht[1].size -
+                                            d-&gt;rehashidx));
+            he = (h &gt;= d-&gt;ht[0].size) ? d-&gt;ht[1].table[h - d-&gt;ht[0].size] :
+                                      d-&gt;ht[0].table[h];
+        } while(he == NULL);
+    } else {
+        do {
+            h = random() &amp; d-&gt;ht[0].sizemask;
+            he = d-&gt;ht[0].table[h];
+        } while(he == NULL);
+    }
+
+    /* Now we found a non empty bucket, but it is a linked
+     * list and we need to get a random element from the list.
+     * The only sane way to do so is counting the elements and
+     * select a random index. */
+    listlen = 0;
+    orighe = he;
+    while(he) {
+        he = he-&gt;next;
+        listlen++;
+    }
+    listele = random() % listlen;
+    he = orighe;
+    while(listele--) he = he-&gt;next;
+    return he;
+}
+</code></pre>
+    </div>
+
+    
+    
+
+    
+    
+
+    <footer class="post-footer">
+      <div class="post-tags">
+          
+          <a href="/en/tags/data-structure/">Data Structure</a>
+          
+        </div>
+
+      
+      <nav class="post-nav">
+        
+        
+          <a class="next" href="/en/post/redis-internals-list/">
+            <span class="next-text nav-default">Redis Internals: List</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+    (function() {
+      
+      
+      if (window.location.hostname === 'localhost') return;
+
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      var disqus_shortname = 'guoqing';
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:hellokangning@hotmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://www.linkedin.com/in/guoqing-geng-9032b820/" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="https://github.com/hellokangning" class="iconfont icon-github" title="github"></a>
+      <a href="https://www.douban.com/people/hellokangning/" class="iconfont icon-douban" title="douban"></a>
+      <a href="https://www.instagram.com/hellokangning/" class="iconfont icon-instagram" title="instagram"></a>
+  <a href="https://hellokangning.github.io/en/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    
+      2016 - 
+    2018
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Guoqing Geng</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+<script src="/lib/highlight/highlight.pack.js?v=20171001"></script><script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+
+
+<script type="text/javascript" src="/dist/even.min.js?v=3.2.0"></script>
+
+
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-105833321-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>
