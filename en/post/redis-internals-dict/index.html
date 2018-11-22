@@ -17,7 +17,7 @@
 
 
 <meta name="author" content="Guoqing Geng" />
-  <meta name="description" content="Dictionary is a data structure for storing key-value pair. Each key in a dictionary is unique and has a corresponding value. Redis implement its own dictionary and use it for hash key.
+  <meta name="description" content="Dictionary is a data structure for storing key-value pair. Each key in a dictionary is unique and has a corresponding value. Redis implements its own dictionary and use it for hash key.
 As a data structure in server side, dictionary must take memory into consideration. That&amp;rsquo;s the reason why resizing and rehashing are so significant.
 
 " />
@@ -53,7 +53,7 @@ As a data structure in server side, dictionary must take memory into considerati
 
 
 <meta property="og:title" content="Redis Internals: Dict" />
-<meta property="og:description" content="Dictionary is a data structure for storing key-value pair. Each key in a dictionary is unique and has a corresponding value. Redis implement its own dictionary and use it for hash key.
+<meta property="og:description" content="Dictionary is a data structure for storing key-value pair. Each key in a dictionary is unique and has a corresponding value. Redis implements its own dictionary and use it for hash key.
 
 As a data structure in server side, dictionary must take memory into consideration. That&rsquo;s the reason why resizing and rehashing are so significant.
 
@@ -78,7 +78,7 @@ As a data structure in server side, dictionary must take memory into considerati
 
 
 <meta itemprop="name" content="Redis Internals: Dict">
-<meta itemprop="description" content="Dictionary is a data structure for storing key-value pair. Each key in a dictionary is unique and has a corresponding value. Redis implement its own dictionary and use it for hash key.
+<meta itemprop="description" content="Dictionary is a data structure for storing key-value pair. Each key in a dictionary is unique and has a corresponding value. Redis implements its own dictionary and use it for hash key.
 
 As a data structure in server side, dictionary must take memory into consideration. That&rsquo;s the reason why resizing and rehashing are so significant.
 
@@ -87,14 +87,14 @@ As a data structure in server side, dictionary must take memory into considerati
 
 <meta itemprop="datePublished" content="2018-11-15T19:56:57&#43;08:00" />
 <meta itemprop="dateModified" content="2018-11-15T19:56:57&#43;08:00" />
-<meta itemprop="wordCount" content="1756">
+<meta itemprop="wordCount" content="1762">
 
 
 
 <meta itemprop="keywords" content="Data Structure," />
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Redis Internals: Dict"/>
-<meta name="twitter:description" content="Dictionary is a data structure for storing key-value pair. Each key in a dictionary is unique and has a corresponding value. Redis implement its own dictionary and use it for hash key.
+<meta name="twitter:description" content="Dictionary is a data structure for storing key-value pair. Each key in a dictionary is unique and has a corresponding value. Redis implements its own dictionary and use it for hash key.
 
 As a data structure in server side, dictionary must take memory into consideration. That&rsquo;s the reason why resizing and rehashing are so significant.
 
@@ -174,7 +174,7 @@ As a data structure in server side, dictionary must take memory into considerati
               <a href="/en/categories/redis/"> Redis </a>
             
           </div>
-        <span class="more-meta"> 1756 words </span>
+        <span class="more-meta"> 1762 words </span>
         <span class="more-meta"> 4 mins read </span>
         
       </div>
@@ -206,7 +206,7 @@ As a data structure in server side, dictionary must take memory into considerati
 
     
     <div class="post-content">
-      <p>Dictionary is a data structure for storing key-value pair. Each key in a dictionary is unique and has a corresponding value. Redis implement its own dictionary and use it for hash key.</p>
+      <p>Dictionary is a data structure for storing key-value pair. Each key in a dictionary is unique and has a corresponding value. Redis implements its own dictionary and use it for hash key.</p>
 
 <p>As a data structure in server side, dictionary must take memory into consideration. That&rsquo;s the reason why resizing and rehashing are so significant.</p>
 
@@ -218,7 +218,7 @@ As a data structure in server side, dictionary must take memory into considerati
 
 <h1 id="dictionary">Dictionary</h1>
 
-<p>Each key-value pair is represented by <code>dictEntry</code>. The type of key is a <code>void*</code> and value is a <code>union</code> allowing more flexibility. Each key-value includes a <code>next</code> pointer for resolving key conflict.</p>
+<p>Each key-value pair is represented by <code>dictEntry</code>. The type of key is a <code>void*</code> and value is a <code>union</code> allowing more flexibility. Each key-value includes a <code>next</code> pointer for resolving key collision.</p>
 
 <pre><code class="language-c">typedef struct dictEntry {
     void *key;
@@ -259,7 +259,7 @@ typedef struct dict {
 } dict;
 </code></pre>
 
-<p>Here is an example of dictionary that is not rehashing:</p>
+<p>Here is an example of dictionary that is not rehashing, the <code>table</code> pointer of <code>ht[1]</code> is <code>NULL</code>.</p>
 
 <p><img src="/images/redis-dict-not-rehashing.svg" alt="" /></p>
 
@@ -314,7 +314,7 @@ int _dictInit(dict *d, dictType *type,
 
 <p>This function is called by common lookup or update operations in the dictionary, that&rsquo;s why it&rsquo;s called incremental rehashing.</p>
 
-<p><code>ht[0]</code> and <code>ht[1]</code> is coexisting when rehashing, so two tables must be searched if you lookup. Inserting a new item is much more easy, it should be done in <code>ht[1]</code> only.</p>
+<p><code>ht[0]</code> and <code>ht[1]</code> is coexisting when rehashing, so two tables must be searched if you lookup. Inserting a new item is much easier, it should be done in <code>ht[1]</code> only.</p>
 
 <p>After rehashing, <code>ht[0]</code> will be empty and reassigned to <code>ht[1]</code>, the later will be reset.</p>
 
@@ -365,28 +365,15 @@ int _dictInit(dict *d, dictType *type,
 </code></pre>
 
 <ol>
-<li>Before rehashing</li>
+<li>Before rehashing
+<img src="/images/redis-dict-before-rehash.svg" alt="" /></li>
+<li>Do rehashing
+<img src="/images/redis-dict-is-rehashing.svg" alt="" /></li>
+<li>After rehashing
+<img src="/images/redis-dict-after-rehash.svg" alt="" /></li>
+<li>Reassigned hash table
+<img src="/images/redis-dict-final-rehash.svg" alt="" /></li>
 </ol>
-
-<p><img src="/images/redis-dict-before-rehash.svg" alt="" /></p>
-
-<ol>
-<li>Do rehashing</li>
-</ol>
-
-<p><img src="/images/redis-dict-is-rehashing.svg" alt="" /></p>
-
-<ol>
-<li>After rehashing</li>
-</ol>
-
-<p><img src="/images/redis-dict-after-rehash.svg" alt="" /></p>
-
-<ol>
-<li>Reassigned hash table</li>
-</ol>
-
-<p><img src="/images/redis-dict-final-rehash.svg" alt="" /></p>
 
 <h1 id="get-a-key">Get a Key</h1>
 
@@ -402,7 +389,7 @@ void *dictFetchValue(dict *d, const void *key) {
 }
 </code></pre>
 
-<p>Hash function is binding with the type of dictionary. <code>dictFind</code> locates the index of the giving key by ADDing the hash value with <code>sizemask</code>.</p>
+<p>Hash function is binding with the type of dictionary. <code>dictFind</code> locates the index of the giving key by ANDing the hash value with <code>sizemask</code>.</p>
 
 <pre><code class="language-c">#define dictHashKey(d, key) (d)-&gt;type-&gt;hashFunction(key)
 
@@ -547,7 +534,7 @@ int dictExpand(dict *d, unsigned long size)
 }
 </code></pre>
 
-<p><code>dictGenericDelete</code> is an helper function for <code>dictDelete</code> and also <code>dictUnlink</code> searching and removing an element. This function will operates <code>ht[0]</code> firstly, and then  <code>ht[1]</code> if needed.</p>
+<p><code>dictGenericDelete</code> is a helper function for <code>dictDelete</code> and also <code>dictUnlink</code> searching and removing an element. This function will operates <code>ht[0]</code> firstly, and then  <code>ht[1]</code> if needed.</p>
 
 <p>After finding the element to be deleted, <code>dictGenericDelete</code> will unlink it from the list, then release its memory.</p>
 
