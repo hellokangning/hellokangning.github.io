@@ -57,7 +57,7 @@
 
 
 
-<meta property="og:updated_time" content="2018-11-01T09:44:00&#43;08:00"/>
+<meta property="og:updated_time" content="2018-11-28T14:25:25&#43;08:00"/>
 
 
 
@@ -141,6 +141,36 @@
   <section id="posts" class="posts">
     
     
+    
+      <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/zh/post/100-server-load-because-of-redis-sync/">Redis同步引发的系统过载</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> Nov 28, 2018 </span>
+      <div class="post-category">
+          
+            <a href="/zh/categories/redis/"> Redis </a>
+          
+        </div>
+      <span class="more-meta"> 约 3104 字 </span>
+      <span class="more-meta"> 预计阅读 7 分钟 </span>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      <p>今天一早，就有客户来报说机器负载 100%。从日志中看到的现象是，Slave 向 Master 请求部分同步，Master 却要求 Slave 做个全套：全量同步，因为 Slave 发过来的 replication ID 太老了。Slave 说好吧，整个全的，然后消费成功。接着，Slave 还想来个部分同步，上述的过程连续发生 3 次。Master 有点强买强卖的意思了，这样一来两边的 CPU 不干了，这不是加班嘛！二者之间的网络带宽也是突增，从下图可以看出：</p>
+
+<p><img src="/images/redis-network-bandwidth-spiking.png" alt="" /></p>
+
+<p></p>
+    </div>
+    <div class="read-more">
+      <a href="/zh/post/100-server-load-because-of-redis-sync/" class="read-more-link">阅读更多</a>
+    </div>
+  </div>
+</article>
+
     
       <article class="post">
   <header class="post-header">
