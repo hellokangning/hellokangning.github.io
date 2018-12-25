@@ -25,7 +25,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.44" />
+<meta name="generator" content="Hugo 0.52" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/en/" />
@@ -54,19 +54,7 @@
 <meta property="og:description" content="Guoqing Geng&#39;s blog" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://hellokangning.github.io/en/" />
-
-
-
 <meta property="og:updated_time" content="2018-11-15T19:56:57&#43;08:00"/>
-
-
-
-
-
-
-
-
-
 
 <meta itemprop="name" content="Guoqing Geng">
 <meta itemprop="description" content="Guoqing Geng&#39;s blog">
@@ -162,8 +150,6 @@
       <p>Dictionary is a data structure for storing key-value pair. Each key in a dictionary is unique and has a corresponding value. Redis implements its own dictionary and use it for hash key.</p>
 
 <p>As a data structure in server side, dictionary must take memory into consideration. That&rsquo;s the reason why resizing and rehashing are so significant.</p>
-
-<p></p>
     </div>
     <div class="read-more">
       <a href="/en/post/redis-internals-dict/" class="read-more-link">Read more..</a>
@@ -192,8 +178,6 @@
       <p>Redis provides a generic doubly linked list implementation, which is widely used in Redis. If a list key involves two many elements or there are many long strings in the list, Redis will apply linked list for it.  Publish-subscribe, slow query, monitor also make use of linked list. Redis keeps the states of clients in linked list, and client&rsquo;s output buffer use it too.</p>
 
 <p>This post will plough into the implementation of doubly linked list.</p>
-
-<p></p>
     </div>
     <div class="read-more">
       <a href="/en/post/redis-internals-list/" class="read-more-link">Read more..</a>
@@ -226,8 +210,6 @@
 <p>In CPython, the primary algorithm for garbage collection is reference counting. Essentially each object keeps count fo how many references point to it. As soon as that <code>refcount</code> reaches 0, the object is immediately destroyed: CPython calls the <code>__del__</code> method on the object (if defined) and the frees the memory.</p>
 
 <p>But sometimes, it is useful to have a reference to an object that does not keep it around longer than necessary. Week references to an object do not increase its reference count. A weak reference does not prevent the referent from being garbage collected.</p>
-
-<p></p>
     </div>
     <div class="read-more">
       <a href="/en/post/weak-references-in-python/" class="read-more-link">Read more..</a>
@@ -264,8 +246,6 @@ print(b)
 <p><img src="/images/variables-are-labels.png" alt="" /></p>
 
 <p>If you imagine that variables are like boxes, you cannot make sense of assignment in Python. For an assignment, you must always read the right-hand side first: that&rsquo;s where the object is created or retrieved. After that, the variable on the left is bound to the object, like a label stuck to it. Just forget about the boxes.</p>
-
-<p></p>
     </div>
     <div class="read-more">
       <a href="/en/post/variables-are-labels-not-boxes/" class="read-more-link">Read more..</a>
@@ -296,8 +276,6 @@ print(b)
 <p>Besides string, SDS is also used for buffer which can serve the AOF module and client&rsquo;s input.</p>
 
 <p>This post will dive into the implementation of SDS comparing with classic C string.</p>
-
-<p></p>
     </div>
     <div class="read-more">
       <a href="/en/post/redis-internals-sds/" class="read-more-link">Read more..</a>
@@ -332,8 +310,6 @@ print(b)
 <blockquote>
 <p>The message &ldquo;concurrent mode failure&rdquo; signifies that the concurrent collection of the Old Generation did not finish before the Old Generation became full.</p>
 </blockquote>
-
-<p></p>
     </div>
     <div class="read-more">
       <a href="/en/post/what-is-the-concurrent-mode-failure/" class="read-more-link">Read more..</a>
@@ -360,8 +336,6 @@ print(b)
   <div class="post-content">
     <div class="post-summary">
       <p>A key feature of decorators is that they run right after the decorated function is defined. This is usually at import time.</p>
-
-<p></p>
     </div>
     <div class="read-more">
       <a href="/en/post/when-python-executes-decorators/" class="read-more-link">Read more..</a>
@@ -390,8 +364,6 @@ print(b)
       <p>Design patterns are language-independent, but in the context of languages with first-class functions, it&rsquo;s beneficial to rethink some patterns. The general idea is: you can replace instances of some participant class with simple functions, reducing a lot of boilerplate code.</p>
 
 <p>In this post, I will refactor Strategy using functions objects.</p>
-
-<p></p>
     </div>
     <div class="read-more">
       <a href="/en/post/design-patterns-with-first-class-functions/" class="read-more-link">Read more..</a>
@@ -428,8 +400,6 @@ print(b)
 </code></pre>
 
 <p>The output is not expected, why?</p>
-
-<p></p>
     </div>
     <div class="read-more">
       <a href="/en/post/a-list-comprehension-puzzler/" class="read-more-link">Read more..</a>
@@ -458,8 +428,6 @@ print(b)
       <p>Redis is a great example of high-performance server. When I worked as a backend developer, my mentor recommended that I should read the code of Redis. And so I did, it&rsquo;s rewarding. As the time goes by, the ideas behind Redis are still cutting-edge, so I think it&rsquo;s time to retrospect the implementation of Redis. This post is a good beginning.</p>
 
 <p>It&rsquo;s my habit to start from the entry when meeting a big project. In Redis, <code>server.c</code> is responsible for bootstrap, that&rsquo;s what I pay close attention to in this post.</p>
-
-<p></p>
     </div>
     <div class="read-more">
       <a href="/en/post/what-happens-when-starting-redis/" class="read-more-link">Read more..</a>
@@ -490,8 +458,6 @@ print(b)
 <p>Python introduces a concept called mixin that encapsulates behavior that can be reused in other classes. It&rsquo;s supported via multiple inheritance, the difference of inheritance and mixin is, inheritance means &ldquo;is-a&rdquo; and mixin means &ldquo;has-a&rdquo;.</p>
 
 <p>This post will illustrate how mixin works with a simple example.</p>
-
-<p></p>
     </div>
     <div class="read-more">
       <a href="/en/post/using-mixins-with-python/" class="read-more-link">Read more..</a>
@@ -522,8 +488,6 @@ print(b)
 <p>Python allows operator overloading, which let us to define the custom behavior for a class. For instance, if a class defines a <code>__str__()</code>, then it can return a readable string representation of an object.</p>
 
 <p>In this post, I will enumerate some special methods that can change the behavior of an object and may putted into practice in daily work.</p>
-
-<p></p>
     </div>
     <div class="read-more">
       <a href="/en/post/special-methods-in-python-data-model/" class="read-more-link">Read more..</a>
@@ -550,8 +514,6 @@ print(b)
   <div class="post-content">
     <div class="post-summary">
       <p>The <code>bisect</code> module offers two main functions - <code>bisect</code> and <code>insort</code> - that use the binary search algorithm to quickly find an d insert items in any sorted sequence.</p>
-
-<p></p>
     </div>
     <div class="read-more">
       <a href="/en/post/managing-ordered-sequences-with-bisect/" class="read-more-link">Read more..</a>
@@ -578,8 +540,6 @@ print(b)
   <div class="post-content">
     <div class="post-summary">
       <p>A closure is a function with an extended scope that encompasses non-global variables but not defined there. It does not matter whether the function is anonymous of not, what matters is that it can access non-global variables that are defined outside of its body.</p>
-
-<p></p>
     </div>
     <div class="read-more">
       <a href="/en/post/python-closure/" class="read-more-link">Read more..</a>
@@ -608,8 +568,6 @@ print(b)
       <p>This post concludes a global view of Spark using a mind map, in which I try to enumerate what I know about it. A graph for the relationship of terminologies like Job, Stage is illustrated firstly so that you would be confused.</p>
 
 <p><img src="/images/spark-terminology-relationship.png" alt="" /></p>
-
-<p></p>
     </div>
     <div class="read-more">
       <a href="/en/post/a-few-things-about-spark/" class="read-more-link">Read more..</a>
@@ -638,8 +596,6 @@ print(b)
       <p>In line with fail-fast philosophy, <code>dict</code> access with <code>d[k]</code> raises an error if <code>k</code> is not an existing key. A common solution is <code>d.get(k, default)</code> which return a default rather handling <code>KeyError</code> if <code>k</code> is not present.</p>
 
 <p>This post introduces three alternatives - <code>setdefault</code>, <code>defaultdict</code> and <code>__mising</code> for this situation.</p>
-
-<p></p>
     </div>
     <div class="read-more">
       <a href="/en/post/handling-missing-keys-in-python/" class="read-more-link">Read more..</a>
@@ -680,8 +636,6 @@ print(b)
 <p>A visual diagram of this problem unfolds in the following. Each process <strong>p<sub>k</sub></strong> with an input value <strong>u<sub>k</sub></strong> runs a program to exchange its value. Finally the output of all non-faulty processes become identical. It is permissive that one or more processes may fail at any time, but the output <strong>v</strong> must be equal to the value of at least one process.</p>
 
 <p><img src="/images/distributed-consensus-problem.png" alt="" /></p>
-
-<p></p>
     </div>
     <div class="read-more">
       <a href="/en/post/consensus-in-distributed-system/" class="read-more-link">Read more..</a>
@@ -717,8 +671,6 @@ print(b)
 </code></pre>
 
 <p>Besides tuple, every iterative object can support unpacking, such as list, dictionary, set, string, generator etc. Let&rsquo;s traverse them one by one.</p>
-
-<p></p>
     </div>
     <div class="read-more">
       <a href="/en/post/python-unpacking/" class="read-more-link">Read more..</a>
@@ -747,8 +699,6 @@ print(b)
       <p>This post summarizes some design patterns I used in daily work or learnt from books.</p>
 
 <p><img src="/images/design-pattern-overview.png" alt="" /></p>
-
-<p></p>
     </div>
     <div class="read-more">
       <a href="/en/post/retrospect-design-pattern/" class="read-more-link">Read more..</a>
@@ -777,8 +727,6 @@ print(b)
       <p>This post only involves three mind maps for Linux covering principles, manual and programming. I find it is beneficial to organize my knowledge with mind map.</p>
 
 <p>I also realized a few captions are also useful for the full picture, so they are attached.</p>
-
-<p></p>
     </div>
     <div class="read-more">
       <a href="/en/post/linux-principle-manual-programming/" class="read-more-link">Read more..</a>
@@ -859,7 +807,7 @@ print(b)
   <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 
 
-<script>
+<script type="application/javascript">
 var doNotTrack = false;
 if (!doNotTrack) {
 	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;

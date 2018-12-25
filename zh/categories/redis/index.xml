@@ -6,22 +6,33 @@
     <description>Recent content in Redis on Guoqing Geng</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Wed, 28 Nov 2018 14:25:25 +0800</lastBuildDate>
+    <lastBuildDate>Mon, 24 Dec 2018 16:47:34 +0800</lastBuildDate>
     
 	<atom:link href="https://hellokangning.github.io/zh/categories/redis/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>Redis同步引发的系统过载</title>
+      <title>Redis 用作 LRU 缓存</title>
+      <link>https://hellokangning.github.io/zh/post/redis-as-an-lru-cache/</link>
+      <pubDate>Mon, 24 Dec 2018 16:47:34 +0800</pubDate>
+      
+      <guid>https://hellokangning.github.io/zh/post/redis-as-an-lru-cache/</guid>
+      <description>&lt;p&gt;本文翻译自 &lt;a href=&#34;https://redis.io/topics/lru-cache&#34;&gt;Using Redis as an LRU Cache&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;Redis 作为缓存使用时，很容易在增加新数据时剔除旧数据。这也是 &lt;em&gt;memcached&lt;/em&gt; 的默认行为。&lt;/p&gt;
+
+&lt;p&gt;LRU 只是其中的一种剔除方法。使用 Redis 作为 LRU 时，必须用到 &lt;code&gt;maxmemory&lt;/code&gt; 参数来限制可用内存的大小。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Redis 同步引发的系统过载</title>
       <link>https://hellokangning.github.io/zh/post/100-server-load-because-of-redis-sync/</link>
       <pubDate>Wed, 28 Nov 2018 14:25:25 +0800</pubDate>
       
       <guid>https://hellokangning.github.io/zh/post/100-server-load-because-of-redis-sync/</guid>
       <description>&lt;p&gt;今天一早，就有客户来报说机器负载 100%。从日志中看到的现象是，Slave 向 Master 请求部分同步，Master 却要求 Slave 做个全套：全量同步，因为 Slave 发过来的 replication ID 太老了。Slave 说好吧，整个全的，然后消费成功。接着，Slave 还想来个部分同步，上述的过程连续发生 3 次。Master 有点强买强卖的意思了，这样一来两边的 CPU 不干了，这不是加班嘛！二者之间的网络带宽也是突增，从下图可以看出：&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;https://hellokangning.github.io/images/redis-network-bandwidth-spiking.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+&lt;p&gt;&lt;img src=&#34;https://hellokangning.github.io/images/redis-network-bandwidth-spiking.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;</description>
     </item>
     
   </channel>
