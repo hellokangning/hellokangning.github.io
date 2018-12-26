@@ -6,10 +6,36 @@
     <description>Recent content on Qing&#39;s Landing</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Mon, 24 Dec 2018 16:47:34 +0800</lastBuildDate>
+    <lastBuildDate>Wed, 26 Dec 2018 10:26:19 +0800</lastBuildDate>
     
 	<atom:link href="https://hellokangning.github.io/zh/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Redis 的 SSL</title>
+      <link>https://hellokangning.github.io/zh/post/redis-ssl/</link>
+      <pubDate>Wed, 26 Dec 2018 10:26:19 +0800</pubDate>
+      
+      <guid>https://hellokangning.github.io/zh/post/redis-ssl/</guid>
+      <description>&lt;p&gt;这篇博客的起源是一位内部用户询问，Azure Cache for Redis 有没有 &lt;em&gt;.pem&lt;/em&gt; 或者 &lt;em&gt;.cem&lt;/em&gt; 的证书，然后可以在客户端指定它：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;import redis
+
+try:
+    conn = redis.StrictRedis(
+        host=&#39;&amp;lt;cache-name&amp;gt;.redis.cache.windows.net&#39;,
+        port=6380,
+        password=&#39;your password here&#39;,
+        ssl=True,
+        ssl_ca_certs=&#39;path to cert&#39;)
+    print (conn)
+    conn.ping()
+    print (&#39;Connected!&#39;)
+except Exception as ex:
+    print (&#39;Error:&#39;, ex)
+    exit(&#39;Failed to connect, terminating.&#39;)
+&lt;/code&gt;&lt;/pre&gt;</description>
+    </item>
     
     <item>
       <title>Redis 用作 LRU 缓存</title>
