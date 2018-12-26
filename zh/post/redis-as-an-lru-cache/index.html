@@ -61,7 +61,7 @@ LRU 只是其中的一种剔除方法。使用 Redis 作为 LRU 时，必须用�
 
 <meta itemprop="datePublished" content="2018-12-24T16:47:34&#43;08:00" />
 <meta itemprop="dateModified" content="2018-12-25T13:47:34&#43;08:00" />
-<meta itemprop="wordCount" content="1465">
+<meta itemprop="wordCount" content="1467">
 
 
 
@@ -146,7 +146,7 @@ LRU 只是其中的一种剔除方法。使用 Redis 作为 LRU 时，必须用�
         <div class="post-category">
             <a href="/zh/categories/redis/"> Redis </a>
             </div>
-          <span class="more-meta"> 1465 words </span>
+          <span class="more-meta"> 1467 words </span>
           <span class="more-meta"> 3 mins read </span>
         
       </div>
@@ -176,10 +176,14 @@ LRU 只是其中的一种剔除方法。使用 Redis 作为 LRU 时，必须用�
 <h1 id="最大可用内存">最大可用内存</h1>
 
 <p><code>maxmemory</code> 选项可以在 <code>redis.conf</code> 中配置，也可以使用 CONFIG SET 命令在运行时设置。如果要设置 100M　的限制，可以在　<code>redis.conf</code> 加上一行：</p>
-
-<pre><code>maxmemory 100mb
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">maxmemory 100mb</pre></td></tr></table>
+</div>
+</div>
 <p>值为 0 意味着没有内存限制，在 64 位系统下默认为 0，32 位有个隐形的限制，即 3GB。</p>
 
 <p>到达 <code>maxmemory</code> 的限制时，有一些策略可供选择，可以是返回错误、或者逐出某些键值。</p>
@@ -231,10 +235,14 @@ LRU 只是其中的一种剔除方法。使用 Redis 作为 LRU 时，必须用�
 <p>Redis 3.0 引入了候选池，极大地提升了性能，同时也更贴近真正的 LRU 算法。</p>
 
 <p>Redis 的 LRU 算法允许设置每次剔除时的采样数量，通过配置项 <code>maxmemory-samples</code> 就可以调整 LRU 算法的精度。</p>
-
-<pre><code>max-memory-samples 5
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">max-memory-samples 5</pre></td></tr></table>
+</div>
+</div>
 <p>Redis 没有实现严格 LRU 是为了节省内存。对于使用 Redis LRU 的应用来说，近似算法和严格 LRU 是一样的，从下图就能看出来：</p>
 
 <p><img src="/images/redis-approx-lru.png" alt="" /></p>

@@ -69,7 +69,7 @@ StoreFiles are composed of Blocks.
 
 <meta itemprop="datePublished" content="2017-11-16T11:34:49&#43;08:00" />
 <meta itemprop="dateModified" content="2017-11-16T11:34:49&#43;08:00" />
-<meta itemprop="wordCount" content="1298">
+<meta itemprop="wordCount" content="1413">
 
 
 
@@ -159,7 +159,7 @@ StoreFiles are composed of Blocks.
         <div class="post-category">
             <a href="/en/categories/hbase/"> HBase </a>
             </div>
-          <span class="more-meta"> 1298 words </span>
+          <span class="more-meta"> 1413 words </span>
           <span class="more-meta"> 3 mins read </span>
         
       </div>
@@ -208,144 +208,271 @@ StoreFiles are composed of Blocks.
 <p>OK, Let source code tell the truth.</p>
 
 <p><img src="/images/hbase-hregion-class.png" alt="" /></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">Region</span> <span class="kd">extends</span> <span class="n">ConfigurationObserver</span> <span class="o">{</span>
+    <span class="cm">/**
+</span><span class="cm">    * @return a list of the Stores managed by this region
+</span><span class="cm">    */</span>
+    <span class="n">List</span><span class="o">&lt;?</span> <span class="kd">extends</span> <span class="n">Store</span><span class="o">&gt;</span> <span class="nf">getStores</span><span class="o">();</span>
 
-<pre><code class="language-java">public interface Region extends ConfigurationObserver {
-    /**
-    * @return a list of the Stores managed by this region
-    */
-    List&lt;? extends Store&gt; getStores();
+    <span class="cm">/**
+</span><span class="cm">    * @return the Store for the given family
+</span><span class="cm">    */</span>
+    <span class="n">Store</span> <span class="nf">getStore</span><span class="o">(</span><span class="kt">byte</span><span class="o">[]</span> <span class="n">family</span><span class="o">);</span>
 
-    /**
-    * @return the Store for the given family
-    */
-    Store getStore(byte[] family);
+    <span class="cm">/**
+</span><span class="cm">    * Check the region&#39;s underlying store files, open the files that have not
+</span><span class="cm">    * been opened yet, and remove the store file readers for store files no
+</span><span class="cm">    * longer available.
+</span><span class="cm">    * @throws IOException
+</span><span class="cm">    */</span>
+    <span class="kt">boolean</span> <span class="nf">refreshStoreFiles</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
 
-    /**
-    * Check the region's underlying store files, open the files that have not
-    * been opened yet, and remove the store file readers for store files no
-    * longer available.
-    * @throws IOException
-    */
-    boolean refreshStoreFiles() throws IOException;
+    <span class="cm">/**
+</span><span class="cm">    * @return memstore size for this region, in bytes. It just accounts data size of cells added to
+</span><span class="cm">    *         the memstores of this Region. Means size in bytes for key, value and tags within Cells.
+</span><span class="cm">    *         It wont consider any java heap overhead for the cell objects or any other.
+</span><span class="cm">    */</span>
+    <span class="kt">long</span> <span class="nf">getMemStoreSize</span><span class="o">();</span>
 
-    /**
-    * @return memstore size for this region, in bytes. It just accounts data size of cells added to
-    *         the memstores of this Region. Means size in bytes for key, value and tags within Cells.
-    *         It wont consider any java heap overhead for the cell objects or any other.
-    */
-    long getMemStoreSize();
+    <span class="cm">/**
+</span><span class="cm">    * Puts some data in the table.
+</span><span class="cm">    * @param put
+</span><span class="cm">    * @throws IOException
+</span><span class="cm">    */</span>
+    <span class="kt">void</span> <span class="nf">put</span><span class="o">(</span><span class="n">Put</span> <span class="n">put</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
 
-    /**
-    * Puts some data in the table.
-    * @param put
-    * @throws IOException
-    */
-    void put(Put put) throws IOException;
+    <span class="cm">/**
+</span><span class="cm">    * Perform one or more increment operations on a row.
+</span><span class="cm">    * @param increment
+</span><span class="cm">    * @return result of the operation
+</span><span class="cm">    * @throws IOException
+</span><span class="cm">    */</span>
+    <span class="n">Result</span> <span class="nf">increment</span><span class="o">(</span><span class="n">Increment</span> <span class="n">increment</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
 
-    /**
-    * Perform one or more increment operations on a row.
-    * @param increment
-    * @return result of the operation
-    * @throws IOException
-    */
-    Result increment(Increment increment) throws IOException;
+    <span class="cm">/**
+</span><span class="cm">    * Do a get based on the get parameter.
+</span><span class="cm">    * @param get query parameters
+</span><span class="cm">    * @return result of the operation
+</span><span class="cm">    */</span>
+    <span class="n">Result</span> <span class="nf">get</span><span class="o">(</span><span class="n">Get</span> <span class="n">get</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
+<span class="o">}</span>
 
-    /**
-    * Do a get based on the get parameter.
-    * @param get query parameters
-    * @return result of the operation
-    */
-    Result get(Get get) throws IOException;
-}
-
-public class HRegion implements HeapSize, PropagatingConfigurationObserver, Region {
-    private final WAL wal;
-    private final HRegionFileSystem fs;
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">HRegion</span> <span class="kd">implements</span> <span class="n">HeapSize</span><span class="o">,</span> <span class="n">PropagatingConfigurationObserver</span><span class="o">,</span> <span class="n">Region</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">WAL</span> <span class="n">wal</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">HRegionFileSystem</span> <span class="n">fs</span><span class="o">;</span>
 
 
-    protected final Map&lt;byte[], HStore&gt; stores =
-     new ConcurrentSkipListMap&lt;&gt;(Bytes.BYTES_RAWCOMPARATOR);
-}
-</code></pre>
-
+    <span class="kd">protected</span> <span class="kd">final</span> <span class="n">Map</span><span class="o">&lt;</span><span class="kt">byte</span><span class="o">[],</span> <span class="n">HStore</span><span class="o">&gt;</span> <span class="n">stores</span> <span class="o">=</span>
+     <span class="k">new</span> <span class="n">ConcurrentSkipListMap</span><span class="o">&lt;&gt;(</span><span class="n">Bytes</span><span class="o">.</span><span class="na">BYTES_RAWCOMPARATOR</span><span class="o">);</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <h1 id="store">Store</h1>
 
 <p>A Store corresponds to a column family for a table for a given region.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">Store</span> <span class="o">{</span>
+    <span class="n">Collection</span><span class="o">&lt;?</span> <span class="kd">extends</span> <span class="n">StoreFile</span><span class="o">&gt;</span> <span class="nf">getStorefiles</span><span class="o">();</span>
 
-<pre><code class="language-java">public interface Store {
-    Collection&lt;? extends StoreFile&gt; getStorefiles();
+    <span class="n">FileSystem</span> <span class="nf">getFileSystem</span><span class="o">();</span>
 
-    FileSystem getFileSystem();
+    <span class="cm">/**
+</span><span class="cm">    * @return The size of this store&#39;s memstore.
+</span><span class="cm">    */</span>
+    <span class="n">MemStoreSize</span> <span class="nf">getMemStoreSize</span><span class="o">();</span>
+<span class="o">}</span>
 
-    /**
-    * @return The size of this store's memstore.
-    */
-    MemStoreSize getMemStoreSize();
-}
-
-public class HStore implements Store, HeapSize, StoreConfigInformation, PropagatingConfigurationObserver {
-    protected final MemStore memstore;
-    // This stores directory in the filesystem.
-    protected final HRegion region;
-    private final ColumnFamilyDescriptor family;
-    private final HRegionFileSystem fs;
-}
-</code></pre>
-
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">HStore</span> <span class="kd">implements</span> <span class="n">Store</span><span class="o">,</span> <span class="n">HeapSize</span><span class="o">,</span> <span class="n">StoreConfigInformation</span><span class="o">,</span> <span class="n">PropagatingConfigurationObserver</span> <span class="o">{</span>
+    <span class="kd">protected</span> <span class="kd">final</span> <span class="n">MemStore</span> <span class="n">memstore</span><span class="o">;</span>
+    <span class="c1">// This stores directory in the filesystem.
+</span><span class="c1"></span>    <span class="kd">protected</span> <span class="kd">final</span> <span class="n">HRegion</span> <span class="n">region</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">ColumnFamilyDescriptor</span> <span class="n">family</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">HRegionFileSystem</span> <span class="n">fs</span><span class="o">;</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <h1 id="memstore">MemStore</h1>
 
 <p>A Store hosts a MemStore and 0 or more StoreFiles (HFiles). The MemStore holds in-memory modifications to the Store. Modifications are Cells/KeyValues.</p>
 
 <p>When the MemStore reaches a given size (<code>hbase.hregion.memstore.flush.size</code>), it flushes its contents to a StoreFile.</p>
-
-<pre><code class="language-java">public interface MemStore {
-    /**
-    * Write the updates
-    * @param cells
-    * @param memstoreSizing The delta in memstore size will be passed back via this.
-    *        This will include both data size and heap overhead delta.
-    */
-    void add(Iterable&lt;Cell&gt; cells, MemStoreSizing memstoreSizing);
-}
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">MemStore</span> <span class="o">{</span>
+    <span class="cm">/**
+</span><span class="cm">    * Write the updates
+</span><span class="cm">    * @param cells
+</span><span class="cm">    * @param memstoreSizing The delta in memstore size will be passed back via this.
+</span><span class="cm">    *        This will include both data size and heap overhead delta.
+</span><span class="cm">    */</span>
+    <span class="kt">void</span> <span class="nf">add</span><span class="o">(</span><span class="n">Iterable</span><span class="o">&lt;</span><span class="n">Cell</span><span class="o">&gt;</span> <span class="n">cells</span><span class="o">,</span> <span class="n">MemStoreSizing</span> <span class="n">memstoreSizing</span><span class="o">);</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <h1 id="storefile-hfile">StoreFile (HFile)</h1>
 
 <p>StoreFiles are where your data lives. The HFile file format is based on the SSTable file described in the BigTable [2006] paper and on Hadoop’s TFile. StoreFile wraps HFile, a file of sorted key/value pairs. Both keys and values are byte arrays.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">StoreFile</span> <span class="o">{</span>
+    <span class="cm">/**
+</span><span class="cm">    * @return True if this is HFile.
+</span><span class="cm">    */</span>
+    <span class="kt">boolean</span> <span class="nf">isHFile</span><span class="o">();</span>
 
-<pre><code class="language-java">public interface StoreFile {
-    /**
-    * @return True if this is HFile.
-    */
-    boolean isHFile();
+    <span class="cm">/**
+</span><span class="cm">    * Get the first key in this store file.
+</span><span class="cm">    */</span>
+    <span class="n">Optional</span><span class="o">&lt;</span><span class="n">Cell</span><span class="o">&gt;</span> <span class="nf">getFirstKey</span><span class="o">();</span> 
+<span class="o">}</span>
 
-    /**
-    * Get the first key in this store file.
-    */
-    Optional&lt;Cell&gt; getFirstKey(); 
-}
+<span class="cm">/**
+</span><span class="cm"> * A Store data file.  Stores usually have one or more of these files.  They
+</span><span class="cm"> * are produced by flushing the memstore to disk.
+</span><span class="cm"> */</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">HStoreFile</span> <span class="kd">implements</span> <span class="n">StoreFile</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">StoreFileInfo</span> <span class="n">fileInfo</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">FileSystem</span> <span class="n">fs</span><span class="o">;</span>
 
-/**
- * A Store data file.  Stores usually have one or more of these files.  They
- * are produced by flushing the memstore to disk.
- */
-public class HStoreFile implements StoreFile {
-    private final StoreFileInfo fileInfo;
-    private final FileSystem fs;
+    <span class="c1">// firstKey, lastkey and cellComparator will be set when openReader.
+</span><span class="c1"></span>    <span class="kd">private</span> <span class="n">Optional</span><span class="o">&lt;</span><span class="n">Cell</span><span class="o">&gt;</span> <span class="n">firstKey</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="n">Optional</span><span class="o">&lt;</span><span class="n">Cell</span><span class="o">&gt;</span> <span class="n">lastKey</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="n">CellComparator</span> <span class="n">comparator</span><span class="o">;</span>
 
-    // firstKey, lastkey and cellComparator will be set when openReader.
-    private Optional&lt;Cell&gt; firstKey;
-    private Optional&lt;Cell&gt; lastKey;
-    private CellComparator comparator;
-
-    /**
-    * Bloom filter type specified in column family configuration. Does not
-    * necessarily correspond to the Bloom filter type present in the HFile.
-    */
-    private final BloomType cfBloomType;
-}
-</code></pre>
-
+    <span class="cm">/**
+</span><span class="cm">    * Bloom filter type specified in column family configuration. Does not
+</span><span class="cm">    * necessarily correspond to the Bloom filter type present in the HFile.
+</span><span class="cm">    */</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">BloomType</span> <span class="n">cfBloomType</span><span class="o">;</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>The following describes the evolution of the HFile format. It is useful to give a short overview of the original (HFile version 1) format.</p>
 
 <p><img src="/images/hbase-hfile-v1.png" alt="" /></p>

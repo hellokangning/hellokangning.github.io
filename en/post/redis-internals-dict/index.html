@@ -56,7 +56,7 @@ As a data structure in server side, dictionary must take memory into considerati
 
 <meta itemprop="datePublished" content="2018-11-15T19:56:57&#43;08:00" />
 <meta itemprop="dateModified" content="2018-11-20T20:56:57&#43;08:00" />
-<meta itemprop="wordCount" content="1762">
+<meta itemprop="wordCount" content="2058">
 
 
 
@@ -139,8 +139,8 @@ As a data structure in server side, dictionary must take memory into considerati
         <div class="post-category">
             <a href="/en/categories/redis/"> Redis </a>
             </div>
-          <span class="more-meta"> 1762 words </span>
-          <span class="more-meta"> 4 mins read </span>
+          <span class="more-meta"> 2058 words </span>
+          <span class="more-meta"> 5 mins read </span>
         
       </div>
     </header>
@@ -174,46 +174,85 @@ As a data structure in server side, dictionary must take memory into considerati
 <h1 id="dictionary">Dictionary</h1>
 
 <p>Each key-value pair is represented by <code>dictEntry</code>. The type of key is a <code>void*</code> and value is a <code>union</code> allowing more flexibility. Each key-value includes a <code>next</code> pointer for resolving key collision.</p>
-
-<pre><code class="language-c">typedef struct dictEntry {
-    void *key;
-    union {
-        void *val;
-        uint64_t u64;
-        int64_t s64;
-        double d;
-    } v;
-    struct dictEntry *next;
-} dictEntry;
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">dictEntry</span> <span class="p">{</span>
+    <span class="kt">void</span> <span class="o">*</span><span class="n">key</span><span class="p">;</span>
+    <span class="k">union</span> <span class="p">{</span>
+        <span class="kt">void</span> <span class="o">*</span><span class="n">val</span><span class="p">;</span>
+        <span class="n">uint64_t</span> <span class="n">u64</span><span class="p">;</span>
+        <span class="n">int64_t</span> <span class="n">s64</span><span class="p">;</span>
+        <span class="kt">double</span> <span class="n">d</span><span class="p">;</span>
+    <span class="p">}</span> <span class="n">v</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="n">dictEntry</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>
+<span class="p">}</span> <span class="n">dictEntry</span><span class="p">;</span></code></pre></td></tr></table>
+</div>
+</div>
 <p><code>dictht</code> is our hash table structure, and every dictionary has two of this as we implementing incremental rehashing, for the old to the new table.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">dictType</span> <span class="p">{</span>
+    <span class="n">uint64_t</span> <span class="p">(</span><span class="o">*</span><span class="n">hashFunction</span><span class="p">)(</span><span class="k">const</span> <span class="kt">void</span> <span class="o">*</span><span class="n">key</span><span class="p">);</span>
+    <span class="kt">void</span> <span class="o">*</span><span class="p">(</span><span class="o">*</span><span class="n">keyDup</span><span class="p">)(</span><span class="kt">void</span> <span class="o">*</span><span class="n">privdata</span><span class="p">,</span> <span class="k">const</span> <span class="kt">void</span> <span class="o">*</span><span class="n">key</span><span class="p">);</span>
+    <span class="kt">void</span> <span class="o">*</span><span class="p">(</span><span class="o">*</span><span class="n">valDup</span><span class="p">)(</span><span class="kt">void</span> <span class="o">*</span><span class="n">privdata</span><span class="p">,</span> <span class="k">const</span> <span class="kt">void</span> <span class="o">*</span><span class="n">obj</span><span class="p">);</span>
+    <span class="kt">int</span> <span class="p">(</span><span class="o">*</span><span class="n">keyCompare</span><span class="p">)(</span><span class="kt">void</span> <span class="o">*</span><span class="n">privdata</span><span class="p">,</span> <span class="k">const</span> <span class="kt">void</span> <span class="o">*</span><span class="n">key1</span><span class="p">,</span> <span class="k">const</span> <span class="kt">void</span> <span class="o">*</span><span class="n">key2</span><span class="p">);</span>
+    <span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">keyDestructor</span><span class="p">)(</span><span class="kt">void</span> <span class="o">*</span><span class="n">privdata</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">key</span><span class="p">);</span>
+    <span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">valDestructor</span><span class="p">)(</span><span class="kt">void</span> <span class="o">*</span><span class="n">privdata</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">obj</span><span class="p">);</span>
+<span class="p">}</span> <span class="n">dictType</span><span class="p">;</span>
 
-<pre><code class="language-c">typedef struct dictType {
-    uint64_t (*hashFunction)(const void *key);
-    void *(*keyDup)(void *privdata, const void *key);
-    void *(*valDup)(void *privdata, const void *obj);
-    int (*keyCompare)(void *privdata, const void *key1, const void *key2);
-    void (*keyDestructor)(void *privdata, void *key);
-    void (*valDestructor)(void *privdata, void *obj);
-} dictType;
+<span class="k">typedef</span> <span class="k">struct</span> <span class="n">dictht</span> <span class="p">{</span>
+    <span class="n">dictEntry</span> <span class="o">**</span><span class="n">table</span><span class="p">;</span>
+    <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">size</span><span class="p">;</span> <span class="c1">// the number of buckets
+</span><span class="c1"></span>    <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">sizemask</span><span class="p">;</span> 
+    <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">used</span><span class="p">;</span> <span class="c1">// how many buckets are occupied
+</span><span class="c1"></span><span class="p">}</span> <span class="n">dictht</span><span class="p">;</span>
 
-typedef struct dictht {
-    dictEntry **table;
-    unsigned long size; // the number of buckets
-    unsigned long sizemask; 
-    unsigned long used; // how many buckets are occupied
-} dictht;
-
-typedef struct dict {
-    dictType *type;
-    void *privdata;
-    dictht ht[2];
-    long rehashidx; /* rehashing not in progress if rehashidx == -1 */
-    unsigned long iterators; /* number of iterators currently running */
-} dict;
-</code></pre>
-
+<span class="k">typedef</span> <span class="k">struct</span> <span class="n">dict</span> <span class="p">{</span>
+    <span class="n">dictType</span> <span class="o">*</span><span class="n">type</span><span class="p">;</span>
+    <span class="kt">void</span> <span class="o">*</span><span class="n">privdata</span><span class="p">;</span>
+    <span class="n">dictht</span> <span class="n">ht</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+    <span class="kt">long</span> <span class="n">rehashidx</span><span class="p">;</span> <span class="cm">/* rehashing not in progress if rehashidx == -1 */</span>
+    <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">iterators</span><span class="p">;</span> <span class="cm">/* number of iterators currently running */</span>
+<span class="p">}</span> <span class="n">dict</span><span class="p">;</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>Here is an example of dictionary that is not rehashing, the <code>table</code> pointer of <code>ht[1]</code> is <code>NULL</code>.</p>
 
 <p><img src="/images/redis-dict-not-rehashing.svg" alt="" /></p>
@@ -221,37 +260,68 @@ typedef struct dict {
 <h1 id="create-a-dictionary">Create a Dictionary</h1>
 
 <p>For creating a dictionary, a new memory space should be allocated, then two <code>dictht</code> will be reset with their member variable <code>0</code> or <code>NULL</code>.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="k">static</span> <span class="kt">void</span> <span class="nf">_dictReset</span><span class="p">(</span><span class="n">dictht</span> <span class="o">*</span><span class="n">ht</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">ht</span><span class="o">-&gt;</span><span class="n">table</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="n">ht</span><span class="o">-&gt;</span><span class="n">size</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">ht</span><span class="o">-&gt;</span><span class="n">sizemask</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">ht</span><span class="o">-&gt;</span><span class="n">used</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
 
-<pre><code class="language-c">static void _dictReset(dictht *ht)
-{
-    ht-&gt;table = NULL;
-    ht-&gt;size = 0;
-    ht-&gt;sizemask = 0;
-    ht-&gt;used = 0;
-}
+<span class="n">dict</span> <span class="o">*</span><span class="nf">dictCreate</span><span class="p">(</span><span class="n">dictType</span> <span class="o">*</span><span class="n">type</span><span class="p">,</span>
+        <span class="kt">void</span> <span class="o">*</span><span class="n">privDataPtr</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">dict</span> <span class="o">*</span><span class="n">d</span> <span class="o">=</span> <span class="n">zmalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="o">*</span><span class="n">d</span><span class="p">));</span>
 
-dict *dictCreate(dictType *type,
-        void *privDataPtr)
-{
-    dict *d = zmalloc(sizeof(*d));
+    <span class="n">_dictInit</span><span class="p">(</span><span class="n">d</span><span class="p">,</span><span class="n">type</span><span class="p">,</span><span class="n">privDataPtr</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">d</span><span class="p">;</span>
+<span class="p">}</span>
 
-    _dictInit(d,type,privDataPtr);
-    return d;
-}
-
-int _dictInit(dict *d, dictType *type,
-        void *privDataPtr)
-{
-    _dictReset(&amp;d-&gt;ht[0]);
-    _dictReset(&amp;d-&gt;ht[1]);
-    d-&gt;type = type;
-    d-&gt;privdata = privDataPtr;
-    d-&gt;rehashidx = -1;
-    d-&gt;iterators = 0;
-    return DICT_OK;
-}
-</code></pre>
-
+<span class="kt">int</span> <span class="nf">_dictInit</span><span class="p">(</span><span class="n">dict</span> <span class="o">*</span><span class="n">d</span><span class="p">,</span> <span class="n">dictType</span> <span class="o">*</span><span class="n">type</span><span class="p">,</span>
+        <span class="kt">void</span> <span class="o">*</span><span class="n">privDataPtr</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">_dictReset</span><span class="p">(</span><span class="o">&amp;</span><span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+    <span class="n">_dictReset</span><span class="p">(</span><span class="o">&amp;</span><span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+    <span class="n">d</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">=</span> <span class="n">type</span><span class="p">;</span>
+    <span class="n">d</span><span class="o">-&gt;</span><span class="n">privdata</span> <span class="o">=</span> <span class="n">privDataPtr</span><span class="p">;</span>
+    <span class="n">d</span><span class="o">-&gt;</span><span class="n">rehashidx</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+    <span class="n">d</span><span class="o">-&gt;</span><span class="n">iterators</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">return</span> <span class="n">DICT_OK</span><span class="p">;</span>
+<span class="p">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <h1 id="incremental-rehashing">Incremental Rehashing</h1>
 
 <p>I&rsquo;d like to introduce <code>_dictRehashStep</code> first so that you may not surprised when it is called in <code>dictAddRaw</code>, <code>dictGenericDelete</code>, <code>dictFind</code> and <code>dictGetRandomKey</code>.</p>
@@ -261,64 +331,117 @@ int _dictInit(dict *d, dictType *type,
 <blockquote>
 <p>When we have iterators in the middle of a rehashing we can&rsquo;t mess with the two hash tables otherwise some element can be missed or duplicated.</p>
 </blockquote>
-
-<pre><code class="language-c">static void _dictRehashStep(dict *d) {
-    if (d-&gt;iterators == 0) dictRehash(d,1);
-}
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="k">static</span> <span class="kt">void</span> <span class="nf">_dictRehashStep</span><span class="p">(</span><span class="n">dict</span> <span class="o">*</span><span class="n">d</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">d</span><span class="o">-&gt;</span><span class="n">iterators</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="n">dictRehash</span><span class="p">(</span><span class="n">d</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span>
+<span class="p">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>This function is called by common lookup or update operations in the dictionary, that&rsquo;s why it&rsquo;s called incremental rehashing.</p>
 
 <p><code>ht[0]</code> and <code>ht[1]</code> is coexisting when rehashing, so two tables must be searched if you lookup. Inserting a new item is much easier, it should be done in <code>ht[1]</code> only.</p>
 
 <p>After rehashing, <code>ht[0]</code> will be empty and reassigned to <code>ht[1]</code>, the later will be reset.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">int</span> <span class="nf">dictRehash</span><span class="p">(</span><span class="n">dict</span> <span class="o">*</span><span class="n">d</span><span class="p">,</span> <span class="kt">int</span> <span class="n">n</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">int</span> <span class="n">empty_visits</span> <span class="o">=</span> <span class="n">n</span><span class="o">*</span><span class="mi">10</span><span class="p">;</span> <span class="cm">/* Max number of empty buckets to visit. */</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">dictIsRehashing</span><span class="p">(</span><span class="n">d</span><span class="p">))</span> <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
 
-<pre><code class="language-c">int dictRehash(dict *d, int n) {
-    int empty_visits = n*10; /* Max number of empty buckets to visit. */
-    if (!dictIsRehashing(d)) return 0;
+    <span class="k">while</span><span class="p">(</span><span class="n">n</span><span class="o">--</span> <span class="o">&amp;&amp;</span> <span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">used</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">dictEntry</span> <span class="o">*</span><span class="n">de</span><span class="p">,</span> <span class="o">*</span><span class="n">nextde</span><span class="p">;</span>
 
-    while(n-- &amp;&amp; d-&gt;ht[0].used != 0) {
-        dictEntry *de, *nextde;
+        <span class="cm">/* Note that rehashidx can&#39;t overflow as we are sure there are more
+</span><span class="cm">         * elements because ht[0].used != 0 */</span>
+        <span class="n">assert</span><span class="p">(</span><span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">size</span> <span class="o">&gt;</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span><span class="p">)</span><span class="n">d</span><span class="o">-&gt;</span><span class="n">rehashidx</span><span class="p">);</span>
+        <span class="k">while</span><span class="p">(</span><span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">table</span><span class="p">[</span><span class="n">d</span><span class="o">-&gt;</span><span class="n">rehashidx</span><span class="p">]</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">d</span><span class="o">-&gt;</span><span class="n">rehashidx</span><span class="o">++</span><span class="p">;</span>
+            <span class="k">if</span> <span class="p">(</span><span class="o">--</span><span class="n">empty_visits</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="n">de</span> <span class="o">=</span> <span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">table</span><span class="p">[</span><span class="n">d</span><span class="o">-&gt;</span><span class="n">rehashidx</span><span class="p">];</span>
+        <span class="cm">/* Move all the keys in this bucket from the old to the new hash HT */</span>
+        <span class="k">while</span><span class="p">(</span><span class="n">de</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">uint64_t</span> <span class="n">h</span><span class="p">;</span>
 
-        /* Note that rehashidx can't overflow as we are sure there are more
-         * elements because ht[0].used != 0 */
-        assert(d-&gt;ht[0].size &gt; (unsigned long)d-&gt;rehashidx);
-        while(d-&gt;ht[0].table[d-&gt;rehashidx] == NULL) {
-            d-&gt;rehashidx++;
-            if (--empty_visits == 0) return 1;
-        }
-        de = d-&gt;ht[0].table[d-&gt;rehashidx];
-        /* Move all the keys in this bucket from the old to the new hash HT */
-        while(de) {
-            uint64_t h;
+            <span class="n">nextde</span> <span class="o">=</span> <span class="n">de</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+            <span class="cm">/* Get the index in the new hash table */</span>
+            <span class="n">h</span> <span class="o">=</span> <span class="n">dictHashKey</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">de</span><span class="o">-&gt;</span><span class="n">key</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">sizemask</span><span class="p">;</span>
+            <span class="n">de</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">table</span><span class="p">[</span><span class="n">h</span><span class="p">];</span>
+            <span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">table</span><span class="p">[</span><span class="n">h</span><span class="p">]</span> <span class="o">=</span> <span class="n">de</span><span class="p">;</span>
+            <span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">used</span><span class="o">--</span><span class="p">;</span>
+            <span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">used</span><span class="o">++</span><span class="p">;</span>
+            <span class="n">de</span> <span class="o">=</span> <span class="n">nextde</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">table</span><span class="p">[</span><span class="n">d</span><span class="o">-&gt;</span><span class="n">rehashidx</span><span class="p">]</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+        <span class="n">d</span><span class="o">-&gt;</span><span class="n">rehashidx</span><span class="o">++</span><span class="p">;</span>
+    <span class="p">}</span>
 
-            nextde = de-&gt;next;
-            /* Get the index in the new hash table */
-            h = dictHashKey(d, de-&gt;key) &amp; d-&gt;ht[1].sizemask;
-            de-&gt;next = d-&gt;ht[1].table[h];
-            d-&gt;ht[1].table[h] = de;
-            d-&gt;ht[0].used--;
-            d-&gt;ht[1].used++;
-            de = nextde;
-        }
-        d-&gt;ht[0].table[d-&gt;rehashidx] = NULL;
-        d-&gt;rehashidx++;
-    }
+    <span class="cm">/* Check if we already rehashed the whole table... */</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">used</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">zfree</span><span class="p">(</span><span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">table</span><span class="p">);</span>
+        <span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+        <span class="n">_dictReset</span><span class="p">(</span><span class="o">&amp;</span><span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+        <span class="n">d</span><span class="o">-&gt;</span><span class="n">rehashidx</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="p">}</span>
 
-    /* Check if we already rehashed the whole table... */
-    if (d-&gt;ht[0].used == 0) {
-        zfree(d-&gt;ht[0].table);
-        d-&gt;ht[0] = d-&gt;ht[1];
-        _dictReset(&amp;d-&gt;ht[1]);
-        d-&gt;rehashidx = -1;
-        return 0;
-    }
-
-    /* More to rehash... */
-    return 1;
-}
-</code></pre>
-
+    <span class="cm">/* More to rehash... */</span>
+    <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <ol>
 <li>Before rehashing
 <img src="/images/redis-dict-before-rehash.svg" alt="" /></li>
@@ -333,43 +456,79 @@ int _dictInit(dict *d, dictType *type,
 <h1 id="get-a-key">Get a Key</h1>
 
 <p><code>dictFetchValue</code> returns a value corresponding to the given key.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="cp">#define dictGetVal(he) ((he)-&gt;v.val)
+</span><span class="cp"></span>
+<span class="kt">void</span> <span class="o">*</span><span class="nf">dictFetchValue</span><span class="p">(</span><span class="n">dict</span> <span class="o">*</span><span class="n">d</span><span class="p">,</span> <span class="k">const</span> <span class="kt">void</span> <span class="o">*</span><span class="n">key</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">dictEntry</span> <span class="o">*</span><span class="n">he</span><span class="p">;</span>
 
-<pre><code class="language-c">#define dictGetVal(he) ((he)-&gt;v.val)
-
-void *dictFetchValue(dict *d, const void *key) {
-    dictEntry *he;
-
-    he = dictFind(d,key);
-    return he ? dictGetVal(he) : NULL;
-}
-</code></pre>
-
+    <span class="n">he</span> <span class="o">=</span> <span class="n">dictFind</span><span class="p">(</span><span class="n">d</span><span class="p">,</span><span class="n">key</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">he</span> <span class="o">?</span> <span class="n">dictGetVal</span><span class="p">(</span><span class="n">he</span><span class="p">)</span> <span class="o">:</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="p">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>Hash function is binding with the type of dictionary. <code>dictFind</code> locates the index of the giving key by ANDing the hash value with <code>sizemask</code>.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="cp">#define dictHashKey(d, key) (d)-&gt;type-&gt;hashFunction(key)
+</span><span class="cp"></span>
+<span class="n">dictEntry</span> <span class="o">*</span><span class="nf">dictFind</span><span class="p">(</span><span class="n">dict</span> <span class="o">*</span><span class="n">d</span><span class="p">,</span> <span class="k">const</span> <span class="kt">void</span> <span class="o">*</span><span class="n">key</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">dictEntry</span> <span class="o">*</span><span class="n">he</span><span class="p">;</span>
+    <span class="n">uint64_t</span> <span class="n">h</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">table</span><span class="p">;</span>
 
-<pre><code class="language-c">#define dictHashKey(d, key) (d)-&gt;type-&gt;hashFunction(key)
-
-dictEntry *dictFind(dict *d, const void *key)
-{
-    dictEntry *he;
-    uint64_t h, idx, table;
-
-    if (d-&gt;ht[0].used + d-&gt;ht[1].used == 0) return NULL; /* dict is empty */
-    if (dictIsRehashing(d)) _dictRehashStep(d);
-    h = dictHashKey(d, key);
-    for (table = 0; table &lt;= 1; table++) {
-        idx = h &amp; d-&gt;ht[table].sizemask;
-        he = d-&gt;ht[table].table[idx];
-        while(he) {
-            if (key==he-&gt;key || dictCompareKeys(d, key, he-&gt;key))
-                return he;
-            he = he-&gt;next;
-        }
-        if (!dictIsRehashing(d)) return NULL;
-    }
-    return NULL;
-}
-</code></pre>
-
+    <span class="k">if</span> <span class="p">(</span><span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">used</span> <span class="o">+</span> <span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">used</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span> <span class="cm">/* dict is empty */</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">dictIsRehashing</span><span class="p">(</span><span class="n">d</span><span class="p">))</span> <span class="n">_dictRehashStep</span><span class="p">(</span><span class="n">d</span><span class="p">);</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="n">dictHashKey</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">key</span><span class="p">);</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">table</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">table</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">table</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">h</span> <span class="o">&amp;</span> <span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="n">table</span><span class="p">].</span><span class="n">sizemask</span><span class="p">;</span>
+        <span class="n">he</span> <span class="o">=</span> <span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="n">table</span><span class="p">].</span><span class="n">table</span><span class="p">[</span><span class="n">idx</span><span class="p">];</span>
+        <span class="k">while</span><span class="p">(</span><span class="n">he</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">key</span><span class="o">==</span><span class="n">he</span><span class="o">-&gt;</span><span class="n">key</span> <span class="o">||</span> <span class="n">dictCompareKeys</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">he</span><span class="o">-&gt;</span><span class="n">key</span><span class="p">))</span>
+                <span class="k">return</span> <span class="n">he</span><span class="p">;</span>
+            <span class="n">he</span> <span class="o">=</span> <span class="n">he</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">dictIsRehashing</span><span class="p">(</span><span class="n">d</span><span class="p">))</span> <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="p">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <h1 id="resize">Resize</h1>
 
 <p>Load factor is an important measure of how full the dictionary is allowed to get before its capacity is automatically increased. Redis always tries to keep <code>USED/BUCKETS</code> ratio near to <code>&lt;=1</code>, which is done by resizing.</p>
@@ -379,96 +538,184 @@ dictEntry *dictFind(dict *d, const void *key)
 <p>The new size of dictionary is the next power of two that is larger than current size. For example, if the present size is 30, then the brand-new size will be 32.</p>
 
 <p>Please note that the new allocated hash table is assigned to <code>ht[0]</code> or <code>ht[1]</code> depend on this is the first initialization or not. In other words, if it&rsquo;s NOT initialized firstly, <code>ht[1]</code> will be prepared for incremental rehashing.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="cp">#define dictIsRehashing(d) ((d)-&gt;rehashidx != -1)
+</span><span class="cp"></span>
+<span class="kt">int</span> <span class="nf">dictResize</span><span class="p">(</span><span class="n">dict</span> <span class="o">*</span><span class="n">d</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">int</span> <span class="n">minimal</span><span class="p">;</span>
 
-<pre><code class="language-c">#define dictIsRehashing(d) ((d)-&gt;rehashidx != -1)
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">dict_can_resize</span> <span class="o">||</span> <span class="n">dictIsRehashing</span><span class="p">(</span><span class="n">d</span><span class="p">))</span> <span class="k">return</span> <span class="n">DICT_ERR</span><span class="p">;</span>
+    <span class="n">minimal</span> <span class="o">=</span> <span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">used</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">minimal</span> <span class="o">&lt;</span> <span class="n">DICT_HT_INITIAL_SIZE</span><span class="p">)</span>
+        <span class="n">minimal</span> <span class="o">=</span> <span class="n">DICT_HT_INITIAL_SIZE</span><span class="p">;</span>
+    <span class="k">return</span> <span class="n">dictExpand</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">minimal</span><span class="p">);</span>
+<span class="p">}</span>
 
-int dictResize(dict *d)
-{
-    int minimal;
+<span class="kt">int</span> <span class="nf">dictExpand</span><span class="p">(</span><span class="n">dict</span> <span class="o">*</span><span class="n">d</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">size</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="cm">/* the size is invalid if it is smaller than the number of
+</span><span class="cm">     * elements already inside the hash table */</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">dictIsRehashing</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">||</span> <span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">used</span> <span class="o">&gt;</span> <span class="n">size</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">DICT_ERR</span><span class="p">;</span>
 
-    if (!dict_can_resize || dictIsRehashing(d)) return DICT_ERR;
-    minimal = d-&gt;ht[0].used;
-    if (minimal &lt; DICT_HT_INITIAL_SIZE)
-        minimal = DICT_HT_INITIAL_SIZE;
-    return dictExpand(d, minimal);
-}
+    <span class="n">dictht</span> <span class="n">n</span><span class="p">;</span> <span class="cm">/* the new hash table */</span>
+    <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">realsize</span> <span class="o">=</span> <span class="n">_dictNextPower</span><span class="p">(</span><span class="n">size</span><span class="p">);</span>
 
-int dictExpand(dict *d, unsigned long size)
-{
-    /* the size is invalid if it is smaller than the number of
-     * elements already inside the hash table */
-    if (dictIsRehashing(d) || d-&gt;ht[0].used &gt; size)
-        return DICT_ERR;
+    <span class="cm">/* Rehashing to the same table size is not useful. */</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">realsize</span> <span class="o">==</span> <span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">size</span><span class="p">)</span> <span class="k">return</span> <span class="n">DICT_ERR</span><span class="p">;</span>
 
-    dictht n; /* the new hash table */
-    unsigned long realsize = _dictNextPower(size);
+    <span class="cm">/* Allocate the new hash table and initialize all pointers to NULL */</span>
+    <span class="n">n</span><span class="p">.</span><span class="n">size</span> <span class="o">=</span> <span class="n">realsize</span><span class="p">;</span>
+    <span class="n">n</span><span class="p">.</span><span class="n">sizemask</span> <span class="o">=</span> <span class="n">realsize</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+    <span class="n">n</span><span class="p">.</span><span class="n">table</span> <span class="o">=</span> <span class="n">zcalloc</span><span class="p">(</span><span class="n">realsize</span><span class="o">*</span><span class="k">sizeof</span><span class="p">(</span><span class="n">dictEntry</span><span class="o">*</span><span class="p">));</span>
+    <span class="n">n</span><span class="p">.</span><span class="n">used</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 
-    /* Rehashing to the same table size is not useful. */
-    if (realsize == d-&gt;ht[0].size) return DICT_ERR;
+    <span class="cm">/* Is this the first initialization? If so it&#39;s not really a rehashing
+</span><span class="cm">     * we just set the first hash table so that it can accept keys. */</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">table</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">n</span><span class="p">;</span>
+        <span class="k">return</span> <span class="n">DICT_OK</span><span class="p">;</span>
+    <span class="p">}</span>
 
-    /* Allocate the new hash table and initialize all pointers to NULL */
-    n.size = realsize;
-    n.sizemask = realsize-1;
-    n.table = zcalloc(realsize*sizeof(dictEntry*));
-    n.used = 0;
-
-    /* Is this the first initialization? If so it's not really a rehashing
-     * we just set the first hash table so that it can accept keys. */
-    if (d-&gt;ht[0].table == NULL) {
-        d-&gt;ht[0] = n;
-        return DICT_OK;
-    }
-
-    /* Prepare a second hash table for incremental rehashing */
-    d-&gt;ht[1] = n;
-    d-&gt;rehashidx = 0;
-    return DICT_OK;
-}
-</code></pre>
-
+    <span class="cm">/* Prepare a second hash table for incremental rehashing */</span>
+    <span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">n</span><span class="p">;</span>
+    <span class="n">d</span><span class="o">-&gt;</span><span class="n">rehashidx</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">return</span> <span class="n">DICT_OK</span><span class="p">;</span>
+<span class="p">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <h1 id="add-an-element">Add an Element</h1>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">int</span> <span class="nf">dictAdd</span><span class="p">(</span><span class="n">dict</span> <span class="o">*</span><span class="n">d</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">key</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">val</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">dictEntry</span> <span class="o">*</span><span class="n">entry</span> <span class="o">=</span> <span class="n">dictAddRaw</span><span class="p">(</span><span class="n">d</span><span class="p">,</span><span class="n">key</span><span class="p">,</span><span class="nb">NULL</span><span class="p">);</span>
 
-<pre><code class="language-c">int dictAdd(dict *d, void *key, void *val)
-{
-    dictEntry *entry = dictAddRaw(d,key,NULL);
-
-    if (!entry) return DICT_ERR;
-    dictSetVal(d, entry, val);
-    return DICT_OK;
-}
-</code></pre>
-
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">entry</span><span class="p">)</span> <span class="k">return</span> <span class="n">DICT_ERR</span><span class="p">;</span>
+    <span class="n">dictSetVal</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">entry</span><span class="p">,</span> <span class="n">val</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">DICT_OK</span><span class="p">;</span>
+<span class="p">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p><code>dictAddRaw</code> is the function for low level add and find. This function adds the entry but instead of setting a value returns the <code>dictEntry</code> structure to the user, that will make sure to fill the value field as he wishes.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="n">dictEntry</span> <span class="o">*</span><span class="nf">dictAddRaw</span><span class="p">(</span><span class="n">dict</span> <span class="o">*</span><span class="n">d</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">key</span><span class="p">,</span> <span class="n">dictEntry</span> <span class="o">**</span><span class="n">existing</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">long</span> <span class="n">index</span><span class="p">;</span>
+    <span class="n">dictEntry</span> <span class="o">*</span><span class="n">entry</span><span class="p">;</span>
+    <span class="n">dictht</span> <span class="o">*</span><span class="n">ht</span><span class="p">;</span>
 
-<pre><code class="language-c">dictEntry *dictAddRaw(dict *d, void *key, dictEntry **existing)
-{
-    long index;
-    dictEntry *entry;
-    dictht *ht;
+    <span class="k">if</span> <span class="p">(</span><span class="n">dictIsRehashing</span><span class="p">(</span><span class="n">d</span><span class="p">))</span> <span class="n">_dictRehashStep</span><span class="p">(</span><span class="n">d</span><span class="p">);</span>
 
-    if (dictIsRehashing(d)) _dictRehashStep(d);
+    <span class="cm">/* Get the index of the new element, or -1 if
+</span><span class="cm">     * the element already exists. */</span>
+    <span class="k">if</span> <span class="p">((</span><span class="n">index</span> <span class="o">=</span> <span class="n">_dictKeyIndex</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">dictHashKey</span><span class="p">(</span><span class="n">d</span><span class="p">,</span><span class="n">key</span><span class="p">),</span> <span class="n">existing</span><span class="p">))</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
 
-    /* Get the index of the new element, or -1 if
-     * the element already exists. */
-    if ((index = _dictKeyIndex(d, key, dictHashKey(d,key), existing)) == -1)
-        return NULL;
+    <span class="cm">/* Allocate the memory and store the new entry.
+</span><span class="cm">     * Insert the element in top, with the assumption that in a database
+</span><span class="cm">     * system it is more likely that recently added entries are accessed
+</span><span class="cm">     * more frequently. */</span>
+    <span class="n">ht</span> <span class="o">=</span> <span class="n">dictIsRehashing</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">?</span> <span class="o">&amp;</span><span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">:</span> <span class="o">&amp;</span><span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+    <span class="n">entry</span> <span class="o">=</span> <span class="n">zmalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="o">*</span><span class="n">entry</span><span class="p">));</span>
+    <span class="n">entry</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">ht</span><span class="o">-&gt;</span><span class="n">table</span><span class="p">[</span><span class="n">index</span><span class="p">];</span>
+    <span class="n">ht</span><span class="o">-&gt;</span><span class="n">table</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">entry</span><span class="p">;</span>
+    <span class="n">ht</span><span class="o">-&gt;</span><span class="n">used</span><span class="o">++</span><span class="p">;</span>
 
-    /* Allocate the memory and store the new entry.
-     * Insert the element in top, with the assumption that in a database
-     * system it is more likely that recently added entries are accessed
-     * more frequently. */
-    ht = dictIsRehashing(d) ? &amp;d-&gt;ht[1] : &amp;d-&gt;ht[0];
-    entry = zmalloc(sizeof(*entry));
-    entry-&gt;next = ht-&gt;table[index];
-    ht-&gt;table[index] = entry;
-    ht-&gt;used++;
-
-    /* Set the hash entry fields. */
-    dictSetKey(d, entry, key);
-    return entry;
-}
-</code></pre>
-
+    <span class="cm">/* Set the hash entry fields. */</span>
+    <span class="n">dictSetKey</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">entry</span><span class="p">,</span> <span class="n">key</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">entry</span><span class="p">;</span>
+<span class="p">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>The rehashing will not be interrupted when adding a new item, and the new element will be insert into <code>ht[1]</code> if the dictionary is rehashing.</p>
 
 <p>Here we can also find that Redis use linked list to handle key collision, and the new key-value pair will become the new head.</p>
@@ -483,102 +730,190 @@ int dictExpand(dict *d, unsigned long size)
 </ul>
 
 <h1 id="remove-an-element">Remove an element</h1>
-
-<pre><code class="language-c">int dictDelete(dict *ht, const void *key) {
-    return dictGenericDelete(ht,key,0) ? DICT_OK : DICT_ERR;
-}
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">int</span> <span class="nf">dictDelete</span><span class="p">(</span><span class="n">dict</span> <span class="o">*</span><span class="n">ht</span><span class="p">,</span> <span class="k">const</span> <span class="kt">void</span> <span class="o">*</span><span class="n">key</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">dictGenericDelete</span><span class="p">(</span><span class="n">ht</span><span class="p">,</span><span class="n">key</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span> <span class="o">?</span> <span class="nl">DICT_OK</span> <span class="p">:</span> <span class="n">DICT_ERR</span><span class="p">;</span>
+<span class="p">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p><code>dictGenericDelete</code> is a helper function for <code>dictDelete</code> and also <code>dictUnlink</code> searching and removing an element. This function will operates <code>ht[0]</code> firstly, and then  <code>ht[1]</code> if needed.</p>
 
 <p>After finding the element to be deleted, <code>dictGenericDelete</code> will unlink it from the list, then release its memory.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="k">static</span> <span class="n">dictEntry</span> <span class="o">*</span><span class="nf">dictGenericDelete</span><span class="p">(</span><span class="n">dict</span> <span class="o">*</span><span class="n">d</span><span class="p">,</span> <span class="k">const</span> <span class="kt">void</span> <span class="o">*</span><span class="n">key</span><span class="p">,</span> <span class="kt">int</span> <span class="n">nofree</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">uint64_t</span> <span class="n">h</span><span class="p">,</span> <span class="n">idx</span><span class="p">;</span>
+    <span class="n">dictEntry</span> <span class="o">*</span><span class="n">he</span><span class="p">,</span> <span class="o">*</span><span class="n">prevHe</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">table</span><span class="p">;</span>
 
-<pre><code class="language-c">static dictEntry *dictGenericDelete(dict *d, const void *key, int nofree) {
-    uint64_t h, idx;
-    dictEntry *he, *prevHe;
-    int table;
+    <span class="k">if</span> <span class="p">(</span><span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">used</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">used</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
 
-    if (d-&gt;ht[0].used == 0 &amp;&amp; d-&gt;ht[1].used == 0) return NULL;
+    <span class="k">if</span> <span class="p">(</span><span class="n">dictIsRehashing</span><span class="p">(</span><span class="n">d</span><span class="p">))</span> <span class="n">_dictRehashStep</span><span class="p">(</span><span class="n">d</span><span class="p">);</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="n">dictHashKey</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">key</span><span class="p">);</span>
 
-    if (dictIsRehashing(d)) _dictRehashStep(d);
-    h = dictHashKey(d, key);
-
-    for (table = 0; table &lt;= 1; table++) {
-        idx = h &amp; d-&gt;ht[table].sizemask;
-        he = d-&gt;ht[table].table[idx];
-        prevHe = NULL;
-        while(he) {
-            if (key==he-&gt;key || dictCompareKeys(d, key, he-&gt;key)) {
-                /* Unlink the element from the list */
-                if (prevHe)
-                    prevHe-&gt;next = he-&gt;next;
-                else
-                    d-&gt;ht[table].table[idx] = he-&gt;next;
-                if (!nofree) {
-                    dictFreeKey(d, he);
-                    dictFreeVal(d, he);
-                    zfree(he);
-                }
-                d-&gt;ht[table].used--;
-                return he;
-            }
-            prevHe = he;
-            he = he-&gt;next;
-        }
-        if (!dictIsRehashing(d)) break;
-    }
-    return NULL; /* not found */
-}
-</code></pre>
-
+    <span class="k">for</span> <span class="p">(</span><span class="n">table</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">table</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">table</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">h</span> <span class="o">&amp;</span> <span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="n">table</span><span class="p">].</span><span class="n">sizemask</span><span class="p">;</span>
+        <span class="n">he</span> <span class="o">=</span> <span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="n">table</span><span class="p">].</span><span class="n">table</span><span class="p">[</span><span class="n">idx</span><span class="p">];</span>
+        <span class="n">prevHe</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+        <span class="k">while</span><span class="p">(</span><span class="n">he</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">key</span><span class="o">==</span><span class="n">he</span><span class="o">-&gt;</span><span class="n">key</span> <span class="o">||</span> <span class="n">dictCompareKeys</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">he</span><span class="o">-&gt;</span><span class="n">key</span><span class="p">))</span> <span class="p">{</span>
+                <span class="cm">/* Unlink the element from the list */</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">prevHe</span><span class="p">)</span>
+                    <span class="n">prevHe</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">he</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+                <span class="k">else</span>
+                    <span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="n">table</span><span class="p">].</span><span class="n">table</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">he</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+                <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">nofree</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="n">dictFreeKey</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">he</span><span class="p">);</span>
+                    <span class="n">dictFreeVal</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">he</span><span class="p">);</span>
+                    <span class="n">zfree</span><span class="p">(</span><span class="n">he</span><span class="p">);</span>
+                <span class="p">}</span>
+                <span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="n">table</span><span class="p">].</span><span class="n">used</span><span class="o">--</span><span class="p">;</span>
+                <span class="k">return</span> <span class="n">he</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="n">prevHe</span> <span class="o">=</span> <span class="n">he</span><span class="p">;</span>
+            <span class="n">he</span> <span class="o">=</span> <span class="n">he</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">dictIsRehashing</span><span class="p">(</span><span class="n">d</span><span class="p">))</span> <span class="k">break</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span> <span class="cm">/* not found */</span>
+<span class="p">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <h1 id="return-a-random-entry">Return a Random Entry</h1>
 
 <p>This function involves two <code>random()</code> calls. Firstly, it is called for get the index of buckets, then address the index of list.</p>
 
 <p>Actually, it is NOT strict random. Considering a dictionary with only 2 buckets, a bucket with only one elements in the list and the other bucket with 2 elements in the list. The element in former bucket has 50% probability to be gotten, the one in the later bucket only 25%.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="n">dictEntry</span> <span class="o">*</span><span class="nf">dictGetRandomKey</span><span class="p">(</span><span class="n">dict</span> <span class="o">*</span><span class="n">d</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">dictEntry</span> <span class="o">*</span><span class="n">he</span><span class="p">,</span> <span class="o">*</span><span class="n">orighe</span><span class="p">;</span>
+    <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">h</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">listlen</span><span class="p">,</span> <span class="n">listele</span><span class="p">;</span>
 
-<pre><code class="language-c">dictEntry *dictGetRandomKey(dict *d)
-{
-    dictEntry *he, *orighe;
-    unsigned long h;
-    int listlen, listele;
+    <span class="k">if</span> <span class="p">(</span><span class="n">dictSize</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">dictIsRehashing</span><span class="p">(</span><span class="n">d</span><span class="p">))</span> <span class="n">_dictRehashStep</span><span class="p">(</span><span class="n">d</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">dictIsRehashing</span><span class="p">(</span><span class="n">d</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">do</span> <span class="p">{</span>
+            <span class="cm">/* We are sure there are no elements in indexes from 0
+</span><span class="cm">             * to rehashidx-1 */</span>
+            <span class="n">h</span> <span class="o">=</span> <span class="n">d</span><span class="o">-&gt;</span><span class="n">rehashidx</span> <span class="o">+</span> <span class="p">(</span><span class="n">random</span><span class="p">()</span> <span class="o">%</span> <span class="p">(</span><span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">size</span> <span class="o">+</span>
+                                            <span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">size</span> <span class="o">-</span>
+                                            <span class="n">d</span><span class="o">-&gt;</span><span class="n">rehashidx</span><span class="p">));</span>
+            <span class="n">he</span> <span class="o">=</span> <span class="p">(</span><span class="n">h</span> <span class="o">&gt;=</span> <span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">size</span><span class="p">)</span> <span class="o">?</span> <span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">table</span><span class="p">[</span><span class="n">h</span> <span class="o">-</span> <span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">size</span><span class="p">]</span> <span class="o">:</span>
+                                      <span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">table</span><span class="p">[</span><span class="n">h</span><span class="p">];</span>
+        <span class="p">}</span> <span class="k">while</span><span class="p">(</span><span class="n">he</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="k">do</span> <span class="p">{</span>
+            <span class="n">h</span> <span class="o">=</span> <span class="n">random</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">sizemask</span><span class="p">;</span>
+            <span class="n">he</span> <span class="o">=</span> <span class="n">d</span><span class="o">-&gt;</span><span class="n">ht</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">table</span><span class="p">[</span><span class="n">h</span><span class="p">];</span>
+        <span class="p">}</span> <span class="k">while</span><span class="p">(</span><span class="n">he</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">);</span>
+    <span class="p">}</span>
 
-    if (dictSize(d) == 0) return NULL;
-    if (dictIsRehashing(d)) _dictRehashStep(d);
-    if (dictIsRehashing(d)) {
-        do {
-            /* We are sure there are no elements in indexes from 0
-             * to rehashidx-1 */
-            h = d-&gt;rehashidx + (random() % (d-&gt;ht[0].size +
-                                            d-&gt;ht[1].size -
-                                            d-&gt;rehashidx));
-            he = (h &gt;= d-&gt;ht[0].size) ? d-&gt;ht[1].table[h - d-&gt;ht[0].size] :
-                                      d-&gt;ht[0].table[h];
-        } while(he == NULL);
-    } else {
-        do {
-            h = random() &amp; d-&gt;ht[0].sizemask;
-            he = d-&gt;ht[0].table[h];
-        } while(he == NULL);
-    }
-
-    /* Now we found a non empty bucket, but it is a linked
-     * list and we need to get a random element from the list.
-     * The only sane way to do so is counting the elements and
-     * select a random index. */
-    listlen = 0;
-    orighe = he;
-    while(he) {
-        he = he-&gt;next;
-        listlen++;
-    }
-    listele = random() % listlen;
-    he = orighe;
-    while(listele--) he = he-&gt;next;
-    return he;
-}
-</code></pre>
-
+    <span class="cm">/* Now we found a non empty bucket, but it is a linked
+</span><span class="cm">     * list and we need to get a random element from the list.
+</span><span class="cm">     * The only sane way to do so is counting the elements and
+</span><span class="cm">     * select a random index. */</span>
+    <span class="n">listlen</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">orighe</span> <span class="o">=</span> <span class="n">he</span><span class="p">;</span>
+    <span class="k">while</span><span class="p">(</span><span class="n">he</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">he</span> <span class="o">=</span> <span class="n">he</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+        <span class="n">listlen</span><span class="o">++</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">listele</span> <span class="o">=</span> <span class="n">random</span><span class="p">()</span> <span class="o">%</span> <span class="n">listlen</span><span class="p">;</span>
+    <span class="n">he</span> <span class="o">=</span> <span class="n">orighe</span><span class="p">;</span>
+    <span class="k">while</span><span class="p">(</span><span class="n">listele</span><span class="o">--</span><span class="p">)</span> <span class="n">he</span> <span class="o">=</span> <span class="n">he</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+    <span class="k">return</span> <span class="n">he</span><span class="p">;</span>
+<span class="p">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p><strong>Reference</strong></p>
 
 <ul>

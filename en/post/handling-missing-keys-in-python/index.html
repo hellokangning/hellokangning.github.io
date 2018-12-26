@@ -56,7 +56,7 @@ This post introduces three alternatives - setdefault, defaultdict and __mising f
 
 <meta itemprop="datePublished" content="2018-08-27T14:50:08&#43;08:00" />
 <meta itemprop="dateModified" content="2018-10-24T14:50:08&#43;08:00" />
-<meta itemprop="wordCount" content="330">
+<meta itemprop="wordCount" content="363">
 
 
 
@@ -139,7 +139,7 @@ This post introduces three alternatives - setdefault, defaultdict and __mising f
         <div class="post-category">
             <a href="/en/categories/python/"> Python </a>
             </div>
-          <span class="more-meta"> 330 words </span>
+          <span class="more-meta"> 363 words </span>
           <span class="more-meta"> 2 mins read </span>
         
       </div>
@@ -163,23 +163,39 @@ This post introduces three alternatives - setdefault, defaultdict and __mising f
 <p>This post introduces three alternatives - <code>setdefault</code>, <code>defaultdict</code> and <code>__mising</code> for this situation.</p>
 
 <h1 id="setdefault"><code>setdefault</code></h1>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="n">word</span> <span class="o">=</span> <span class="s1">&#39;helloapplepineworld&#39;</span>
+<span class="n">index</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ch</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">word</span><span class="p">):</span>
+    <span class="n">index</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
 
-<pre><code class="language-python">word = 'helloapplepineworld'
-index = {}
-for i, ch in enumerate(word):
-    index.setdefault(ch, []).append(i)
-
-# {'h': [0], 'e': [1, 9, 13], 'l': [2, 3, 8, 17], 'o': [4, 15], 'a': [5], 'p': [6, 7, 10], 'i': [11], 'n': [12], 'w': [14], 'r':[16], 'd': [18]}
-print(index)
-</code></pre>
-
+<span class="c1"># {&#39;h&#39;: [0], &#39;e&#39;: [1, 9, 13], &#39;l&#39;: [2, 3, 8, 17], &#39;o&#39;: [4, 15], &#39;a&#39;: [5], &#39;p&#39;: [6, 7, 10], &#39;i&#39;: [11], &#39;n&#39;: [12], &#39;w&#39;: [14], &#39;r&#39;:[16], &#39;d&#39;: [18]}</span>
+<span class="k">print</span><span class="p">(</span><span class="n">index</span><span class="p">)</span></code></pre></td></tr></table>
+</div>
+</div>
 <p><code>index.setdefault(ch, []).append(i)</code> is the same as running</p>
-
-<pre><code class="language-python">if ch not in index:
-    index[ch] = []
-index[ch].append(i)
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">if</span> <span class="n">ch</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">index</span><span class="p">:</span>
+    <span class="n">index</span><span class="p">[</span><span class="n">ch</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">index</span><span class="p">[</span><span class="n">ch</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>except the later code performs at least two searches for <code>ch</code> - three if not found, which <code>setdefault</code> does it all with a single lookup.</p>
 
 <h1 id="defaultdict"><code>defaultdict</code></h1>
@@ -195,38 +211,67 @@ index[ch].append(i)
 <li>inserts the list into <code>d</code> using <code>k</code> as key</li>
 <li>returns a reference to that list</li>
 </ol>
-
-<pre><code class="language-python">from collections import defaultdict
-word = 'helloapplepineworld'
-index = defaultdict(list)
-for i, ch in enumerate(word):
-    index[ch].append[i]
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="n">word</span> <span class="o">=</span> <span class="s1">&#39;helloapplepineworld&#39;</span>
+<span class="n">index</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ch</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">word</span><span class="p">):</span>
+    <span class="n">index</span><span class="p">[</span><span class="n">ch</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">[</span><span class="n">i</span><span class="p">]</span></code></pre></td></tr></table>
+</div>
+</div>
 <h1 id="implementing-missing">Implementing <code>__missing__</code></h1>
 
 <p><code>__missing__</code> method is not defined in the base <code>dict</code> class, but if you subclass <code>dict</code> and provide a <code>__missing__</code> method, the standard <code>dict.__getitem__</code> will call it whenever a key is not found instead of rasing a <code>KeyError</code>.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">StrKeyDict</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__missing__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
 
-<pre><code class="language-python">class StrKeyDict(dict):
-    def __missing__(self, key):
-        if isinstance(key, str):
-            raise KeyError(key)
+        <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">)]</span>
 
-        return self[str(key)]
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">default</span>
 
-    def get(self, key, default=None):
-        try:
-            return self[key]
-        except KeyError:
-            return default
+    <span class="k">def</span> <span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">or</span> <span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
 
-    def __contains__(self, key):
-        return key in self.keys() or str(key) in self.keys()
-
-d = StrKeyDict([('2','two'),('4','four')])
-print(d['2'], d[4]) # two four
-</code></pre>
-
+<span class="n">d</span> <span class="o">=</span> <span class="n">StrKeyDict</span><span class="p">([(</span><span class="s1">&#39;2&#39;</span><span class="p">,</span><span class="s1">&#39;two&#39;</span><span class="p">),(</span><span class="s1">&#39;4&#39;</span><span class="p">,</span><span class="s1">&#39;four&#39;</span><span class="p">)])</span>
+<span class="k">print</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;2&#39;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span> <span class="c1"># two four</span></code></pre></td></tr></table>
+</div>
+</div>
 <p><strong>Reference</strong></p>
 
 <p><a href="https://book.douban.com/subject/26278021/">Fluent Python</a></p>

@@ -51,7 +51,7 @@
 
 <meta itemprop="datePublished" content="2017-09-08T16:46:50&#43;08:00" />
 <meta itemprop="dateModified" content="2017-09-08T16:46:50&#43;08:00" />
-<meta itemprop="wordCount" content="506">
+<meta itemprop="wordCount" content="604">
 
 
 
@@ -132,7 +132,7 @@
         <div class="post-category">
             <a href="/en/categories/python/"> Python </a>
             </div>
-          <span class="more-meta"> 506 words </span>
+          <span class="more-meta"> 604 words </span>
           <span class="more-meta"> 2 mins read </span>
         
       </div>
@@ -157,58 +157,104 @@
 <h1 id="args"><code>*args</code></h1>
 
 <p>The <code>*args</code> will give you all function parameters as a tuple. You would use <code>*args</code> when you&rsquo;re not sure how many arguments might be passed to your function.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="n">tmp_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+<span class="n">tmp_tuple</span> <span class="o">=</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+<span class="n">tmp_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;m&#39;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">:</span> <span class="mi">49</span><span class="p">}</span>
 
-<pre><code class="language-python">tmp_list = [1, 2, 3]
-tmp_tuple = (4, 5, 6)
-tmp_dict = {'m': 7, 'v': 8, 'p': 49}
+<span class="k">def</span> <span class="nf">test_args</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">print</span> <span class="n">args</span>
 
-def test_args(*args):
-    print args
-
-test_args() # ()
-test_args(0) #(0,)
-test_args(*tmp_list) # (1, 2, 3)
-test_args(*tmp_tuple) # (4, 5, 6)
-test_args(*tmp_dict) # ('p', 'm', 'v')
-</code></pre>
-
+<span class="n">test_args</span><span class="p">()</span> <span class="c1"># ()</span>
+<span class="n">test_args</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="c1">#(0,)</span>
+<span class="n">test_args</span><span class="p">(</span><span class="o">*</span><span class="n">tmp_list</span><span class="p">)</span> <span class="c1"># (1, 2, 3)</span>
+<span class="n">test_args</span><span class="p">(</span><span class="o">*</span><span class="n">tmp_tuple</span><span class="p">)</span> <span class="c1"># (4, 5, 6)</span>
+<span class="n">test_args</span><span class="p">(</span><span class="o">*</span><span class="n">tmp_dict</span><span class="p">)</span> <span class="c1"># (&#39;p&#39;, &#39;m&#39;, &#39;v&#39;)</span></code></pre></td></tr></table>
+</div>
+</div>
 <h1 id="kwargs"><code>**kwargs</code></h1>
 
 <p>The <code>**kwargs</code> will give you all keyword arguments except for those corresponding to a formal parameter as a dictionary. <code>**kwargs</code> allows you to handle named arguments that you have not defined in advance.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">test_kwargs</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+        <span class="k">print</span> <span class="n">k</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
 
-<pre><code class="language-python">def test_kwargs(**kwargs):
-    for k in kwargs:
-        print k, kwargs[k]
-
-'''
-age 20
-name kwargs
-'''
-test_kwargs(name='kwargs', age=20)
-</code></pre>
-
+<span class="s1">&#39;&#39;&#39;
+</span><span class="s1">age 20
+</span><span class="s1">name kwargs
+</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="n">test_kwargs</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;kwargs&#39;</span><span class="p">,</span> <span class="n">age</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span></code></pre></td></tr></table>
+</div>
+</div>
 <h1 id="mixup">Mixup</h1>
 
 <p>You can also use both in the same function definition but <code>*args</code> must occur before <code>**kwargs</code>.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="n">tmp_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+<span class="n">tmp_tuple</span> <span class="o">=</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+<span class="n">tmp_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;m&#39;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">:</span> <span class="mi">49</span><span class="p">}</span>
 
-<pre><code class="language-python">tmp_list = [1, 2, 3]
-tmp_tuple = (4, 5, 6)
-tmp_dict = {'m': 7, 'v': 8, 'p': 49}
+<span class="k">def</span> <span class="nf">test_mixup</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">args</span><span class="p">:</span>  
+        <span class="k">print</span> <span class="s1">&#39;args:&#39;</span><span class="p">,</span> <span class="n">args</span>
 
-def test_mixup(*args, **kwargs):
-    if args:  
-        print 'args:', args
+    <span class="k">if</span> <span class="n">kwargs</span><span class="p">:</span> 
+        <span class="k">print</span> <span class="s1">&#39;kwargs:&#39;</span><span class="p">,</span> <span class="n">kwargs</span>
 
-    if kwargs: 
-        print 'kwargs:', kwargs
+<span class="n">test_mixup</span><span class="p">(</span><span class="n">tmp_list</span><span class="p">)</span> <span class="c1"># args: ([1, 2, 3],)</span>
+<span class="n">test_mixup</span><span class="p">(</span><span class="n">tmp_list</span><span class="p">,</span> <span class="n">tmp_tuple</span><span class="p">)</span> <span class="c1"># args: ([1, 2, 3], (4, 5, 6))</span>
+<span class="n">test_mixup</span><span class="p">(</span><span class="n">tmp_list</span><span class="p">,</span> <span class="n">tmp_dict</span><span class="p">)</span> <span class="c1"># args: ([1, 2, 3], {&#39;p&#39;: 49, &#39;m&#39;: 7, &#39;v&#39;: 8})</span>
 
-test_mixup(tmp_list) # args: ([1, 2, 3],)
-test_mixup(tmp_list, tmp_tuple) # args: ([1, 2, 3], (4, 5, 6))
-test_mixup(tmp_list, tmp_dict) # args: ([1, 2, 3], {'p': 49, 'm': 7, 'v': 8})
-
-test_mixup(tmp_tuple, lis=tmp_list, dic=tmp_dict) # kwargs: {'dic': {'p': 49, 'm': 7, 'v': 8}, 'lis': [1, 2, 3]}
-</code></pre>
-
+<span class="n">test_mixup</span><span class="p">(</span><span class="n">tmp_tuple</span><span class="p">,</span> <span class="n">lis</span><span class="o">=</span><span class="n">tmp_list</span><span class="p">,</span> <span class="n">dic</span><span class="o">=</span><span class="n">tmp_dict</span><span class="p">)</span> <span class="c1"># kwargs: {&#39;dic&#39;: {&#39;p&#39;: 49, &#39;m&#39;: 7, &#39;v&#39;: 8}, &#39;lis&#39;: [1, 2, 3]}</span></code></pre></td></tr></table>
+</div>
+</div>
 <h1 id="summary">Summary</h1>
 
 <p>Now let us study the <code>*</code> operator and <code>**</code> operator. Please note these operators can be used in 2 areas:</p>
@@ -231,70 +277,134 @@ test_mixup(tmp_tuple, lis=tmp_list, dic=tmp_dict) # kwargs: {'dic': {'p': 49, 'm
 <li><code>*</code> operator unpacks data structure such as a list or tuple into arguments needed by function definition.</li>
 <li><code>**</code> operator unpacks a dictionary into arguments needed by function definition.</li>
 </ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">test_unpack</span><span class="p">(</span><span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">,</span> <span class="n">arg3</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&#34;arg1:&#34;</span><span class="p">,</span> <span class="n">arg1</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&#34;arg2:&#34;</span><span class="p">,</span> <span class="n">arg2</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&#34;arg3:&#34;</span><span class="p">,</span> <span class="n">arg3</span><span class="p">)</span>
 
-<pre><code class="language-python">def test_unpack(arg1, arg2, arg3):
-    print(&quot;arg1:&quot;, arg1)
-    print(&quot;arg2:&quot;, arg2)
-    print(&quot;arg3:&quot;, arg3)
+<span class="s1">&#39;&#39;&#39;
+</span><span class="s1">(&#39;arg1:&#39;, &#39;two&#39;)
+</span><span class="s1">(&#39;arg2:&#39;, 3)
+</span><span class="s1">(&#39;arg3:&#39;, 5)
+</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;two&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="n">test_unpack</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
 
-'''
-('arg1:', 'two')
-('arg2:', 3)
-('arg3:', 5)
-'''
-args = ('two', 3, 5)
-test_unpack(*args)
+<span class="s1">&#39;&#39;&#39;
+</span><span class="s1">(&#39;arg1:&#39;, 5)
+</span><span class="s1">(&#39;arg2:&#39;, &#39;two&#39;)
+</span><span class="s1">(&#39;arg3:&#39;, 3)
+</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&#34;arg3&#34;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&#34;arg2&#34;</span><span class="p">:</span> <span class="s2">&#34;two&#34;</span><span class="p">,</span> <span class="s2">&#34;arg1&#34;</span><span class="p">:</span> <span class="mi">5</span><span class="p">}</span>
+<span class="n">test_unpack</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-'''
-('arg1:', 5)
-('arg2:', 'two')
-('arg3:', 3)
-'''
-kwargs = {&quot;arg3&quot;: 3, &quot;arg2&quot;: &quot;two&quot;, &quot;arg1&quot;: 5}
-test_unpack(**kwargs)
+<span class="n">tmp_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+<span class="n">tmp_tuple</span> <span class="o">=</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+<span class="n">tmp_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;m&#39;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">:</span> <span class="mi">49</span><span class="p">}</span>
 
-tmp_list = [1, 2, 3]
-tmp_tuple = (4, 5, 6)
-tmp_dict = {'m': 7, 'v': 8, 'p': 49}
+<span class="s1">&#39;&#39;&#39;
+</span><span class="s1">(&#39;arg1:&#39;, 1)
+</span><span class="s1">(&#39;arg2:&#39;, 2)
+</span><span class="s1">(&#39;arg3:&#39;, 3)
+</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="n">test_unpack</span><span class="p">(</span><span class="o">*</span><span class="n">tmp_list</span><span class="p">)</span>
 
-'''
-('arg1:', 1)
-('arg2:', 2)
-('arg3:', 3)
-'''
-test_unpack(*tmp_list)
+<span class="s1">&#39;&#39;&#39;
+</span><span class="s1">(&#39;arg1:&#39;, 4)
+</span><span class="s1">(&#39;arg2:&#39;, 5)
+</span><span class="s1">(&#39;arg3:&#39;, 6)
+</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="n">test_unpack</span><span class="p">(</span><span class="o">*</span><span class="n">tmp_tuple</span><span class="p">)</span>
 
-'''
-('arg1:', 4)
-('arg2:', 5)
-('arg3:', 6)
-'''
-test_unpack(*tmp_tuple)
+<span class="s1">&#39;&#39;&#39;
+</span><span class="s1">Traceback (most recent call last):
+</span><span class="s1">  File &#34;code.py&#34;, line 30, in &lt;module&gt;
+</span><span class="s1">    test_unpack(**tmp_tuple)
+</span><span class="s1">TypeError: test_unpack() argument after ** must be a mapping, not tuple
+</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="n">test_unpack</span><span class="p">(</span><span class="o">**</span><span class="n">tmp_tuple</span><span class="p">)</span>
 
-'''
-Traceback (most recent call last):
-  File &quot;code.py&quot;, line 30, in &lt;module&gt;
-    test_unpack(**tmp_tuple)
-TypeError: test_unpack() argument after ** must be a mapping, not tuple
-'''
-test_unpack(**tmp_tuple)
+<span class="s1">&#39;&#39;&#39;
+</span><span class="s1">(&#39;arg1:&#39;, &#39;p&#39;)
+</span><span class="s1">(&#39;arg2:&#39;, &#39;m&#39;)
+</span><span class="s1">(&#39;arg3:&#39;, &#39;v&#39;)
+</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="n">test_unpack</span><span class="p">(</span><span class="o">*</span><span class="n">tmp_dict</span><span class="p">)</span>
 
-'''
-('arg1:', 'p')
-('arg2:', 'm')
-('arg3:', 'v')
-'''
-test_unpack(*tmp_dict)
-
-'''
-Traceback (most recent call last):
-  File &quot;code.py&quot;, line 31, in &lt;module&gt;
-    test_unpack(**tmp_dict)
-TypeError: test_unpack() got an unexpected keyword argument 'p'
-'''
-test_unpack(**tmp_dict)
-</code></pre>
-
+<span class="s1">&#39;&#39;&#39;
+</span><span class="s1">Traceback (most recent call last):
+</span><span class="s1">  File &#34;code.py&#34;, line 31, in &lt;module&gt;
+</span><span class="s1">    test_unpack(**tmp_dict)
+</span><span class="s1">TypeError: test_unpack() got an unexpected keyword argument &#39;p&#39;
+</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="n">test_unpack</span><span class="p">(</span><span class="o">**</span><span class="n">tmp_dict</span><span class="p">)</span></code></pre></td></tr></table>
+</div>
+</div>
 <p><strong>Reference</strong></p>
 
 <ul>

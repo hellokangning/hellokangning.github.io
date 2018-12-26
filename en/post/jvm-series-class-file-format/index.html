@@ -56,7 +56,7 @@ A class file consists of a stream of 8-bit bytes. All 16-bit, 32-bit, and 64-bit
 
 <meta itemprop="datePublished" content="2018-05-17T16:52:29&#43;08:00" />
 <meta itemprop="dateModified" content="2018-05-17T16:52:29&#43;08:00" />
-<meta itemprop="wordCount" content="1727">
+<meta itemprop="wordCount" content="1758">
 
 
 
@@ -139,7 +139,7 @@ A class file consists of a stream of 8-bit bytes. All 16-bit, 32-bit, and 64-bit
         <div class="post-category">
             <a href="/en/categories/java/"> Java </a>
             </div>
-          <span class="more-meta"> 1727 words </span>
+          <span class="more-meta"> 1758 words </span>
           <span class="more-meta"> 4 mins read </span>
         
       </div>
@@ -290,18 +290,30 @@ A class file consists of a stream of 8-bit bytes. All 16-bit, 32-bit, and 64-bit
 </table>
 
 <p>To illustrate, I introduce this snippit of code  for example.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kn">package</span> <span class="nn">com.qiniu.fusion.app</span><span class="o">;</span>
 
-<pre><code class="language-java">package com.qiniu.fusion.app;
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">JavaTestApp</span> <span class="o">{</span>
 
-public class JavaTestApp {
-
-    static String localName;
-    public static void main(String[] args) {
-        System.out.println(&quot;local name = &quot; + localName);
-    }
-}
-</code></pre>
-
+    <span class="kd">static</span> <span class="n">String</span> <span class="n">localName</span><span class="o">;</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&#34;local name = &#34;</span> <span class="o">+</span> <span class="n">localName</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <h1 id="magic">magic</h1>
 
 <p>The <code>magic</code> item supplies the magic number <strong>identifying the <code>class</code> file format</strong>; it has the value <code>0xCAFEBABE</code>.</p>
@@ -453,16 +465,28 @@ public class JavaTestApp {
 <h3 id="field-info">field_info</h3>
 
 <p>Each field is described by a <code>field_info</code> structure</p>
-
-<pre><code class="language-cpp">field_info {
-    u2             access_flags;
-    u2             name_index;
-    u2             descriptor_index;
-    u2             attributes_count;
-    attribute_info attributes[attributes_count];
-}
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="n">field_info</span> <span class="p">{</span>
+    <span class="n">u2</span>             <span class="n">access_flags</span><span class="p">;</span>
+    <span class="n">u2</span>             <span class="n">name_index</span><span class="p">;</span>
+    <span class="n">u2</span>             <span class="n">descriptor_index</span><span class="p">;</span>
+    <span class="n">u2</span>             <span class="n">attributes_count</span><span class="p">;</span>
+    <span class="n">attribute_info</span> <span class="n">attributes</span><span class="p">[</span><span class="n">attributes_count</span><span class="p">];</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div>
 <p>access_flags</p>
 
 <p>The value of the <code>access_flags</code> item is a mask of flags used to denote access permission to and properties of this field. The interpretation of each flag, when set, is as shown,</p>
@@ -576,16 +600,28 @@ public class JavaTestApp {
 <h3 id="method-info">method_info</h3>
 
 <p>Each method, including each instance initialization method and the class or interface initialization method, is described by a <code>method_info</code> structure.</p>
-
-<pre><code class="language-cpp">method_info {
-    u2             access_flags;
-    u2             name_index;
-    u2             descriptor_index;
-    u2             attributes_count;
-    attribute_info attributes[attributes_count];
-}
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="n">method_info</span> <span class="p">{</span>
+    <span class="n">u2</span>             <span class="n">access_flags</span><span class="p">;</span>
+    <span class="n">u2</span>             <span class="n">name_index</span><span class="p">;</span>
+    <span class="n">u2</span>             <span class="n">descriptor_index</span><span class="p">;</span>
+    <span class="n">u2</span>             <span class="n">attributes_count</span><span class="p">;</span>
+    <span class="n">attribute_info</span> <span class="n">attributes</span><span class="p">[</span><span class="n">attributes_count</span><span class="p">];</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div>
 <p>access_flags</p>
 
 <p>The value of the <code>access_flags</code> item is a mask of flags used to denote access permission to and properties of this method. The interpretation of each flag, when set, is as following.</p>
@@ -687,14 +723,24 @@ public class JavaTestApp {
 <p>The <code>attributes_count</code> of 0x0001 hints the <code>init</code> method has one attributes.</p>
 
 <p>All attributes have the following general format:</p>
-
-<pre><code class="language-cpp">attribute_info {
-   u2 attribute_name_index;
-   u4 attribute_length;
-   u1 info[attribute_length];
-}
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="n">attribute_info</span> <span class="p">{</span>
+   <span class="n">u2</span> <span class="n">attribute_name_index</span><span class="p">;</span>
+   <span class="n">u4</span> <span class="n">attribute_length</span><span class="p">;</span>
+   <span class="n">u1</span> <span class="n">info</span><span class="p">[</span><span class="n">attribute_length</span><span class="p">];</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div>
 <p>The <code>attribute_name_index</code> is 0x0010, <code>attribute_length</code> is 0x002f.</p>
 
 <p>Let&rsquo;s go to 0x0010 directly, and find this attribute is <code>Code</code>.</p>

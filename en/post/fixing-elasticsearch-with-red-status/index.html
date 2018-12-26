@@ -51,7 +51,7 @@
 
 <meta itemprop="datePublished" content="2017-10-10T10:05:01&#43;08:00" />
 <meta itemprop="dateModified" content="2017-10-10T10:05:01&#43;08:00" />
-<meta itemprop="wordCount" content="606">
+<meta itemprop="wordCount" content="693">
 
 
 
@@ -132,8 +132,8 @@
         <div class="post-category">
             <a href="/en/categories/elasticsearch/"> Elasticsearch </a>
             </div>
-          <span class="more-meta"> 606 words </span>
-          <span class="more-meta"> 3 mins read </span>
+          <span class="more-meta"> 693 words </span>
+          <span class="more-meta"> 4 mins read </span>
         
       </div>
     </header>
@@ -159,60 +159,112 @@
 <p><img src="/images/x-pack-error.png" alt="" /></p>
 
 <p>Don&rsquo;t panic since I have handled this many times. There must be some unassigned shards used by <code>x-pack</code> plugin. Let&rsquo;s see what these index are.</p>
-
-<pre><code class="language-bash">curl -XGET http://xs333:19201/_cluster/health?level=indices | json_pp
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash"><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">curl -XGET http://xs333:19201/_cluster/health?level<span class="o">=</span>indices <span class="p">|</span> json_pp</code></pre></td></tr></table>
+</div>
+</div>
 <p>The output is abbreviated so that we can address monitor index only.</p>
-
-<pre><code class="language-json">{
-{
-  &quot;cluster_name&quot;: &quot;fusiones-v2&quot;,
-  &quot;status&quot;: &quot;red&quot;,
-  &quot;timed_out&quot;: false,
-  &quot;number_of_nodes&quot;: 38,
-  &quot;number_of_data_nodes&quot;: 28,
-  &quot;active_primary_shards&quot;: 5043,
-  &quot;active_shards&quot;: 5064,
-  &quot;relocating_shards&quot;: 0,
-  &quot;initializing_shards&quot;: 0,
-  &quot;unassigned_shards&quot;: 165,
-  &quot;delayed_unassigned_shards&quot;: 0,
-  &quot;number_of_pending_tasks&quot;: 0,
-  &quot;number_of_in_flight_fetch&quot;: 0,
-  &quot;task_max_waiting_in_queue_millis&quot;: 0,
-  &quot;active_shards_percent_as_number&quot;: 96.84452094090649,
-  &quot;indices&quot;: {
-     &quot;.monitoring-kibana-6-2017.08.04&quot; : {
-       &quot;active_shards&quot; : 0,
-       &quot;unassigned_shards&quot; : 2,
-       &quot;relocating_shards&quot; : 0,
-       &quot;number_of_shards&quot; : 1,
-       &quot;active_primary_shards&quot; : 0,
-       &quot;number_of_replicas&quot; : 1,
-       &quot;status&quot; : &quot;red&quot;,
-       &quot;initializing_shards&quot; : 0
-      },
-    &quot;.monitoring-es-6-2017.08.04&quot; : {
-       &quot;initializing_shards&quot; : 0,
-       &quot;status&quot; : &quot;red&quot;,
-       &quot;number_of_replicas&quot; : 1,
-       &quot;active_primary_shards&quot; : 0,
-       &quot;number_of_shards&quot; : 1,
-       &quot;relocating_shards&quot; : 0,
-       &quot;unassigned_shards&quot; : 2,
-       &quot;active_shards&quot; : 0
-      }
-  }
-}
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-json" data-lang="json"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-json" data-lang="json"><span class="p">{</span>
+<span class="err">{</span>
+  <span class="nt">&#34;cluster_name&#34;</span><span class="p">:</span> <span class="s2">&#34;fusiones-v2&#34;</span><span class="p">,</span>
+  <span class="nt">&#34;status&#34;</span><span class="p">:</span> <span class="s2">&#34;red&#34;</span><span class="p">,</span>
+  <span class="nt">&#34;timed_out&#34;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+  <span class="nt">&#34;number_of_nodes&#34;</span><span class="p">:</span> <span class="mi">38</span><span class="p">,</span>
+  <span class="nt">&#34;number_of_data_nodes&#34;</span><span class="p">:</span> <span class="mi">28</span><span class="p">,</span>
+  <span class="nt">&#34;active_primary_shards&#34;</span><span class="p">:</span> <span class="mi">5043</span><span class="p">,</span>
+  <span class="nt">&#34;active_shards&#34;</span><span class="p">:</span> <span class="mi">5064</span><span class="p">,</span>
+  <span class="nt">&#34;relocating_shards&#34;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+  <span class="nt">&#34;initializing_shards&#34;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+  <span class="nt">&#34;unassigned_shards&#34;</span><span class="p">:</span> <span class="mi">165</span><span class="p">,</span>
+  <span class="nt">&#34;delayed_unassigned_shards&#34;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+  <span class="nt">&#34;number_of_pending_tasks&#34;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+  <span class="nt">&#34;number_of_in_flight_fetch&#34;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+  <span class="nt">&#34;task_max_waiting_in_queue_millis&#34;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+  <span class="nt">&#34;active_shards_percent_as_number&#34;</span><span class="p">:</span> <span class="mf">96.84452094090649</span><span class="p">,</span>
+  <span class="nt">&#34;indices&#34;</span><span class="p">:</span> <span class="p">{</span>
+     <span class="nt">&#34;.monitoring-kibana-6-2017.08.04&#34;</span> <span class="p">:</span> <span class="p">{</span>
+       <span class="nt">&#34;active_shards&#34;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+       <span class="nt">&#34;unassigned_shards&#34;</span> <span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+       <span class="nt">&#34;relocating_shards&#34;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+       <span class="nt">&#34;number_of_shards&#34;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+       <span class="nt">&#34;active_primary_shards&#34;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+       <span class="nt">&#34;number_of_replicas&#34;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+       <span class="nt">&#34;status&#34;</span> <span class="p">:</span> <span class="s2">&#34;red&#34;</span><span class="p">,</span>
+       <span class="nt">&#34;initializing_shards&#34;</span> <span class="p">:</span> <span class="mi">0</span>
+      <span class="p">},</span>
+    <span class="nt">&#34;.monitoring-es-6-2017.08.04&#34;</span> <span class="p">:</span> <span class="p">{</span>
+       <span class="nt">&#34;initializing_shards&#34;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+       <span class="nt">&#34;status&#34;</span> <span class="p">:</span> <span class="s2">&#34;red&#34;</span><span class="p">,</span>
+       <span class="nt">&#34;number_of_replicas&#34;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+       <span class="nt">&#34;active_primary_shards&#34;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+       <span class="nt">&#34;number_of_shards&#34;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+       <span class="nt">&#34;relocating_shards&#34;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+       <span class="nt">&#34;unassigned_shards&#34;</span> <span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+       <span class="nt">&#34;active_shards&#34;</span> <span class="p">:</span> <span class="mi">0</span>
+      <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p><code>x-pack</code> reserves monitor index of recent 7 days by default, How does the index of 2017.08.04 still exist and become unassigned? I can only speculate this is a bug of <code>x-pack</code>, and delete these red shards.</p>
-
-<pre><code class="language-bash">curl -XDELETE http://xs333:19201/.monitoring-kibana-6-2017.08.04
-curl -XDELETE http://xs333:19201/.monitoring-es-6-2017.08.04
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash"><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">curl -XDELETE http://xs333:19201/.monitoring-kibana-6-2017.08.04
+curl -XDELETE http://xs333:19201/.monitoring-es-6-2017.08.04</code></pre></td></tr></table>
+</div>
+</div>
 <p>After these commands, We can see normal Kibana, like this.</p>
 
 <p><img src="/images/normal-kibana.png" alt="" /></p>
@@ -222,55 +274,101 @@ curl -XDELETE http://xs333:19201/.monitoring-es-6-2017.08.04
 <h1 id="explain-api">Explain API</h1>
 
 <p><code>GET _cluster/health?level=indices</code> told us which index is red, to explain the allocation of its shard,</p>
-
-<pre><code>GET _cluster/allocation/explain
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">GET _cluster/allocation/explain
 
 {
-  &quot;index&quot;: &quot;rtlogindex_2017-10-09-21_part-00008&quot;,
-  &quot;shard&quot;: 0,
-  &quot;primary&quot;: true
-}
-</code></pre>
-
+  &#34;index&#34;: &#34;rtlogindex_2017-10-09-21_part-00008&#34;,
+  &#34;shard&#34;: 0,
+  &#34;primary&#34;: true
+}</pre></td></tr></table>
+</div>
+</div>
 <p>Specify the <code>index</code> and <code>shard id</code> of the shard you would like an explanation for, as well as the primary flag to indicate whether to explain the primary shard for the given shard id or one of its replica shards. These three request parameters are required.</p>
 
 <p>The upper request produces the following output:</p>
-
-<pre><code class="language-json">{
-  &quot;index&quot;: &quot;rtlogindex_2017-10-09-21_part-00008&quot;,
-  &quot;shard&quot;: 0,
-  &quot;primary&quot;: true,
-  &quot;current_state&quot;: &quot;unassigned&quot;,
-  &quot;unassigned_info&quot;: {
-    &quot;reason&quot;: &quot;INDEX_CREATED&quot;,
-    &quot;at&quot;: &quot;2017-10-09T18:39:56.971Z&quot;,
-    &quot;last_allocation_status&quot;: &quot;no&quot;
-  },
-  &quot;can_allocate&quot;: &quot;no&quot;,
-  &quot;allocate_explanation&quot;: &quot;cannot allocate because allocation is not permitted to any of the nodes&quot;,
-  &quot;node_allocation_decisions&quot;: [
-    {
-      &quot;node_id&quot;: &quot;SLcx_8U7S-C-5aaS39-iTw&quot;,
-      &quot;node_name&quot;: &quot;xs328-i3&quot;,
-      &quot;transport_address&quot;: &quot;10.34.41.52:39301&quot;,
-      &quot;node_attributes&quot;: {
-        &quot;rack&quot;: &quot;xs-r1&quot;,
-        &quot;ml.enabled&quot;: &quot;true&quot;
-      },
-      &quot;node_decision&quot;: &quot;no&quot;,
-      &quot;weight_ranking&quot;: 1,
-      &quot;deciders&quot;: [
-        {
-          &quot;decider&quot;: &quot;filter&quot;,
-          &quot;decision&quot;: &quot;NO&quot;,
-          &quot;explanation&quot;: &quot;&quot;&quot;node does not match index setting [index.routing.allocation.include] filters [_name:&quot;xs393-i4&quot;]&quot;&quot;&quot;
-        }
-      ]
-    }
-  ]
-}
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-json" data-lang="json"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-json" data-lang="json"><span class="p">{</span>
+  <span class="nt">&#34;index&#34;</span><span class="p">:</span> <span class="s2">&#34;rtlogindex_2017-10-09-21_part-00008&#34;</span><span class="p">,</span>
+  <span class="nt">&#34;shard&#34;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+  <span class="nt">&#34;primary&#34;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+  <span class="nt">&#34;current_state&#34;</span><span class="p">:</span> <span class="s2">&#34;unassigned&#34;</span><span class="p">,</span>
+  <span class="nt">&#34;unassigned_info&#34;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&#34;reason&#34;</span><span class="p">:</span> <span class="s2">&#34;INDEX_CREATED&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;at&#34;</span><span class="p">:</span> <span class="s2">&#34;2017-10-09T18:39:56.971Z&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;last_allocation_status&#34;</span><span class="p">:</span> <span class="s2">&#34;no&#34;</span>
+  <span class="p">},</span>
+  <span class="nt">&#34;can_allocate&#34;</span><span class="p">:</span> <span class="s2">&#34;no&#34;</span><span class="p">,</span>
+  <span class="nt">&#34;allocate_explanation&#34;</span><span class="p">:</span> <span class="s2">&#34;cannot allocate because allocation is not permitted to any of the nodes&#34;</span><span class="p">,</span>
+  <span class="nt">&#34;node_allocation_decisions&#34;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="nt">&#34;node_id&#34;</span><span class="p">:</span> <span class="s2">&#34;SLcx_8U7S-C-5aaS39-iTw&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;node_name&#34;</span><span class="p">:</span> <span class="s2">&#34;xs328-i3&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;transport_address&#34;</span><span class="p">:</span> <span class="s2">&#34;10.34.41.52:39301&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;node_attributes&#34;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&#34;rack&#34;</span><span class="p">:</span> <span class="s2">&#34;xs-r1&#34;</span><span class="p">,</span>
+        <span class="nt">&#34;ml.enabled&#34;</span><span class="p">:</span> <span class="s2">&#34;true&#34;</span>
+      <span class="p">},</span>
+      <span class="nt">&#34;node_decision&#34;</span><span class="p">:</span> <span class="s2">&#34;no&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;weight_ranking&#34;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+      <span class="nt">&#34;deciders&#34;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+          <span class="nt">&#34;decider&#34;</span><span class="p">:</span> <span class="s2">&#34;filter&#34;</span><span class="p">,</span>
+          <span class="nt">&#34;decision&#34;</span><span class="p">:</span> <span class="s2">&#34;NO&#34;</span><span class="p">,</span>
+          <span class="nt">&#34;explanation&#34;</span><span class="p">:</span> <span class="s2">&#34;&#34;&#34;node does not match index setting [index.routing.allocation.include] filters [_name:&#34;</span><span class="err">xs</span><span class="mi">393</span><span class="err">-i</span><span class="mi">4</span><span class="s2">&#34;]&#34;&#34;&#34;</span>
+        <span class="p">}</span>
+      <span class="p">]</span>
+    <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>The explain API found the primary shard 0 of <code>rtlogindex_2017-10-09-21_part-00008</code> to explain,</p>
 
 <ol>
@@ -282,13 +380,20 @@ curl -XDELETE http://xs333:19201/.monitoring-es-6-2017.08.04
 <p>For more information of <code>allocator</code> and <code>decider</code>, allocators try to find the best nodes to hold the shard, and deciders make the decision if allocating to a node is allowed.</p>
 
 <p>In consideration of the reason, we&rsquo;d better update index&rsquo;s settings by,</p>
-
-<pre><code>PUT rtlogindex_2017-10-09-21_part-00008/_settings
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">PUT rtlogindex_2017-10-09-21_part-00008/_settings
 {
-  &quot;index.routing.allocation.include._name&quot;: null
-}
-</code></pre>
-
+  &#34;index.routing.allocation.include._name&#34;: null
+}</pre></td></tr></table>
+</div>
+</div>
 <p>Afterwards, this index become green,</p>
 
 <p><img src="/images/index-green.png" alt="" /></p>

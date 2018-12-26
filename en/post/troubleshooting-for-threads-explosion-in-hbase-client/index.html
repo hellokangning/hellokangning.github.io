@@ -51,7 +51,7 @@
 
 <meta itemprop="datePublished" content="2018-03-09T18:27:56&#43;08:00" />
 <meta itemprop="dateModified" content="2018-03-09T18:27:56&#43;08:00" />
-<meta itemprop="wordCount" content="500">
+<meta itemprop="wordCount" content="585">
 
 
 
@@ -132,7 +132,7 @@
         <div class="post-category">
             <a href="/en/categories/hbase/"> HBase </a>
             </div>
-          <span class="more-meta"> 500 words </span>
+          <span class="more-meta"> 585 words </span>
           <span class="more-meta"> 3 mins read </span>
         
       </div>
@@ -153,17 +153,28 @@
       <p>An issue, excessive threads of HBase client, annoyed me for a quite while. It reminds me to penetrate into uses of <code>Executorservice</code> in HBase client. That&rsquo;s the origin of this blog.</p>
 
 <p>Remember how to put some data into HBase?</p>
-
-<pre><code class="language-scala">val conf = HBaseConfiguration.create()
-val conn = ConnectionFactory.createConnection(conf)
-val table = conn.getTable(TableName.valueOf(Bytes.toBytes(tableName))
-val p = new Put(Bytes.toBytes(&quot;rowId&quot;))
-p.addImmutable(Bytes.toBytes(&quot;family&quot;), Bytes.toBytes(&quot;qualifier&quot;), Bytes.toBytes(&quot;value&quot;))
-table.put(p)
-table.close()
-conn.close()
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-scala" data-lang="scala"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">conf</span> <span class="k">=</span> <span class="nc">HBaseConfiguration</span><span class="o">.</span><span class="n">create</span><span class="o">()</span>
+<span class="k">val</span> <span class="n">conn</span> <span class="k">=</span> <span class="nc">ConnectionFactory</span><span class="o">.</span><span class="n">createConnection</span><span class="o">(</span><span class="n">conf</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">table</span> <span class="k">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">getTable</span><span class="o">(</span><span class="nc">TableName</span><span class="o">.</span><span class="n">valueOf</span><span class="o">(</span><span class="nc">Bytes</span><span class="o">.</span><span class="n">toBytes</span><span class="o">(</span><span class="n">tableName</span><span class="o">))</span>
+<span class="k">val</span> <span class="n">p</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">Put</span><span class="o">(</span><span class="nc">Bytes</span><span class="o">.</span><span class="n">toBytes</span><span class="o">(</span><span class="s">&#34;rowId&#34;</span><span class="o">))</span>
+<span class="n">p</span><span class="o">.</span><span class="n">addImmutable</span><span class="o">(</span><span class="nc">Bytes</span><span class="o">.</span><span class="n">toBytes</span><span class="o">(</span><span class="s">&#34;family&#34;</span><span class="o">),</span> <span class="nc">Bytes</span><span class="o">.</span><span class="n">toBytes</span><span class="o">(</span><span class="s">&#34;qualifier&#34;</span><span class="o">),</span> <span class="nc">Bytes</span><span class="o">.</span><span class="n">toBytes</span><span class="o">(</span><span class="s">&#34;value&#34;</span><span class="o">))</span>
+<span class="n">table</span><span class="o">.</span><span class="n">put</span><span class="o">(</span><span class="n">p</span><span class="o">)</span>
+<span class="n">table</span><span class="o">.</span><span class="n">close</span><span class="o">()</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="o">()</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>Two classes is involved during this process,</p>
 
 <ol>
@@ -176,85 +187,158 @@ conn.close()
 <h1 id="connection"><code>Connection</code></h1>
 
 <p><code>ConnectionImplementation</code>, the child of <code>Connection</code> has two private fields.</p>
-
-<pre><code class="language-java">// ConnectionImplementation.java
-
-class ConnectionImplementation implements ClusterConnection, Closeable {
-  private volatile ExecutorService batchPool = null;
-  private volatile ExecutorService metaLookupPool = null;
-}
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// ConnectionImplementation.java
+</span><span class="c1"></span>
+<span class="kd">class</span> <span class="nc">ConnectionImplementation</span> <span class="kd">implements</span> <span class="n">ClusterConnection</span><span class="o">,</span> <span class="n">Closeable</span> <span class="o">{</span>
+  <span class="kd">private</span> <span class="kd">volatile</span> <span class="n">ExecutorService</span> <span class="n">batchPool</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+  <span class="kd">private</span> <span class="kd">volatile</span> <span class="n">ExecutorService</span> <span class="n">metaLookupPool</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p><code>batchPool</code> is an thread executor shared by all Table instances created by this connection, and <code>metaLookupPool</code>, a meta thread executor shared by all Table instances created by this connection.</p>
 
 <p>My question is which configuration decides the size of these pool? As the code says,</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// ConnectionImplementation.java
+</span><span class="c1"></span>
+  <span class="c1">// for batch pool
+</span><span class="c1"></span>  <span class="kd">private</span> <span class="n">ExecutorService</span> <span class="nf">getBatchPool</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">batchPool</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+      <span class="kd">synchronized</span> <span class="o">(</span><span class="k">this</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">batchPool</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+          <span class="kt">int</span> <span class="n">threads</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="na">getInt</span><span class="o">(</span><span class="s">&#34;hbase.hconnection.threads.max&#34;</span><span class="o">,</span> <span class="n">256</span><span class="o">);</span>
+          <span class="k">this</span><span class="o">.</span><span class="na">batchPool</span> <span class="o">=</span> <span class="n">getThreadPool</span><span class="o">(</span><span class="n">threads</span><span class="o">,</span> <span class="n">threads</span><span class="o">,</span> <span class="s">&#34;-shared&#34;</span><span class="o">,</span> <span class="kc">null</span><span class="o">);</span>
+          <span class="k">this</span><span class="o">.</span><span class="na">cleanupPool</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+        <span class="o">}</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
+    <span class="k">return</span> <span class="k">this</span><span class="o">.</span><span class="na">batchPool</span><span class="o">;</span>
+  <span class="o">}</span>
 
-<pre><code class="language-java">// ConnectionImplementation.java
-
-  // for batch pool
-  private ExecutorService getBatchPool() {
-    if (batchPool == null) {
-      synchronized (this) {
-        if (batchPool == null) {
-          int threads = conf.getInt(&quot;hbase.hconnection.threads.max&quot;, 256);
-          this.batchPool = getThreadPool(threads, threads, &quot;-shared&quot;, null);
-          this.cleanupPool = true;
-        }
-      }
-    }
-    return this.batchPool;
-  }
-
-  // for meta pool
-  private ExecutorService getMetaLookupPool() {
-    if (this.metaLookupPool == null) {
-      synchronized (this) {
-        if (this.metaLookupPool == null) {
-          //Some of the threads would be used for meta replicas
-          //To start with, threads.max.core threads can hit the meta (including replicas).
-          //After that, requests will get queued up in the passed queue, and only after
-          //the queue is full, a new thread will be started
-          int threads = conf.getInt(&quot;hbase.hconnection.meta.lookup.threads.max&quot;, 128);
-          this.metaLookupPool = getThreadPool(
-             threads,
-             threads,
-             &quot;-metaLookup-shared-&quot;, new LinkedBlockingQueue&lt;&gt;());
-        }
-      }
-    }
-    return this.metaLookupPool;
-  }
-</code></pre>
-
+  <span class="c1">// for meta pool
+</span><span class="c1"></span>  <span class="kd">private</span> <span class="n">ExecutorService</span> <span class="nf">getMetaLookupPool</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">metaLookupPool</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+      <span class="kd">synchronized</span> <span class="o">(</span><span class="k">this</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">metaLookupPool</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+          <span class="c1">//Some of the threads would be used for meta replicas
+</span><span class="c1"></span>          <span class="c1">//To start with, threads.max.core threads can hit the meta (including replicas).
+</span><span class="c1"></span>          <span class="c1">//After that, requests will get queued up in the passed queue, and only after
+</span><span class="c1"></span>          <span class="c1">//the queue is full, a new thread will be started
+</span><span class="c1"></span>          <span class="kt">int</span> <span class="n">threads</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="na">getInt</span><span class="o">(</span><span class="s">&#34;hbase.hconnection.meta.lookup.threads.max&#34;</span><span class="o">,</span> <span class="n">128</span><span class="o">);</span>
+          <span class="k">this</span><span class="o">.</span><span class="na">metaLookupPool</span> <span class="o">=</span> <span class="n">getThreadPool</span><span class="o">(</span>
+             <span class="n">threads</span><span class="o">,</span>
+             <span class="n">threads</span><span class="o">,</span>
+             <span class="s">&#34;-metaLookup-shared-&#34;</span><span class="o">,</span> <span class="k">new</span> <span class="n">LinkedBlockingQueue</span><span class="o">&lt;&gt;());</span>
+        <span class="o">}</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
+    <span class="k">return</span> <span class="k">this</span><span class="o">.</span><span class="na">metaLookupPool</span><span class="o">;</span>
+  <span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <h1 id="table"><code>Table</code></h1>
 
 <p>In <code>HTable</code>, an independent pool is also initialized.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// HTable.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">HTable</span> <span class="kd">implements</span> <span class="n">Table</span> <span class="o">{</span>
+  <span class="kd">private</span> <span class="kd">final</span> <span class="n">ExecutorService</span> <span class="n">pool</span><span class="o">;</span>
 
-<pre><code class="language-java">// HTable.java
+  <span class="kd">public</span> <span class="kd">static</span> <span class="n">ThreadPoolExecutor</span> <span class="nf">getDefaultExecutor</span><span class="o">(</span><span class="n">Configuration</span> <span class="n">conf</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kt">int</span> <span class="n">maxThreads</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="na">getInt</span><span class="o">(</span><span class="s">&#34;hbase.htable.threads.max&#34;</span><span class="o">,</span> <span class="n">Integer</span><span class="o">.</span><span class="na">MAX_VALUE</span><span class="o">);</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">maxThreads</span> <span class="o">==</span> <span class="n">0</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">maxThreads</span> <span class="o">=</span> <span class="n">1</span><span class="o">;</span> <span class="c1">// is there a better default?
+</span><span class="c1"></span>    <span class="o">}</span>
+    <span class="kt">int</span> <span class="n">corePoolSize</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="na">getInt</span><span class="o">(</span><span class="s">&#34;hbase.htable.threads.coresize&#34;</span><span class="o">,</span> <span class="n">1</span><span class="o">);</span>
+    <span class="kt">long</span> <span class="n">keepAliveTime</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="na">getLong</span><span class="o">(</span><span class="s">&#34;hbase.htable.threads.keepalivetime&#34;</span><span class="o">,</span> <span class="n">60</span><span class="o">);</span>
 
-public class HTable implements Table {
-  private final ExecutorService pool;
-
-  public static ThreadPoolExecutor getDefaultExecutor(Configuration conf) {
-    int maxThreads = conf.getInt(&quot;hbase.htable.threads.max&quot;, Integer.MAX_VALUE);
-    if (maxThreads == 0) {
-      maxThreads = 1; // is there a better default?
-    }
-    int corePoolSize = conf.getInt(&quot;hbase.htable.threads.coresize&quot;, 1);
-    long keepAliveTime = conf.getLong(&quot;hbase.htable.threads.keepalivetime&quot;, 60);
-
-    // Using the &quot;direct handoff&quot; approach, new threads will only be created
-    // if it is necessary and will grow unbounded. This could be bad but in HCM
-    // we only create as many Runnables as there are region servers. It means
-    // it also scales when new region servers are added.
-    ThreadPoolExecutor pool = new ThreadPoolExecutor(corePoolSize, maxThreads, keepAliveTime,
-      TimeUnit.SECONDS, new SynchronousQueue&lt;&gt;(), Threads.newDaemonThreadFactory(&quot;htable&quot;));
-    pool.allowCoreThreadTimeOut(true);
-    return pool;
-  }
-}
-</code></pre>
-
+    <span class="c1">// Using the &#34;direct handoff&#34; approach, new threads will only be created
+</span><span class="c1"></span>    <span class="c1">// if it is necessary and will grow unbounded. This could be bad but in HCM
+</span><span class="c1"></span>    <span class="c1">// we only create as many Runnables as there are region servers. It means
+</span><span class="c1"></span>    <span class="c1">// it also scales when new region servers are added.
+</span><span class="c1"></span>    <span class="n">ThreadPoolExecutor</span> <span class="n">pool</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ThreadPoolExecutor</span><span class="o">(</span><span class="n">corePoolSize</span><span class="o">,</span> <span class="n">maxThreads</span><span class="o">,</span> <span class="n">keepAliveTime</span><span class="o">,</span>
+      <span class="n">TimeUnit</span><span class="o">.</span><span class="na">SECONDS</span><span class="o">,</span> <span class="k">new</span> <span class="n">SynchronousQueue</span><span class="o">&lt;&gt;(),</span> <span class="n">Threads</span><span class="o">.</span><span class="na">newDaemonThreadFactory</span><span class="o">(</span><span class="s">&#34;htable&#34;</span><span class="o">));</span>
+    <span class="n">pool</span><span class="o">.</span><span class="na">allowCoreThreadTimeOut</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+    <span class="k">return</span> <span class="n">pool</span><span class="o">;</span>
+  <span class="o">}</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>So far, I found these configurations about threads limit:</p>
 
 <ol>
@@ -269,21 +353,38 @@ public class HTable implements Table {
 <p>It strikes me <code>RpcClient</code> is also involved during <a href="https://hellokangning.github.io/en/post/a-lifecycle-of-hbase-put-client-side">A Lifecycle of HBase&rsquo;s Put: Client-side</a>.</p>
 
 <p>After a quick look at <code>AbstractRpcClient</code>, I finally found the key configuration, which is misused in our code, <code>hbase.client.ipc.pool.size</code>.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// AbstractRpcClient.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="kd">abstract</span> <span class="kd">class</span> <span class="nc">AbstractRpcClient</span><span class="o">&lt;</span><span class="n">T</span> <span class="kd">extends</span> <span class="n">RpcConnection</span><span class="o">&gt;</span> <span class="kd">implements</span> <span class="n">RpcClient</span> <span class="o">{</span>
+  <span class="kd">protected</span> <span class="kd">final</span> <span class="n">PoolMap</span><span class="o">&lt;</span><span class="n">ConnectionId</span><span class="o">,</span> <span class="n">T</span><span class="o">&gt;</span> <span class="n">connections</span><span class="o">;</span>
 
-<pre><code class="language-java">// AbstractRpcClient.java
-
-public abstract class AbstractRpcClient&lt;T extends RpcConnection&gt; implements RpcClient {
-  protected final PoolMap&lt;ConnectionId, T&gt; connections;
-
-  public AbstractRpcClient(Configuration conf, String clusterId, SocketAddress localAddr,
-      MetricsConnection metrics) {
-       this.connections = new PoolMap&lt;&gt;(getPoolType(conf), getPoolSize(conf));
-  }
-  private static int getPoolSize(Configuration config) {
-    return config.getInt(HConstants.HBASE_CLIENT_IPC_POOL_SIZE, 1);
-  }
-}
-</code></pre>
+  <span class="kd">public</span> <span class="nf">AbstractRpcClient</span><span class="o">(</span><span class="n">Configuration</span> <span class="n">conf</span><span class="o">,</span> <span class="n">String</span> <span class="n">clusterId</span><span class="o">,</span> <span class="n">SocketAddress</span> <span class="n">localAddr</span><span class="o">,</span>
+      <span class="n">MetricsConnection</span> <span class="n">metrics</span><span class="o">)</span> <span class="o">{</span>
+       <span class="k">this</span><span class="o">.</span><span class="na">connections</span> <span class="o">=</span> <span class="k">new</span> <span class="n">PoolMap</span><span class="o">&lt;&gt;(</span><span class="n">getPoolType</span><span class="o">(</span><span class="n">conf</span><span class="o">),</span> <span class="n">getPoolSize</span><span class="o">(</span><span class="n">conf</span><span class="o">));</span>
+  <span class="o">}</span>
+  <span class="kd">private</span> <span class="kd">static</span> <span class="kt">int</span> <span class="nf">getPoolSize</span><span class="o">(</span><span class="n">Configuration</span> <span class="n">config</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">config</span><span class="o">.</span><span class="na">getInt</span><span class="o">(</span><span class="n">HConstants</span><span class="o">.</span><span class="na">HBASE_CLIENT_IPC_POOL_SIZE</span><span class="o">,</span> <span class="n">1</span><span class="o">);</span>
+  <span class="o">}</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
     </div>
 
     <footer class="post-footer">

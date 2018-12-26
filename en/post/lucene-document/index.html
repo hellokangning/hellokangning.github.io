@@ -53,7 +53,7 @@
 
 <meta itemprop="datePublished" content="2017-08-07T18:52:01&#43;08:00" />
 <meta itemprop="dateModified" content="2017-08-07T18:52:01&#43;08:00" />
-<meta itemprop="wordCount" content="885">
+<meta itemprop="wordCount" content="1044">
 
 
 
@@ -135,7 +135,7 @@
         <div class="post-category">
             <a href="/en/categories/elasticsearch/"> Elasticsearch </a>
             </div>
-          <span class="more-meta"> 885 words </span>
+          <span class="more-meta"> 1044 words </span>
           <span class="more-meta"> 5 mins read </span>
         
       </div>
@@ -179,175 +179,341 @@
 <p>Each field has three parts: name, type and value. Values may be text (String, Reader or pre-analyzed TokenStream), binary (byte[]), or numeric (a Number). Fields are optionally stored in the index, so that they may be returned with hits on the document.</p>
 
 <p>Then, Let&rsquo;s deep into source code,</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span><span class="lnt">106
+</span><span class="lnt">107
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Field</span> <span class="kd">implements</span> <span class="n">IndexableField</span> <span class="o">{</span>
 
-<pre><code class="language-java">public class Field implements IndexableField {
-
-  protected final FieldType type;
-  protected final String name;
-  protected float boost = 1.0f;
+  <span class="kd">protected</span> <span class="kd">final</span> <span class="n">FieldType</span> <span class="n">type</span><span class="o">;</span>
+  <span class="kd">protected</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">name</span><span class="o">;</span>
+  <span class="kd">protected</span> <span class="kt">float</span> <span class="n">boost</span> <span class="o">=</span> <span class="n">1</span><span class="o">.</span><span class="na">0f</span><span class="o">;</span>
   
-  /**
-   * data can be converted to 
-   * 1. Numberic Value
-   * 2. Binary Value
-   * 3. String Value
-   * 4. Reader Value
-   */
-  protected Object fieldsData;
+  <span class="cm">/**
+</span><span class="cm">   * data can be converted to 
+</span><span class="cm">   * 1. Numberic Value
+</span><span class="cm">   * 2. Binary Value
+</span><span class="cm">   * 3. String Value
+</span><span class="cm">   * 4. Reader Value
+</span><span class="cm">   */</span>
+  <span class="kd">protected</span> <span class="n">Object</span> <span class="n">fieldsData</span><span class="o">;</span>
 
-  /** Pre-analyzed tokenStream for indexed fields; this is
-   * separate from fieldsData because you are allowed to
-   * have both; eg maybe field has a String value but you
-   * customize how it's tokenized */
-  protected TokenStream tokenStream;
+  <span class="cm">/** Pre-analyzed tokenStream for indexed fields; this is
+</span><span class="cm">   * separate from fieldsData because you are allowed to
+</span><span class="cm">   * have both; eg maybe field has a String value but you
+</span><span class="cm">   * customize how it&#39;s tokenized */</span>
+  <span class="kd">protected</span> <span class="n">TokenStream</span> <span class="n">tokenStream</span><span class="o">;</span>
 
-  /**
-   *...
-   * getters and settins for above attributes.
-   */
+  <span class="cm">/**
+</span><span class="cm">   *...
+</span><span class="cm">   * getters and settins for above attributes.
+</span><span class="cm">   */</span>
 
 
-  /**
-   * Creates the TokenStream used for indexing this field.  If appropriate,
-   * @param analyzer Analyzer that should be used to create the TokenStreams from
-   * @param reuse TokenStream for a previous instance of this field name. This allows
-   * custom field types (like StringField and NumericField) that do not use
-   *              the analyzer to still have good performance. Note: the passed-in type
-   *              may be inappropriate, for example if you mix up different types of Fields
-   *              for the same field name. So it's the responsibility of the implementation to
-   *              check.
-   * @return TokenStream value for indexing the document.  Should always return
-  */
-  @Override
-  public TokenStream tokenStream(Analyzer analyzer, TokenStream reuse) {
-    if (fieldType().indexOptions() == IndexOptions.NONE) {
-      // Not indexed
-      return null;
-    }
+  <span class="cm">/**
+</span><span class="cm">   * Creates the TokenStream used for indexing this field.  If appropriate,
+</span><span class="cm">   * @param analyzer Analyzer that should be used to create the TokenStreams from
+</span><span class="cm">   * @param reuse TokenStream for a previous instance of this field name. This allows
+</span><span class="cm">   * custom field types (like StringField and NumericField) that do not use
+</span><span class="cm">   *              the analyzer to still have good performance. Note: the passed-in type
+</span><span class="cm">   *              may be inappropriate, for example if you mix up different types of Fields
+</span><span class="cm">   *              for the same field name. So it&#39;s the responsibility of the implementation to
+</span><span class="cm">   *              check.
+</span><span class="cm">   * @return TokenStream value for indexing the document.  Should always return
+</span><span class="cm">  */</span>
+  <span class="nd">@Override</span>
+  <span class="kd">public</span> <span class="n">TokenStream</span> <span class="nf">tokenStream</span><span class="o">(</span><span class="n">Analyzer</span> <span class="n">analyzer</span><span class="o">,</span> <span class="n">TokenStream</span> <span class="n">reuse</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">fieldType</span><span class="o">().</span><span class="na">indexOptions</span><span class="o">()</span> <span class="o">==</span> <span class="n">IndexOptions</span><span class="o">.</span><span class="na">NONE</span><span class="o">)</span> <span class="o">{</span>
+      <span class="c1">// Not indexed
+</span><span class="c1"></span>      <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="o">}</span>
 
-    final FieldType.LegacyNumericType numericType = fieldType().numericType();
-    if (numericType != null) {
-      if (!(reuse instanceof LegacyNumericTokenStream &amp;&amp; ((LegacyNumericTokenStream)reuse).getPrecisionStep() == type.numericPrecisionStep())) {
-        // lazy init the TokenStream as it is heavy to instantiate
-        // (attributes,...) if not needed (stored field loading)
-        reuse = new LegacyNumericTokenStream(type.numericPrecisionStep());
-      }
-      final LegacyNumericTokenStream nts = (LegacyNumericTokenStream) reuse;
-      // initialize value in TokenStream
-      final Number val = (Number) fieldsData;
-      switch (numericType) {
-      case INT:
-        nts.setIntValue(val.intValue());
-        break;
-      case LONG:
-        nts.setLongValue(val.longValue());
-        break;
-      case FLOAT:
-        nts.setFloatValue(val.floatValue());
-        break;
-      case DOUBLE:
-        nts.setDoubleValue(val.doubleValue());
-        break;
-      default:
-        throw new AssertionError(&quot;Should never get here&quot;);
-      }
-      return reuse;
-    }
+    <span class="kd">final</span> <span class="n">FieldType</span><span class="o">.</span><span class="na">LegacyNumericType</span> <span class="n">numericType</span> <span class="o">=</span> <span class="n">fieldType</span><span class="o">().</span><span class="na">numericType</span><span class="o">();</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">numericType</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">if</span> <span class="o">(!(</span><span class="n">reuse</span> <span class="k">instanceof</span> <span class="n">LegacyNumericTokenStream</span> <span class="o">&amp;&amp;</span> <span class="o">((</span><span class="n">LegacyNumericTokenStream</span><span class="o">)</span><span class="n">reuse</span><span class="o">).</span><span class="na">getPrecisionStep</span><span class="o">()</span> <span class="o">==</span> <span class="n">type</span><span class="o">.</span><span class="na">numericPrecisionStep</span><span class="o">()))</span> <span class="o">{</span>
+        <span class="c1">// lazy init the TokenStream as it is heavy to instantiate
+</span><span class="c1"></span>        <span class="c1">// (attributes,...) if not needed (stored field loading)
+</span><span class="c1"></span>        <span class="n">reuse</span> <span class="o">=</span> <span class="k">new</span> <span class="n">LegacyNumericTokenStream</span><span class="o">(</span><span class="n">type</span><span class="o">.</span><span class="na">numericPrecisionStep</span><span class="o">());</span>
+      <span class="o">}</span>
+      <span class="kd">final</span> <span class="n">LegacyNumericTokenStream</span> <span class="n">nts</span> <span class="o">=</span> <span class="o">(</span><span class="n">LegacyNumericTokenStream</span><span class="o">)</span> <span class="n">reuse</span><span class="o">;</span>
+      <span class="c1">// initialize value in TokenStream
+</span><span class="c1"></span>      <span class="kd">final</span> <span class="n">Number</span> <span class="n">val</span> <span class="o">=</span> <span class="o">(</span><span class="n">Number</span><span class="o">)</span> <span class="n">fieldsData</span><span class="o">;</span>
+      <span class="k">switch</span> <span class="o">(</span><span class="n">numericType</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">case</span> <span class="nl">INT:</span>
+        <span class="n">nts</span><span class="o">.</span><span class="na">setIntValue</span><span class="o">(</span><span class="n">val</span><span class="o">.</span><span class="na">intValue</span><span class="o">());</span>
+        <span class="k">break</span><span class="o">;</span>
+      <span class="k">case</span> <span class="nl">LONG:</span>
+        <span class="n">nts</span><span class="o">.</span><span class="na">setLongValue</span><span class="o">(</span><span class="n">val</span><span class="o">.</span><span class="na">longValue</span><span class="o">());</span>
+        <span class="k">break</span><span class="o">;</span>
+      <span class="k">case</span> <span class="nl">FLOAT:</span>
+        <span class="n">nts</span><span class="o">.</span><span class="na">setFloatValue</span><span class="o">(</span><span class="n">val</span><span class="o">.</span><span class="na">floatValue</span><span class="o">());</span>
+        <span class="k">break</span><span class="o">;</span>
+      <span class="k">case</span> <span class="nl">DOUBLE:</span>
+        <span class="n">nts</span><span class="o">.</span><span class="na">setDoubleValue</span><span class="o">(</span><span class="n">val</span><span class="o">.</span><span class="na">doubleValue</span><span class="o">());</span>
+        <span class="k">break</span><span class="o">;</span><span class="nl">
+</span><span class="nl">      default:</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="n">AssertionError</span><span class="o">(</span><span class="s">&#34;Should never get here&#34;</span><span class="o">);</span>
+      <span class="o">}</span>
+      <span class="k">return</span> <span class="n">reuse</span><span class="o">;</span>
+    <span class="o">}</span>
 
-    if (!fieldType().tokenized()) {
-      if (stringValue() != null) {
-        if (!(reuse instanceof StringTokenStream)) {
-          // lazy init the TokenStream as it is heavy to instantiate
-          // (attributes,...) if not needed
-          reuse = new StringTokenStream();
-        }
-        ((StringTokenStream) reuse).setValue(stringValue());
-        return reuse;
-      } else if (binaryValue() != null) {
-        if (!(reuse instanceof BinaryTokenStream)) {
-          // lazy init the TokenStream as it is heavy to instantiate
-          // (attributes,...) if not needed
-          reuse = new BinaryTokenStream();
-        }
-        ((BinaryTokenStream) reuse).setValue(binaryValue());
-        return reuse;
-      } else {
-        throw new IllegalArgumentException(&quot;Non-Tokenized Fields must have a String value&quot;);
-      }
-    }
+    <span class="k">if</span> <span class="o">(!</span><span class="n">fieldType</span><span class="o">().</span><span class="na">tokenized</span><span class="o">())</span> <span class="o">{</span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">stringValue</span><span class="o">()</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(!(</span><span class="n">reuse</span> <span class="k">instanceof</span> <span class="n">StringTokenStream</span><span class="o">))</span> <span class="o">{</span>
+          <span class="c1">// lazy init the TokenStream as it is heavy to instantiate
+</span><span class="c1"></span>          <span class="c1">// (attributes,...) if not needed
+</span><span class="c1"></span>          <span class="n">reuse</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StringTokenStream</span><span class="o">();</span>
+        <span class="o">}</span>
+        <span class="o">((</span><span class="n">StringTokenStream</span><span class="o">)</span> <span class="n">reuse</span><span class="o">).</span><span class="na">setValue</span><span class="o">(</span><span class="n">stringValue</span><span class="o">());</span>
+        <span class="k">return</span> <span class="n">reuse</span><span class="o">;</span>
+      <span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">binaryValue</span><span class="o">()</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(!(</span><span class="n">reuse</span> <span class="k">instanceof</span> <span class="n">BinaryTokenStream</span><span class="o">))</span> <span class="o">{</span>
+          <span class="c1">// lazy init the TokenStream as it is heavy to instantiate
+</span><span class="c1"></span>          <span class="c1">// (attributes,...) if not needed
+</span><span class="c1"></span>          <span class="n">reuse</span> <span class="o">=</span> <span class="k">new</span> <span class="n">BinaryTokenStream</span><span class="o">();</span>
+        <span class="o">}</span>
+        <span class="o">((</span><span class="n">BinaryTokenStream</span><span class="o">)</span> <span class="n">reuse</span><span class="o">).</span><span class="na">setValue</span><span class="o">(</span><span class="n">binaryValue</span><span class="o">());</span>
+        <span class="k">return</span> <span class="n">reuse</span><span class="o">;</span>
+      <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="n">IllegalArgumentException</span><span class="o">(</span><span class="s">&#34;Non-Tokenized Fields must have a String value&#34;</span><span class="o">);</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
 
-    if (tokenStream != null) {
-      return tokenStream;
-    } else if (readerValue() != null) {
-      return analyzer.tokenStream(name(), readerValue());
-    } else if (stringValue() != null) {
-      return analyzer.tokenStream(name(), stringValue());
-    }  
+    <span class="k">if</span> <span class="o">(</span><span class="n">tokenStream</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">return</span> <span class="n">tokenStream</span><span class="o">;</span>
+    <span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">readerValue</span><span class="o">()</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">return</span> <span class="n">analyzer</span><span class="o">.</span><span class="na">tokenStream</span><span class="o">(</span><span class="n">name</span><span class="o">(),</span> <span class="n">readerValue</span><span class="o">());</span>
+    <span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">stringValue</span><span class="o">()</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">return</span> <span class="n">analyzer</span><span class="o">.</span><span class="na">tokenStream</span><span class="o">(</span><span class="n">name</span><span class="o">(),</span> <span class="n">stringValue</span><span class="o">());</span>
+    <span class="o">}</span>  
 
-    throw new IllegalArgumentException(&quot;Field must have either TokenStream, String, Reader or Number value; got &quot; + this);
-  }
-}
-</code></pre>
-
+    <span class="k">throw</span> <span class="k">new</span> <span class="n">IllegalArgumentException</span><span class="o">(</span><span class="s">&#34;Field must have either TokenStream, String, Reader or Number value; got &#34;</span> <span class="o">+</span> <span class="k">this</span><span class="o">);</span>
+  <span class="o">}</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <h1 id="document">Document</h1>
 
 <p>Documents are the unit of indexing and search. A Document is a set of fields. Each field has a name and a textual value. A field may be stored with the document, in which case it is returned with search hits on the document. Thus each document should typically contain one or more stored fields which uniquely identify it.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="nc">Document</span> <span class="kd">implements</span> <span class="n">Iterable</span><span class="o">&lt;</span><span class="n">IndexableField</span><span class="o">&gt;</span> <span class="o">{</span>
 
-<pre><code class="language-java">public final class Document implements Iterable&lt;IndexableField&gt; {
+  <span class="kd">private</span> <span class="kd">final</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">IndexableField</span><span class="o">&gt;</span> <span class="n">fields</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;();</span>
 
-  private final List&lt;IndexableField&gt; fields = new ArrayList&lt;&gt;();
+  <span class="nd">@Override</span>
+  <span class="kd">public</span> <span class="n">Iterator</span><span class="o">&lt;</span><span class="n">IndexableField</span><span class="o">&gt;</span> <span class="nf">iterator</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">fields</span><span class="o">.</span><span class="na">iterator</span><span class="o">();</span>
+  <span class="o">}</span>
 
-  @Override
-  public Iterator&lt;IndexableField&gt; iterator() {
-    return fields.iterator();
-  }
+  <span class="cm">/**
+</span><span class="cm">  Adds a field to a document.
+</span><span class="cm">  Several fields may be added with the same name. 
+</span><span class="cm">  */</span>
+  <span class="kd">public</span> <span class="kd">final</span> <span class="kt">void</span> <span class="nf">add</span><span class="o">(</span><span class="n">IndexableField</span> <span class="n">field</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">fields</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">field</span><span class="o">);</span>
+  <span class="o">}</span>
 
-  /**
-  Adds a field to a document.
-  Several fields may be added with the same name. 
-  */
-  public final void add(IndexableField field) {
-    fields.add(field);
-  }
+  <span class="kd">public</span> <span class="kd">final</span> <span class="kt">void</span> <span class="nf">removeField</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">Iterator</span><span class="o">&lt;</span><span class="n">IndexableField</span><span class="o">&gt;</span> <span class="n">it</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="na">iterator</span><span class="o">();</span>
+    <span class="k">while</span> <span class="o">(</span><span class="n">it</span><span class="o">.</span><span class="na">hasNext</span><span class="o">())</span> <span class="o">{</span>
+      <span class="n">IndexableField</span> <span class="n">field</span> <span class="o">=</span> <span class="n">it</span><span class="o">.</span><span class="na">next</span><span class="o">();</span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">field</span><span class="o">.</span><span class="na">name</span><span class="o">().</span><span class="na">equals</span><span class="o">(</span><span class="n">name</span><span class="o">))</span> <span class="o">{</span>
+        <span class="n">it</span><span class="o">.</span><span class="na">remove</span><span class="o">();</span>
+        <span class="k">return</span><span class="o">;</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
 
-  public final void removeField(String name) {
-    Iterator&lt;IndexableField&gt; it = fields.iterator();
-    while (it.hasNext()) {
-      IndexableField field = it.next();
-      if (field.name().equals(name)) {
-        it.remove();
-        return;
-      }
-    }
-  }
+  <span class="cm">/**
+</span><span class="cm">  * Returns an array of bytes for the first (or only) field that has the name
+</span><span class="cm">  * specified as the method parameter. 
+</span><span class="cm">  */</span>
+  <span class="kd">public</span> <span class="kd">final</span> <span class="n">BytesRef</span> <span class="nf">getBinaryValue</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">for</span> <span class="o">(</span><span class="n">IndexableField</span> <span class="n">field</span> <span class="o">:</span> <span class="n">fields</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">field</span><span class="o">.</span><span class="na">name</span><span class="o">().</span><span class="na">equals</span><span class="o">(</span><span class="n">name</span><span class="o">))</span> <span class="o">{</span>
+        <span class="kd">final</span> <span class="n">BytesRef</span> <span class="n">bytes</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="na">binaryValue</span><span class="o">();</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">bytes</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+          <span class="k">return</span> <span class="n">bytes</span><span class="o">;</span>
+        <span class="o">}</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
+    <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+  <span class="o">}</span>
 
-  /**
-  * Returns an array of bytes for the first (or only) field that has the name
-  * specified as the method parameter. 
-  */
-  public final BytesRef getBinaryValue(String name) {
-    for (IndexableField field : fields) {
-      if (field.name().equals(name)) {
-        final BytesRef bytes = field.binaryValue();
-        if (bytes != null) {
-          return bytes;
-        }
-      }
-    }
-    return null;
-  }
-
-  public final IndexableField getField(String name) {
-    for (IndexableField field : fields) {
-      if (field.name().equals(name)) {
-        return field;
-      }
-    }
-    return null;
-  }
-}
-</code></pre>
-
+  <span class="kd">public</span> <span class="kd">final</span> <span class="n">IndexableField</span> <span class="nf">getField</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">for</span> <span class="o">(</span><span class="n">IndexableField</span> <span class="n">field</span> <span class="o">:</span> <span class="n">fields</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">field</span><span class="o">.</span><span class="na">name</span><span class="o">().</span><span class="na">equals</span><span class="o">(</span><span class="n">name</span><span class="o">))</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">field</span><span class="o">;</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
+    <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+  <span class="o">}</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
     </div>
 
     <footer class="post-footer">

@@ -51,7 +51,7 @@
 
 <meta itemprop="datePublished" content="2017-12-27T16:19:17&#43;08:00" />
 <meta itemprop="dateModified" content="2018-01-09T16:19:17&#43;08:00" />
-<meta itemprop="wordCount" content="1481">
+<meta itemprop="wordCount" content="1665">
 
 
 
@@ -132,8 +132,8 @@
         <div class="post-category">
             <a href="/en/categories/hbase/"> HBase </a>
             </div>
-          <span class="more-meta"> 1481 words </span>
-          <span class="more-meta"> 3 mins read </span>
+          <span class="more-meta"> 1665 words </span>
+          <span class="more-meta"> 4 mins read </span>
         
       </div>
     </header>
@@ -252,19 +252,32 @@
 <p>The <code>MultiVersionConsistencyControl</code> class implements Multiversion Consistency Control in HBase.</p>
 
 <p>A few member variables lists here:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// MultiVersionConcurrencyControl.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MultiVersionConcurrencyControl</span> <span class="o">{</span>
+  <span class="kd">final</span> <span class="n">AtomicLong</span> <span class="n">readPoint</span> <span class="o">=</span> <span class="k">new</span> <span class="n">AtomicLong</span><span class="o">(</span><span class="n">0</span><span class="o">);</span>
+  <span class="kd">final</span> <span class="n">AtomicLong</span> <span class="n">writePoint</span> <span class="o">=</span> <span class="k">new</span> <span class="n">AtomicLong</span><span class="o">(</span><span class="n">0</span><span class="o">);</span>
+  <span class="kd">private</span> <span class="kd">final</span> <span class="n">Object</span> <span class="n">readWaiters</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Object</span><span class="o">();</span>
 
-<pre><code class="language-java">// MultiVersionConcurrencyControl.java
-
-public class MultiVersionConcurrencyControl {
-  final AtomicLong readPoint = new AtomicLong(0);
-  final AtomicLong writePoint = new AtomicLong(0);
-  private final Object readWaiters = new Object();
-
-  // This is the pending queue of writes.
-  private final LinkedList&lt;WriteEntry&gt; writeQueue = new LinkedList&lt;&gt;();
-}
-</code></pre>
-
+  <span class="c1">// This is the pending queue of writes.
+</span><span class="c1"></span>  <span class="kd">private</span> <span class="kd">final</span> <span class="n">LinkedList</span><span class="o">&lt;</span><span class="n">WriteEntry</span><span class="o">&gt;</span> <span class="n">writeQueue</span> <span class="o">=</span> <span class="k">new</span> <span class="n">LinkedList</span><span class="o">&lt;&gt;();</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>From <code>doMiniBatchMutate</code> method in <a href="https://hellokangning.github.io/en/post/a-lifecycle-of-hbase-put-server-side/#dominibatchmutate">HRegion.java</a>, we can conclude the order of calling <code>MultiVersionConcurrencyControl</code>&rsquo;s member methods:</p>
 
 <ol>
@@ -287,158 +300,298 @@ public class MultiVersionConcurrencyControl {
 <li>call <code>Runnable</code>.</li>
 <li>Return this <code>WriteEntry</code> instance.</li>
 </ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// MultiVersionConcurrencyControl.java
+</span><span class="c1"></span>
+<span class="kd">private</span> <span class="kd">final</span> <span class="n">LinkedList</span><span class="o">&lt;</span><span class="n">WriteEntry</span><span class="o">&gt;</span> <span class="n">writeQueue</span> <span class="o">=</span> <span class="k">new</span> <span class="n">LinkedList</span><span class="o">&lt;&gt;();</span>
 
-<pre><code class="language-java">// MultiVersionConcurrencyControl.java
-
-private final LinkedList&lt;WriteEntry&gt; writeQueue = new LinkedList&lt;&gt;();
-
-public WriteEntry begin(Runnable action) {
-  synchronized (writeQueue) {
-    long nextWriteNumber = writePoint.incrementAndGet();
-    WriteEntry e = new WriteEntry(nextWriteNumber);
-    writeQueue.add(e);
-    action.run();
-    return e;
-  }
-}
-</code></pre>
-
+<span class="kd">public</span> <span class="n">WriteEntry</span> <span class="nf">begin</span><span class="o">(</span><span class="n">Runnable</span> <span class="n">action</span><span class="o">)</span> <span class="o">{</span>
+  <span class="kd">synchronized</span> <span class="o">(</span><span class="n">writeQueue</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kt">long</span> <span class="n">nextWriteNumber</span> <span class="o">=</span> <span class="n">writePoint</span><span class="o">.</span><span class="na">incrementAndGet</span><span class="o">();</span>
+    <span class="n">WriteEntry</span> <span class="n">e</span> <span class="o">=</span> <span class="k">new</span> <span class="n">WriteEntry</span><span class="o">(</span><span class="n">nextWriteNumber</span><span class="o">);</span>
+    <span class="n">writeQueue</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
+    <span class="n">action</span><span class="o">.</span><span class="na">run</span><span class="o">();</span>
+    <span class="k">return</span> <span class="n">e</span><span class="o">;</span>
+  <span class="o">}</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <h2 id="completeandwait"><code>completeAndWait</code></h2>
 
 <p>To complete the write transaction and wait for it to be visible, call <code>completeAndWait(WriteEntry)</code>. It waits until the read point catches up to our write. At the end of this call, the global read point is at least as large as the write point of the passed in WriteEntry. Thus, the write is visible to MVCC readers.</p>
-
-<pre><code class="language-java">// MultiVersionConcurrencyControl.java
-
-public void completeAndWait(WriteEntry e) {
-  if (!complete(e)) {
-    waitForRead(e);
-  }
-}
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// MultiVersionConcurrencyControl.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">completeAndWait</span><span class="o">(</span><span class="n">WriteEntry</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+  <span class="k">if</span> <span class="o">(!</span><span class="n">complete</span><span class="o">(</span><span class="n">e</span><span class="o">))</span> <span class="o">{</span>
+    <span class="n">waitForRead</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
+  <span class="o">}</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>Take <code>waitForRead(WriteEntry)</code> first if you don&rsquo;t mind, since <code>complete(WriteEntry)</code> will be penetrated later.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// MultiVersionConcurrencyControl.java
+</span><span class="c1"></span>
+<span class="kd">private</span> <span class="kd">final</span> <span class="n">Object</span> <span class="n">readWaiters</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Object</span><span class="o">();</span>
 
-<pre><code class="language-java">// MultiVersionConcurrencyControl.java
-
-private final Object readWaiters = new Object();
-
-// Wait for the global readPoint to advance up to the passed in write entry number.
-void waitForRead(WriteEntry e) {
-  boolean interrupted = false;
-  int count = 0;
-  synchronized (readWaiters) {
-    while (readPoint.get() &lt; e.getWriteNumber()) {
-      if (count % 100 == 0 &amp;&amp; count &gt; 0) {
-        LOG.warn(&quot;STUCK: &quot; + this);
-      }
-      count++;
-      try {
-        readWaiters.wait(10);
-      } catch (InterruptedException ie) {
-        // We were interrupted... finish the loop -- i.e. cleanup --and then
-        // on our way out, reset the interrupt flag.
-        interrupted = true;
-      }
-    }
-  }
-  if (interrupted) {
-    Thread.currentThread().interrupt();
-  }
-}
-</code></pre>
-
+<span class="c1">// Wait for the global readPoint to advance up to the passed in write entry number.
+</span><span class="c1"></span><span class="kt">void</span> <span class="nf">waitForRead</span><span class="o">(</span><span class="n">WriteEntry</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+  <span class="kt">boolean</span> <span class="n">interrupted</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+  <span class="kt">int</span> <span class="n">count</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span>
+  <span class="kd">synchronized</span> <span class="o">(</span><span class="n">readWaiters</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">while</span> <span class="o">(</span><span class="n">readPoint</span><span class="o">.</span><span class="na">get</span><span class="o">()</span> <span class="o">&lt;</span> <span class="n">e</span><span class="o">.</span><span class="na">getWriteNumber</span><span class="o">())</span> <span class="o">{</span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">count</span> <span class="o">%</span> <span class="n">100</span> <span class="o">==</span> <span class="n">0</span> <span class="o">&amp;&amp;</span> <span class="n">count</span> <span class="o">&gt;</span> <span class="n">0</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="na">warn</span><span class="o">(</span><span class="s">&#34;STUCK: &#34;</span> <span class="o">+</span> <span class="k">this</span><span class="o">);</span>
+      <span class="o">}</span>
+      <span class="n">count</span><span class="o">++;</span>
+      <span class="k">try</span> <span class="o">{</span>
+        <span class="n">readWaiters</span><span class="o">.</span><span class="na">wait</span><span class="o">(</span><span class="n">10</span><span class="o">);</span>
+      <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">InterruptedException</span> <span class="n">ie</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// We were interrupted... finish the loop -- i.e. cleanup --and then
+</span><span class="c1"></span>        <span class="c1">// on our way out, reset the interrupt flag.
+</span><span class="c1"></span>        <span class="n">interrupted</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+  <span class="k">if</span> <span class="o">(</span><span class="n">interrupted</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">().</span><span class="na">interrupt</span><span class="o">();</span>
+  <span class="o">}</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <h2 id="advanceto"><code>advanceTo</code></h2>
 
 <p><code>advanceTo</code> steps the MVCC forward on to a new read/write basis, which calls <code>tryAdvanceTo</code> in the loop until it succeeds.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// MultiVersionConcurrencyControl.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">advanceTo</span><span class="o">(</span><span class="kt">long</span> <span class="n">newStartPoint</span><span class="o">)</span> <span class="o">{</span>
+  <span class="k">while</span> <span class="o">(</span><span class="kc">true</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kt">long</span> <span class="n">seqId</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">getWritePoint</span><span class="o">();</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">seqId</span> <span class="o">&gt;=</span> <span class="n">newStartPoint</span><span class="o">)</span> <span class="k">break</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">tryAdvanceTo</span><span class="o">(</span><span class="cm">/* newSeqId = */</span> <span class="n">newStartPoint</span><span class="o">,</span> <span class="cm">/* expected = */</span> <span class="n">seqId</span><span class="o">))</span> <span class="k">break</span><span class="o">;</span>
+  <span class="o">}</span>
+<span class="o">}</span>
 
-<pre><code class="language-java">// MultiVersionConcurrencyControl.java
+<span class="cm">/*
+</span><span class="cm"> + @param newStartPoint Point to move read and write points to.
+</span><span class="cm"> + @param expected If not -1 (#NONE)
+</span><span class="cm"> + @return Returns false if expected is not equal to the
+</span><span class="cm"> + current readPoint or if startPoint is less than current readPoint
+</span><span class="cm">*/</span>
+<span class="kt">boolean</span> <span class="nf">tryAdvanceTo</span><span class="o">(</span><span class="kt">long</span> <span class="n">newStartPoint</span><span class="o">,</span> <span class="kt">long</span> <span class="n">expected</span><span class="o">)</span> <span class="o">{</span>
+  <span class="kd">synchronized</span> <span class="o">(</span><span class="n">writeQueue</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kt">long</span> <span class="n">currentRead</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">readPoint</span><span class="o">.</span><span class="na">get</span><span class="o">();</span>
+    <span class="kt">long</span> <span class="n">currentWrite</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">writePoint</span><span class="o">.</span><span class="na">get</span><span class="o">();</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">currentRead</span> <span class="o">!=</span> <span class="n">currentWrite</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">throw</span> <span class="k">new</span> <span class="n">RuntimeException</span><span class="o">(</span><span class="s">&#34;Already used this mvcc; currentRead=&#34;</span> <span class="o">+</span> <span class="n">currentRead</span> <span class="o">+</span>
+        <span class="s">&#34;, currentWrite=&#34;</span> <span class="o">+</span> <span class="n">currentWrite</span> <span class="o">+</span> <span class="s">&#34;; too late to tryAdvanceTo&#34;</span><span class="o">);</span>
+    <span class="o">}</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">expected</span> <span class="o">!=</span> <span class="n">NONE</span> <span class="o">&amp;&amp;</span> <span class="n">expected</span> <span class="o">!=</span> <span class="n">currentRead</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+    <span class="o">}</span>
 
-public void advanceTo(long newStartPoint) {
-  while (true) {
-    long seqId = this.getWritePoint();
-    if (seqId &gt;= newStartPoint) break;
-    if (this.tryAdvanceTo(/* newSeqId = */ newStartPoint, /* expected = */ seqId)) break;
-  }
-}
+    <span class="k">if</span> <span class="o">(</span><span class="n">newStartPoint</span> <span class="o">&lt;</span> <span class="n">currentRead</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+    <span class="o">}</span>
 
-/*
- + @param newStartPoint Point to move read and write points to.
- + @param expected If not -1 (#NONE)
- + @return Returns false if expected is not equal to the
- + current readPoint or if startPoint is less than current readPoint
-*/
-boolean tryAdvanceTo(long newStartPoint, long expected) {
-  synchronized (writeQueue) {
-    long currentRead = this.readPoint.get();
-    long currentWrite = this.writePoint.get();
-    if (currentRead != currentWrite) {
-      throw new RuntimeException(&quot;Already used this mvcc; currentRead=&quot; + currentRead +
-        &quot;, currentWrite=&quot; + currentWrite + &quot;; too late to tryAdvanceTo&quot;);
-    }
-    if (expected != NONE &amp;&amp; expected != currentRead) {
-      return false;
-    }
-
-    if (newStartPoint &lt; currentRead) {
-      return false;
-    }
-
-    readPoint.set(newStartPoint);
-    writePoint.set(newStartPoint);
-  }
-  return true;
-}
-</code></pre>
-
+    <span class="n">readPoint</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="n">newStartPoint</span><span class="o">);</span>
+    <span class="n">writePoint</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="n">newStartPoint</span><span class="o">);</span>
+  <span class="o">}</span>
+  <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <h2 id="complete"><code>complete</code></h2>
 
 <p><code>complete</code> marks the <code>WriteEntry</code> as complete and advances the read point as much as possible.</p>
 
 <p><code>complete</code> is called even if the write has FAILED (AFTER backing out the write transaction changes completely) so we can clean up the outstanding transaction.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// MultiVersionConcurrencyControl.java
+</span><span class="c1"></span>
+<span class="kd">private</span> <span class="kd">final</span> <span class="n">LinkedList</span><span class="o">&lt;</span><span class="n">WriteEntry</span><span class="o">&gt;</span> <span class="n">writeQueue</span> <span class="o">=</span> <span class="k">new</span> <span class="n">LinkedList</span><span class="o">&lt;&gt;();</span>
 
-<pre><code class="language-java">// MultiVersionConcurrencyControl.java
+<span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">complete</span><span class="o">(</span><span class="n">WriteEntry</span> <span class="n">writeEntry</span><span class="o">)</span> <span class="o">{</span>
+  <span class="kd">synchronized</span> <span class="o">(</span><span class="n">writeQueue</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">writeEntry</span><span class="o">.</span><span class="na">markCompleted</span><span class="o">();</span>
+    <span class="kt">long</span> <span class="n">nextReadValue</span> <span class="o">=</span> <span class="n">NONE</span><span class="o">;</span>
+    <span class="kt">boolean</span> <span class="n">ranOnce</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+    <span class="k">while</span> <span class="o">(!</span><span class="n">writeQueue</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">())</span> <span class="o">{</span>
+      <span class="n">ranOnce</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+      <span class="n">WriteEntry</span> <span class="n">queueFirst</span> <span class="o">=</span> <span class="n">writeQueue</span><span class="o">.</span><span class="na">getFirst</span><span class="o">();</span>
 
-private final LinkedList&lt;WriteEntry&gt; writeQueue = new LinkedList&lt;&gt;();
+      <span class="k">if</span> <span class="o">(</span><span class="n">nextReadValue</span> <span class="o">&gt;</span> <span class="n">0</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">nextReadValue</span> <span class="o">+</span> <span class="n">1</span> <span class="o">!=</span> <span class="n">queueFirst</span><span class="o">.</span><span class="na">getWriteNumber</span><span class="o">())</span> <span class="o">{</span>
+          <span class="k">throw</span> <span class="k">new</span> <span class="n">RuntimeException</span><span class="o">(</span><span class="s">&#34;Invariant in complete violated, nextReadValue=&#34;</span>
+              <span class="o">+</span> <span class="n">nextReadValue</span> <span class="o">+</span> <span class="s">&#34;, writeNumber=&#34;</span> <span class="o">+</span> <span class="n">queueFirst</span><span class="o">.</span><span class="na">getWriteNumber</span><span class="o">());</span>
+        <span class="o">}</span>
+      <span class="o">}</span>
 
-public boolean complete(WriteEntry writeEntry) {
-  synchronized (writeQueue) {
-    writeEntry.markCompleted();
-    long nextReadValue = NONE;
-    boolean ranOnce = false;
-    while (!writeQueue.isEmpty()) {
-      ranOnce = true;
-      WriteEntry queueFirst = writeQueue.getFirst();
+      <span class="k">if</span> <span class="o">(</span><span class="n">queueFirst</span><span class="o">.</span><span class="na">isCompleted</span><span class="o">())</span> <span class="o">{</span>
+        <span class="n">nextReadValue</span> <span class="o">=</span> <span class="n">queueFirst</span><span class="o">.</span><span class="na">getWriteNumber</span><span class="o">();</span>
+        <span class="n">writeQueue</span><span class="o">.</span><span class="na">removeFirst</span><span class="o">();</span>
+      <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+        <span class="k">break</span><span class="o">;</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
 
-      if (nextReadValue &gt; 0) {
-        if (nextReadValue + 1 != queueFirst.getWriteNumber()) {
-          throw new RuntimeException(&quot;Invariant in complete violated, nextReadValue=&quot;
-              + nextReadValue + &quot;, writeNumber=&quot; + queueFirst.getWriteNumber());
-        }
-      }
+    <span class="k">if</span> <span class="o">(!</span><span class="n">ranOnce</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">throw</span> <span class="k">new</span> <span class="n">RuntimeException</span><span class="o">(</span><span class="s">&#34;There is no first!&#34;</span><span class="o">);</span>
+    <span class="o">}</span>
 
-      if (queueFirst.isCompleted()) {
-        nextReadValue = queueFirst.getWriteNumber();
-        writeQueue.removeFirst();
-      } else {
-        break;
-      }
-    }
-
-    if (!ranOnce) {
-      throw new RuntimeException(&quot;There is no first!&quot;);
-    }
-
-    if (nextReadValue &gt; 0) {
-      synchronized (readWaiters) {
-        readPoint.set(nextReadValue);
-        readWaiters.notifyAll();
-      }
-    }
-    return readPoint.get() &gt;= writeEntry.getWriteNumber();
-  }
-}
-</code></pre>
-
+    <span class="k">if</span> <span class="o">(</span><span class="n">nextReadValue</span> <span class="o">&gt;</span> <span class="n">0</span><span class="o">)</span> <span class="o">{</span>
+      <span class="kd">synchronized</span> <span class="o">(</span><span class="n">readWaiters</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">readPoint</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="n">nextReadValue</span><span class="o">);</span>
+        <span class="n">readWaiters</span><span class="o">.</span><span class="na">notifyAll</span><span class="o">();</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
+    <span class="k">return</span> <span class="n">readPoint</span><span class="o">.</span><span class="na">get</span><span class="o">()</span> <span class="o">&gt;=</span> <span class="n">writeEntry</span><span class="o">.</span><span class="na">getWriteNumber</span><span class="o">();</span>
+  <span class="o">}</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <h1 id="where-mvcc-is-used">Where MVCC is used</h1>
 
 <p>For writes, many methods in <code>HRegion.java</code> depends on MVCC,</p>
@@ -457,62 +610,117 @@ public boolean complete(WriteEntry writeEntry) {
 <p>For reads, a member, <code>private final ConcurrentHashMap&lt;RegionScanner, Long&gt; scannerReadPoints</code> in <code>HRegion.java</code>, is responsible for recording each read point.</p>
 
 <p>If you <code>get</code> or <code>scan</code> in HBase, a <code>RegionScannerImpl</code> will be created by calling <code>getScanner</code>.</p>
-
-<pre><code class="language-java">// HRegion.java
-
-public RegionScannerImpl getScanner(Scan scan, List&lt;KeyValueScanner&gt; additionalScanners)
-    throws IOException {
-  return getScanner(scan, additionalScanners, HConstants.NO_NONCE, HConstants.NO_NONCE);
-}
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// HRegion.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="n">RegionScannerImpl</span> <span class="nf">getScanner</span><span class="o">(</span><span class="n">Scan</span> <span class="n">scan</span><span class="o">,</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">KeyValueScanner</span><span class="o">&gt;</span> <span class="n">additionalScanners</span><span class="o">)</span>
+    <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+  <span class="k">return</span> <span class="n">getScanner</span><span class="o">(</span><span class="n">scan</span><span class="o">,</span> <span class="n">additionalScanners</span><span class="o">,</span> <span class="n">HConstants</span><span class="o">.</span><span class="na">NO_NONCE</span><span class="o">,</span> <span class="n">HConstants</span><span class="o">.</span><span class="na">NO_NONCE</span><span class="o">);</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>Notice the input parameter <code>KeyValueScanner</code>. One of its child <code>StoreFileScanner</code>&rsquo;s <code>next</code> method is called to every time get a new cell.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// StoreFileScanner.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="n">Cell</span> <span class="nf">next</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+  <span class="n">Cell</span> <span class="n">retKey</span> <span class="o">=</span> <span class="n">cur</span><span class="o">;</span>
 
-<pre><code class="language-java">// StoreFileScanner.java
+  <span class="k">try</span> <span class="o">{</span>
+    <span class="c1">// only seek if we aren&#39;t at the end. cur == null implies &#39;end&#39;.
+</span><span class="c1"></span>    <span class="k">if</span> <span class="o">(</span><span class="n">cur</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">hfs</span><span class="o">.</span><span class="na">next</span><span class="o">();</span>
+      <span class="n">setCurrentCell</span><span class="o">(</span><span class="n">hfs</span><span class="o">.</span><span class="na">getCell</span><span class="o">());</span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">hasMVCCInfo</span> <span class="o">||</span> <span class="k">this</span><span class="o">.</span><span class="na">reader</span><span class="o">.</span><span class="na">isBulkLoaded</span><span class="o">())</span> <span class="o">{</span>
+        <span class="n">skipKVsNewerThanReadpoint</span><span class="o">();</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
+  <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">FileNotFoundException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">throw</span> <span class="n">e</span><span class="o">;</span>
+  <span class="o">}</span> <span class="k">catch</span><span class="o">(</span><span class="n">IOException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">throw</span> <span class="k">new</span> <span class="n">IOException</span><span class="o">(</span><span class="s">&#34;Could not iterate &#34;</span> <span class="o">+</span> <span class="k">this</span><span class="o">,</span> <span class="n">e</span><span class="o">);</span>
+  <span class="o">}</span>
+  <span class="k">return</span> <span class="n">retKey</span><span class="o">;</span>
+<span class="o">}</span>
 
-public Cell next() throws IOException {
-  Cell retKey = cur;
+<span class="kd">protected</span> <span class="kt">boolean</span> <span class="nf">skipKVsNewerThanReadpoint</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+  <span class="c1">// We want to ignore all key-values that are newer than our current
+</span><span class="c1"></span>  <span class="c1">// readPoint
+</span><span class="c1"></span>  <span class="n">Cell</span> <span class="n">startKV</span> <span class="o">=</span> <span class="n">cur</span><span class="o">;</span>
+  <span class="k">while</span><span class="o">(</span><span class="n">enforceMVCC</span>
+      <span class="o">&amp;&amp;</span> <span class="n">cur</span> <span class="o">!=</span> <span class="kc">null</span>
+      <span class="o">&amp;&amp;</span> <span class="o">(</span><span class="n">cur</span><span class="o">.</span><span class="na">getSequenceId</span><span class="o">()</span> <span class="o">&gt;</span> <span class="n">readPt</span><span class="o">))</span> <span class="o">{</span>
+    <span class="kt">boolean</span> <span class="n">hasNext</span> <span class="o">=</span> <span class="n">hfs</span><span class="o">.</span><span class="na">next</span><span class="o">();</span>
+    <span class="n">setCurrentCell</span><span class="o">(</span><span class="n">hfs</span><span class="o">.</span><span class="na">getCell</span><span class="o">());</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">hasNext</span> <span class="o">&amp;&amp;</span> <span class="k">this</span><span class="o">.</span><span class="na">stopSkippingKVsIfNextRow</span>
+        <span class="o">&amp;&amp;</span> <span class="n">getComparator</span><span class="o">().</span><span class="na">compareRows</span><span class="o">(</span><span class="n">cur</span><span class="o">,</span> <span class="n">startKV</span><span class="o">)</span> <span class="o">&gt;</span> <span class="n">0</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
 
-  try {
-    // only seek if we aren't at the end. cur == null implies 'end'.
-    if (cur != null) {
-      hfs.next();
-      setCurrentCell(hfs.getCell());
-      if (hasMVCCInfo || this.reader.isBulkLoaded()) {
-        skipKVsNewerThanReadpoint();
-      }
-    }
-  } catch (FileNotFoundException e) {
-    throw e;
-  } catch(IOException e) {
-    throw new IOException(&quot;Could not iterate &quot; + this, e);
-  }
-  return retKey;
-}
+  <span class="k">if</span> <span class="o">(</span><span class="n">cur</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+  <span class="o">}</span>
 
-protected boolean skipKVsNewerThanReadpoint() throws IOException {
-  // We want to ignore all key-values that are newer than our current
-  // readPoint
-  Cell startKV = cur;
-  while(enforceMVCC
-      &amp;&amp; cur != null
-      &amp;&amp; (cur.getSequenceId() &gt; readPt)) {
-    boolean hasNext = hfs.next();
-    setCurrentCell(hfs.getCell());
-    if (hasNext &amp;&amp; this.stopSkippingKVsIfNextRow
-        &amp;&amp; getComparator().compareRows(cur, startKV) &gt; 0) {
-      return false;
-    }
-  }
-
-  if (cur == null) {
-    return false;
-  }
-
-  return true;
-}
-</code></pre>
-
+  <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p><strong>Reference</strong></p>
 
 <ol>

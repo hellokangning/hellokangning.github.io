@@ -65,7 +65,7 @@ How does HMaster detect the death of RegionServer?">
 
 <meta itemprop="datePublished" content="2018-07-06T10:31:19&#43;08:00" />
 <meta itemprop="dateModified" content="2018-07-06T10:31:19&#43;08:00" />
-<meta itemprop="wordCount" content="433">
+<meta itemprop="wordCount" content="463">
 
 
 
@@ -152,7 +152,7 @@ How does HMaster detect the death of RegionServer?"/>
         <div class="post-category">
             <a href="/en/categories/hbase/"> HBase </a>
             </div>
-          <span class="more-meta"> 433 words </span>
+          <span class="more-meta"> 463 words </span>
           <span class="more-meta"> 3 mins read </span>
         
       </div>
@@ -194,45 +194,81 @@ deleted, processing expiration [xs319,60020,1530601168001]</p>
 <p><code>RegionServerTracker</code> tracks the online region servers via ZK. It handles listening for changes in the RS node list and watching each node via RPC.</p>
 
 <p>According the log <code>RegionServer ephemeral node deleted, processing expiration</code>,  we can locate the method named <code>nodeDeleted</code> in the following.</p>
-
-<pre><code class="language-java">// RegionServerTracker.java
-
-public void nodeDeleted(String path) {
-  if (path.startsWith(watcher.znodePaths.rsZNode)) {
-    String serverName = ZKUtil.getNodeName(path);
-    LOG.info(&quot;RegionServer ephemeral node deleted, processing expiration [&quot; +
-      serverName + &quot;]&quot;);
-    ServerName sn = ServerName.parseServerName(serverName);
-    if (!serverManager.isServerOnline(sn)) {
-      LOG.warn(serverName.toString() + &quot; is not online or isn't known to the master.&quot;+
-       &quot;The latter could be caused by a DNS misconfiguration.&quot;);
-      return;
-    }
-    remove(sn);
-    this.serverManager.expireServer(sn);
-  }
-}
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// RegionServerTracker.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">nodeDeleted</span><span class="o">(</span><span class="n">String</span> <span class="n">path</span><span class="o">)</span> <span class="o">{</span>
+  <span class="k">if</span> <span class="o">(</span><span class="n">path</span><span class="o">.</span><span class="na">startsWith</span><span class="o">(</span><span class="n">watcher</span><span class="o">.</span><span class="na">znodePaths</span><span class="o">.</span><span class="na">rsZNode</span><span class="o">))</span> <span class="o">{</span>
+    <span class="n">String</span> <span class="n">serverName</span> <span class="o">=</span> <span class="n">ZKUtil</span><span class="o">.</span><span class="na">getNodeName</span><span class="o">(</span><span class="n">path</span><span class="o">);</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&#34;RegionServer ephemeral node deleted, processing expiration [&#34;</span> <span class="o">+</span>
+      <span class="n">serverName</span> <span class="o">+</span> <span class="s">&#34;]&#34;</span><span class="o">);</span>
+    <span class="n">ServerName</span> <span class="n">sn</span> <span class="o">=</span> <span class="n">ServerName</span><span class="o">.</span><span class="na">parseServerName</span><span class="o">(</span><span class="n">serverName</span><span class="o">);</span>
+    <span class="k">if</span> <span class="o">(!</span><span class="n">serverManager</span><span class="o">.</span><span class="na">isServerOnline</span><span class="o">(</span><span class="n">sn</span><span class="o">))</span> <span class="o">{</span>
+      <span class="n">LOG</span><span class="o">.</span><span class="na">warn</span><span class="o">(</span><span class="n">serverName</span><span class="o">.</span><span class="na">toString</span><span class="o">()</span> <span class="o">+</span> <span class="s">&#34; is not online or isn&#39;t known to the master.&#34;</span><span class="o">+</span>
+       <span class="s">&#34;The latter could be caused by a DNS misconfiguration.&#34;</span><span class="o">);</span>
+      <span class="k">return</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="n">remove</span><span class="o">(</span><span class="n">sn</span><span class="o">);</span>
+    <span class="k">this</span><span class="o">.</span><span class="na">serverManager</span><span class="o">.</span><span class="na">expireServer</span><span class="o">(</span><span class="n">sn</span><span class="o">);</span>
+  <span class="o">}</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>If a <code>RegionServer</code> node gets deleted, this automatically handles calling of <code>ServerManager#expireServer(ServerName)</code>.</p>
 
 <p>The only usage of <code>nodeDeleted</code> occurs in <code>ZKWatcher</code>, one instance of which is instantiated for each <code>HMaster</code>, <code>RegionServer</code>, and client process. This class also holds and manages the connection to ZooKeeper. Code to deal with connection related events and exceptions are handled here.</p>
-
-<pre><code class="language-java">//  ZKWatcher.java
-
-public void process(WatchedEvent event) {
-    switch(event.getType()) {
-      // ...  
-      case NodeDeleted: {
-        for(ZKListener listener : listeners) {
-          listener.nodeDeleted(event.getPath());
-        }
-        break;
-      }
-    }
-  }
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">//  ZKWatcher.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">process</span><span class="o">(</span><span class="n">WatchedEvent</span> <span class="n">event</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">switch</span><span class="o">(</span><span class="n">event</span><span class="o">.</span><span class="na">getType</span><span class="o">())</span> <span class="o">{</span>
+      <span class="c1">// ...  
+</span><span class="c1"></span>      <span class="k">case</span> <span class="nl">NodeDeleted:</span> <span class="o">{</span>
+        <span class="k">for</span><span class="o">(</span><span class="n">ZKListener</span> <span class="n">listener</span> <span class="o">:</span> <span class="n">listeners</span><span class="o">)</span> <span class="o">{</span>
+          <span class="n">listener</span><span class="o">.</span><span class="na">nodeDeleted</span><span class="o">(</span><span class="n">event</span><span class="o">.</span><span class="na">getPath</span><span class="o">());</span>
+        <span class="o">}</span>
+        <span class="k">break</span><span class="o">;</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
+  <span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p><code>ZKWatcher</code> receives valid events from ZooKeeper, including <code>NodeDeleted</code> and passes along to listeners, one of which is <code>RegionServerTracker</code>.</p>
 
 <p><strong>Reference</strong></p>

@@ -82,7 +82,7 @@ Buffers are used to interact with Channels. A Buffer is an allocated block of me
 
 <meta itemprop="datePublished" content="2018-07-14T17:00:53&#43;08:00" />
 <meta itemprop="dateModified" content="2018-07-14T17:00:53&#43;08:00" />
-<meta itemprop="wordCount" content="1342">
+<meta itemprop="wordCount" content="1498">
 
 
 
@@ -177,7 +177,7 @@ Buffers are used to interact with Channels. A Buffer is an allocated block of me
         <div class="post-category">
             <a href="/en/categories/java/"> Java </a>
             </div>
-          <span class="more-meta"> 1342 words </span>
+          <span class="more-meta"> 1498 words </span>
           <span class="more-meta"> 3 mins read </span>
         
       </div>
@@ -235,28 +235,50 @@ Buffers are used to interact with Channels. A Buffer is an allocated block of me
 <p>It&rsquo;s hard to understand what <code>flip()</code> does from its name. Actually, <code>flip()</code> switch the buffer from writing mode to reading mode, allowing reading all data in it.</p>
 
 <p>After read, you need to clear the buffer so that it can be written again. Two alternative methods, <code>clear()</code> and <code>compact()</code>, are able to sweep the buffer for you. While <code>clear()</code> clears the whole buffer, <code>compact()</code> only clear the data just already read. Any unread data is moved to the beginning of buffer, after which data will be written.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="n">RandomAccessFile</span> <span class="n">aFile</span> <span class="o">=</span> <span class="k">new</span> <span class="n">RandomAccessFile</span><span class="o">(</span><span class="s">&#34;data/nio-data.txt&#34;</span><span class="o">,</span> <span class="s">&#34;rw&#34;</span><span class="o">);</span>
+<span class="n">FileChannel</span> <span class="n">inChannel</span> <span class="o">=</span> <span class="n">aFile</span><span class="o">.</span><span class="na">getChannel</span><span class="o">();</span>
 
-<pre><code class="language-java">RandomAccessFile aFile = new RandomAccessFile(&quot;data/nio-data.txt&quot;, &quot;rw&quot;);
-FileChannel inChannel = aFile.getChannel();
+<span class="c1">//create buffer with capacity of 48 bytes
+</span><span class="c1"></span><span class="n">ByteBuffer</span> <span class="n">buf</span> <span class="o">=</span> <span class="n">ByteBuffer</span><span class="o">.</span><span class="na">allocate</span><span class="o">(</span><span class="n">48</span><span class="o">);</span>
 
-//create buffer with capacity of 48 bytes
-ByteBuffer buf = ByteBuffer.allocate(48);
+<span class="kt">int</span> <span class="n">bytesRead</span> <span class="o">=</span> <span class="n">inChannel</span><span class="o">.</span><span class="na">read</span><span class="o">(</span><span class="n">buf</span><span class="o">);</span> <span class="c1">//read into buffer.
+</span><span class="c1"></span><span class="k">while</span> <span class="o">(</span><span class="n">bytesRead</span> <span class="o">!=</span> <span class="o">-</span><span class="n">1</span><span class="o">)</span> <span class="o">{</span>
 
-int bytesRead = inChannel.read(buf); //read into buffer.
-while (bytesRead != -1) {
+  <span class="n">buf</span><span class="o">.</span><span class="na">flip</span><span class="o">();</span>  <span class="c1">//make buffer ready for read
+</span><span class="c1"></span>
+  <span class="k">while</span><span class="o">(</span><span class="n">buf</span><span class="o">.</span><span class="na">hasRemaining</span><span class="o">()){</span>
+      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">print</span><span class="o">((</span><span class="kt">char</span><span class="o">)</span> <span class="n">buf</span><span class="o">.</span><span class="na">get</span><span class="o">());</span> <span class="c1">// read 1 byte at a time
+</span><span class="c1"></span>  <span class="o">}</span>
 
-  buf.flip();  //make buffer ready for read
-
-  while(buf.hasRemaining()){
-      System.out.print((char) buf.get()); // read 1 byte at a time
-  }
-
-  buf.clear(); //make buffer ready for writing
-  bytesRead = inChannel.read(buf);
-}
-aFile.close();
-</code></pre>
-
+  <span class="n">buf</span><span class="o">.</span><span class="na">clear</span><span class="o">();</span> <span class="c1">//make buffer ready for writing
+</span><span class="c1"></span>  <span class="n">bytesRead</span> <span class="o">=</span> <span class="n">inChannel</span><span class="o">.</span><span class="na">read</span><span class="o">(</span><span class="n">buf</span><span class="o">);</span>
+<span class="o">}</span>
+<span class="n">aFile</span><span class="o">.</span><span class="na">close</span><span class="o">();</span></code></pre></td></tr></table>
+</div>
+</div>
 <h1 id="buffer-capacity-position-and-limit">Buffer Capacity, Position and Limit</h1>
 
 <p>Aside from its content, the essential properties of a buffer are</p>
@@ -270,14 +292,22 @@ aFile.close();
 <p><img src="/images/java-nio-buffer-mode.png" alt="" /></p>
 
 <p>A glimpse of code supports the above statements.</p>
-
-<pre><code class="language-java">public abstract class Buffer {
-    private int position = 0;
-    private int limit;
-    private int capacity;
-}
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">abstract</span> <span class="kd">class</span> <span class="nc">Buffer</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kt">int</span> <span class="n">position</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kt">int</span> <span class="n">limit</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kt">int</span> <span class="n">capacity</span><span class="o">;</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>Java NIO provides various types of buffers that can be used depending on the type of input. This post will take <code>ByteBuffer</code> for simplicity.</p>
 
 <h1 id="allocating-a-buffer">Allocating a Buffer</h1>
@@ -285,101 +315,178 @@ aFile.close();
 <p>Before you do anything on a Buffer, you need to allocate one. <code>allocate</code> method is inevitable to call.</p>
 
 <p>The following example shows the allocation of a <code>ByteBuffer</code>, with a capacity of 48 bytes.</p>
-
-<pre><code class="language-java">ByteBuffer buf = ByteBuffer.allocate(48);
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="n">ByteBuffer</span> <span class="n">buf</span> <span class="o">=</span> <span class="n">ByteBuffer</span><span class="o">.</span><span class="na">allocate</span><span class="o">(</span><span class="n">48</span><span class="o">);</span></code></pre></td></tr></table>
+</div>
+</div>
 <p><code>allocate</code> in <code>ByteBuffer</code> calls the constructor of <code>HeapByteBuffer</code>, a subclass of `ByteBuffer.</p>
-
-<pre><code class="language-java">// ByteBuffer.java
-
-public static ByteBuffer allocate(int capacity) {
-    if (capacity &lt; 0)
-        throw new IllegalArgumentException();
-    return new HeapByteBuffer(capacity, capacity);
-}
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// ByteBuffer.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="kd">static</span> <span class="n">ByteBuffer</span> <span class="nf">allocate</span><span class="o">(</span><span class="kt">int</span> <span class="n">capacity</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">capacity</span> <span class="o">&lt;</span> <span class="n">0</span><span class="o">)</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="n">IllegalArgumentException</span><span class="o">();</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="n">HeapByteBuffer</span><span class="o">(</span><span class="n">capacity</span><span class="o">,</span> <span class="n">capacity</span><span class="o">);</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>A byte array with capacity of <code>cap</code> is allocated and offet is set to 0, here is a illustration.</p>
-
-<pre><code class="language-java">hb = new byte[cap];
-offset = 0;
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="n">hb</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">byte</span><span class="o">[</span><span class="n">cap</span><span class="o">];</span>
+<span class="n">offset</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span></code></pre></td></tr></table>
+</div>
+</div>
 <p><code>hb</code> and <code>offset</code> are two varibles in <code>ByteBuffer</code>.</p>
-
-<pre><code class="language-java">public abstract class ByteBuffer
-    extends Buffer
-    implements Comparable&lt;ByteBuffer&gt;
-{
-    final byte[] hb;                  // Non-null only for heap buffers
-    final int offset;
-}
-
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">abstract</span> <span class="kd">class</span> <span class="nc">ByteBuffer</span>
+    <span class="kd">extends</span> <span class="n">Buffer</span>
+    <span class="kd">implements</span> <span class="n">Comparable</span><span class="o">&lt;</span><span class="n">ByteBuffer</span><span class="o">&gt;</span>
+<span class="o">{</span>
+    <span class="kd">final</span> <span class="kt">byte</span><span class="o">[]</span> <span class="n">hb</span><span class="o">;</span>                  <span class="c1">// Non-null only for heap buffers
+</span><span class="c1"></span>    <span class="kd">final</span> <span class="kt">int</span> <span class="n">offset</span><span class="o">;</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <h1 id="writing-data-to-a-buffer">Writing Data to a Buffer</h1>
 
 <p>You can write data from a Channel to a Buffer, like</p>
-
-<pre><code class="language-java">int bytesRead = inChannel.read(buf); //read into buffer
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kt">int</span> <span class="n">bytesRead</span> <span class="o">=</span> <span class="n">inChannel</span><span class="o">.</span><span class="na">read</span><span class="o">(</span><span class="n">buf</span><span class="o">);</span> <span class="o">//</span><span class="n">read</span> <span class="n">into</span> <span class="n">buffer</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>Or you can write data into Buffer yourself,</p>
-
-<pre><code class="language-java">buf.put(127);
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="n">buf</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">127</span><span class="o">);</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>The former will be illuminated later. Let&rsquo;s check what <code>put</code> does.</p>
-
-<pre><code class="language-java">// ByteBuffer.java
-
-public abstract ByteBuffer put(byte b);
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// ByteBuffer.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="kd">abstract</span> <span class="n">ByteBuffer</span> <span class="nf">put</span><span class="o">(</span><span class="kt">byte</span> <span class="n">b</span><span class="o">);</span></code></pre></td></tr></table>
+</div>
+</div>
 <p><code>put</code> method is abstract in <code>ByteBuffer</code>, which means its derived class is responsible to implement it.</p>
 
 <p>As mentioned before, <code>HeapByteBuffer</code> derives from <code>ByteBuffer</code>.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// HeapByteBuffer.java
+</span><span class="c1"></span>
+<span class="kd">class</span> <span class="nc">HeapByteBuffer</span>
+    <span class="kd">extends</span> <span class="n">ByteBuffer</span> 
+<span class="o">{</span>
+    <span class="kd">public</span> <span class="n">ByteBuffer</span> <span class="nf">put</span><span class="o">(</span><span class="kt">byte</span> <span class="n">x</span><span class="o">)</span> <span class="o">{</span>
 
-<pre><code class="language-java">// HeapByteBuffer.java
+        <span class="n">hb</span><span class="o">[</span><span class="n">ix</span><span class="o">(</span><span class="n">nextPutIndex</span><span class="o">())]</span> <span class="o">=</span> <span class="n">x</span><span class="o">;</span>
+        <span class="k">return</span> <span class="k">this</span><span class="o">;</span>
+    <span class="o">}</span>
 
-class HeapByteBuffer
-    extends ByteBuffer 
-{
-    public ByteBuffer put(byte x) {
+    <span class="kd">protected</span> <span class="kt">int</span> <span class="nf">ix</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">i</span> <span class="o">+</span> <span class="n">offset</span><span class="o">;</span>
+    <span class="o">}</span>
 
-        hb[ix(nextPutIndex())] = x;
-        return this;
-    }
-
-    protected int ix(int i) {
-        return i + offset;
-    }
-
-    final int nextPutIndex() {                          // package-private
-        if (position &gt;= limit)
-            throw new BufferOverflowException();
-        return position++;
-    }
-}
-</code></pre>
-
+    <span class="kd">final</span> <span class="kt">int</span> <span class="nf">nextPutIndex</span><span class="o">()</span> <span class="o">{</span>                          <span class="c1">// package-private
+</span><span class="c1"></span>        <span class="k">if</span> <span class="o">(</span><span class="n">position</span> <span class="o">&gt;=</span> <span class="n">limit</span><span class="o">)</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="n">BufferOverflowException</span><span class="o">();</span>
+        <span class="k">return</span> <span class="n">position</span><span class="o">++;</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p><code>nextPutIndex</code> returns the current position against the limit, and <code>ix</code> adds any input with <code>offset</code>. The combination of <code>nextPutIndex</code> and <code>ix</code> find the index which the newcome byte can be put into.</p>
 
 <h1 id="flip"><code>flip()</code></h1>
 
 <p><code>flip</code> method swithes the mode of a Buffer, from writing mode to reading.</p>
-
-<pre><code class="language-java">// Buffer.java
-
-public final Buffer flip() {
-    limit = position;
-    position = 0;
-    mark = -1;
-    return this;
-}
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// Buffer.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="kd">final</span> <span class="n">Buffer</span> <span class="nf">flip</span><span class="o">()</span> <span class="o">{</span>
+    <span class="n">limit</span> <span class="o">=</span> <span class="n">position</span><span class="o">;</span>
+    <span class="n">position</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span>
+    <span class="n">mark</span> <span class="o">=</span> <span class="o">-</span><span class="n">1</span><span class="o">;</span>
+    <span class="k">return</span> <span class="k">this</span><span class="o">;</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>The code is simple, from which we can see it sets the <code>limit</code> to current position and then sets the <code>position</code> back to 0.</p>
 
 <p>After <code>flip()</code>, <code>position</code> represents the reading point and <code>limit</code> indicates how many bytes have been written into this Buffer so that can be read.</p>
@@ -387,119 +494,213 @@ public final Buffer flip() {
 <h1 id="reading-data-from-a-buffer">Reading Data from a Buffer</h1>
 
 <p><code>get</code> method gives a way to read data from Buffer.</p>
-
-<pre><code class="language-java">byte aByte = buf.get();
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kt">byte</span> <span class="n">aByte</span> <span class="o">=</span> <span class="n">buf</span><span class="o">.</span><span class="na">get</span><span class="o">();</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>Here is what <code>HeapByteBuffer</code> does.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// HeapByteBuffer.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="kt">byte</span> <span class="nf">get</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">hb</span><span class="o">[</span><span class="n">ix</span><span class="o">(</span><span class="n">nextGetIndex</span><span class="o">())];</span>
+<span class="o">}</span>
 
-<pre><code class="language-java">// HeapByteBuffer.java
-
-public byte get() {
-    return hb[ix(nextGetIndex())];
-}
-
-final int nextGetIndex() {
-    if (position &gt;= limit)
-        throw new BufferUnderflowException();
-    return position++;
-}
-</code></pre>
-
+<span class="kd">final</span> <span class="kt">int</span> <span class="nf">nextGetIndex</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">position</span> <span class="o">&gt;=</span> <span class="n">limit</span><span class="o">)</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="n">BufferUnderflowException</span><span class="o">();</span>
+    <span class="k">return</span> <span class="n">position</span><span class="o">++;</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p><code>nextGetIndex</code> checks the current position against the limit, and plus one after each read.</p>
 
 <h1 id="rewind"><code>rewind()</code></h1>
 
 <p>The <code>Buffer.rewind()</code> sets the position back to 0 and keeps <code>limit</code> intact, so you can reread all the data in the buffer.</p>
-
-<pre><code class="language-java">// Buffer.java
-
-public final Buffer rewind() {
-    position = 0;
-    mark = -1;
-    return this;
-}
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// Buffer.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="kd">final</span> <span class="n">Buffer</span> <span class="nf">rewind</span><span class="o">()</span> <span class="o">{</span>
+    <span class="n">position</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span>
+    <span class="n">mark</span> <span class="o">=</span> <span class="o">-</span><span class="n">1</span><span class="o">;</span>
+    <span class="k">return</span> <span class="k">this</span><span class="o">;</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <h1 id="clear"><code>clear()</code></h1>
 
 <p><code>clear()</code> does not purge the Buffer, as many of you may think. It only resets <code>position</code> to 0, and <code>limit</code> to <code>capacity</code>. Any unread data will lost if you <code>clear()</code> wrongly.</p>
-
-<pre><code class="language-java">// Buffer.java
-
-public final Buffer clear() {
-    position = 0;
-    limit = capacity;
-    mark = -1;
-    return this;
-}
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// Buffer.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="kd">final</span> <span class="n">Buffer</span> <span class="nf">clear</span><span class="o">()</span> <span class="o">{</span>
+    <span class="n">position</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span>
+    <span class="n">limit</span> <span class="o">=</span> <span class="n">capacity</span><span class="o">;</span>
+    <span class="n">mark</span> <span class="o">=</span> <span class="o">-</span><span class="n">1</span><span class="o">;</span>
+    <span class="k">return</span> <span class="k">this</span><span class="o">;</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>If you want to keep those unread data, use <code>compact()</code>. <code>compact()</code> copies all unread data to the beginning of the Buffer. Then it sets position to right after the last unread element. The limit property is still set to capacity, just like <code>clear()</code> does. Now the Buffer is ready for writing, but you will not overwrite the unread data.</p>
-
-<pre><code class="language-java">// HeapByteBuffer.java
-
-public ByteBuffer compact() {
-    System.arraycopy(hb, ix(position()), hb, ix(0), remaining());
-    position(remaining());
-    limit(capacity());
-    discardMark();
-    return this;
-}
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// HeapByteBuffer.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="n">ByteBuffer</span> <span class="nf">compact</span><span class="o">()</span> <span class="o">{</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">arraycopy</span><span class="o">(</span><span class="n">hb</span><span class="o">,</span> <span class="n">ix</span><span class="o">(</span><span class="n">position</span><span class="o">()),</span> <span class="n">hb</span><span class="o">,</span> <span class="n">ix</span><span class="o">(</span><span class="n">0</span><span class="o">),</span> <span class="n">remaining</span><span class="o">());</span>
+    <span class="n">position</span><span class="o">(</span><span class="n">remaining</span><span class="o">());</span>
+    <span class="n">limit</span><span class="o">(</span><span class="n">capacity</span><span class="o">());</span>
+    <span class="n">discardMark</span><span class="o">();</span>
+    <span class="k">return</span> <span class="k">this</span><span class="o">;</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <h1 id="mark"><code>mark</code></h1>
 
 <p>You may notice, no matter in <code>get</code>, <code>put</code>, <code>clear</code> or <code>compact</code>, a variable <code>mark</code> is engaged. As its name reveals, you can mark a given position of Buffer if you want.</p>
 
 <p>By calling <code>mark()</code>, current <code>position</code> is assigned to <code>mark</code>, which you can acquire later on.</p>
-
-<pre><code class="language-java">// Buffer.java
-
-public final Buffer mark() {
-    mark = position;
-    return this;
-}
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// Buffer.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="kd">final</span> <span class="n">Buffer</span> <span class="nf">mark</span><span class="o">()</span> <span class="o">{</span>
+    <span class="n">mark</span> <span class="o">=</span> <span class="n">position</span><span class="o">;</span>
+    <span class="k">return</span> <span class="k">this</span><span class="o">;</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>See <code>markValue</code> for read and <code>reset</code> to resets this buffer&rsquo;s position to the previously-marked position.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// Buffer.java
+</span><span class="c1"></span>
+<span class="kd">final</span> <span class="kt">int</span> <span class="nf">markValue</span><span class="o">()</span> <span class="o">{</span> 
+    <span class="k">return</span> <span class="n">mark</span><span class="o">;</span>
+<span class="o">}</span>
 
-<pre><code class="language-java">// Buffer.java
-
-final int markValue() { 
-    return mark;
-}
-
-public final Buffer reset() {
-    int m = mark;
-    if (m &lt; 0)
-        throw new InvalidMarkException();
-    position = m;
-    return this;
-}
-</code></pre>
-
+<span class="kd">public</span> <span class="kd">final</span> <span class="n">Buffer</span> <span class="nf">reset</span><span class="o">()</span> <span class="o">{</span>
+    <span class="kt">int</span> <span class="n">m</span> <span class="o">=</span> <span class="n">mark</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">m</span> <span class="o">&lt;</span> <span class="n">0</span><span class="o">)</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="n">InvalidMarkException</span><span class="o">();</span>
+    <span class="n">position</span> <span class="o">=</span> <span class="n">m</span><span class="o">;</span>
+    <span class="k">return</span> <span class="k">this</span><span class="o">;</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <h1 id="equals-and-compareto"><code>equals()</code> and <code>compareTo()</code></h1>
 
 <p>Another method in <code>Buffer</code> that must be refferd is <code>equals()</code>. It is more complicated comparing the equality of two Buffers.</p>
-
-<pre><code class="language-java">// ByteBuffer.java
-public boolean equals(Object ob) {
-    if (this == ob)
-        return true;
-    if (!(ob instanceof ByteBuffer))
-        return false;
-    ByteBuffer that = (ByteBuffer)ob;
-    if (this.remaining() != that.remaining())
-        return false;
-    int p = this.position();
-    for (int i = this.limit() - 1, j = that.limit() - 1; i &gt;= p; i--, j--)
-        if (!equals(this.get(i), that.get(j)))
-            return false;
-    return true;
-}
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// ByteBuffer.java
+</span><span class="c1"></span><span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">equals</span><span class="o">(</span><span class="n">Object</span> <span class="n">ob</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="k">this</span> <span class="o">==</span> <span class="n">ob</span><span class="o">)</span>
+        <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(!(</span><span class="n">ob</span> <span class="k">instanceof</span> <span class="n">ByteBuffer</span><span class="o">))</span>
+        <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+    <span class="n">ByteBuffer</span> <span class="n">that</span> <span class="o">=</span> <span class="o">(</span><span class="n">ByteBuffer</span><span class="o">)</span><span class="n">ob</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">remaining</span><span class="o">()</span> <span class="o">!=</span> <span class="n">that</span><span class="o">.</span><span class="na">remaining</span><span class="o">())</span>
+        <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+    <span class="kt">int</span> <span class="n">p</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">position</span><span class="o">();</span>
+    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">limit</span><span class="o">()</span> <span class="o">-</span> <span class="n">1</span><span class="o">,</span> <span class="n">j</span> <span class="o">=</span> <span class="n">that</span><span class="o">.</span><span class="na">limit</span><span class="o">()</span> <span class="o">-</span> <span class="n">1</span><span class="o">;</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="n">p</span><span class="o">;</span> <span class="n">i</span><span class="o">--,</span> <span class="n">j</span><span class="o">--)</span>
+        <span class="k">if</span> <span class="o">(!</span><span class="n">equals</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">i</span><span class="o">),</span> <span class="n">that</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">j</span><span class="o">)))</span>
+            <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+    <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>Two buffers are equal if:</p>
 
 <ol>
@@ -509,20 +710,34 @@ public boolean equals(Object ob) {
 </ol>
 
 <p>It&rsquo;s inevictable to involve <code>compareTo()</code> since <code>equals()</code> appears.</p>
-
-<pre><code class="language-java">// ByteBuffer.java
-
-public int compareTo(ByteBuffer that) {
-    int n = this.position() + Math.min(this.remaining(), that.remaining());
-    for (int i = this.position(), j = that.position(); i &lt; n; i++, j++) {
-        int cmp = compare(this.get(i), that.get(j));
-        if (cmp != 0)
-            return cmp;
-    }
-    return this.remaining() - that.remaining();
-}
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// ByteBuffer.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="kt">int</span> <span class="nf">compareTo</span><span class="o">(</span><span class="n">ByteBuffer</span> <span class="n">that</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">position</span><span class="o">()</span> <span class="o">+</span> <span class="n">Math</span><span class="o">.</span><span class="na">min</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">remaining</span><span class="o">(),</span> <span class="n">that</span><span class="o">.</span><span class="na">remaining</span><span class="o">());</span>
+    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">position</span><span class="o">(),</span> <span class="n">j</span> <span class="o">=</span> <span class="n">that</span><span class="o">.</span><span class="na">position</span><span class="o">();</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="o">;</span> <span class="n">i</span><span class="o">++,</span> <span class="n">j</span><span class="o">++)</span> <span class="o">{</span>
+        <span class="kt">int</span> <span class="n">cmp</span> <span class="o">=</span> <span class="n">compare</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">i</span><span class="o">),</span> <span class="n">that</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">j</span><span class="o">));</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">cmp</span> <span class="o">!=</span> <span class="n">0</span><span class="o">)</span>
+            <span class="k">return</span> <span class="n">cmp</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="k">return</span> <span class="k">this</span><span class="o">.</span><span class="na">remaining</span><span class="o">()</span> <span class="o">-</span> <span class="n">that</span><span class="o">.</span><span class="na">remaining</span><span class="o">();</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>A buffer is considered &ldquo;smaller&rdquo; than another buffer if:</p>
 
 <ol>

@@ -61,7 +61,7 @@ Thanks to the linked list, this kind of map is well-suited to building LRU cache
 
 <meta itemprop="datePublished" content="2016-06-10T20:01:59&#43;08:00" />
 <meta itemprop="dateModified" content="2018-06-09T10:20:03&#43;08:00" />
-<meta itemprop="wordCount" content="947">
+<meta itemprop="wordCount" content="1109">
 
 
 
@@ -146,8 +146,8 @@ Thanks to the linked list, this kind of map is well-suited to building LRU cache
         <div class="post-category">
             <a href="/en/categories/java/"> Java </a>
             </div>
-          <span class="more-meta"> 947 words </span>
-          <span class="more-meta"> 5 mins read </span>
+          <span class="more-meta"> 1109 words </span>
+          <span class="more-meta"> 6 mins read </span>
         
       </div>
     </header>
@@ -189,193 +189,359 @@ Thanks to the linked list, this kind of map is well-suited to building LRU cache
 <li><code>tail</code>: the tail (youngest) of the doubly linked list.</li>
 <li><code>accessOrder</code>: the iteration ordering method for this linked hash map</li>
 </ul>
-
-<pre><code class="language-java">// LinkedHashMap.java
-
-public class LinkedHashMap&lt;K,V&gt;
-    extends HashMap&lt;K,V&gt;
-    implements Map&lt;K,V&gt;
-{
-    transient LinkedHashMap.Entry&lt;K,V&gt; head;
-    transient LinkedHashMap.Entry&lt;K,V&gt; tail;
-    final boolean accessOrder;
-}
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// LinkedHashMap.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">LinkedHashMap</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span>
+    <span class="kd">extends</span> <span class="n">HashMap</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span>
+    <span class="kd">implements</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span>
+<span class="o">{</span>
+    <span class="kd">transient</span> <span class="n">LinkedHashMap</span><span class="o">.</span><span class="na">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">head</span><span class="o">;</span>
+    <span class="kd">transient</span> <span class="n">LinkedHashMap</span><span class="o">.</span><span class="na">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">tail</span><span class="o">;</span>
+    <span class="kd">final</span> <span class="kt">boolean</span> <span class="n">accessOrder</span><span class="o">;</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>As to <code>LinkedHashMap.Entry&lt;K,V&gt;</code>, a nested class in <code>LinkedHashMap</code>, we can see,</p>
-
-<pre><code class="language-java">// LinkedHashMap.java
-
-static class Entry&lt;K,V&gt; extends HashMap.Node&lt;K,V&gt; {
-    Entry&lt;K,V&gt; before, after;
-    Entry(int hash, K key, V value, Node&lt;K,V&gt; next) {
-        super(hash, key, value, next);
-    }
-}
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// LinkedHashMap.java
+</span><span class="c1"></span>
+<span class="kd">static</span> <span class="kd">class</span> <span class="nc">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="kd">extends</span> <span class="n">HashMap</span><span class="o">.</span><span class="na">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="o">{</span>
+    <span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">before</span><span class="o">,</span> <span class="n">after</span><span class="o">;</span>
+    <span class="n">Entry</span><span class="o">(</span><span class="kt">int</span> <span class="n">hash</span><span class="o">,</span> <span class="n">K</span> <span class="n">key</span><span class="o">,</span> <span class="n">V</span> <span class="n">value</span><span class="o">,</span> <span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">next</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">(</span><span class="n">hash</span><span class="o">,</span> <span class="n">key</span><span class="o">,</span> <span class="n">value</span><span class="o">,</span> <span class="n">next</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <h1 id="get"><code>get</code></h1>
 
 <p>As the subclass of <code>HashMap</code>, <code>LinkedHashMap</code> get value from the <code>table</code> of base class.</p>
-
-<pre><code class="language-java">// LinkedHashMap.java
-
-public V get(Object key) {
-    Node&lt;K,V&gt; e;
-    if ((e = getNode(hash(key), key)) == null)
-        return null;
-    if (accessOrder)
-        afterNodeAccess(e);
-    return e.value;
-}
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// LinkedHashMap.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="n">V</span> <span class="nf">get</span><span class="o">(</span><span class="n">Object</span> <span class="n">key</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">e</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">((</span><span class="n">e</span> <span class="o">=</span> <span class="n">getNode</span><span class="o">(</span><span class="n">hash</span><span class="o">(</span><span class="n">key</span><span class="o">),</span> <span class="n">key</span><span class="o">))</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span>
+        <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">accessOrder</span><span class="o">)</span>
+        <span class="n">afterNodeAccess</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
+    <span class="k">return</span> <span class="n">e</span><span class="o">.</span><span class="na">value</span><span class="o">;</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>It is advisable to keep this array for fast read, after which <code>afterNodeAccess</code> is called to update the linked list, moving the node just accessed to last of the list. You can see the details from comments in the code.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// LinkedHashMap.java
+</span><span class="c1"></span>
+<span class="kt">void</span> <span class="nf">afterNodeAccess</span><span class="o">(</span><span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">LinkedHashMap</span><span class="o">.</span><span class="na">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">last</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">accessOrder</span> <span class="o">&amp;&amp;</span> <span class="o">(</span><span class="n">last</span> <span class="o">=</span> <span class="n">tail</span><span class="o">)</span> <span class="o">!=</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">LinkedHashMap</span><span class="o">.</span><span class="na">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">p</span> <span class="o">=</span>
+            <span class="o">(</span><span class="n">LinkedHashMap</span><span class="o">.</span><span class="na">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;)</span><span class="n">e</span><span class="o">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="na">before</span><span class="o">,</span> <span class="n">a</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="na">after</span><span class="o">;</span>
+        <span class="n">p</span><span class="o">.</span><span class="na">after</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
 
-<pre><code class="language-java">// LinkedHashMap.java
-
-void afterNodeAccess(Node&lt;K,V&gt; e) {
-    LinkedHashMap.Entry&lt;K,V&gt; last;
-    if (accessOrder &amp;&amp; (last = tail) != e) {
-        LinkedHashMap.Entry&lt;K,V&gt; p =
-            (LinkedHashMap.Entry&lt;K,V&gt;)e, b = p.before, a = p.after;
-        p.after = null;
-
-        // if p is the old head
-        if (b == null)
-            head = a; // update head
-        else
-            b.after = a; // kick p out
-
-        // if p is not the tail    
-        if (a != null)
-            a.before = b; // kick p out
-        else
-            last = b; // make b the tail
-
-        if (last == null)
-            head = p;
-        else {
-            p.before = last;
-            last.after = p;
-        }
-        tail = p;
-        ++modCount;
-    }
-}
-</code></pre>
-
+        <span class="c1">// if p is the old head
+</span><span class="c1"></span>        <span class="k">if</span> <span class="o">(</span><span class="n">b</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span>
+            <span class="n">head</span> <span class="o">=</span> <span class="n">a</span><span class="o">;</span> <span class="c1">// update head
+</span><span class="c1"></span>        <span class="k">else</span>
+            <span class="n">b</span><span class="o">.</span><span class="na">after</span> <span class="o">=</span> <span class="n">a</span><span class="o">;</span> <span class="c1">// kick p out
+</span><span class="c1"></span>
+        <span class="c1">// if p is not the tail    
+</span><span class="c1"></span>        <span class="k">if</span> <span class="o">(</span><span class="n">a</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span>
+            <span class="n">a</span><span class="o">.</span><span class="na">before</span> <span class="o">=</span> <span class="n">b</span><span class="o">;</span> <span class="c1">// kick p out
+</span><span class="c1"></span>        <span class="k">else</span>
+            <span class="n">last</span> <span class="o">=</span> <span class="n">b</span><span class="o">;</span> <span class="c1">// make b the tail
+</span><span class="c1"></span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">last</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span>
+            <span class="n">head</span> <span class="o">=</span> <span class="n">p</span><span class="o">;</span>
+        <span class="k">else</span> <span class="o">{</span>
+            <span class="n">p</span><span class="o">.</span><span class="na">before</span> <span class="o">=</span> <span class="n">last</span><span class="o">;</span>
+            <span class="n">last</span><span class="o">.</span><span class="na">after</span> <span class="o">=</span> <span class="n">p</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="n">tail</span> <span class="o">=</span> <span class="n">p</span><span class="o">;</span>
+        <span class="o">++</span><span class="n">modCount</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <h1 id="put"><code>put</code></h1>
 
 <p>There is no <code>put</code> method in <code>LinkedHashMap</code> which means the one from base class is not overwritten. But it overwrite the <code>newNode</code> called from <code>put</code>.</p>
 
 <h2 id="newnode"><code>newNode</code></h2>
-
-<pre><code class="language-java">// LinkedHashMap.java
-
-Node&lt;K,V&gt; newNode(int hash, K key, V value, Node&lt;K,V&gt; e) {
-    LinkedHashMap.Entry&lt;K,V&gt; p =
-        new LinkedHashMap.Entry&lt;K,V&gt;(hash, key, value, e);
-    linkNodeLast(p);
-    return p;
-}
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// LinkedHashMap.java
+</span><span class="c1"></span>
+<span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="nf">newNode</span><span class="o">(</span><span class="kt">int</span> <span class="n">hash</span><span class="o">,</span> <span class="n">K</span> <span class="n">key</span><span class="o">,</span> <span class="n">V</span> <span class="n">value</span><span class="o">,</span> <span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">LinkedHashMap</span><span class="o">.</span><span class="na">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">p</span> <span class="o">=</span>
+        <span class="k">new</span> <span class="n">LinkedHashMap</span><span class="o">.</span><span class="na">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;(</span><span class="n">hash</span><span class="o">,</span> <span class="n">key</span><span class="o">,</span> <span class="n">value</span><span class="o">,</span> <span class="n">e</span><span class="o">);</span>
+    <span class="n">linkNodeLast</span><span class="o">(</span><span class="n">p</span><span class="o">);</span>
+    <span class="k">return</span> <span class="n">p</span><span class="o">;</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>It&rsquo;s reasonable to infer <code>newNode</code> do some maintain work with the help of <code>linkNodeLast</code>.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// LinkedHashMap.java
+</span><span class="c1"></span>
+<span class="kd">private</span> <span class="kt">void</span> <span class="nf">linkNodeLast</span><span class="o">(</span><span class="n">LinkedHashMap</span><span class="o">.</span><span class="na">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">p</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">LinkedHashMap</span><span class="o">.</span><span class="na">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">last</span> <span class="o">=</span> <span class="n">tail</span><span class="o">;</span>
+    <span class="n">tail</span> <span class="o">=</span> <span class="n">p</span><span class="o">;</span>
 
-<pre><code class="language-java">// LinkedHashMap.java
-
-private void linkNodeLast(LinkedHashMap.Entry&lt;K,V&gt; p) {
-    LinkedHashMap.Entry&lt;K,V&gt; last = tail;
-    tail = p;
-
-    // empty list
-    if (last == null)
-        head = p;
-    else {
-        p.before = last;
-        last.after = p;
-    }
-}
-</code></pre>
-
+    <span class="c1">// empty list
+</span><span class="c1"></span>    <span class="k">if</span> <span class="o">(</span><span class="n">last</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span>
+        <span class="n">head</span> <span class="o">=</span> <span class="n">p</span><span class="o">;</span>
+    <span class="k">else</span> <span class="o">{</span>
+        <span class="n">p</span><span class="o">.</span><span class="na">before</span> <span class="o">=</span> <span class="n">last</span><span class="o">;</span>
+        <span class="n">last</span><span class="o">.</span><span class="na">after</span> <span class="o">=</span> <span class="n">p</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>Since the code is so succinct that we can discover it link the new node at the end of list.</p>
 
 <h2 id="afternodeinsertion"><code>afterNodeInsertion</code></h2>
 
 <p>Another method called from <code>put</code> and overwritten by <code>LinkedHashMap</code> is <code>afterNodeInsertion</code>.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// LinkedHashMap.java
+</span><span class="c1"></span>
+<span class="kt">void</span> <span class="nf">afterNodeInsertion</span><span class="o">(</span><span class="kt">boolean</span> <span class="n">evict</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">LinkedHashMap</span><span class="o">.</span><span class="na">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">first</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">evict</span> <span class="o">&amp;&amp;</span> <span class="o">(</span><span class="n">first</span> <span class="o">=</span> <span class="n">head</span><span class="o">)</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">removeEldestEntry</span><span class="o">(</span><span class="n">first</span><span class="o">))</span> <span class="o">{</span>
+        <span class="n">K</span> <span class="n">key</span> <span class="o">=</span> <span class="n">first</span><span class="o">.</span><span class="na">key</span><span class="o">;</span>
+        <span class="n">removeNode</span><span class="o">(</span><span class="n">hash</span><span class="o">(</span><span class="n">key</span><span class="o">),</span> <span class="n">key</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="kc">false</span><span class="o">,</span> <span class="kc">true</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
 
-<pre><code class="language-java">// LinkedHashMap.java
-
-void afterNodeInsertion(boolean evict) {
-    LinkedHashMap.Entry&lt;K,V&gt; first;
-    if (evict &amp;&amp; (first = head) != null &amp;&amp; removeEldestEntry(first)) {
-        K key = first.key;
-        removeNode(hash(key), key, null, false, true);
-    }
-}
-
-protected boolean removeEldestEntry(Map.Entry&lt;K,V&gt; eldest) {
-    return false;
-}
-</code></pre>
-
+<span class="kd">protected</span> <span class="kt">boolean</span> <span class="nf">removeEldestEntry</span><span class="o">(</span><span class="n">Map</span><span class="o">.</span><span class="na">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">eldest</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p><code>afterNodeInsertion</code> possibly removes eldest node from the list. Since <code>removeEldestEntry</code> always return <code>false</code>, so <code>afterNodeInsertion</code> does not modify the map in any way. <code>removeNode</code> is also in <code>HashMap</code> and keep intact, which will be discussed in the next section.</p>
 
 <h1 id="remove"><code>remove</code></h1>
 
 <p>Being left out by <a href="https://hellokangning.github.io/en/post/java-hashmap/">last post</a>, <code>remove</code> removes the mapping for the specified key from this map if present.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// HashMap.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="n">V</span> <span class="nf">remove</span><span class="o">(</span><span class="n">Object</span> <span class="n">key</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">e</span><span class="o">;</span>
+    <span class="k">return</span> <span class="o">(</span><span class="n">e</span> <span class="o">=</span> <span class="n">removeNode</span><span class="o">(</span><span class="n">hash</span><span class="o">(</span><span class="n">key</span><span class="o">),</span> <span class="n">key</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="kc">false</span><span class="o">,</span> <span class="kc">true</span><span class="o">))</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">?</span>
+        <span class="kc">null</span> <span class="o">:</span> <span class="n">e</span><span class="o">.</span><span class="na">value</span><span class="o">;</span>
+<span class="o">}</span>
 
-<pre><code class="language-java">// HashMap.java
-
-public V remove(Object key) {
-    Node&lt;K,V&gt; e;
-    return (e = removeNode(hash(key), key, null, false, true)) == null ?
-        null : e.value;
-}
-
-final Node&lt;K,V&gt; removeNode(int hash, Object key, Object value,
-                           boolean matchValue, boolean movable) {
-    Node&lt;K,V&gt;[] tab; Node&lt;K,V&gt; p; int n, index;
-    if ((tab = table) != null &amp;&amp; (n = tab.length) &gt; 0 &amp;&amp;
-        (p = tab[index = (n - 1) &amp; hash]) != null) {
-        Node&lt;K,V&gt; node = null, e; K k; V v;
-        if (p.hash == hash &amp;&amp;
-            ((k = p.key) == key || (key != null &amp;&amp; key.equals(k))))
-            node = p;
-        else if ((e = p.next) != null) {
-            if (p instanceof TreeNode)
-                node = ((TreeNode&lt;K,V&gt;)p).getTreeNode(hash, key);
-            else {
-                do {
-                    if (e.hash == hash &amp;&amp;
-                        ((k = e.key) == key ||
-                         (key != null &amp;&amp; key.equals(k)))) {
-                        node = e;
-                        break;
-                    }
-                    p = e;
-                } while ((e = e.next) != null);
-            }
-        }
-        if (node != null &amp;&amp; (!matchValue || (v = node.value) == value ||
-                             (value != null &amp;&amp; value.equals(v)))) {
-            if (node instanceof TreeNode)
-                ((TreeNode&lt;K,V&gt;)node).removeTreeNode(this, tab, movable);
-            else if (node == p)
-                tab[index] = node.next;
-            else
-                p.next = node.next;
-            ++modCount;
-            --size;
-            afterNodeRemoval(node);
-            return node;
-        }
-    }
-    return null;
-}
-</code></pre>
-
+<span class="kd">final</span> <span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="nf">removeNode</span><span class="o">(</span><span class="kt">int</span> <span class="n">hash</span><span class="o">,</span> <span class="n">Object</span> <span class="n">key</span><span class="o">,</span> <span class="n">Object</span> <span class="n">value</span><span class="o">,</span>
+                           <span class="kt">boolean</span> <span class="n">matchValue</span><span class="o">,</span> <span class="kt">boolean</span> <span class="n">movable</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;[]</span> <span class="n">tab</span><span class="o">;</span> <span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">p</span><span class="o">;</span> <span class="kt">int</span> <span class="n">n</span><span class="o">,</span> <span class="n">index</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">((</span><span class="n">tab</span> <span class="o">=</span> <span class="n">table</span><span class="o">)</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="o">(</span><span class="n">n</span> <span class="o">=</span> <span class="n">tab</span><span class="o">.</span><span class="na">length</span><span class="o">)</span> <span class="o">&gt;</span> <span class="n">0</span> <span class="o">&amp;&amp;</span>
+        <span class="o">(</span><span class="n">p</span> <span class="o">=</span> <span class="n">tab</span><span class="o">[</span><span class="n">index</span> <span class="o">=</span> <span class="o">(</span><span class="n">n</span> <span class="o">-</span> <span class="n">1</span><span class="o">)</span> <span class="o">&amp;</span> <span class="n">hash</span><span class="o">])</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">node</span> <span class="o">=</span> <span class="kc">null</span><span class="o">,</span> <span class="n">e</span><span class="o">;</span> <span class="n">K</span> <span class="n">k</span><span class="o">;</span> <span class="n">V</span> <span class="n">v</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">p</span><span class="o">.</span><span class="na">hash</span> <span class="o">==</span> <span class="n">hash</span> <span class="o">&amp;&amp;</span>
+            <span class="o">((</span><span class="n">k</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="na">key</span><span class="o">)</span> <span class="o">==</span> <span class="n">key</span> <span class="o">||</span> <span class="o">(</span><span class="n">key</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">key</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">k</span><span class="o">))))</span>
+            <span class="n">node</span> <span class="o">=</span> <span class="n">p</span><span class="o">;</span>
+        <span class="k">else</span> <span class="k">if</span> <span class="o">((</span><span class="n">e</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="na">next</span><span class="o">)</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">p</span> <span class="k">instanceof</span> <span class="n">TreeNode</span><span class="o">)</span>
+                <span class="n">node</span> <span class="o">=</span> <span class="o">((</span><span class="n">TreeNode</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;)</span><span class="n">p</span><span class="o">).</span><span class="na">getTreeNode</span><span class="o">(</span><span class="n">hash</span><span class="o">,</span> <span class="n">key</span><span class="o">);</span>
+            <span class="k">else</span> <span class="o">{</span>
+                <span class="k">do</span> <span class="o">{</span>
+                    <span class="k">if</span> <span class="o">(</span><span class="n">e</span><span class="o">.</span><span class="na">hash</span> <span class="o">==</span> <span class="n">hash</span> <span class="o">&amp;&amp;</span>
+                        <span class="o">((</span><span class="n">k</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="na">key</span><span class="o">)</span> <span class="o">==</span> <span class="n">key</span> <span class="o">||</span>
+                         <span class="o">(</span><span class="n">key</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">key</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">k</span><span class="o">))))</span> <span class="o">{</span>
+                        <span class="n">node</span> <span class="o">=</span> <span class="n">e</span><span class="o">;</span>
+                        <span class="k">break</span><span class="o">;</span>
+                    <span class="o">}</span>
+                    <span class="n">p</span> <span class="o">=</span> <span class="n">e</span><span class="o">;</span>
+                <span class="o">}</span> <span class="k">while</span> <span class="o">((</span><span class="n">e</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="na">next</span><span class="o">)</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">);</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">node</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="o">(!</span><span class="n">matchValue</span> <span class="o">||</span> <span class="o">(</span><span class="n">v</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="na">value</span><span class="o">)</span> <span class="o">==</span> <span class="n">value</span> <span class="o">||</span>
+                             <span class="o">(</span><span class="n">value</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">value</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">v</span><span class="o">))))</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">node</span> <span class="k">instanceof</span> <span class="n">TreeNode</span><span class="o">)</span>
+                <span class="o">((</span><span class="n">TreeNode</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;)</span><span class="n">node</span><span class="o">).</span><span class="na">removeTreeNode</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">tab</span><span class="o">,</span> <span class="n">movable</span><span class="o">);</span>
+            <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">node</span> <span class="o">==</span> <span class="n">p</span><span class="o">)</span>
+                <span class="n">tab</span><span class="o">[</span><span class="n">index</span><span class="o">]</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="na">next</span><span class="o">;</span>
+            <span class="k">else</span>
+                <span class="n">p</span><span class="o">.</span><span class="na">next</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="na">next</span><span class="o">;</span>
+            <span class="o">++</span><span class="n">modCount</span><span class="o">;</span>
+            <span class="o">--</span><span class="n">size</span><span class="o">;</span>
+            <span class="n">afterNodeRemoval</span><span class="o">(</span><span class="n">node</span><span class="o">);</span>
+            <span class="k">return</span> <span class="n">node</span><span class="o">;</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+    <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>Despite the nested if-else, <code>removeNode</code> does the following steps:</p>
 
 <ul>
@@ -385,28 +551,52 @@ final Node&lt;K,V&gt; removeNode(int hash, Object key, Object value,
 </ul>
 
 <p>For <code>afterNodeRemoval</code>, it unlink the node from linked list.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// LinkedHashMap.java
+</span><span class="c1"></span>
+<span class="kt">void</span> <span class="nf">afterNodeRemoval</span><span class="o">(</span><span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">LinkedHashMap</span><span class="o">.</span><span class="na">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">p</span> <span class="o">=</span>
+        <span class="o">(</span><span class="n">LinkedHashMap</span><span class="o">.</span><span class="na">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;)</span><span class="n">e</span><span class="o">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="na">before</span><span class="o">,</span> <span class="n">a</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="na">after</span><span class="o">;</span>
+    <span class="c1">// isolate the node    
+</span><span class="c1"></span>    <span class="n">p</span><span class="o">.</span><span class="na">before</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="na">after</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
 
-<pre><code class="language-java">// LinkedHashMap.java
+    <span class="c1">// if it is head
+</span><span class="c1"></span>    <span class="k">if</span> <span class="o">(</span><span class="n">b</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span>
+        <span class="n">head</span> <span class="o">=</span> <span class="n">a</span><span class="o">;</span>
+    <span class="k">else</span>
+        <span class="n">b</span><span class="o">.</span><span class="na">after</span> <span class="o">=</span> <span class="n">a</span><span class="o">;</span>
 
-void afterNodeRemoval(Node&lt;K,V&gt; e) {
-    LinkedHashMap.Entry&lt;K,V&gt; p =
-        (LinkedHashMap.Entry&lt;K,V&gt;)e, b = p.before, a = p.after;
-    // isolate the node    
-    p.before = p.after = null;
-
-    // if it is head
-    if (b == null)
-        head = a;
-    else
-        b.after = a;
-
-    // if it is tail    
-    if (a == null)
-        tail = b;
-    else
-        a.before = b;
-}
-</code></pre>
+    <span class="c1">// if it is tail    
+</span><span class="c1"></span>    <span class="k">if</span> <span class="o">(</span><span class="n">a</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span>
+        <span class="n">tail</span> <span class="o">=</span> <span class="n">b</span><span class="o">;</span>
+    <span class="k">else</span>
+        <span class="n">a</span><span class="o">.</span><span class="na">before</span> <span class="o">=</span> <span class="n">b</span><span class="o">;</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
     </div>
 
     <footer class="post-footer">

@@ -51,7 +51,7 @@
 
 <meta itemprop="datePublished" content="2017-12-05T15:14:28&#43;08:00" />
 <meta itemprop="dateModified" content="2017-12-07T15:14:28&#43;08:00" />
-<meta itemprop="wordCount" content="2395">
+<meta itemprop="wordCount" content="2920">
 
 
 
@@ -132,8 +132,8 @@
         <div class="post-category">
             <a href="/en/categories/hbase/"> HBase </a>
             </div>
-          <span class="more-meta"> 2395 words </span>
-          <span class="more-meta"> 5 mins read </span>
+          <span class="more-meta"> 2920 words </span>
+          <span class="more-meta"> 6 mins read </span>
         
       </div>
     </header>
@@ -160,273 +160,525 @@
 <p><img src="/images/hbase-regionserver-put-interaction.png" alt="" /></p>
 
 <p>What <code>ClientServiceCallable</code> do on client-side, if you remember, is calling <code>ClientProtos.ClientService.BlockingInterface</code>&rsquo;s <code>mutate</code> method to send <code>Put</code> request to <code>RegionServer</code>.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// ClientServiceCallable.java
+</span><span class="c1"></span>
+<span class="nd">@InterfaceAudience.Private</span>
+<span class="kd">public</span> <span class="kd">abstract</span> <span class="kd">class</span> <span class="nc">ClientServiceCallable</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="kd">extends</span>
+    <span class="n">RegionServerCallable</span><span class="o">&lt;</span><span class="n">T</span><span class="o">,</span> <span class="n">ClientProtos</span><span class="o">.</span><span class="na">ClientService</span><span class="o">.</span><span class="na">BlockingInterface</span><span class="o">&gt;</span> <span class="o">{</span>
 
-<pre><code class="language-java">// ClientServiceCallable.java
+  <span class="nd">@Override</span>
+  <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">setStubByServiceName</span><span class="o">(</span><span class="n">ServerName</span> <span class="n">serviceName</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+    <span class="n">setStub</span><span class="o">(</span><span class="n">getConnection</span><span class="o">().</span><span class="na">getClient</span><span class="o">(</span><span class="n">serviceName</span><span class="o">));</span>
+  <span class="o">}</span>
 
-@InterfaceAudience.Private
-public abstract class ClientServiceCallable&lt;T&gt; extends
-    RegionServerCallable&lt;T, ClientProtos.ClientService.BlockingInterface&gt; {
-
-  @Override
-  protected void setStubByServiceName(ServerName serviceName) throws IOException {
-    setStub(getConnection().getClient(serviceName));
-  }
-
-  protected ClientProtos.MutateResponse doMutate(ClientProtos.MutateRequest request)
-  throws org.apache.hadoop.hbase.shaded.com.google.protobuf.ServiceException {
-    return getStub().mutate(getRpcController(), request);
-  }
-}
-</code></pre>
-
+  <span class="kd">protected</span> <span class="n">ClientProtos</span><span class="o">.</span><span class="na">MutateResponse</span> <span class="nf">doMutate</span><span class="o">(</span><span class="n">ClientProtos</span><span class="o">.</span><span class="na">MutateRequest</span> <span class="n">request</span><span class="o">)</span>
+  <span class="kd">throws</span> <span class="n">org</span><span class="o">.</span><span class="na">apache</span><span class="o">.</span><span class="na">hadoop</span><span class="o">.</span><span class="na">hbase</span><span class="o">.</span><span class="na">shaded</span><span class="o">.</span><span class="na">com</span><span class="o">.</span><span class="na">google</span><span class="o">.</span><span class="na">protobuf</span><span class="o">.</span><span class="na">ServiceException</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">getStub</span><span class="o">().</span><span class="na">mutate</span><span class="o">(</span><span class="n">getRpcController</span><span class="o">(),</span> <span class="n">request</span><span class="o">);</span>
+  <span class="o">}</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <h1 id="hregionserver"><code>HRegionServer</code></h1>
 
 <p><img src="/images/hbase-hregionserver-class.png" alt="" /></p>
 
 <p>And on server-side, who will accept this request? Every <code>RegionServer</code> runs a <code>HRegionServer</code> from commandline. When <code>HregionServer</code> is initialized, it starts <code>RSRpcServices</code>. See the definition of <code>HRegionServer</code> and its constructor.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// HRegionServer.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">HRegionServer</span> <span class="kd">extends</span> <span class="n">HasThread</span> <span class="kd">implements</span>
+    <span class="n">RegionServerServices</span><span class="o">,</span> <span class="n">LastSequenceId</span><span class="o">,</span> <span class="n">ConfigurationObserver</span> <span class="o">{</span>
 
-<pre><code class="language-java">// HRegionServer.java
+  <span class="kd">protected</span> <span class="kd">final</span> <span class="n">RSRpcServices</span> <span class="n">rpcServices</span><span class="o">;</span>
 
-public class HRegionServer extends HasThread implements
-    RegionServerServices, LastSequenceId, ConfigurationObserver {
-
-  protected final RSRpcServices rpcServices;
-
-  /**
-  * Starts a HRegionServer at the default location
-  */
-  public HRegionServer(Configuration conf) throws IOException {
-    // ...
-
-    rpcServices = createRpcServices();
-    this.rpcServices.start();
-  }
-}
-</code></pre>
-
+  <span class="cm">/**
+</span><span class="cm">  * Starts a HRegionServer at the default location
+</span><span class="cm">  */</span>
+  <span class="kd">public</span> <span class="nf">HRegionServer</span><span class="o">(</span><span class="n">Configuration</span> <span class="n">conf</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+    <span class="c1">// ...
+</span><span class="c1"></span>
+    <span class="n">rpcServices</span> <span class="o">=</span> <span class="n">createRpcServices</span><span class="o">();</span>
+    <span class="k">this</span><span class="o">.</span><span class="na">rpcServices</span><span class="o">.</span><span class="na">start</span><span class="o">();</span>
+  <span class="o">}</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <h1 id="rsrpsservices"><code>RSRpsServices</code></h1>
 
 <p><code>RSRpsServices</code> implements <code>ClientService.BlockingInterface</code>, and override <code>mutate</code> method of course. What <code>mutate</code> method is simple, it calls <code>put</code> method of <code>HRegion</code>, them update metrics.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// RSRpcServices.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">RSRpcServices</span> <span class="kd">implements</span> <span class="n">HBaseRPCErrorHandler</span><span class="o">,</span>
+    <span class="n">AdminService</span><span class="o">.</span><span class="na">BlockingInterface</span><span class="o">,</span> <span class="n">ClientService</span><span class="o">.</span><span class="na">BlockingInterface</span><span class="o">,</span> <span class="n">PriorityFunction</span><span class="o">,</span>
+    <span class="n">ConfigurationObserver</span> <span class="o">{</span>
 
-<pre><code class="language-java">// RSRpcServices.java
+   <span class="kd">final</span> <span class="n">RpcServerInterface</span> <span class="n">rpcServer</span><span class="o">;</span>
 
-public class RSRpcServices implements HBaseRPCErrorHandler,
-    AdminService.BlockingInterface, ClientService.BlockingInterface, PriorityFunction,
-    ConfigurationObserver {
+   <span class="kt">void</span> <span class="nf">start</span><span class="o">()</span> <span class="o">{</span>
+      <span class="n">rpcServer</span><span class="o">.</span><span class="na">start</span><span class="o">();</span>
+    <span class="o">}</span>   
 
-   final RpcServerInterface rpcServer;
+   <span class="cm">/**
+</span><span class="cm">   * Mutate data in a table.
+</span><span class="cm">   */</span>
+  <span class="nd">@Override</span>
+  <span class="kd">public</span> <span class="n">MutateResponse</span> <span class="nf">mutate</span><span class="o">(</span><span class="kd">final</span> <span class="n">RpcController</span> <span class="n">rpcc</span><span class="o">,</span>
+      <span class="kd">final</span> <span class="n">MutateRequest</span> <span class="n">request</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">ServiceException</span> <span class="o">{</span>
+    <span class="c1">// ...
+</span><span class="c1"></span>    <span class="n">HBaseRpcController</span> <span class="n">controller</span> <span class="o">=</span> <span class="o">(</span><span class="n">HBaseRpcController</span><span class="o">)</span><span class="n">rpcc</span><span class="o">;</span>
+    <span class="n">CellScanner</span> <span class="n">cellScanner</span> <span class="o">=</span> <span class="n">controller</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">?</span> <span class="n">controller</span><span class="o">.</span><span class="na">cellScanner</span><span class="o">()</span> <span class="o">:</span> <span class="kc">null</span><span class="o">;</span>
 
-   void start() {
-      rpcServer.start();
-    }   
+    <span class="n">MutationProto</span> <span class="n">mutation</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="na">getMutation</span><span class="o">();</span>
+    <span class="n">Put</span> <span class="n">put</span> <span class="o">=</span> <span class="n">ProtobufUtil</span><span class="o">.</span><span class="na">toPut</span><span class="o">(</span><span class="n">mutation</span><span class="o">,</span> <span class="n">cellScanner</span><span class="o">);</span>
 
-   /**
-   * Mutate data in a table.
-   */
-  @Override
-  public MutateResponse mutate(final RpcController rpcc,
-      final MutateRequest request) throws ServiceException {
-    // ...
-    HBaseRpcController controller = (HBaseRpcController)rpcc;
-    CellScanner cellScanner = controller != null ? controller.cellScanner() : null;
-
-    MutationProto mutation = request.getMutation();
-    Put put = ProtobufUtil.toPut(mutation, cellScanner);
-
-    HRegion region = getRegion(request.getRegion());
-    region.put(put)
-  }
-}
-</code></pre>
-
+    <span class="n">HRegion</span> <span class="n">region</span> <span class="o">=</span> <span class="n">getRegion</span><span class="o">(</span><span class="n">request</span><span class="o">.</span><span class="na">getRegion</span><span class="o">());</span>
+    <span class="n">region</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">put</span><span class="o">)</span>
+  <span class="o">}</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <h1 id="hregion"><code>HRegion</code></h1>
 
 <p><img src="/images/hbase-hregion-class.png" alt="" /></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// HRegion.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">HRegion</span> <span class="kd">implements</span> <span class="n">HeapSize</span><span class="o">,</span> <span class="n">PropagatingConfigurationObserver</span><span class="o">,</span> <span class="n">Region</span> <span class="o">{</span>
+  <span class="nd">@Override</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">put</span><span class="o">(</span><span class="n">Put</span> <span class="n">put</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+    <span class="n">checkReadOnly</span><span class="o">();</span>
 
-<pre><code class="language-java">// HRegion.java
+    <span class="c1">// Do a rough check that we have resources to accept a write.  The check is
+</span><span class="c1"></span>    <span class="c1">// &#39;rough&#39; in that between the resource check and the call to obtain a
+</span><span class="c1"></span>    <span class="c1">// read lock, resources may run out.  For now, the thought is that this
+</span><span class="c1"></span>    <span class="c1">// will be extremely rare; we&#39;ll deal with it when it happens.
+</span><span class="c1"></span>    <span class="n">checkResources</span><span class="o">();</span>
+    <span class="n">startRegionOperation</span><span class="o">(</span><span class="n">Operation</span><span class="o">.</span><span class="na">PUT</span><span class="o">);</span>
+    <span class="k">try</span> <span class="o">{</span>
+      <span class="c1">// All edits for the given row (across all column families) must happen atomically.
+</span><span class="c1"></span>      <span class="n">doBatchMutate</span><span class="o">(</span><span class="n">put</span><span class="o">);</span>
+    <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+      <span class="n">closeRegionOperation</span><span class="o">(</span><span class="n">Operation</span><span class="o">.</span><span class="na">PUT</span><span class="o">);</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
 
-public class HRegion implements HeapSize, PropagatingConfigurationObserver, Region {
-  @Override
-  public void put(Put put) throws IOException {
-    checkReadOnly();
+  <span class="n">OperationStatus</span><span class="o">[]</span> <span class="nf">batchMutate</span><span class="o">(</span><span class="n">BatchOperation</span><span class="o">&lt;?&gt;</span> <span class="n">batchOp</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+    <span class="kt">boolean</span> <span class="n">initialized</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+    <span class="n">Operation</span> <span class="n">op</span> <span class="o">=</span> <span class="n">batchOp</span><span class="o">.</span><span class="na">isInReplay</span><span class="o">()</span> <span class="o">?</span> <span class="n">Operation</span><span class="o">.</span><span class="na">REPLAY_BATCH_MUTATE</span> <span class="o">:</span> <span class="n">Operation</span><span class="o">.</span><span class="na">BATCH_MUTATE</span><span class="o">;</span>
+    <span class="n">startRegionOperation</span><span class="o">(</span><span class="n">op</span><span class="o">);</span>
+    <span class="k">try</span> <span class="o">{</span>
+      <span class="k">while</span> <span class="o">(!</span><span class="n">batchOp</span><span class="o">.</span><span class="na">isDone</span><span class="o">())</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(!</span><span class="n">batchOp</span><span class="o">.</span><span class="na">isInReplay</span><span class="o">())</span> <span class="o">{</span>
+          <span class="n">checkReadOnly</span><span class="o">();</span>
+        <span class="o">}</span>
+        <span class="n">checkResources</span><span class="o">();</span>
 
-    // Do a rough check that we have resources to accept a write.  The check is
-    // 'rough' in that between the resource check and the call to obtain a
-    // read lock, resources may run out.  For now, the thought is that this
-    // will be extremely rare; we'll deal with it when it happens.
-    checkResources();
-    startRegionOperation(Operation.PUT);
-    try {
-      // All edits for the given row (across all column families) must happen atomically.
-      doBatchMutate(put);
-    } finally {
-      closeRegionOperation(Operation.PUT);
-    }
-  }
-
-  OperationStatus[] batchMutate(BatchOperation&lt;?&gt; batchOp) throws IOException {
-    boolean initialized = false;
-    Operation op = batchOp.isInReplay() ? Operation.REPLAY_BATCH_MUTATE : Operation.BATCH_MUTATE;
-    startRegionOperation(op);
-    try {
-      while (!batchOp.isDone()) {
-        if (!batchOp.isInReplay()) {
-          checkReadOnly();
-        }
-        checkResources();
-
-        if (!initialized) {
-          this.writeRequestsCount.add(batchOp.operations.length);
-          if (!batchOp.isInReplay()) {
-            callPreMutateCPHooks(batchOp);
-          }
-          // validate and prepare batch for write, after CP pre-hooks
-          batchOp.checkAndPrepare(this);
-          initialized = true;
-        }
-        doMiniBatchMutate(batchOp);
-        long newSize = this.getMemStoreSize();
-        requestFlushIfNeeded(newSize);
-      }
-    } finally {
-      closeRegionOperation(op);
-    }
-    return batchOp.retCodeDetails;
-  }
-}
-</code></pre>
-
+        <span class="k">if</span> <span class="o">(!</span><span class="n">initialized</span><span class="o">)</span> <span class="o">{</span>
+          <span class="k">this</span><span class="o">.</span><span class="na">writeRequestsCount</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">batchOp</span><span class="o">.</span><span class="na">operations</span><span class="o">.</span><span class="na">length</span><span class="o">);</span>
+          <span class="k">if</span> <span class="o">(!</span><span class="n">batchOp</span><span class="o">.</span><span class="na">isInReplay</span><span class="o">())</span> <span class="o">{</span>
+            <span class="n">callPreMutateCPHooks</span><span class="o">(</span><span class="n">batchOp</span><span class="o">);</span>
+          <span class="o">}</span>
+          <span class="c1">// validate and prepare batch for write, after CP pre-hooks
+</span><span class="c1"></span>          <span class="n">batchOp</span><span class="o">.</span><span class="na">checkAndPrepare</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
+          <span class="n">initialized</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="n">doMiniBatchMutate</span><span class="o">(</span><span class="n">batchOp</span><span class="o">);</span>
+        <span class="kt">long</span> <span class="n">newSize</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">getMemStoreSize</span><span class="o">();</span>
+        <span class="n">requestFlushIfNeeded</span><span class="o">(</span><span class="n">newSize</span><span class="o">);</span>
+      <span class="o">}</span>
+    <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+      <span class="n">closeRegionOperation</span><span class="o">(</span><span class="n">op</span><span class="o">);</span>
+    <span class="o">}</span>
+    <span class="k">return</span> <span class="n">batchOp</span><span class="o">.</span><span class="na">retCodeDetails</span><span class="o">;</span>
+  <span class="o">}</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>After some validations, <code>doMiniBatchMutate</code> becomes the worker that really writes, and <code>requestFlushIfNeeded</code> will flush <code>MemStore</code> to <code>HFile</code>. Let&rsquo;s look at <code>requestFlushIfNeeded</code> first, since <code>doMiniBatchMutate</code> is more complicated and will take a large chunk of this post.</p>
 
 <h2 id="requestflushifneeded"><code>requestFlushIfNeeded</code></h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// HRegion.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">HRegion</span> <span class="kd">implements</span> <span class="n">HeapSize</span><span class="o">,</span> <span class="n">PropagatingConfigurationObserver</span><span class="o">,</span> <span class="n">Region</span> <span class="o">{</span>
+  <span class="kd">private</span> <span class="kt">void</span> <span class="nf">requestFlushIfNeeded</span><span class="o">(</span><span class="kt">long</span> <span class="n">memstoreTotalSize</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">RegionTooBusyException</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">memstoreTotalSize</span> <span class="o">&gt;</span> <span class="k">this</span><span class="o">.</span><span class="na">getMemStoreFlushSize</span><span class="o">())</span> <span class="o">{</span>
+      <span class="n">requestFlush</span><span class="o">();</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
 
-<pre><code class="language-java">// HRegion.java
+  <span class="kd">private</span> <span class="kt">void</span> <span class="nf">requestFlush</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">rsServices</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">return</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="n">requestFlush0</span><span class="o">(</span><span class="n">FlushLifeCycleTracker</span><span class="o">.</span><span class="na">DUMMY</span><span class="o">);</span>
+  <span class="o">}</span>
 
-public class HRegion implements HeapSize, PropagatingConfigurationObserver, Region {
-  private void requestFlushIfNeeded(long memstoreTotalSize) throws RegionTooBusyException {
-    if (memstoreTotalSize &gt; this.getMemStoreFlushSize()) {
-      requestFlush();
-    }
-  }
-
-  private void requestFlush() {
-    if (this.rsServices == null) {
-      return;
-    }
-    requestFlush0(FlushLifeCycleTracker.DUMMY);
-  }
-
-  private void requestFlush0(FlushLifeCycleTracker tracker) {
-    boolean shouldFlush = false;
-    synchronized (writestate) {
-      if (!this.writestate.isFlushRequested()) {
-        shouldFlush = true;
-        writestate.flushRequested = true;
-      }
-    }
-    if (shouldFlush) {
-      // Make request outside of synchronize block; HBASE-818.
-      this.rsServices.getFlushRequester().requestFlush(this, false, tracker);
-      if (LOG.isDebugEnabled()) {
-        LOG.debug(&quot;Flush requested on &quot; + this.getRegionInfo().getEncodedName());
-      }
-    } else {
-      tracker.notExecuted(&quot;Flush already requested on &quot; + this);
-    }
-  }
-}
-</code></pre>
-
+  <span class="kd">private</span> <span class="kt">void</span> <span class="nf">requestFlush0</span><span class="o">(</span><span class="n">FlushLifeCycleTracker</span> <span class="n">tracker</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kt">boolean</span> <span class="n">shouldFlush</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+    <span class="kd">synchronized</span> <span class="o">(</span><span class="n">writestate</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">if</span> <span class="o">(!</span><span class="k">this</span><span class="o">.</span><span class="na">writestate</span><span class="o">.</span><span class="na">isFlushRequested</span><span class="o">())</span> <span class="o">{</span>
+        <span class="n">shouldFlush</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+        <span class="n">writestate</span><span class="o">.</span><span class="na">flushRequested</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">shouldFlush</span><span class="o">)</span> <span class="o">{</span>
+      <span class="c1">// Make request outside of synchronize block; HBASE-818.
+</span><span class="c1"></span>      <span class="k">this</span><span class="o">.</span><span class="na">rsServices</span><span class="o">.</span><span class="na">getFlushRequester</span><span class="o">().</span><span class="na">requestFlush</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="kc">false</span><span class="o">,</span> <span class="n">tracker</span><span class="o">);</span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">LOG</span><span class="o">.</span><span class="na">isDebugEnabled</span><span class="o">())</span> <span class="o">{</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="na">debug</span><span class="o">(</span><span class="s">&#34;Flush requested on &#34;</span> <span class="o">+</span> <span class="k">this</span><span class="o">.</span><span class="na">getRegionInfo</span><span class="o">().</span><span class="na">getEncodedName</span><span class="o">());</span>
+      <span class="o">}</span>
+    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+      <span class="n">tracker</span><span class="o">.</span><span class="na">notExecuted</span><span class="o">(</span><span class="s">&#34;Flush already requested on &#34;</span> <span class="o">+</span> <span class="k">this</span><span class="o">);</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>As we can see, <code>FlushRequester</code> is called to trigger flush operation. In its Child <code>MemStoreFlusher</code>, each flush task is appended into <code>BlockingQueue</code>. At the same time, one <code>Runnable</code> named <code>FlushHandler</code> periodically flushes these cache into HDFS with the help of <code>HRegion</code>&rsquo;s <code>flushcache</code>.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span><span class="lnt">80
+</span><span class="lnt">81
+</span><span class="lnt">82
+</span><span class="lnt">83
+</span><span class="lnt">84
+</span><span class="lnt">85
+</span><span class="lnt">86
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// MemStoreFlusher.java
+</span><span class="c1"></span>
+<span class="kd">class</span> <span class="nc">MemStoreFlusher</span> <span class="kd">implements</span> <span class="n">FlushRequester</span> <span class="o">{</span>
 
-<pre><code class="language-java">// MemStoreFlusher.java
+  <span class="kd">private</span> <span class="kd">final</span> <span class="n">BlockingQueue</span><span class="o">&lt;</span><span class="n">FlushQueueEntry</span><span class="o">&gt;</span> <span class="n">flushQueue</span> <span class="o">=</span> <span class="k">new</span> <span class="n">DelayQueue</span><span class="o">&lt;&gt;();</span>
+  <span class="kd">private</span> <span class="kd">final</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">Region</span><span class="o">,</span> <span class="n">FlushRegionEntry</span><span class="o">&gt;</span> <span class="n">regionsInQueue</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&lt;&gt;();</span>
+  <span class="kd">private</span> <span class="kd">final</span> <span class="n">FlushHandler</span><span class="o">[]</span> <span class="n">flushHandlers</span><span class="o">;</span>
+  <span class="kd">private</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">FlushRequestListener</span><span class="o">&gt;</span> <span class="n">flushRequestListeners</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;(</span><span class="n">1</span><span class="o">);</span>
+  <span class="kd">private</span> <span class="kd">final</span> <span class="n">HRegionServer</span> <span class="n">server</span><span class="o">;</span>
 
-class MemStoreFlusher implements FlushRequester {
+  <span class="nd">@Override</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">requestFlush</span><span class="o">(</span><span class="n">HRegion</span> <span class="n">r</span><span class="o">,</span> <span class="kt">boolean</span> <span class="n">forceFlushAllStores</span><span class="o">,</span> <span class="n">FlushLifeCycleTracker</span> <span class="n">tracker</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">r</span><span class="o">.</span><span class="na">incrementFlushesQueuedCount</span><span class="o">();</span>
+    <span class="kd">synchronized</span> <span class="o">(</span><span class="n">regionsInQueue</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">if</span> <span class="o">(!</span><span class="n">regionsInQueue</span><span class="o">.</span><span class="na">containsKey</span><span class="o">(</span><span class="n">r</span><span class="o">))</span> <span class="o">{</span>
+        <span class="c1">// This entry has no delay so it will be added at the top of the flush
+</span><span class="c1"></span>        <span class="c1">// queue. It&#39;ll come out near immediately.
+</span><span class="c1"></span>        <span class="n">FlushRegionEntry</span> <span class="n">fqe</span> <span class="o">=</span> <span class="k">new</span> <span class="n">FlushRegionEntry</span><span class="o">(</span><span class="n">r</span><span class="o">,</span> <span class="n">forceFlushAllStores</span><span class="o">,</span> <span class="n">tracker</span><span class="o">);</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">regionsInQueue</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">r</span><span class="o">,</span> <span class="n">fqe</span><span class="o">);</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">flushQueue</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">fqe</span><span class="o">);</span>
+      <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+        <span class="n">tracker</span><span class="o">.</span><span class="na">notExecuted</span><span class="o">(</span><span class="s">&#34;Flush already requested on &#34;</span> <span class="o">+</span> <span class="n">r</span><span class="o">);</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
 
-  private final BlockingQueue&lt;FlushQueueEntry&gt; flushQueue = new DelayQueue&lt;&gt;();
-  private final Map&lt;Region, FlushRegionEntry&gt; regionsInQueue = new HashMap&lt;&gt;();
-  private final FlushHandler[] flushHandlers;
-  private List&lt;FlushRequestListener&gt; flushRequestListeners = new ArrayList&lt;&gt;(1);
-  private final HRegionServer server;
+  <span class="kd">private</span> <span class="kt">boolean</span> <span class="nf">flushRegion</span><span class="o">(</span><span class="n">HRegion</span> <span class="n">region</span><span class="o">,</span> <span class="kt">boolean</span> <span class="n">emergencyFlush</span><span class="o">,</span> <span class="kt">boolean</span> <span class="n">forceFlushAllStores</span><span class="o">,</span>
+      <span class="n">FlushLifeCycleTracker</span> <span class="n">tracker</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kd">synchronized</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">regionsInQueue</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">FlushRegionEntry</span> <span class="n">fqe</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">regionsInQueue</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="n">region</span><span class="o">);</span>
+      <span class="c1">// Use the start time of the FlushRegionEntry if available
+</span><span class="c1"></span>      <span class="k">if</span> <span class="o">(</span><span class="n">fqe</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">emergencyFlush</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// Need to remove from region from delay queue. When NOT an
+</span><span class="c1"></span>        <span class="c1">// emergencyFlush, then item was removed via a flushQueue.poll.
+</span><span class="c1"></span>        <span class="n">flushQueue</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="n">fqe</span><span class="o">);</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
 
-  @Override
-  public void requestFlush(HRegion r, boolean forceFlushAllStores, FlushLifeCycleTracker tracker) {
-    r.incrementFlushesQueuedCount();
-    synchronized (regionsInQueue) {
-      if (!regionsInQueue.containsKey(r)) {
-        // This entry has no delay so it will be added at the top of the flush
-        // queue. It'll come out near immediately.
-        FlushRegionEntry fqe = new FlushRegionEntry(r, forceFlushAllStores, tracker);
-        this.regionsInQueue.put(r, fqe);
-        this.flushQueue.add(fqe);
-      } else {
-        tracker.notExecuted(&quot;Flush already requested on &quot; + r);
-      }
-    }
-  }
+    <span class="n">lock</span><span class="o">.</span><span class="na">readLock</span><span class="o">().</span><span class="na">lock</span><span class="o">();</span>
+    <span class="k">try</span> <span class="o">{</span>
+      <span class="n">notifyFlushRequest</span><span class="o">(</span><span class="n">region</span><span class="o">,</span> <span class="n">emergencyFlush</span><span class="o">);</span>
+      <span class="n">FlushResult</span> <span class="n">flushResult</span> <span class="o">=</span> <span class="n">region</span><span class="o">.</span><span class="na">flushcache</span><span class="o">(</span><span class="n">forceFlushAllStores</span><span class="o">,</span> <span class="kc">false</span><span class="o">,</span> <span class="n">tracker</span><span class="o">);</span>
 
-  private boolean flushRegion(HRegion region, boolean emergencyFlush, boolean forceFlushAllStores,
-      FlushLifeCycleTracker tracker) {
-    synchronized (this.regionsInQueue) {
-      FlushRegionEntry fqe = this.regionsInQueue.remove(region);
-      // Use the start time of the FlushRegionEntry if available
-      if (fqe != null &amp;&amp; emergencyFlush) {
-        // Need to remove from region from delay queue. When NOT an
-        // emergencyFlush, then item was removed via a flushQueue.poll.
-        flushQueue.remove(fqe);
-      }
-    }
+      <span class="c1">// ...
+</span><span class="c1"></span>    <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+      <span class="n">lock</span><span class="o">.</span><span class="na">readLock</span><span class="o">().</span><span class="na">unlock</span><span class="o">();</span>
+      <span class="n">wakeUpIfBlocking</span><span class="o">();</span>
+      <span class="n">tracker</span><span class="o">.</span><span class="na">afterExecution</span><span class="o">();</span>
+    <span class="o">}</span>
+    <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
+  <span class="o">}</span>
 
-    lock.readLock().lock();
-    try {
-      notifyFlushRequest(region, emergencyFlush);
-      FlushResult flushResult = region.flushcache(forceFlushAllStores, false, tracker);
+  <span class="kd">private</span> <span class="kd">class</span> <span class="nc">FlushHandler</span> <span class="kd">extends</span> <span class="n">HasThread</span> <span class="o">{</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">run</span><span class="o">()</span> <span class="o">{</span>
+      <span class="k">while</span> <span class="o">(!</span><span class="n">server</span><span class="o">.</span><span class="na">isStopped</span><span class="o">())</span> <span class="o">{</span>
+        <span class="n">FlushQueueEntry</span> <span class="n">fqe</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="k">try</span> <span class="o">{</span>
+          <span class="c1">// ...
+</span><span class="c1"></span>          <span class="n">FlushRegionEntry</span> <span class="n">fre</span> <span class="o">=</span> <span class="o">(</span><span class="n">FlushRegionEntry</span><span class="o">)</span> <span class="n">fqe</span><span class="o">;</span>
+          <span class="k">if</span> <span class="o">(!</span><span class="n">flushRegion</span><span class="o">(</span><span class="n">fre</span><span class="o">))</span> <span class="o">{</span>
+            <span class="k">break</span><span class="o">;</span>
+          <span class="o">}</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">InterruptedException</span> <span class="n">ex</span><span class="o">)</span> <span class="o">{</span>
+          <span class="k">continue</span><span class="o">;</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">ConcurrentModificationException</span> <span class="n">ex</span><span class="o">)</span> <span class="o">{</span>
+          <span class="k">continue</span><span class="o">;</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">ex</span><span class="o">)</span> <span class="o">{</span>
+          <span class="n">LOG</span><span class="o">.</span><span class="na">error</span><span class="o">(</span><span class="s">&#34;Cache flusher failed for entry &#34;</span> <span class="o">+</span> <span class="n">fqe</span><span class="o">,</span> <span class="n">ex</span><span class="o">);</span>
+          <span class="k">if</span> <span class="o">(!</span><span class="n">server</span><span class="o">.</span><span class="na">checkFileSystem</span><span class="o">())</span> <span class="o">{</span>
+            <span class="k">break</span><span class="o">;</span>
+          <span class="o">}</span>
+        <span class="o">}</span>
+      <span class="o">}</span>
 
-      // ...
-    } finally {
-      lock.readLock().unlock();
-      wakeUpIfBlocking();
-      tracker.afterExecution();
-    }
-    return true;
-  }
+      <span class="kd">synchronized</span> <span class="o">(</span><span class="n">regionsInQueue</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">regionsInQueue</span><span class="o">.</span><span class="na">clear</span><span class="o">();</span>
+        <span class="n">flushQueue</span><span class="o">.</span><span class="na">clear</span><span class="o">();</span>
+      <span class="o">}</span>
 
-  private class FlushHandler extends HasThread {
-    @Override
-    public void run() {
-      while (!server.isStopped()) {
-        FlushQueueEntry fqe = null;
-        try {
-          // ...
-          FlushRegionEntry fre = (FlushRegionEntry) fqe;
-          if (!flushRegion(fre)) {
-            break;
-          }
-        } catch (InterruptedException ex) {
-          continue;
-        } catch (ConcurrentModificationException ex) {
-          continue;
-        } catch (Exception ex) {
-          LOG.error(&quot;Cache flusher failed for entry &quot; + fqe, ex);
-          if (!server.checkFileSystem()) {
-            break;
-          }
-        }
-      }
-
-      synchronized (regionsInQueue) {
-        regionsInQueue.clear();
-        flushQueue.clear();
-      }
-
-      // Signal anyone waiting, so they see the close flag
-      wakeUpIfBlocking();
-      LOG.info(getName() + &quot; exiting&quot;);
-    }
-  }
-}
-</code></pre>
-
+      <span class="c1">// Signal anyone waiting, so they see the close flag
+</span><span class="c1"></span>      <span class="n">wakeUpIfBlocking</span><span class="o">();</span>
+      <span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="n">getName</span><span class="o">()</span> <span class="o">+</span> <span class="s">&#34; exiting&#34;</span><span class="o">);</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <h2 id="dominibatchmutate"><code>doMiniBatchMutate</code></h2>
 
 <p><img src="/images/hbase-hregion-dominibatchmutate-interaction.png" alt="" /></p>
@@ -448,300 +700,594 @@ class MemStoreFlusher implements FlushRequester {
 <li>mvcc, shorted for <code>MultiVersionConcurrencyControl</code>. it manages the read/write consistency. This provides an interface for readers to determine what entries to ignore, and a mechanism for writers to obtain new write numbers, then &ldquo;commit&rdquo; the new writes for readers to read (thus forming atomic transactions).</li>
 <li><code>RegionCoprocessorHost</code>, which implements the coprocessor environment and runtime support for coprocessors loaded within a <code>Region</code>. Every step leaves some pre or post jobs to coprocessors.</li>
 </ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span><span class="lnt">106
+</span><span class="lnt">107
+</span><span class="lnt">108
+</span><span class="lnt">109
+</span><span class="lnt">110
+</span><span class="lnt">111
+</span><span class="lnt">112
+</span><span class="lnt">113
+</span><span class="lnt">114
+</span><span class="lnt">115
+</span><span class="lnt">116
+</span><span class="lnt">117
+</span><span class="lnt">118
+</span><span class="lnt">119
+</span><span class="lnt">120
+</span><span class="lnt">121
+</span><span class="lnt">122
+</span><span class="lnt">123
+</span><span class="lnt">124
+</span><span class="lnt">125
+</span><span class="lnt">126
+</span><span class="lnt">127
+</span><span class="lnt">128
+</span><span class="lnt">129
+</span><span class="lnt">130
+</span><span class="lnt">131
+</span><span class="lnt">132
+</span><span class="lnt">133
+</span><span class="lnt">134
+</span><span class="lnt">135
+</span><span class="lnt">136
+</span><span class="lnt">137
+</span><span class="lnt">138
+</span><span class="lnt">139
+</span><span class="lnt">140
+</span><span class="lnt">141
+</span><span class="lnt">142
+</span><span class="lnt">143
+</span><span class="lnt">144
+</span><span class="lnt">145
+</span><span class="lnt">146
+</span><span class="lnt">147
+</span><span class="lnt">148
+</span><span class="lnt">149
+</span><span class="lnt">150
+</span><span class="lnt">151
+</span><span class="lnt">152
+</span><span class="lnt">153
+</span><span class="lnt">154
+</span><span class="lnt">155
+</span><span class="lnt">156
+</span><span class="lnt">157
+</span><span class="lnt">158
+</span><span class="lnt">159
+</span><span class="lnt">160
+</span><span class="lnt">161
+</span><span class="lnt">162
+</span><span class="lnt">163
+</span><span class="lnt">164
+</span><span class="lnt">165
+</span><span class="lnt">166
+</span><span class="lnt">167
+</span><span class="lnt">168
+</span><span class="lnt">169
+</span><span class="lnt">170
+</span><span class="lnt">171
+</span><span class="lnt">172
+</span><span class="lnt">173
+</span><span class="lnt">174
+</span><span class="lnt">175
+</span><span class="lnt">176
+</span><span class="lnt">177
+</span><span class="lnt">178
+</span><span class="lnt">179
+</span><span class="lnt">180
+</span><span class="lnt">181
+</span><span class="lnt">182
+</span><span class="lnt">183
+</span><span class="lnt">184
+</span><span class="lnt">185
+</span><span class="lnt">186
+</span><span class="lnt">187
+</span><span class="lnt">188
+</span><span class="lnt">189
+</span><span class="lnt">190
+</span><span class="lnt">191
+</span><span class="lnt">192
+</span><span class="lnt">193
+</span><span class="lnt">194
+</span><span class="lnt">195
+</span><span class="lnt">196
+</span><span class="lnt">197
+</span><span class="lnt">198
+</span><span class="lnt">199
+</span><span class="lnt">200
+</span><span class="lnt">201
+</span><span class="lnt">202
+</span><span class="lnt">203
+</span><span class="lnt">204
+</span><span class="lnt">205
+</span><span class="lnt">206
+</span><span class="lnt">207
+</span><span class="lnt">208
+</span><span class="lnt">209
+</span><span class="lnt">210
+</span><span class="lnt">211
+</span><span class="lnt">212
+</span><span class="lnt">213
+</span><span class="lnt">214
+</span><span class="lnt">215
+</span><span class="lnt">216
+</span><span class="lnt">217
+</span><span class="lnt">218
+</span><span class="lnt">219
+</span><span class="lnt">220
+</span><span class="lnt">221
+</span><span class="lnt">222
+</span><span class="lnt">223
+</span><span class="lnt">224
+</span><span class="lnt">225
+</span><span class="lnt">226
+</span><span class="lnt">227
+</span><span class="lnt">228
+</span><span class="lnt">229
+</span><span class="lnt">230
+</span><span class="lnt">231
+</span><span class="lnt">232
+</span><span class="lnt">233
+</span><span class="lnt">234
+</span><span class="lnt">235
+</span><span class="lnt">236
+</span><span class="lnt">237
+</span><span class="lnt">238
+</span><span class="lnt">239
+</span><span class="lnt">240
+</span><span class="lnt">241
+</span><span class="lnt">242
+</span><span class="lnt">243
+</span><span class="lnt">244
+</span><span class="lnt">245
+</span><span class="lnt">246
+</span><span class="lnt">247
+</span><span class="lnt">248
+</span><span class="lnt">249
+</span><span class="lnt">250
+</span><span class="lnt">251
+</span><span class="lnt">252
+</span><span class="lnt">253
+</span><span class="lnt">254
+</span><span class="lnt">255
+</span><span class="lnt">256
+</span><span class="lnt">257
+</span><span class="lnt">258
+</span><span class="lnt">259
+</span><span class="lnt">260
+</span><span class="lnt">261
+</span><span class="lnt">262
+</span><span class="lnt">263
+</span><span class="lnt">264
+</span><span class="lnt">265
+</span><span class="lnt">266
+</span><span class="lnt">267
+</span><span class="lnt">268
+</span><span class="lnt">269
+</span><span class="lnt">270
+</span><span class="lnt">271
+</span><span class="lnt">272
+</span><span class="lnt">273
+</span><span class="lnt">274
+</span><span class="lnt">275
+</span><span class="lnt">276
+</span><span class="lnt">277
+</span><span class="lnt">278
+</span><span class="lnt">279
+</span><span class="lnt">280
+</span><span class="lnt">281
+</span><span class="lnt">282
+</span><span class="lnt">283
+</span><span class="lnt">284
+</span><span class="lnt">285
+</span><span class="lnt">286
+</span><span class="lnt">287
+</span><span class="lnt">288
+</span><span class="lnt">289
+</span><span class="lnt">290
+</span><span class="lnt">291
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// HRegion.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">HRegion</span> <span class="kd">implements</span> <span class="n">HeapSize</span><span class="o">,</span> <span class="n">PropagatingConfigurationObserver</span><span class="o">,</span> <span class="n">Region</span> <span class="o">{</span>
+  <span class="kd">private</span> <span class="kt">void</span> <span class="nf">doMiniBatchMutate</span><span class="o">(</span><span class="n">BatchOperation</span><span class="o">&lt;?&gt;</span> <span class="n">batchOp</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+    <span class="kt">boolean</span> <span class="n">replay</span> <span class="o">=</span> <span class="n">batchOp</span><span class="o">.</span><span class="na">isInReplay</span><span class="o">();</span>
+    <span class="kt">long</span> <span class="n">currentNonceGroup</span> <span class="o">=</span> <span class="n">HConstants</span><span class="o">.</span><span class="na">NO_NONCE</span><span class="o">;</span>
+    <span class="kt">long</span> <span class="n">currentNonce</span> <span class="o">=</span> <span class="n">HConstants</span><span class="o">.</span><span class="na">NO_NONCE</span><span class="o">;</span>
+    <span class="n">WALEdit</span> <span class="n">walEdit</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="kt">boolean</span> <span class="n">locked</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+    <span class="c1">// We try to set up a batch in the range [firstIndex,lastIndexExclusive)
+</span><span class="c1"></span>    <span class="kt">int</span> <span class="n">firstIndex</span> <span class="o">=</span> <span class="n">batchOp</span><span class="o">.</span><span class="na">nextIndexToProcess</span><span class="o">;</span>
+    <span class="kt">int</span> <span class="n">lastIndexExclusive</span> <span class="o">=</span> <span class="n">firstIndex</span><span class="o">;</span>
+    <span class="kt">boolean</span> <span class="n">success</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+    <span class="kt">boolean</span> <span class="n">doneByCoprocessor</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+    <span class="kt">int</span> <span class="n">noOfPuts</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span>
+    <span class="kt">int</span> <span class="n">noOfDeletes</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span>
+    <span class="n">WriteEntry</span> <span class="n">writeEntry</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="kt">int</span> <span class="n">cellCount</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span>
+    <span class="cm">/** Keep track of the locks we hold so we can release them in finally clause */</span>
+    <span class="n">List</span><span class="o">&lt;</span><span class="n">RowLock</span><span class="o">&gt;</span> <span class="n">acquiredRowLocks</span> <span class="o">=</span> <span class="n">Lists</span><span class="o">.</span><span class="na">newArrayListWithCapacity</span><span class="o">(</span><span class="n">batchOp</span><span class="o">.</span><span class="na">operations</span><span class="o">.</span><span class="na">length</span><span class="o">);</span>
+    <span class="n">MemStoreSizing</span> <span class="n">memStoreAccounting</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MemStoreSizing</span><span class="o">();</span>
+    <span class="k">try</span> <span class="o">{</span>
+      <span class="c1">// STEP 1. Try to acquire as many locks as we can, and ensure we acquire at least one.
+</span><span class="c1"></span>      <span class="kt">int</span> <span class="n">numReadyToWrite</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span>
+      <span class="k">for</span> <span class="o">(;</span> <span class="n">lastIndexExclusive</span> <span class="o">&lt;</span> <span class="n">batchOp</span><span class="o">.</span><span class="na">operations</span><span class="o">.</span><span class="na">length</span><span class="o">;</span> <span class="n">lastIndexExclusive</span><span class="o">++)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">batchOp</span><span class="o">.</span><span class="na">retCodeDetails</span><span class="o">[</span><span class="n">lastIndexExclusive</span><span class="o">].</span><span class="na">getOperationStatusCode</span><span class="o">()</span>
+            <span class="o">!=</span> <span class="n">OperationStatusCode</span><span class="o">.</span><span class="na">NOT_RUN</span><span class="o">)</span> <span class="o">{</span>
+          <span class="k">continue</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="n">Mutation</span> <span class="n">mutation</span> <span class="o">=</span> <span class="n">batchOp</span><span class="o">.</span><span class="na">getMutation</span><span class="o">(</span><span class="n">lastIndexExclusive</span><span class="o">);</span>
+        <span class="c1">// If we haven&#39;t got any rows in our batch, we should block to get the next one.
+</span><span class="c1"></span>        <span class="n">RowLock</span> <span class="n">rowLock</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="k">try</span> <span class="o">{</span>
+          <span class="n">rowLock</span> <span class="o">=</span> <span class="n">getRowLockInternal</span><span class="o">(</span><span class="n">mutation</span><span class="o">.</span><span class="na">getRow</span><span class="o">(),</span> <span class="kc">true</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">TimeoutIOException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+          <span class="c1">// We will retry when other exceptions, but we should stop if we timeout .
+</span><span class="c1"></span>          <span class="k">throw</span> <span class="n">e</span><span class="o">;</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">IOException</span> <span class="n">ioe</span><span class="o">)</span> <span class="o">{</span>
+          <span class="n">LOG</span><span class="o">.</span><span class="na">warn</span><span class="o">(</span><span class="s">&#34;Failed getting lock, row=&#34;</span> <span class="o">+</span> <span class="n">Bytes</span><span class="o">.</span><span class="na">toStringBinary</span><span class="o">(</span><span class="n">mutation</span><span class="o">.</span><span class="na">getRow</span><span class="o">()),</span> <span class="n">ioe</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">rowLock</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+          <span class="c1">// We failed to grab another lock
+</span><span class="c1"></span>          <span class="k">break</span><span class="o">;</span> <span class="c1">// Stop acquiring more rows for this batch
+</span><span class="c1"></span>        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+          <span class="n">acquiredRowLocks</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">rowLock</span><span class="o">);</span>
+        <span class="o">}</span>
 
-<pre><code class="language-java">// HRegion.java
+        <span class="n">numReadyToWrite</span><span class="o">++;</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">replay</span> <span class="o">||</span> <span class="n">getEffectiveDurability</span><span class="o">(</span><span class="n">mutation</span><span class="o">.</span><span class="na">getDurability</span><span class="o">())</span> <span class="o">!=</span> <span class="n">Durability</span><span class="o">.</span><span class="na">SKIP_WAL</span><span class="o">)</span> <span class="o">{</span>
+          <span class="k">for</span> <span class="o">(</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Cell</span><span class="o">&gt;</span> <span class="n">cells</span> <span class="o">:</span> <span class="n">mutation</span><span class="o">.</span><span class="na">getFamilyCellMap</span><span class="o">().</span><span class="na">values</span><span class="o">())</span> <span class="o">{</span>
+            <span class="n">cellCount</span> <span class="o">+=</span> <span class="n">cells</span><span class="o">.</span><span class="na">size</span><span class="o">();</span>
+          <span class="o">}</span>
+        <span class="o">}</span>
+      <span class="o">}</span>
 
-public class HRegion implements HeapSize, PropagatingConfigurationObserver, Region {
-  private void doMiniBatchMutate(BatchOperation&lt;?&gt; batchOp) throws IOException {
-    boolean replay = batchOp.isInReplay();
-    long currentNonceGroup = HConstants.NO_NONCE;
-    long currentNonce = HConstants.NO_NONCE;
-    WALEdit walEdit = null;
-    boolean locked = false;
-    // We try to set up a batch in the range [firstIndex,lastIndexExclusive)
-    int firstIndex = batchOp.nextIndexToProcess;
-    int lastIndexExclusive = firstIndex;
-    boolean success = false;
-    boolean doneByCoprocessor = false;
-    int noOfPuts = 0;
-    int noOfDeletes = 0;
-    WriteEntry writeEntry = null;
-    int cellCount = 0;
-    /** Keep track of the locks we hold so we can release them in finally clause */
-    List&lt;RowLock&gt; acquiredRowLocks = Lists.newArrayListWithCapacity(batchOp.operations.length);
-    MemStoreSizing memStoreAccounting = new MemStoreSizing();
-    try {
-      // STEP 1. Try to acquire as many locks as we can, and ensure we acquire at least one.
-      int numReadyToWrite = 0;
-      for (; lastIndexExclusive &lt; batchOp.operations.length; lastIndexExclusive++) {
-        if (batchOp.retCodeDetails[lastIndexExclusive].getOperationStatusCode()
-            != OperationStatusCode.NOT_RUN) {
-          continue;
-        }
-        Mutation mutation = batchOp.getMutation(lastIndexExclusive);
-        // If we haven't got any rows in our batch, we should block to get the next one.
-        RowLock rowLock = null;
-        try {
-          rowLock = getRowLockInternal(mutation.getRow(), true);
-        } catch (TimeoutIOException e) {
-          // We will retry when other exceptions, but we should stop if we timeout .
-          throw e;
-        } catch (IOException ioe) {
-          LOG.warn(&quot;Failed getting lock, row=&quot; + Bytes.toStringBinary(mutation.getRow()), ioe);
-        }
-        if (rowLock == null) {
-          // We failed to grab another lock
-          break; // Stop acquiring more rows for this batch
-        } else {
-          acquiredRowLocks.add(rowLock);
-        }
+      <span class="c1">// We&#39;ve now grabbed as many mutations off the list as we can
+</span><span class="c1"></span>      <span class="c1">// Nothing to put/delete -- an exception in the above such as NoSuchColumnFamily?
+</span><span class="c1"></span>      <span class="k">if</span> <span class="o">(</span><span class="n">numReadyToWrite</span> <span class="o">&lt;=</span> <span class="n">0</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span><span class="o">;</span>
+      <span class="o">}</span>
 
-        numReadyToWrite++;
-        if (replay || getEffectiveDurability(mutation.getDurability()) != Durability.SKIP_WAL) {
-          for (List&lt;Cell&gt; cells : mutation.getFamilyCellMap().values()) {
-            cellCount += cells.size();
-          }
-        }
-      }
+      <span class="c1">// STEP 2. Update any LATEST_TIMESTAMP timestamps
+</span><span class="c1"></span>      <span class="c1">// We should record the timestamp only after we have acquired the rowLock,
+</span><span class="c1"></span>      <span class="c1">// otherwise, newer puts/deletes are not guaranteed to have a newer timestamp
+</span><span class="c1"></span>      <span class="kt">long</span> <span class="n">now</span> <span class="o">=</span> <span class="n">EnvironmentEdgeManager</span><span class="o">.</span><span class="na">currentTime</span><span class="o">();</span>
+      <span class="k">if</span> <span class="o">(!</span><span class="n">replay</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kt">byte</span><span class="o">[]</span> <span class="n">byteNow</span> <span class="o">=</span> <span class="n">Bytes</span><span class="o">.</span><span class="na">toBytes</span><span class="o">(</span><span class="n">now</span><span class="o">);</span>
+        <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">firstIndex</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">lastIndexExclusive</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+          <span class="c1">// skip invalid
+</span><span class="c1"></span>          <span class="k">if</span> <span class="o">(</span><span class="n">batchOp</span><span class="o">.</span><span class="na">retCodeDetails</span><span class="o">[</span><span class="n">i</span><span class="o">].</span><span class="na">getOperationStatusCode</span><span class="o">()</span> <span class="o">!=</span> <span class="n">OperationStatusCode</span><span class="o">.</span><span class="na">NOT_RUN</span><span class="o">)</span> <span class="o">{</span>
+            <span class="c1">// lastIndexExclusive was incremented above.
+</span><span class="c1"></span>            <span class="k">continue</span><span class="o">;</span>
+          <span class="o">}</span>
 
-      // We've now grabbed as many mutations off the list as we can
-      // Nothing to put/delete -- an exception in the above such as NoSuchColumnFamily?
-      if (numReadyToWrite &lt;= 0) {
-        return;
-      }
+          <span class="n">Mutation</span> <span class="n">mutation</span> <span class="o">=</span> <span class="n">batchOp</span><span class="o">.</span><span class="na">getMutation</span><span class="o">(</span><span class="n">i</span><span class="o">);</span>
+          <span class="k">if</span> <span class="o">(</span><span class="n">mutation</span> <span class="k">instanceof</span> <span class="n">Put</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">updateCellTimestamps</span><span class="o">(</span><span class="n">batchOp</span><span class="o">.</span><span class="na">familyCellMaps</span><span class="o">[</span><span class="n">i</span><span class="o">].</span><span class="na">values</span><span class="o">(),</span> <span class="n">byteNow</span><span class="o">);</span>
+            <span class="n">noOfPuts</span><span class="o">++;</span>
+          <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+            <span class="n">prepareDeleteTimestamps</span><span class="o">(</span><span class="n">mutation</span><span class="o">,</span> <span class="n">batchOp</span><span class="o">.</span><span class="na">familyCellMaps</span><span class="o">[</span><span class="n">i</span><span class="o">],</span> <span class="n">byteNow</span><span class="o">);</span>
+            <span class="n">noOfDeletes</span><span class="o">++;</span>
+          <span class="o">}</span>
+          <span class="n">rewriteCellTags</span><span class="o">(</span><span class="n">batchOp</span><span class="o">.</span><span class="na">familyCellMaps</span><span class="o">[</span><span class="n">i</span><span class="o">],</span> <span class="n">mutation</span><span class="o">);</span>
+          <span class="n">WALEdit</span> <span class="n">fromCP</span> <span class="o">=</span> <span class="n">batchOp</span><span class="o">.</span><span class="na">walEditsFromCoprocessors</span><span class="o">[</span><span class="n">i</span><span class="o">];</span>
+          <span class="k">if</span> <span class="o">(</span><span class="n">fromCP</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">cellCount</span> <span class="o">+=</span> <span class="n">fromCP</span><span class="o">.</span><span class="na">size</span><span class="o">();</span>
+          <span class="o">}</span>
+        <span class="o">}</span>
+      <span class="o">}</span>
+      <span class="n">lock</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">updatesLock</span><span class="o">.</span><span class="na">readLock</span><span class="o">(),</span> <span class="n">numReadyToWrite</span><span class="o">);</span>
+      <span class="n">locked</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
 
-      // STEP 2. Update any LATEST_TIMESTAMP timestamps
-      // We should record the timestamp only after we have acquired the rowLock,
-      // otherwise, newer puts/deletes are not guaranteed to have a newer timestamp
-      long now = EnvironmentEdgeManager.currentTime();
-      if (!replay) {
-        byte[] byteNow = Bytes.toBytes(now);
-        for (int i = firstIndex; i &lt; lastIndexExclusive; i++) {
-          // skip invalid
-          if (batchOp.retCodeDetails[i].getOperationStatusCode() != OperationStatusCode.NOT_RUN) {
-            // lastIndexExclusive was incremented above.
-            continue;
-          }
+      <span class="c1">// calling the pre CP hook for batch mutation
+</span><span class="c1"></span>      <span class="k">if</span> <span class="o">(!</span><span class="n">replay</span> <span class="o">&amp;&amp;</span> <span class="n">coprocessorHost</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">MiniBatchOperationInProgress</span><span class="o">&lt;</span><span class="n">Mutation</span><span class="o">&gt;</span> <span class="n">miniBatchOp</span> <span class="o">=</span>
+          <span class="k">new</span> <span class="n">MiniBatchOperationInProgress</span><span class="o">&lt;&gt;(</span><span class="n">batchOp</span><span class="o">.</span><span class="na">getMutationsForCoprocs</span><span class="o">(),</span>
+          <span class="n">batchOp</span><span class="o">.</span><span class="na">retCodeDetails</span><span class="o">,</span> <span class="n">batchOp</span><span class="o">.</span><span class="na">walEditsFromCoprocessors</span><span class="o">,</span> <span class="n">firstIndex</span><span class="o">,</span> <span class="n">lastIndexExclusive</span><span class="o">);</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">coprocessorHost</span><span class="o">.</span><span class="na">preBatchMutate</span><span class="o">(</span><span class="n">miniBatchOp</span><span class="o">))</span> <span class="o">{</span>
+          <span class="n">doneByCoprocessor</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+          <span class="k">return</span><span class="o">;</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+          <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">firstIndex</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">lastIndexExclusive</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">batchOp</span><span class="o">.</span><span class="na">retCodeDetails</span><span class="o">[</span><span class="n">i</span><span class="o">].</span><span class="na">getOperationStatusCode</span><span class="o">()</span> <span class="o">!=</span> <span class="n">OperationStatusCode</span><span class="o">.</span><span class="na">NOT_RUN</span><span class="o">)</span> <span class="o">{</span>
+              <span class="c1">// lastIndexExclusive was incremented above.
+</span><span class="c1"></span>              <span class="k">continue</span><span class="o">;</span>
+            <span class="o">}</span>
+            <span class="c1">// we pass (i - firstIndex) below since the call expects a relative index
+</span><span class="c1"></span>            <span class="n">Mutation</span><span class="o">[]</span> <span class="n">cpMutations</span> <span class="o">=</span> <span class="n">miniBatchOp</span><span class="o">.</span><span class="na">getOperationsFromCoprocessors</span><span class="o">(</span><span class="n">i</span> <span class="o">-</span> <span class="n">firstIndex</span><span class="o">);</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">cpMutations</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+              <span class="k">continue</span><span class="o">;</span>
+            <span class="o">}</span>
+            <span class="n">Mutation</span> <span class="n">mutation</span> <span class="o">=</span> <span class="n">batchOp</span><span class="o">.</span><span class="na">getMutation</span><span class="o">(</span><span class="n">i</span><span class="o">);</span>
+            <span class="kt">boolean</span> <span class="n">skipWal</span> <span class="o">=</span> <span class="n">getEffectiveDurability</span><span class="o">(</span><span class="n">mutation</span><span class="o">.</span><span class="na">getDurability</span><span class="o">())</span> <span class="o">==</span> <span class="n">Durability</span><span class="o">.</span><span class="na">SKIP_WAL</span><span class="o">;</span>
+            <span class="c1">// Else Coprocessor added more Mutations corresponding to the Mutation at this index.
+</span><span class="c1"></span>            <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">cpMutations</span><span class="o">.</span><span class="na">length</span><span class="o">;</span> <span class="n">j</span><span class="o">++)</span> <span class="o">{</span>
+              <span class="n">Mutation</span> <span class="n">cpMutation</span> <span class="o">=</span> <span class="n">cpMutations</span><span class="o">[</span><span class="n">j</span><span class="o">];</span>
+              <span class="n">checkAndPrepareMutation</span><span class="o">(</span><span class="n">cpMutation</span><span class="o">,</span> <span class="n">replay</span><span class="o">,</span> <span class="n">now</span><span class="o">);</span>
 
-          Mutation mutation = batchOp.getMutation(i);
-          if (mutation instanceof Put) {
-            updateCellTimestamps(batchOp.familyCellMaps[i].values(), byteNow);
-            noOfPuts++;
-          } else {
-            prepareDeleteTimestamps(mutation, batchOp.familyCellMaps[i], byteNow);
-            noOfDeletes++;
-          }
-          rewriteCellTags(batchOp.familyCellMaps[i], mutation);
-          WALEdit fromCP = batchOp.walEditsFromCoprocessors[i];
-          if (fromCP != null) {
-            cellCount += fromCP.size();
-          }
-        }
-      }
-      lock(this.updatesLock.readLock(), numReadyToWrite);
-      locked = true;
+              <span class="c1">// Acquire row locks. If not, the whole batch will fail.
+</span><span class="c1"></span>              <span class="n">acquiredRowLocks</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">getRowLockInternal</span><span class="o">(</span><span class="n">cpMutation</span><span class="o">.</span><span class="na">getRow</span><span class="o">(),</span> <span class="kc">true</span><span class="o">));</span>
 
-      // calling the pre CP hook for batch mutation
-      if (!replay &amp;&amp; coprocessorHost != null) {
-        MiniBatchOperationInProgress&lt;Mutation&gt; miniBatchOp =
-          new MiniBatchOperationInProgress&lt;&gt;(batchOp.getMutationsForCoprocs(),
-          batchOp.retCodeDetails, batchOp.walEditsFromCoprocessors, firstIndex, lastIndexExclusive);
-        if (coprocessorHost.preBatchMutate(miniBatchOp)) {
-          doneByCoprocessor = true;
-          return;
-        } else {
-          for (int i = firstIndex; i &lt; lastIndexExclusive; i++) {
-            if (batchOp.retCodeDetails[i].getOperationStatusCode() != OperationStatusCode.NOT_RUN) {
-              // lastIndexExclusive was incremented above.
-              continue;
-            }
-            // we pass (i - firstIndex) below since the call expects a relative index
-            Mutation[] cpMutations = miniBatchOp.getOperationsFromCoprocessors(i - firstIndex);
-            if (cpMutations == null) {
-              continue;
-            }
-            Mutation mutation = batchOp.getMutation(i);
-            boolean skipWal = getEffectiveDurability(mutation.getDurability()) == Durability.SKIP_WAL;
-            // Else Coprocessor added more Mutations corresponding to the Mutation at this index.
-            for (int j = 0; j &lt; cpMutations.length; j++) {
-              Mutation cpMutation = cpMutations[j];
-              checkAndPrepareMutation(cpMutation, replay, now);
+              <span class="c1">// Returned mutations from coprocessor correspond to the Mutation at index i. We can
+</span><span class="c1"></span>              <span class="c1">// directly add the cells from those mutations to the familyMaps of this mutation.
+</span><span class="c1"></span>              <span class="n">Map</span><span class="o">&lt;</span><span class="kt">byte</span><span class="o">[],</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">Cell</span><span class="o">&gt;&gt;</span> <span class="n">cpFamilyMap</span> <span class="o">=</span> <span class="n">cpMutation</span><span class="o">.</span><span class="na">getFamilyCellMap</span><span class="o">();</span>
+              <span class="c1">// will get added to the memStore later
+</span><span class="c1"></span>              <span class="n">mergeFamilyMaps</span><span class="o">(</span><span class="n">batchOp</span><span class="o">.</span><span class="na">familyCellMaps</span><span class="o">[</span><span class="n">i</span><span class="o">],</span> <span class="n">cpFamilyMap</span><span class="o">);</span>
 
-              // Acquire row locks. If not, the whole batch will fail.
-              acquiredRowLocks.add(getRowLockInternal(cpMutation.getRow(), true));
+              <span class="c1">// The durability of returned mutation is replaced by the corresponding mutation.
+</span><span class="c1"></span>              <span class="c1">// If the corresponding mutation contains the SKIP_WAL, we shouldn&#39;t count the
+</span><span class="c1"></span>              <span class="c1">// cells of returned mutation.
+</span><span class="c1"></span>              <span class="k">if</span> <span class="o">(!</span><span class="n">skipWal</span><span class="o">)</span> <span class="o">{</span>
+                <span class="k">for</span> <span class="o">(</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Cell</span><span class="o">&gt;</span> <span class="n">cells</span> <span class="o">:</span> <span class="n">cpFamilyMap</span><span class="o">.</span><span class="na">values</span><span class="o">())</span> <span class="o">{</span>
+                  <span class="n">cellCount</span> <span class="o">+=</span> <span class="n">cells</span><span class="o">.</span><span class="na">size</span><span class="o">();</span>
+                <span class="o">}</span>
+              <span class="o">}</span>
+            <span class="o">}</span>
+          <span class="o">}</span>
+        <span class="o">}</span>
+      <span class="o">}</span>
 
-              // Returned mutations from coprocessor correspond to the Mutation at index i. We can
-              // directly add the cells from those mutations to the familyMaps of this mutation.
-              Map&lt;byte[], List&lt;Cell&gt;&gt; cpFamilyMap = cpMutation.getFamilyCellMap();
-              // will get added to the memStore later
-              mergeFamilyMaps(batchOp.familyCellMaps[i], cpFamilyMap);
+      <span class="c1">// STEP 3. Build WAL edit
+</span><span class="c1"></span>      <span class="n">walEdit</span> <span class="o">=</span> <span class="k">new</span> <span class="n">WALEdit</span><span class="o">(</span><span class="n">cellCount</span><span class="o">,</span> <span class="n">replay</span><span class="o">);</span>
+      <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">firstIndex</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">lastIndexExclusive</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+        <span class="c1">// Skip puts that were determined to be invalid during preprocessing
+</span><span class="c1"></span>        <span class="k">if</span> <span class="o">(</span><span class="n">batchOp</span><span class="o">.</span><span class="na">retCodeDetails</span><span class="o">[</span><span class="n">i</span><span class="o">].</span><span class="na">getOperationStatusCode</span><span class="o">()</span> <span class="o">!=</span> <span class="n">OperationStatusCode</span><span class="o">.</span><span class="na">NOT_RUN</span><span class="o">)</span> <span class="o">{</span>
+          <span class="k">continue</span><span class="o">;</span>
+        <span class="o">}</span>
 
-              // The durability of returned mutation is replaced by the corresponding mutation.
-              // If the corresponding mutation contains the SKIP_WAL, we shouldn't count the
-              // cells of returned mutation.
-              if (!skipWal) {
-                for (List&lt;Cell&gt; cells : cpFamilyMap.values()) {
-                  cellCount += cells.size();
-                }
-              }
-            }
-          }
-        }
-      }
+        <span class="n">Mutation</span> <span class="n">m</span> <span class="o">=</span> <span class="n">batchOp</span><span class="o">.</span><span class="na">getMutation</span><span class="o">(</span><span class="n">i</span><span class="o">);</span>
+        <span class="c1">// we use durability of the original mutation for the mutation passed by CP.
+</span><span class="c1"></span>        <span class="k">if</span> <span class="o">(</span><span class="n">getEffectiveDurability</span><span class="o">(</span><span class="n">m</span><span class="o">.</span><span class="na">getDurability</span><span class="o">())</span> <span class="o">==</span> <span class="n">Durability</span><span class="o">.</span><span class="na">SKIP_WAL</span><span class="o">)</span> <span class="o">{</span>
+          <span class="n">recordMutationWithoutWal</span><span class="o">(</span><span class="n">m</span><span class="o">.</span><span class="na">getFamilyCellMap</span><span class="o">());</span>
+          <span class="k">continue</span><span class="o">;</span>
+        <span class="o">}</span>
 
-      // STEP 3. Build WAL edit
-      walEdit = new WALEdit(cellCount, replay);
-      for (int i = firstIndex; i &lt; lastIndexExclusive; i++) {
-        // Skip puts that were determined to be invalid during preprocessing
-        if (batchOp.retCodeDetails[i].getOperationStatusCode() != OperationStatusCode.NOT_RUN) {
-          continue;
-        }
+        <span class="kt">long</span> <span class="n">nonceGroup</span> <span class="o">=</span> <span class="n">batchOp</span><span class="o">.</span><span class="na">getNonceGroup</span><span class="o">(</span><span class="n">i</span><span class="o">);</span>
+        <span class="kt">long</span> <span class="n">nonce</span> <span class="o">=</span> <span class="n">batchOp</span><span class="o">.</span><span class="na">getNonce</span><span class="o">(</span><span class="n">i</span><span class="o">);</span>
+        <span class="c1">// In replay, the batch may contain multiple nonces. If so, write WALEdit for each.
+</span><span class="c1"></span>        <span class="c1">// Given how nonces are originally written, these should be contiguous.
+</span><span class="c1"></span>        <span class="c1">// They don&#39;t have to be, it will still work, just write more WALEdits than needed.
+</span><span class="c1"></span>        <span class="k">if</span> <span class="o">(</span><span class="n">nonceGroup</span> <span class="o">!=</span> <span class="n">currentNonceGroup</span> <span class="o">||</span> <span class="n">nonce</span> <span class="o">!=</span> <span class="n">currentNonce</span><span class="o">)</span> <span class="o">{</span>
+          <span class="c1">// Write what we have so far for nonces out to WAL
+</span><span class="c1"></span>          <span class="n">appendCurrentNonces</span><span class="o">(</span><span class="n">m</span><span class="o">,</span> <span class="n">replay</span><span class="o">,</span> <span class="n">walEdit</span><span class="o">,</span> <span class="n">now</span><span class="o">,</span> <span class="n">currentNonceGroup</span><span class="o">,</span> <span class="n">currentNonce</span><span class="o">);</span>
+          <span class="n">walEdit</span> <span class="o">=</span> <span class="k">new</span> <span class="n">WALEdit</span><span class="o">(</span><span class="n">cellCount</span><span class="o">,</span> <span class="n">replay</span><span class="o">);</span>
+          <span class="n">currentNonceGroup</span> <span class="o">=</span> <span class="n">nonceGroup</span><span class="o">;</span>
+          <span class="n">currentNonce</span> <span class="o">=</span> <span class="n">nonce</span><span class="o">;</span>
+        <span class="o">}</span>
 
-        Mutation m = batchOp.getMutation(i);
-        // we use durability of the original mutation for the mutation passed by CP.
-        if (getEffectiveDurability(m.getDurability()) == Durability.SKIP_WAL) {
-          recordMutationWithoutWal(m.getFamilyCellMap());
-          continue;
-        }
+        <span class="c1">// Add WAL edits by CP
+</span><span class="c1"></span>        <span class="n">WALEdit</span> <span class="n">fromCP</span> <span class="o">=</span> <span class="n">batchOp</span><span class="o">.</span><span class="na">walEditsFromCoprocessors</span><span class="o">[</span><span class="n">i</span><span class="o">];</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">fromCP</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+          <span class="k">for</span> <span class="o">(</span><span class="n">Cell</span> <span class="n">cell</span> <span class="o">:</span> <span class="n">fromCP</span><span class="o">.</span><span class="na">getCells</span><span class="o">())</span> <span class="o">{</span>
+            <span class="n">walEdit</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">cell</span><span class="o">);</span>
+          <span class="o">}</span>
+        <span class="o">}</span>
+        <span class="n">addFamilyMapToWALEdit</span><span class="o">(</span><span class="n">batchOp</span><span class="o">.</span><span class="na">familyCellMaps</span><span class="o">[</span><span class="n">i</span><span class="o">],</span> <span class="n">walEdit</span><span class="o">);</span>
+      <span class="o">}</span>
 
-        long nonceGroup = batchOp.getNonceGroup(i);
-        long nonce = batchOp.getNonce(i);
-        // In replay, the batch may contain multiple nonces. If so, write WALEdit for each.
-        // Given how nonces are originally written, these should be contiguous.
-        // They don't have to be, it will still work, just write more WALEdits than needed.
-        if (nonceGroup != currentNonceGroup || nonce != currentNonce) {
-          // Write what we have so far for nonces out to WAL
-          appendCurrentNonces(m, replay, walEdit, now, currentNonceGroup, currentNonce);
-          walEdit = new WALEdit(cellCount, replay);
-          currentNonceGroup = nonceGroup;
-          currentNonce = nonce;
-        }
+      <span class="c1">// STEP 4. Append the final edit to WAL and sync.
+</span><span class="c1"></span>      <span class="n">Mutation</span> <span class="n">mutation</span> <span class="o">=</span> <span class="n">batchOp</span><span class="o">.</span><span class="na">getMutation</span><span class="o">(</span><span class="n">firstIndex</span><span class="o">);</span>
+      <span class="n">writeEntry</span> <span class="o">=</span> <span class="n">doWALAppend</span><span class="o">(</span><span class="n">walEdit</span><span class="o">,</span> <span class="n">batchOp</span><span class="o">.</span><span class="na">durability</span><span class="o">,</span> <span class="n">mutation</span><span class="o">.</span><span class="na">getClusterIds</span><span class="o">(),</span> <span class="n">now</span><span class="o">,</span>
+          <span class="n">currentNonceGroup</span><span class="o">,</span> <span class="n">currentNonce</span><span class="o">,</span>
+          <span class="n">replay</span> <span class="o">?</span> <span class="n">batchOp</span><span class="o">.</span><span class="na">getReplaySequenceId</span><span class="o">()</span> <span class="o">:</span> <span class="n">WALKey</span><span class="o">.</span><span class="na">NO_SEQUENCE_ID</span><span class="o">);</span>
+      <span class="k">if</span> <span class="o">(!</span><span class="n">replay</span> <span class="o">&amp;&amp;</span> <span class="n">writeEntry</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// If no writeEntry, then not in replay and skipping WAL or some such. Begin an MVCC
+</span><span class="c1"></span>        <span class="c1">// transaction to get sequence id.
+</span><span class="c1"></span>        <span class="n">writeEntry</span> <span class="o">=</span> <span class="n">mvcc</span><span class="o">.</span><span class="na">begin</span><span class="o">();</span>
+      <span class="o">}</span>
 
-        // Add WAL edits by CP
-        WALEdit fromCP = batchOp.walEditsFromCoprocessors[i];
-        if (fromCP != null) {
-          for (Cell cell : fromCP.getCells()) {
-            walEdit.add(cell);
-          }
-        }
-        addFamilyMapToWALEdit(batchOp.familyCellMaps[i], walEdit);
-      }
+      <span class="c1">// STEP 5. Write back to memStore
+</span><span class="c1"></span>      <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">firstIndex</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">lastIndexExclusive</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">batchOp</span><span class="o">.</span><span class="na">retCodeDetails</span><span class="o">[</span><span class="n">i</span><span class="o">].</span><span class="na">getOperationStatusCode</span><span class="o">()</span> <span class="o">!=</span> <span class="n">OperationStatusCode</span><span class="o">.</span><span class="na">NOT_RUN</span><span class="o">)</span> <span class="o">{</span>
+          <span class="k">continue</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="c1">// We need to update the sequence id for following reasons.
+</span><span class="c1"></span>        <span class="c1">// 1) If the op is in replay mode, FSWALEntry#stampRegionSequenceId won&#39;t stamp sequence id.
+</span><span class="c1"></span>        <span class="c1">// 2) If no WAL, FSWALEntry won&#39;t be used
+</span><span class="c1"></span>        <span class="c1">// we use durability of the original mutation for the mutation passed by CP.
+</span><span class="c1"></span>        <span class="kt">boolean</span> <span class="n">updateSeqId</span> <span class="o">=</span> <span class="n">replay</span> <span class="o">||</span> <span class="n">batchOp</span><span class="o">.</span><span class="na">getMutation</span><span class="o">(</span><span class="n">i</span><span class="o">).</span><span class="na">getDurability</span><span class="o">()</span> <span class="o">==</span> <span class="n">Durability</span><span class="o">.</span><span class="na">SKIP_WAL</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">updateSeqId</span><span class="o">)</span> <span class="o">{</span>
+          <span class="k">this</span><span class="o">.</span><span class="na">updateSequenceId</span><span class="o">(</span><span class="n">batchOp</span><span class="o">.</span><span class="na">familyCellMaps</span><span class="o">[</span><span class="n">i</span><span class="o">].</span><span class="na">values</span><span class="o">(),</span>
+            <span class="n">replay</span><span class="o">?</span> <span class="n">batchOp</span><span class="o">.</span><span class="na">getReplaySequenceId</span><span class="o">():</span> <span class="n">writeEntry</span><span class="o">.</span><span class="na">getWriteNumber</span><span class="o">());</span>
+        <span class="o">}</span>
+        <span class="n">applyFamilyMapToMemStore</span><span class="o">(</span><span class="n">batchOp</span><span class="o">.</span><span class="na">familyCellMaps</span><span class="o">[</span><span class="n">i</span><span class="o">],</span> <span class="n">memStoreAccounting</span><span class="o">);</span>
+      <span class="o">}</span>
 
-      // STEP 4. Append the final edit to WAL and sync.
-      Mutation mutation = batchOp.getMutation(firstIndex);
-      writeEntry = doWALAppend(walEdit, batchOp.durability, mutation.getClusterIds(), now,
-          currentNonceGroup, currentNonce,
-          replay ? batchOp.getReplaySequenceId() : WALKey.NO_SEQUENCE_ID);
-      if (!replay &amp;&amp; writeEntry == null) {
-        // If no writeEntry, then not in replay and skipping WAL or some such. Begin an MVCC
-        // transaction to get sequence id.
-        writeEntry = mvcc.begin();
-      }
+      <span class="c1">// update memstore size
+</span><span class="c1"></span>      <span class="k">this</span><span class="o">.</span><span class="na">addAndGetMemStoreSize</span><span class="o">(</span><span class="n">memStoreAccounting</span><span class="o">);</span>
 
-      // STEP 5. Write back to memStore
-      for (int i = firstIndex; i &lt; lastIndexExclusive; i++) {
-        if (batchOp.retCodeDetails[i].getOperationStatusCode() != OperationStatusCode.NOT_RUN) {
-          continue;
-        }
-        // We need to update the sequence id for following reasons.
-        // 1) If the op is in replay mode, FSWALEntry#stampRegionSequenceId won't stamp sequence id.
-        // 2) If no WAL, FSWALEntry won't be used
-        // we use durability of the original mutation for the mutation passed by CP.
-        boolean updateSeqId = replay || batchOp.getMutation(i).getDurability() == Durability.SKIP_WAL;
-        if (updateSeqId) {
-          this.updateSequenceId(batchOp.familyCellMaps[i].values(),
-            replay? batchOp.getReplaySequenceId(): writeEntry.getWriteNumber());
-        }
-        applyFamilyMapToMemStore(batchOp.familyCellMaps[i], memStoreAccounting);
-      }
+      <span class="c1">// calling the post CP hook for batch mutation
+</span><span class="c1"></span>      <span class="k">if</span> <span class="o">(!</span><span class="n">replay</span> <span class="o">&amp;&amp;</span> <span class="n">coprocessorHost</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">MiniBatchOperationInProgress</span><span class="o">&lt;</span><span class="n">Mutation</span><span class="o">&gt;</span> <span class="n">miniBatchOp</span> <span class="o">=</span>
+          <span class="k">new</span> <span class="n">MiniBatchOperationInProgress</span><span class="o">&lt;&gt;(</span><span class="n">batchOp</span><span class="o">.</span><span class="na">getMutationsForCoprocs</span><span class="o">(),</span>
+          <span class="n">batchOp</span><span class="o">.</span><span class="na">retCodeDetails</span><span class="o">,</span> <span class="n">batchOp</span><span class="o">.</span><span class="na">walEditsFromCoprocessors</span><span class="o">,</span> <span class="n">firstIndex</span><span class="o">,</span> <span class="n">lastIndexExclusive</span><span class="o">);</span>
+        <span class="n">coprocessorHost</span><span class="o">.</span><span class="na">postBatchMutate</span><span class="o">(</span><span class="n">miniBatchOp</span><span class="o">);</span>
+      <span class="o">}</span>
 
-      // update memstore size
-      this.addAndGetMemStoreSize(memStoreAccounting);
+      <span class="c1">// STEP 6. Complete mvcc.
+</span><span class="c1"></span>      <span class="k">if</span> <span class="o">(</span><span class="n">writeEntry</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">mvcc</span><span class="o">.</span><span class="na">completeAndWait</span><span class="o">(</span><span class="n">writeEntry</span><span class="o">);</span>
+        <span class="n">writeEntry</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+      <span class="o">}</span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">replay</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">mvcc</span><span class="o">.</span><span class="na">advanceTo</span><span class="o">(</span><span class="n">batchOp</span><span class="o">.</span><span class="na">getReplaySequenceId</span><span class="o">());</span>
+      <span class="o">}</span>
 
-      // calling the post CP hook for batch mutation
-      if (!replay &amp;&amp; coprocessorHost != null) {
-        MiniBatchOperationInProgress&lt;Mutation&gt; miniBatchOp =
-          new MiniBatchOperationInProgress&lt;&gt;(batchOp.getMutationsForCoprocs(),
-          batchOp.retCodeDetails, batchOp.walEditsFromCoprocessors, firstIndex, lastIndexExclusive);
-        coprocessorHost.postBatchMutate(miniBatchOp);
-      }
+      <span class="n">success</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+    <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+      <span class="c1">// Call complete rather than completeAndWait because we probably had error if walKey != null
+</span><span class="c1"></span>      <span class="k">if</span> <span class="o">(</span><span class="n">writeEntry</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="n">mvcc</span><span class="o">.</span><span class="na">complete</span><span class="o">(</span><span class="n">writeEntry</span><span class="o">);</span>
 
-      // STEP 6. Complete mvcc.
-      if (writeEntry != null) {
-        mvcc.completeAndWait(writeEntry);
-        writeEntry = null;
-      }
-      if (replay) {
-        this.mvcc.advanceTo(batchOp.getReplaySequenceId());
-      }
+      <span class="k">if</span> <span class="o">(</span><span class="n">locked</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">updatesLock</span><span class="o">.</span><span class="na">readLock</span><span class="o">().</span><span class="na">unlock</span><span class="o">();</span>
+      <span class="o">}</span>
+      <span class="n">releaseRowLocks</span><span class="o">(</span><span class="n">acquiredRowLocks</span><span class="o">);</span>
 
-      success = true;
-    } finally {
-      // Call complete rather than completeAndWait because we probably had error if walKey != null
-      if (writeEntry != null) mvcc.complete(writeEntry);
+      <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">firstIndex</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">lastIndexExclusive</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">batchOp</span><span class="o">.</span><span class="na">retCodeDetails</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">==</span> <span class="n">OperationStatus</span><span class="o">.</span><span class="na">NOT_RUN</span><span class="o">)</span> <span class="o">{</span>
+          <span class="n">batchOp</span><span class="o">.</span><span class="na">retCodeDetails</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">=</span>
+              <span class="n">success</span> <span class="o">||</span> <span class="n">doneByCoprocessor</span> <span class="o">?</span> <span class="n">OperationStatus</span><span class="o">.</span><span class="na">SUCCESS</span> <span class="o">:</span> <span class="n">OperationStatus</span><span class="o">.</span><span class="na">FAILURE</span><span class="o">;</span>
+        <span class="o">}</span>
+      <span class="o">}</span>
 
-      if (locked) {
-        this.updatesLock.readLock().unlock();
-      }
-      releaseRowLocks(acquiredRowLocks);
+      <span class="c1">// synced so that the coprocessor contract is adhered to.
+</span><span class="c1"></span>      <span class="k">if</span> <span class="o">(!</span><span class="n">replay</span> <span class="o">&amp;&amp;</span> <span class="n">coprocessorHost</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">doneByCoprocessor</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">firstIndex</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">lastIndexExclusive</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+          <span class="c1">// only for successful puts
+</span><span class="c1"></span>          <span class="k">if</span> <span class="o">(</span><span class="n">batchOp</span><span class="o">.</span><span class="na">retCodeDetails</span><span class="o">[</span><span class="n">i</span><span class="o">].</span><span class="na">getOperationStatusCode</span><span class="o">()</span>
+              <span class="o">!=</span> <span class="n">OperationStatusCode</span><span class="o">.</span><span class="na">SUCCESS</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">continue</span><span class="o">;</span>
+          <span class="o">}</span>
+          <span class="n">Mutation</span> <span class="n">m</span> <span class="o">=</span> <span class="n">batchOp</span><span class="o">.</span><span class="na">getMutation</span><span class="o">(</span><span class="n">i</span><span class="o">);</span>
+          <span class="k">if</span> <span class="o">(</span><span class="n">m</span> <span class="k">instanceof</span> <span class="n">Put</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">coprocessorHost</span><span class="o">.</span><span class="na">postPut</span><span class="o">((</span><span class="n">Put</span><span class="o">)</span> <span class="n">m</span><span class="o">,</span> <span class="n">walEdit</span><span class="o">,</span> <span class="n">m</span><span class="o">.</span><span class="na">getDurability</span><span class="o">());</span>
+          <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+            <span class="n">coprocessorHost</span><span class="o">.</span><span class="na">postDelete</span><span class="o">((</span><span class="n">Delete</span><span class="o">)</span> <span class="n">m</span><span class="o">,</span> <span class="n">walEdit</span><span class="o">,</span> <span class="n">m</span><span class="o">.</span><span class="na">getDurability</span><span class="o">());</span>
+          <span class="o">}</span>
+        <span class="o">}</span>
+      <span class="o">}</span>
 
-      for (int i = firstIndex; i &lt; lastIndexExclusive; i++) {
-        if (batchOp.retCodeDetails[i] == OperationStatus.NOT_RUN) {
-          batchOp.retCodeDetails[i] =
-              success || doneByCoprocessor ? OperationStatus.SUCCESS : OperationStatus.FAILURE;
-        }
-      }
+      <span class="c1">// See if the column families were consistent through the whole thing.
+</span><span class="c1"></span>      <span class="c1">// if they were then keep them. If they were not then pass a null.
+</span><span class="c1"></span>      <span class="c1">// null will be treated as unknown.
+</span><span class="c1"></span>      <span class="c1">// Total time taken might be involving Puts and Deletes.
+</span><span class="c1"></span>      <span class="c1">// Split the time for puts and deletes based on the total number of Puts and Deletes.
+</span><span class="c1"></span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">noOfPuts</span> <span class="o">&gt;</span> <span class="n">0</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// There were some Puts in the batch.
+</span><span class="c1"></span>        <span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">metricsRegion</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+          <span class="k">this</span><span class="o">.</span><span class="na">metricsRegion</span><span class="o">.</span><span class="na">updatePut</span><span class="o">();</span>
+        <span class="o">}</span>
+      <span class="o">}</span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">noOfDeletes</span> <span class="o">&gt;</span> <span class="n">0</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// There were some Deletes in the batch.
+</span><span class="c1"></span>        <span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">metricsRegion</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+          <span class="k">this</span><span class="o">.</span><span class="na">metricsRegion</span><span class="o">.</span><span class="na">updateDelete</span><span class="o">();</span>
+        <span class="o">}</span>
+      <span class="o">}</span>
 
-      // synced so that the coprocessor contract is adhered to.
-      if (!replay &amp;&amp; coprocessorHost != null &amp;&amp; !doneByCoprocessor) {
-        for (int i = firstIndex; i &lt; lastIndexExclusive; i++) {
-          // only for successful puts
-          if (batchOp.retCodeDetails[i].getOperationStatusCode()
-              != OperationStatusCode.SUCCESS) {
-            continue;
-          }
-          Mutation m = batchOp.getMutation(i);
-          if (m instanceof Put) {
-            coprocessorHost.postPut((Put) m, walEdit, m.getDurability());
-          } else {
-            coprocessorHost.postDelete((Delete) m, walEdit, m.getDurability());
-          }
-        }
-      }
+      <span class="k">if</span> <span class="o">(</span><span class="n">coprocessorHost</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">batchOp</span><span class="o">.</span><span class="na">isInReplay</span><span class="o">())</span> <span class="o">{</span>
+        <span class="c1">// call the coprocessor hook to do any finalization steps
+</span><span class="c1"></span>        <span class="c1">// after the put is done
+</span><span class="c1"></span>        <span class="n">MiniBatchOperationInProgress</span><span class="o">&lt;</span><span class="n">Mutation</span><span class="o">&gt;</span> <span class="n">miniBatchOp</span> <span class="o">=</span>
+          <span class="k">new</span> <span class="n">MiniBatchOperationInProgress</span><span class="o">&lt;&gt;(</span><span class="n">batchOp</span><span class="o">.</span><span class="na">getMutationsForCoprocs</span><span class="o">(),</span>
+          <span class="n">batchOp</span><span class="o">.</span><span class="na">retCodeDetails</span><span class="o">,</span> <span class="n">batchOp</span><span class="o">.</span><span class="na">walEditsFromCoprocessors</span><span class="o">,</span> <span class="n">firstIndex</span><span class="o">,</span> <span class="n">lastIndexExclusive</span><span class="o">);</span>
+        <span class="n">coprocessorHost</span><span class="o">.</span><span class="na">postBatchMutateIndispensably</span><span class="o">(</span><span class="n">miniBatchOp</span><span class="o">,</span> <span class="n">success</span><span class="o">);</span>
+      <span class="o">}</span>
 
-      // See if the column families were consistent through the whole thing.
-      // if they were then keep them. If they were not then pass a null.
-      // null will be treated as unknown.
-      // Total time taken might be involving Puts and Deletes.
-      // Split the time for puts and deletes based on the total number of Puts and Deletes.
-
-      if (noOfPuts &gt; 0) {
-        // There were some Puts in the batch.
-        if (this.metricsRegion != null) {
-          this.metricsRegion.updatePut();
-        }
-      }
-      if (noOfDeletes &gt; 0) {
-        // There were some Deletes in the batch.
-        if (this.metricsRegion != null) {
-          this.metricsRegion.updateDelete();
-        }
-      }
-
-      if (coprocessorHost != null &amp;&amp; !batchOp.isInReplay()) {
-        // call the coprocessor hook to do any finalization steps
-        // after the put is done
-        MiniBatchOperationInProgress&lt;Mutation&gt; miniBatchOp =
-          new MiniBatchOperationInProgress&lt;&gt;(batchOp.getMutationsForCoprocs(),
-          batchOp.retCodeDetails, batchOp.walEditsFromCoprocessors, firstIndex, lastIndexExclusive);
-        coprocessorHost.postBatchMutateIndispensably(miniBatchOp, success);
-      }
-
-      batchOp.nextIndexToProcess = lastIndexExclusive;
-    }
-  }
-</code></pre>
-
+      <span class="n">batchOp</span><span class="o">.</span><span class="na">nextIndexToProcess</span> <span class="o">=</span> <span class="n">lastIndexExclusive</span><span class="o">;</span>
+    <span class="o">}</span>
+  <span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p><strong>Reference</strong></p>
 
 <ol>

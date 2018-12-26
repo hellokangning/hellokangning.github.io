@@ -51,7 +51,7 @@
 
 <meta itemprop="datePublished" content="2016-04-18T11:37:29&#43;08:00" />
 <meta itemprop="dateModified" content="2018-07-18T11:37:29&#43;08:00" />
-<meta itemprop="wordCount" content="1025">
+<meta itemprop="wordCount" content="1287">
 
 
 
@@ -132,8 +132,8 @@
         <div class="post-category">
             <a href="/en/categories/java/"> Java </a>
             </div>
-          <span class="more-meta"> 1025 words </span>
-          <span class="more-meta"> 5 mins read </span>
+          <span class="more-meta"> 1287 words </span>
+          <span class="more-meta"> 7 mins read </span>
         
       </div>
     </header>
@@ -167,21 +167,36 @@
 <p><img src="/images/java-linkedlist-class-diagram.png" alt="" /></p>
 
 <h1 id="node"><code>Node</code></h1>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// LinkedList.java
+</span><span class="c1"></span><span class="kd">private</span> <span class="kd">static</span> <span class="kd">class</span> <span class="nc">Node</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span> <span class="o">{</span>
+    <span class="n">E</span> <span class="n">item</span><span class="o">;</span>
+    <span class="n">Node</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span> <span class="n">next</span><span class="o">;</span>
+    <span class="n">Node</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span> <span class="n">prev</span><span class="o">;</span>
 
-<pre><code class="language-java">// LinkedList.java
-private static class Node&lt;E&gt; {
-    E item;
-    Node&lt;E&gt; next;
-    Node&lt;E&gt; prev;
-
-    Node(Node&lt;E&gt; prev, E element, Node&lt;E&gt; next) {
-        this.item = element;
-        this.next = next;
-        this.prev = prev;
-    }
-}
-</code></pre>
-
+    <span class="n">Node</span><span class="o">(</span><span class="n">Node</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span> <span class="n">prev</span><span class="o">,</span> <span class="n">E</span> <span class="n">element</span><span class="o">,</span> <span class="n">Node</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span> <span class="n">next</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">item</span> <span class="o">=</span> <span class="n">element</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">next</span> <span class="o">=</span> <span class="n">next</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">prev</span> <span class="o">=</span> <span class="n">prev</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <h1 id="member-variables">Member Variables</h1>
 
 <p>Three fields in <code>LinkedList</code> includes,</p>
@@ -191,277 +206,520 @@ private static class Node&lt;E&gt; {
 <li><code>first</code>, pointer to first node.</li>
 <li><code>last</code>, pointer to last node.</li>
 </ul>
-
-<pre><code class="language-java">// LinkedList.java
-
-public class LinkedList&lt;E&gt;
-    extends AbstractSequentialList&lt;E&gt;
-    implements List&lt;E&gt;, Deque&lt;E&gt;, Cloneable, java.io.Serializable
-{
-    transient int size = 0;
-    transient Node&lt;E&gt; first;
-    transient Node&lt;E&gt; last;
-}
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// LinkedList.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">LinkedList</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span>
+    <span class="kd">extends</span> <span class="n">AbstractSequentialList</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span>
+    <span class="kd">implements</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;,</span> <span class="n">Deque</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;,</span> <span class="n">Cloneable</span><span class="o">,</span> <span class="n">java</span><span class="o">.</span><span class="na">io</span><span class="o">.</span><span class="na">Serializable</span>
+<span class="o">{</span>
+    <span class="kd">transient</span> <span class="kt">int</span> <span class="n">size</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span>
+    <span class="kd">transient</span> <span class="n">Node</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span> <span class="n">first</span><span class="o">;</span>
+    <span class="kd">transient</span> <span class="n">Node</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span> <span class="n">last</span><span class="o">;</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <h1 id="member-functions">Member Functions</h1>
 
 <h2 id="constructor">Constructor</h2>
 
 <p>The constructor constructs a list containing the elements of the specified collection.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// LinkedList.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="nf">LinkedList</span><span class="o">(</span><span class="n">Collection</span><span class="o">&lt;?</span> <span class="kd">extends</span> <span class="n">E</span><span class="o">&gt;</span> <span class="n">c</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">this</span><span class="o">();</span>
+    <span class="n">addAll</span><span class="o">(</span><span class="n">c</span><span class="o">);</span>
+<span class="o">}</span>
 
-<pre><code class="language-java">// LinkedList.java
+<span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">addAll</span><span class="o">(</span><span class="n">Collection</span><span class="o">&lt;?</span> <span class="kd">extends</span> <span class="n">E</span><span class="o">&gt;</span> <span class="n">c</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">addAll</span><span class="o">(</span><span class="n">size</span><span class="o">,</span> <span class="n">c</span><span class="o">);</span>
+<span class="o">}</span>
 
-public LinkedList(Collection&lt;? extends E&gt; c) {
-    this();
-    addAll(c);
-}
+<span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">addAll</span><span class="o">(</span><span class="kt">int</span> <span class="n">index</span><span class="o">,</span> <span class="n">Collection</span><span class="o">&lt;?</span> <span class="kd">extends</span> <span class="n">E</span><span class="o">&gt;</span> <span class="n">c</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">checkPositionIndex</span><span class="o">(</span><span class="n">index</span><span class="o">);</span>
 
-public boolean addAll(Collection&lt;? extends E&gt; c) {
-    return addAll(size, c);
-}
+    <span class="n">Object</span><span class="o">[]</span> <span class="n">a</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="na">toArray</span><span class="o">();</span>
+    <span class="kt">int</span> <span class="n">numNew</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="na">length</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">numNew</span> <span class="o">==</span> <span class="n">0</span><span class="o">)</span>
+        <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
 
-public boolean addAll(int index, Collection&lt;? extends E&gt; c) {
-    checkPositionIndex(index);
+    <span class="n">Node</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span> <span class="n">pred</span><span class="o">,</span> <span class="n">succ</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">index</span> <span class="o">==</span> <span class="n">size</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">succ</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="n">pred</span> <span class="o">=</span> <span class="n">last</span><span class="o">;</span>
+    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+        <span class="n">succ</span> <span class="o">=</span> <span class="n">node</span><span class="o">(</span><span class="n">index</span><span class="o">);</span>
+        <span class="n">pred</span> <span class="o">=</span> <span class="n">succ</span><span class="o">.</span><span class="na">prev</span><span class="o">;</span>
+    <span class="o">}</span>
 
-    Object[] a = c.toArray();
-    int numNew = a.length;
-    if (numNew == 0)
-        return false;
+    <span class="k">for</span> <span class="o">(</span><span class="n">Object</span> <span class="n">o</span> <span class="o">:</span> <span class="n">a</span><span class="o">)</span> <span class="o">{</span>
+        <span class="nd">@SuppressWarnings</span><span class="o">(</span><span class="s">&#34;unchecked&#34;</span><span class="o">)</span> <span class="n">E</span> <span class="n">e</span> <span class="o">=</span> <span class="o">(</span><span class="n">E</span><span class="o">)</span> <span class="n">o</span><span class="o">;</span>
+        <span class="n">Node</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span> <span class="n">newNode</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Node</span><span class="o">&lt;&gt;(</span><span class="n">pred</span><span class="o">,</span> <span class="n">e</span><span class="o">,</span> <span class="kc">null</span><span class="o">);</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">pred</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span>
+            <span class="n">first</span> <span class="o">=</span> <span class="n">newNode</span><span class="o">;</span>
+        <span class="k">else</span>
+            <span class="n">pred</span><span class="o">.</span><span class="na">next</span> <span class="o">=</span> <span class="n">newNode</span><span class="o">;</span>
+        <span class="n">pred</span> <span class="o">=</span> <span class="n">newNode</span><span class="o">;</span>
+    <span class="o">}</span>
 
-    Node&lt;E&gt; pred, succ;
-    if (index == size) {
-        succ = null;
-        pred = last;
-    } else {
-        succ = node(index);
-        pred = succ.prev;
-    }
+    <span class="k">if</span> <span class="o">(</span><span class="n">succ</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">last</span> <span class="o">=</span> <span class="n">pred</span><span class="o">;</span>
+    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+        <span class="n">pred</span><span class="o">.</span><span class="na">next</span> <span class="o">=</span> <span class="n">succ</span><span class="o">;</span>
+        <span class="n">succ</span><span class="o">.</span><span class="na">prev</span> <span class="o">=</span> <span class="n">pred</span><span class="o">;</span>
+    <span class="o">}</span>
 
-    for (Object o : a) {
-        @SuppressWarnings(&quot;unchecked&quot;) E e = (E) o;
-        Node&lt;E&gt; newNode = new Node&lt;&gt;(pred, e, null);
-        if (pred == null)
-            first = newNode;
-        else
-            pred.next = newNode;
-        pred = newNode;
-    }
-
-    if (succ == null) {
-        last = pred;
-    } else {
-        pred.next = succ;
-        succ.prev = pred;
-    }
-
-    size += numNew;
-    modCount++;
-    return true;
-}
-</code></pre>
-
+    <span class="n">size</span> <span class="o">+=</span> <span class="n">numNew</span><span class="o">;</span>
+    <span class="n">modCount</span><span class="o">++;</span>
+    <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <h2 id="getfirst-getlast"><code>getFirst</code> &amp; <code>getLast</code></h2>
 
 <p><code>getFirst</code> returns the first element in this list, thanks to <code>first</code> pointer, which makes this very easy.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// LinkedList.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="n">E</span> <span class="nf">getFirst</span><span class="o">()</span> <span class="o">{</span>
+    <span class="kd">final</span> <span class="n">Node</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span> <span class="n">f</span> <span class="o">=</span> <span class="n">first</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">f</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="n">NoSuchElementException</span><span class="o">();</span>
+    <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="na">item</span><span class="o">;</span>
+<span class="o">}</span>
 
-<pre><code class="language-java">// LinkedList.java
-
-public E getFirst() {
-    final Node&lt;E&gt; f = first;
-    if (f == null)
-        throw new NoSuchElementException();
-    return f.item;
-}
-
-public E getLast() {
-    final Node&lt;E&gt; l = last;
-    if (l == null)
-        throw new NoSuchElementException();
-    return l.item;
-}
-</code></pre>
-
+<span class="kd">public</span> <span class="n">E</span> <span class="nf">getLast</span><span class="o">()</span> <span class="o">{</span>
+    <span class="kd">final</span> <span class="n">Node</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span> <span class="n">l</span> <span class="o">=</span> <span class="n">last</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">l</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="n">NoSuchElementException</span><span class="o">();</span>
+    <span class="k">return</span> <span class="n">l</span><span class="o">.</span><span class="na">item</span><span class="o">;</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <h2 id="removefirst-removelast"><code>removeFirst</code> &amp; <code>removeLast</code></h2>
 
 <p><code>removeFirst</code> retrieves and removes the head (first element) of this list, so that <code>pop</code> calls <code>removeFirst</code> directly.</p>
 
 <p>Oppositely, <code>removeLast</code> removes and returns the last element from this list.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// LinkedList.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="n">E</span> <span class="nf">removeFirst</span><span class="o">()</span> <span class="o">{</span>
+    <span class="kd">final</span> <span class="n">Node</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span> <span class="n">f</span> <span class="o">=</span> <span class="n">first</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">f</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="n">NoSuchElementException</span><span class="o">();</span>
+    <span class="k">return</span> <span class="n">unlinkFirst</span><span class="o">(</span><span class="n">f</span><span class="o">);</span>
+<span class="o">}</span>
 
-<pre><code class="language-java">// LinkedList.java
+<span class="kd">public</span> <span class="n">E</span> <span class="nf">removeLast</span><span class="o">()</span> <span class="o">{</span>
+    <span class="kd">final</span> <span class="n">Node</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span> <span class="n">l</span> <span class="o">=</span> <span class="n">last</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">l</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="n">NoSuchElementException</span><span class="o">();</span>
+    <span class="k">return</span> <span class="n">unlinkLast</span><span class="o">(</span><span class="n">l</span><span class="o">);</span>
+<span class="o">}</span>
 
-public E removeFirst() {
-    final Node&lt;E&gt; f = first;
-    if (f == null)
-        throw new NoSuchElementException();
-    return unlinkFirst(f);
-}
+<span class="kd">private</span> <span class="n">E</span> <span class="nf">unlinkFirst</span><span class="o">(</span><span class="n">Node</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span> <span class="n">f</span><span class="o">)</span> <span class="o">{</span>
+    <span class="c1">// assert f == first &amp;&amp; f != null;
+</span><span class="c1"></span>    <span class="kd">final</span> <span class="n">E</span> <span class="n">element</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="na">item</span><span class="o">;</span>
+    <span class="kd">final</span> <span class="n">Node</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span> <span class="n">next</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="na">next</span><span class="o">;</span>
+    <span class="n">f</span><span class="o">.</span><span class="na">item</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="n">f</span><span class="o">.</span><span class="na">next</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span> <span class="c1">// help GC
+</span><span class="c1"></span>    <span class="n">first</span> <span class="o">=</span> <span class="n">next</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">next</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span>
+        <span class="n">last</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="k">else</span>
+        <span class="n">next</span><span class="o">.</span><span class="na">prev</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="n">size</span><span class="o">--;</span>
+    <span class="n">modCount</span><span class="o">++;</span>
+    <span class="k">return</span> <span class="n">element</span><span class="o">;</span>
+<span class="o">}</span>
 
-public E removeLast() {
-    final Node&lt;E&gt; l = last;
-    if (l == null)
-        throw new NoSuchElementException();
-    return unlinkLast(l);
-}
-
-private E unlinkFirst(Node&lt;E&gt; f) {
-    // assert f == first &amp;&amp; f != null;
-    final E element = f.item;
-    final Node&lt;E&gt; next = f.next;
-    f.item = null;
-    f.next = null; // help GC
-    first = next;
-    if (next == null)
-        last = null;
-    else
-        next.prev = null;
-    size--;
-    modCount++;
-    return element;
-}
-
-private E unlinkLast(Node&lt;E&gt; l) {
-    // assert l == last &amp;&amp; l != null;
-    final E element = l.item;
-    final Node&lt;E&gt; prev = l.prev;
-    l.item = null;
-    l.prev = null; // help GC
-    last = prev;
-    if (prev == null)
-        first = null;
-    else
-        prev.next = null;
-    size--;
-    modCount++;
-    return element;
-}
-</code></pre>
-
+<span class="kd">private</span> <span class="n">E</span> <span class="nf">unlinkLast</span><span class="o">(</span><span class="n">Node</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span> <span class="n">l</span><span class="o">)</span> <span class="o">{</span>
+    <span class="c1">// assert l == last &amp;&amp; l != null;
+</span><span class="c1"></span>    <span class="kd">final</span> <span class="n">E</span> <span class="n">element</span> <span class="o">=</span> <span class="n">l</span><span class="o">.</span><span class="na">item</span><span class="o">;</span>
+    <span class="kd">final</span> <span class="n">Node</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span> <span class="n">prev</span> <span class="o">=</span> <span class="n">l</span><span class="o">.</span><span class="na">prev</span><span class="o">;</span>
+    <span class="n">l</span><span class="o">.</span><span class="na">item</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="n">l</span><span class="o">.</span><span class="na">prev</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span> <span class="c1">// help GC
+</span><span class="c1"></span>    <span class="n">last</span> <span class="o">=</span> <span class="n">prev</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">prev</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span>
+        <span class="n">first</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="k">else</span>
+        <span class="n">prev</span><span class="o">.</span><span class="na">next</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="n">size</span><span class="o">--;</span>
+    <span class="n">modCount</span><span class="o">++;</span>
+    <span class="k">return</span> <span class="n">element</span><span class="o">;</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>for <code>unlinkFirst</code>, you must reset the <code>last</code> pointer if needed, and <code>first</code> pointer for <code>unlinkLast</code>.</p>
 
 <h2 id="addfirst-addlast"><code>addFirst</code> &amp; <code>addLast</code></h2>
 
 <p><code>addFirst</code> inserts the specified element at the beginning of this list.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// LinkedList.java
+</span><span class="c1"></span><span class="kd">public</span> <span class="kt">void</span> <span class="nf">addFirst</span><span class="o">(</span><span class="n">E</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">linkFirst</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
+<span class="o">}</span>
 
-<pre><code class="language-java">// LinkedList.java
-public void addFirst(E e) {
-    linkFirst(e);
-}
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">addLast</span><span class="o">(</span><span class="n">E</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">linkLast</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
+<span class="o">}</span>
 
-public void addLast(E e) {
-    linkLast(e);
-}
+<span class="kd">private</span> <span class="kt">void</span> <span class="nf">linkFirst</span><span class="o">(</span><span class="n">E</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kd">final</span> <span class="n">Node</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span> <span class="n">f</span> <span class="o">=</span> <span class="n">first</span><span class="o">;</span>
+    <span class="kd">final</span> <span class="n">Node</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span> <span class="n">newNode</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Node</span><span class="o">&lt;&gt;(</span><span class="kc">null</span><span class="o">,</span> <span class="n">e</span><span class="o">,</span> <span class="n">f</span><span class="o">);</span>
+    <span class="n">first</span> <span class="o">=</span> <span class="n">newNode</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">f</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span>
+        <span class="n">last</span> <span class="o">=</span> <span class="n">newNode</span><span class="o">;</span>
+    <span class="k">else</span>
+        <span class="n">f</span><span class="o">.</span><span class="na">prev</span> <span class="o">=</span> <span class="n">newNode</span><span class="o">;</span>
+    <span class="n">size</span><span class="o">++;</span>
+    <span class="n">modCount</span><span class="o">++;</span>
+<span class="o">}</span>
 
-private void linkFirst(E e) {
-    final Node&lt;E&gt; f = first;
-    final Node&lt;E&gt; newNode = new Node&lt;&gt;(null, e, f);
-    first = newNode;
-    if (f == null)
-        last = newNode;
-    else
-        f.prev = newNode;
-    size++;
-    modCount++;
-}
-
-void linkLast(E e) {
-    final Node&lt;E&gt; l = last;
-    final Node&lt;E&gt; newNode = new Node&lt;&gt;(l, e, null);
-    last = newNode;
-    if (l == null)
-        first = newNode;
-    else
-        l.next = newNode;
-    size++;
-    modCount++;
-}
-</code></pre>
-
+<span class="kt">void</span> <span class="nf">linkLast</span><span class="o">(</span><span class="n">E</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kd">final</span> <span class="n">Node</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span> <span class="n">l</span> <span class="o">=</span> <span class="n">last</span><span class="o">;</span>
+    <span class="kd">final</span> <span class="n">Node</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span> <span class="n">newNode</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Node</span><span class="o">&lt;&gt;(</span><span class="n">l</span><span class="o">,</span> <span class="n">e</span><span class="o">,</span> <span class="kc">null</span><span class="o">);</span>
+    <span class="n">last</span> <span class="o">=</span> <span class="n">newNode</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">l</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span>
+        <span class="n">first</span> <span class="o">=</span> <span class="n">newNode</span><span class="o">;</span>
+    <span class="k">else</span>
+        <span class="n">l</span><span class="o">.</span><span class="na">next</span> <span class="o">=</span> <span class="n">newNode</span><span class="o">;</span>
+    <span class="n">size</span><span class="o">++;</span>
+    <span class="n">modCount</span><span class="o">++;</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>After a new <code>Node</code> is inserted as first node, not only <code>first</code> pointer, but also the <code>last</code> pointer may be changed.</p>
 
 <h2 id="contains-indexof"><code>contains</code> &amp; <code>indexOf</code></h2>
 
 <p><code>contains</code>, turning to <code>indexOf</code>, checks if this list contains the specified element.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// LinkedList.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">contains</span><span class="o">(</span><span class="n">Object</span> <span class="n">o</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">indexOf</span><span class="o">(</span><span class="n">o</span><span class="o">)</span> <span class="o">&gt;=</span> <span class="n">0</span><span class="o">;</span>
+<span class="o">}</span>
 
-<pre><code class="language-java">// LinkedList.java
-
-public boolean contains(Object o) {
-    return indexOf(o) &gt;= 0;
-}
-
-public int indexOf(Object o) {
-    int index = 0;
-    if (o == null) {
-        for (Node&lt;E&gt; x = first; x != null; x = x.next) {
-            if (x.item == null)
-                return index;
-            index++;
-        }
-    } else {
-        for (Node&lt;E&gt; x = first; x != null; x = x.next) {
-            if (o.equals(x.item))
-                return index;
-            index++;
-        }
-    }
-    return -1;
-}
-</code></pre>
-
+<span class="kd">public</span> <span class="kt">int</span> <span class="nf">indexOf</span><span class="o">(</span><span class="n">Object</span> <span class="n">o</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">o</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">for</span> <span class="o">(</span><span class="n">Node</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span> <span class="n">x</span> <span class="o">=</span> <span class="n">first</span><span class="o">;</span> <span class="n">x</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">;</span> <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="na">next</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">x</span><span class="o">.</span><span class="na">item</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span>
+                <span class="k">return</span> <span class="n">index</span><span class="o">;</span>
+            <span class="n">index</span><span class="o">++;</span>
+        <span class="o">}</span>
+    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+        <span class="k">for</span> <span class="o">(</span><span class="n">Node</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span> <span class="n">x</span> <span class="o">=</span> <span class="n">first</span><span class="o">;</span> <span class="n">x</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">;</span> <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="na">next</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">o</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">x</span><span class="o">.</span><span class="na">item</span><span class="o">))</span>
+                <span class="k">return</span> <span class="n">index</span><span class="o">;</span>
+            <span class="n">index</span><span class="o">++;</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+    <span class="k">return</span> <span class="o">-</span><span class="n">1</span><span class="o">;</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p><code>indexOf</code> iterates all items in the list in consecutive order and examines the equality.</p>
 
 <h2 id="remove"><code>remove</code></h2>
 
 <p><code>remove</code> removes the first occurrence of the specified element from this list, if it is present.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// LinkedList.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">remove</span><span class="o">(</span><span class="n">Object</span> <span class="n">o</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">o</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">for</span> <span class="o">(</span><span class="n">Node</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span> <span class="n">x</span> <span class="o">=</span> <span class="n">first</span><span class="o">;</span> <span class="n">x</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">;</span> <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="na">next</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">x</span><span class="o">.</span><span class="na">item</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">unlink</span><span class="o">(</span><span class="n">x</span><span class="o">);</span>
+                <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+        <span class="k">for</span> <span class="o">(</span><span class="n">Node</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span> <span class="n">x</span> <span class="o">=</span> <span class="n">first</span><span class="o">;</span> <span class="n">x</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">;</span> <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="na">next</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">o</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">x</span><span class="o">.</span><span class="na">item</span><span class="o">))</span> <span class="o">{</span>
+                <span class="n">unlink</span><span class="o">(</span><span class="n">x</span><span class="o">);</span>
+                <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+    <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+<span class="o">}</span>
 
-<pre><code class="language-java">// LinkedList.java
+<span class="n">E</span> <span class="nf">unlink</span><span class="o">(</span><span class="n">Node</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span> <span class="n">x</span><span class="o">)</span> <span class="o">{</span>
+    <span class="c1">// assert x != null;
+</span><span class="c1"></span>    <span class="kd">final</span> <span class="n">E</span> <span class="n">element</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="na">item</span><span class="o">;</span>
+    <span class="kd">final</span> <span class="n">Node</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span> <span class="n">next</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="na">next</span><span class="o">;</span>
+    <span class="kd">final</span> <span class="n">Node</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span> <span class="n">prev</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="na">prev</span><span class="o">;</span>
 
-public boolean remove(Object o) {
-    if (o == null) {
-        for (Node&lt;E&gt; x = first; x != null; x = x.next) {
-            if (x.item == null) {
-                unlink(x);
-                return true;
-            }
-        }
-    } else {
-        for (Node&lt;E&gt; x = first; x != null; x = x.next) {
-            if (o.equals(x.item)) {
-                unlink(x);
-                return true;
-            }
-        }
-    }
-    return false;
-}
+    <span class="k">if</span> <span class="o">(</span><span class="n">prev</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">first</span> <span class="o">=</span> <span class="n">next</span><span class="o">;</span>
+    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+        <span class="n">prev</span><span class="o">.</span><span class="na">next</span> <span class="o">=</span> <span class="n">next</span><span class="o">;</span>
+        <span class="n">x</span><span class="o">.</span><span class="na">prev</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="o">}</span>
 
-E unlink(Node&lt;E&gt; x) {
-    // assert x != null;
-    final E element = x.item;
-    final Node&lt;E&gt; next = x.next;
-    final Node&lt;E&gt; prev = x.prev;
+    <span class="k">if</span> <span class="o">(</span><span class="n">next</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">last</span> <span class="o">=</span> <span class="n">prev</span><span class="o">;</span>
+    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+        <span class="n">next</span><span class="o">.</span><span class="na">prev</span> <span class="o">=</span> <span class="n">prev</span><span class="o">;</span>
+        <span class="n">x</span><span class="o">.</span><span class="na">next</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="o">}</span>
 
-    if (prev == null) {
-        first = next;
-    } else {
-        prev.next = next;
-        x.prev = null;
-    }
-
-    if (next == null) {
-        last = prev;
-    } else {
-        next.prev = prev;
-        x.next = null;
-    }
-
-    x.item = null;
-    size--;
-    modCount++;
-    return element;
-}
-</code></pre>
-
+    <span class="n">x</span><span class="o">.</span><span class="na">item</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="n">size</span><span class="o">--;</span>
+    <span class="n">modCount</span><span class="o">++;</span>
+    <span class="k">return</span> <span class="n">element</span><span class="o">;</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>The steps of <code>unlink</code> lists,</p>
 
 <p><img src="/images/java-linkedlist-unlink.png" alt="" /></p>
@@ -469,37 +727,68 @@ E unlink(Node&lt;E&gt; x) {
 <h2 id="get-set"><code>get</code> &amp; <code>set</code></h2>
 
 <p><code>get</code> and <code>set</code> both call <code>node</code> to fetch the node at the specified element index.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="n">E</span> <span class="nf">get</span><span class="o">(</span><span class="kt">int</span> <span class="n">index</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">checkElementIndex</span><span class="o">(</span><span class="n">index</span><span class="o">);</span>
+    <span class="k">return</span> <span class="n">node</span><span class="o">(</span><span class="n">index</span><span class="o">).</span><span class="na">item</span><span class="o">;</span>
+<span class="o">}</span>
 
-<pre><code class="language-java">public E get(int index) {
-    checkElementIndex(index);
-    return node(index).item;
-}
+<span class="kd">public</span> <span class="n">E</span> <span class="nf">set</span><span class="o">(</span><span class="kt">int</span> <span class="n">index</span><span class="o">,</span> <span class="n">E</span> <span class="n">element</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">checkElementIndex</span><span class="o">(</span><span class="n">index</span><span class="o">);</span>
+    <span class="n">Node</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span> <span class="n">x</span> <span class="o">=</span> <span class="n">node</span><span class="o">(</span><span class="n">index</span><span class="o">);</span>
+    <span class="n">E</span> <span class="n">oldVal</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="na">item</span><span class="o">;</span>
+    <span class="n">x</span><span class="o">.</span><span class="na">item</span> <span class="o">=</span> <span class="n">element</span><span class="o">;</span>
+    <span class="k">return</span> <span class="n">oldVal</span><span class="o">;</span>
+<span class="o">}</span>
 
-public E set(int index, E element) {
-    checkElementIndex(index);
-    Node&lt;E&gt; x = node(index);
-    E oldVal = x.item;
-    x.item = element;
-    return oldVal;
-}
-
-Node&lt;E&gt; node(int index) {
-    // assert isElementIndex(index);
-
-    if (index &lt; (size &gt;&gt; 1)) {
-        Node&lt;E&gt; x = first;
-        for (int i = 0; i &lt; index; i++)
-            x = x.next;
-        return x;
-    } else {
-        Node&lt;E&gt; x = last;
-        for (int i = size - 1; i &gt; index; i--)
-            x = x.prev;
-        return x;
-    }
-}
-</code></pre>
-
+<span class="n">Node</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span> <span class="nf">node</span><span class="o">(</span><span class="kt">int</span> <span class="n">index</span><span class="o">)</span> <span class="o">{</span>
+    <span class="c1">// assert isElementIndex(index);
+</span><span class="c1"></span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">index</span> <span class="o">&lt;</span> <span class="o">(</span><span class="n">size</span> <span class="o">&gt;&gt;</span> <span class="n">1</span><span class="o">))</span> <span class="o">{</span>
+        <span class="n">Node</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span> <span class="n">x</span> <span class="o">=</span> <span class="n">first</span><span class="o">;</span>
+        <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">index</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="na">next</span><span class="o">;</span>
+        <span class="k">return</span> <span class="n">x</span><span class="o">;</span>
+    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+        <span class="n">Node</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span> <span class="n">x</span> <span class="o">=</span> <span class="n">last</span><span class="o">;</span>
+        <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">size</span> <span class="o">-</span> <span class="n">1</span><span class="o">;</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="n">index</span><span class="o">;</span> <span class="n">i</span><span class="o">--)</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="na">prev</span><span class="o">;</span>
+        <span class="k">return</span> <span class="n">x</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p><code>node(int)</code> first checks the element locates in which half of list to determine which end to start iterating.</p>
     </div>
 

@@ -17,7 +17,7 @@
 
 
 <meta name="author" content="Guoqing Geng" /><meta name="description" content="Variables are labels, not boxes. Take the following code for example:
-a = [1, 2, 3] b = a a.append(4) print(b)  If you imagine that variables are like boxes, you cannot make sense of assignment in Python. For an assignment, you must always read the right-hand side first: that&amp;rsquo;s where the object is created or retrieved. After that, the variable on the left is bound to the object, like a label stuck to it. Just forget about the boxes.
+1 2 3 4  a = [1, 2, 3] b = a a.append(4) print(b)   If you imagine that variables are like boxes, you cannot make sense of assignment in Python. For an assignment, you must always read the right-hand side first: that&amp;rsquo;s where the object is created or retrieved. After that, the variable on the left is bound to the object, like a label stuck to it. Just forget about the boxes.
 " /><meta name="keywords" content="Python, Variable, Reference" />
 
 
@@ -43,6 +43,13 @@ a = [1, 2, 3] b = a a.append(4) print(b)  If you imagine that variables are like
 <meta property="og:title" content="Variables Are Labels, Not Boxes" />
 <meta property="og:description" content="Variables are labels, not boxes. Take the following code for example:
 
+
+1
+2
+3
+4
+
+
 a = [1, 2, 3]
 b = a
 a.append(4)
@@ -59,6 +66,13 @@ If you imagine that variables are like boxes, you cannot make sense of assignmen
 <meta itemprop="name" content="Variables Are Labels, Not Boxes">
 <meta itemprop="description" content="Variables are labels, not boxes. Take the following code for example:
 
+
+1
+2
+3
+4
+
+
 a = [1, 2, 3]
 b = a
 a.append(4)
@@ -72,7 +86,7 @@ If you imagine that variables are like boxes, you cannot make sense of assignmen
 
 <meta itemprop="datePublished" content="2018-11-01T14:51:40&#43;08:00" />
 <meta itemprop="dateModified" content="2018-11-01T14:51:40&#43;08:00" />
-<meta itemprop="wordCount" content="558">
+<meta itemprop="wordCount" content="621">
 
 
 
@@ -80,6 +94,13 @@ If you imagine that variables are like boxes, you cannot make sense of assignmen
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Variables Are Labels, Not Boxes"/>
 <meta name="twitter:description" content="Variables are labels, not boxes. Take the following code for example:
+
+
+1
+2
+3
+4
+
 
 a = [1, 2, 3]
 b = a
@@ -163,7 +184,7 @@ If you imagine that variables are like boxes, you cannot make sense of assignmen
         <div class="post-category">
             <a href="/en/categories/python/"> Python </a>
             </div>
-          <span class="more-meta"> 558 words </span>
+          <span class="more-meta"> 621 words </span>
           <span class="more-meta"> 3 mins read </span>
         
       </div>
@@ -188,13 +209,20 @@ If you imagine that variables are like boxes, you cannot make sense of assignmen
 </div>
     <div class="post-content">
       <p>Variables are labels, not boxes. Take the following code for example:</p>
-
-<pre><code class="language-python">a = [1, 2, 3]
-b = a
-a.append(4)
-print(b)
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="n">a</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">a</span>
+<span class="n">a</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">b</span><span class="p">)</span></code></pre></td></tr></table>
+</div>
+</div>
 <p><img src="/images/variables-are-labels.png" alt="" /></p>
 
 <p>If you imagine that variables are like boxes, you cannot make sense of assignment in Python. For an assignment, you must always read the right-hand side first: that&rsquo;s where the object is created or retrieved. After that, the variable on the left is bound to the object, like a label stuck to it. Just forget about the boxes.</p>
@@ -202,19 +230,32 @@ print(b)
 <p>Since variables are mere labels, nothing prevents an object from having several labels assigned to it. When that happens, you have <strong>aliasing</strong>.</p>
 
 <h1 id="identity-equality-and-aliases">Identity, equality and aliases</h1>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="n">charles</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Charles&#39;</span><span class="p">,</span> <span class="s1">&#39;born&#39;</span><span class="p">:</span> <span class="mi">1932</span><span class="p">}</span>
+<span class="n">levis</span> <span class="o">=</span> <span class="n">charles</span>
+<span class="k">print</span><span class="p">(</span><span class="n">levis</span> <span class="ow">is</span> <span class="n">charles</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">levis</span><span class="p">),</span> <span class="nb">id</span><span class="p">(</span><span class="n">charles</span><span class="p">))</span>
+<span class="n">levis</span><span class="p">[</span><span class="s1">&#39;balance&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">950</span>
+<span class="k">print</span><span class="p">(</span><span class="n">charles</span><span class="p">)</span>
 
-<pre><code class="language-python">charles = {'name': 'Charles', 'born': 1932}
-levis = charles
-print(levis is charles)
-print(id(levis), id(charles))
-levis['balance'] = 950
-print(charles)
-
-alex = {'name': 'Charles', 'born': 1932, 'balance': 950}
-print(alex == charles)
-print(alex is not charles)
-</code></pre>
-
+<span class="n">alex</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Charles&#39;</span><span class="p">,</span> <span class="s1">&#39;born&#39;</span><span class="p">:</span> <span class="mi">1932</span><span class="p">,</span> <span class="s1">&#39;balance&#39;</span><span class="p">:</span> <span class="mi">950</span><span class="p">}</span>
+<span class="k">print</span><span class="p">(</span><span class="n">alex</span> <span class="o">==</span> <span class="n">charles</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">alex</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">charles</span><span class="p">)</span></code></pre></td></tr></table>
+</div>
+</div>
 <p><img src="/images/identity-equality-aliases.png" alt="" /></p>
 
 <p><code>charles</code> and <code>levis</code> refer to the same object, while <code>alex</code> is bound to a separate object of equal contents. We call <code>lewis</code> and <code>charles</code> are aliases.</p>
@@ -228,19 +269,32 @@ print(alex is not charles)
 <h2 id="are-tuples-immutable">Are tuples immutable?</h2>
 
 <p>Tuples, like most Python collections - lists, dicts, sets etc. - hold references to objects. If the referenced items are mutable, they may change even if the tuple itself does not.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="n">t1</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+<span class="n">t2</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="n">t1</span> <span class="o">==</span> <span class="n">t2</span><span class="p">)</span>
 
-<pre><code class="language-python">t1 = (1, 2, [3, 4])
-t2 = (1, 2, [3, 4])
-print(t1 == t2)
+<span class="k">print</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">t1</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+<span class="n">t1</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">t1</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">t1</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
 
-print(id(t1[-1]))
-t1[-1].append(5)
-print(t1)
-print(id(t1[-1]))
-
-print(t1 == t2)
-</code></pre>
-
+<span class="k">print</span><span class="p">(</span><span class="n">t1</span> <span class="o">==</span> <span class="n">t2</span><span class="p">)</span></code></pre></td></tr></table>
+</div>
+</div>
 <p><img src="/images/tuples-are-mutable.png" alt="" /></p>
 
 <p>The distinction between equality and identity has further implications when you need to copy an object. A copy is an equal object with a different id. But if an object contains other objects, it becomes more complicated.</p>
@@ -248,33 +302,55 @@ print(t1 == t2)
 <h1 id="copies-are-shallow-by-default">Copies are shallow by default</h1>
 
 <p>The easiest way to copy a list is to use the built-in constructor for the type itself.</p>
-
-<pre><code class="language-python">l1 = [3, [4, 5], [6,7,8]]
-l2 = list(l1)
-print(l2)
-print(l1 == l2)
-print(l1 is l2)
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="n">l1</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">]]</span>
+<span class="n">l2</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">l1</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">l2</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">l1</span> <span class="o">==</span> <span class="n">l2</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">l1</span> <span class="ow">is</span> <span class="n">l2</span><span class="p">)</span></code></pre></td></tr></table>
+</div>
+</div>
 <p><img src="/images/copies-are-shallow.png" alt="" /></p>
 
 <p>However, the constructor or <code>[:]</code> produces a shallow copy, i.e. the outermost container is duplicated, but the copy is filled with references to the same items held by the original container.</p>
 
 <p>If there are mutable items, this lead to unpleasant surprises.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="n">l1</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">]]</span>
+<span class="n">l2</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">l1</span><span class="p">)</span>
+<span class="n">l1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span>
+<span class="n">l1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s1">&#39;l1 -&gt;&#39;</span><span class="p">,</span> <span class="n">l1</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s1">&#39;l2 -&gt;&#39;</span><span class="p">,</span> <span class="n">l2</span><span class="p">)</span>
 
-<pre><code class="language-python">l1 = [3, [4, 5], [6,7,8]]
-l2 = list(l1)
-l1.append(9)
-l1[1].remove(5)
-print('l1 -&gt;', l1)
-print('l2 -&gt;', l2)
-
-l2[1] += [22, 33]
-l2[2] += [44, 55]
-print('l1 -&gt;', l1)
-print('l2 -&gt;', l2)
-</code></pre>
-
+<span class="n">l2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span><span class="mi">22</span><span class="p">,</span> <span class="mi">33</span><span class="p">]</span>
+<span class="n">l2</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span><span class="mi">44</span><span class="p">,</span> <span class="mi">55</span><span class="p">]</span>
+<span class="k">print</span><span class="p">(</span><span class="s1">&#39;l1 -&gt;&#39;</span><span class="p">,</span> <span class="n">l1</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s1">&#39;l2 -&gt;&#39;</span><span class="p">,</span> <span class="n">l2</span><span class="p">)</span></code></pre></td></tr></table>
+</div>
+</div>
 <p><img src="/images/shallow-copy-cause-surprise.png" alt="" /></p>
 
 <h2 id="deep-copies-of-arbitrary-objects">Deep copies of arbitrary objects</h2>
@@ -282,32 +358,58 @@ print('l2 -&gt;', l2)
 <p>Sometimes we need to make deep copies, i.e. duplicates that do not share references of embedded objects.</p>
 
 <p>The <code>copy</code> module provides the <code>deepcopy</code> and <code>copy</code> function that return deep and shallow copies of arbitrary objects.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Bus</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">passengers</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">passengers</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">passengers</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">passengers</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">passengers</span><span class="p">)</span>
 
-<pre><code class="language-python">class Bus:
-    def __init__(self, passengers=None):
-        if passengers is None:
-            self.passengers = []
-        else:
-            self.passengers = list(passengers)
+    <span class="k">def</span> <span class="nf">pick</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">passengers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
-    def pick(self, name):
-        self.passengers.append(name)
+    <span class="k">def</span> <span class="nf">drop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">passengers</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
-    def drop(self, name):
-        self.passengers.remove(name)
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="n">bus1</span> <span class="o">=</span> <span class="n">Bus</span><span class="p">([</span><span class="s1">&#39;Alice&#39;</span><span class="p">,</span> <span class="s1">&#39;Bill&#39;</span><span class="p">,</span> <span class="s1">&#39;Claire&#39;</span><span class="p">,</span> <span class="s1">&#39;David&#39;</span><span class="p">])</span>
+<span class="n">bus2</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">bus1</span><span class="p">)</span>
+<span class="n">bus3</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">bus1</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">bus1</span><span class="p">),</span> <span class="nb">id</span><span class="p">(</span><span class="n">bus2</span><span class="p">),</span> <span class="nb">id</span><span class="p">(</span><span class="n">bus3</span><span class="p">))</span>
 
-import copy
-bus1 = Bus(['Alice', 'Bill', 'Claire', 'David'])
-bus2 = copy.copy(bus1)
-bus3 = copy.deepcopy(bus1)
-print(id(bus1), id(bus2), id(bus3))
-
-bus1.drop('Bill')
-print(bus2.passengers)
-print(bus3.passengers)
-print(id(bus1.passengers), id(bus2.passengers), id(bus3.passengers))
-</code></pre>
-
+<span class="n">bus1</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;Bill&#39;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">bus2</span><span class="o">.</span><span class="n">passengers</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">bus3</span><span class="o">.</span><span class="n">passengers</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">bus1</span><span class="o">.</span><span class="n">passengers</span><span class="p">),</span> <span class="nb">id</span><span class="p">(</span><span class="n">bus2</span><span class="o">.</span><span class="n">passengers</span><span class="p">),</span> <span class="nb">id</span><span class="p">(</span><span class="n">bus3</span><span class="o">.</span><span class="n">passengers</span><span class="p">))</span></code></pre></td></tr></table>
+</div>
+</div>
 <p><img src="/images/copy-module-deepcopy.png" alt="" /></p>
 
 <p>If you want to control the behavior of both <code>copy</code> and <code>deepcopy</code>, implement the <code>__copy__()</code> and <code>__deepcopy__()</code> special methods.</p>

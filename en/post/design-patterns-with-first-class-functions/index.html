@@ -56,7 +56,7 @@ In this post, I will refactor Strategy using functions objects.">
 
 <meta itemprop="datePublished" content="2018-10-27T16:16:13&#43;08:00" />
 <meta itemprop="dateModified" content="2018-10-27T21:16:13&#43;08:00" />
-<meta itemprop="wordCount" content="750">
+<meta itemprop="wordCount" content="910">
 
 
 
@@ -139,8 +139,8 @@ In this post, I will refactor Strategy using functions objects."/>
         <div class="post-category">
             <a href="/en/categories/python/"> Python </a>
             </div>
-          <span class="more-meta"> 750 words </span>
-          <span class="more-meta"> 4 mins read </span>
+          <span class="more-meta"> 910 words </span>
+          <span class="more-meta"> 5 mins read </span>
         
       </div>
     </header>
@@ -182,177 +182,343 @@ In this post, I will refactor Strategy using functions objects."/>
 <li>Strategy. The interface common to the components that implement different algorithms. In our example, it&rsquo;s <code>Promotion</code>.</li>
 <li>Concrete Strategy. One of the concrete subclasses of Strategy. <code>LargeOrderPromo</code>, <code>BulkItemPromo</code>, and <code>FidelityPromo</code>.</li>
 </ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span><span class="lnt">80
+</span><span class="lnt">81
+</span><span class="lnt">82
+</span><span class="lnt">83
+</span><span class="lnt">84
+</span><span class="lnt">85
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
 
-<pre><code class="language-python">from abc import ABC, abstractmethod
-from collections import namedtuple
+<span class="n">Customer</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Customer&#39;</span><span class="p">,</span> <span class="s1">&#39;name fidelity&#39;</span><span class="p">)</span>
 
-Customer = namedtuple('Customer', 'name fidelity')
+<span class="k">class</span> <span class="nc">LineItem</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">product</span><span class="p">,</span> <span class="n">quantity</span><span class="p">,</span> <span class="n">price</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">product</span> <span class="o">=</span> <span class="n">product</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">quantity</span> <span class="o">=</span> <span class="n">quantity</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">price</span> <span class="o">=</span> <span class="n">price</span>
 
-class LineItem:
-    def __init__(self, product, quantity, price):
-        self.product = product
-        self.quantity = quantity
-        self.price = price
+    <span class="k">def</span> <span class="nf">total</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">price</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">quantity</span>
 
-    def total(self):
-        return self.price * self.quantity
+<span class="k">class</span> <span class="nc">Order</span><span class="p">:</span> <span class="c1"># Context</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">customer</span><span class="p">,</span> <span class="n">cart</span><span class="p">,</span> <span class="n">promotion</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">customer</span> <span class="o">=</span> <span class="n">customer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cart</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">cart</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">promotion</span> <span class="o">=</span> <span class="n">promotion</span>
 
-class Order: # Context
-    def __init__(self, customer, cart, promotion=None):
-        self.customer = customer
-        self.cart = list(cart)
-        self.promotion = promotion
+    <span class="k">def</span> <span class="nf">total</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;__total&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">total</span><span class="p">()</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cart</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__total</span>
 
-    def total(self):
-        if not hasattr(self, '__total'):
-            self.__total = sum(item.total() for item in self.cart)
-            return self.__total
+    <span class="k">def</span> <span class="nf">due</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">discount</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">promotion</span> <span class="ow">is</span> <span class="bp">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">promotion</span><span class="o">.</span><span class="n">discount</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-    def due(self):
-        discount = 0 if self.promotion is None else self.promotion.discount(self)
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">total</span><span class="p">()</span> <span class="o">-</span> <span class="n">discount</span>
 
-        return self.total() - discount
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;&lt;Order total: {:.2f} due: {:.2f}&gt;&#39;</span>
+        <span class="k">return</span> <span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">due</span><span class="p">())</span>
 
-    def __repr__(self):
-        fmt = '&lt;Order total: {:.2f} due: {:.2f}&gt;'
-        return fmt.format(self.total(), self.due())
+<span class="k">class</span> <span class="nc">Promotion</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span> <span class="c1"># the Strategy: an Abstract Base Class</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">discount</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
+        <span class="s2">&#34;&#34;&#34;
+</span><span class="s2">        Return discount as a positive dollar amount
+</span><span class="s2">        &#34;&#34;&#34;</span>
 
-class Promotion(ABC): # the Strategy: an Abstract Base Class
-    @abstractmethod
-    def discount(self, order):
-        &quot;&quot;&quot;
-        Return discount as a positive dollar amount
-        &quot;&quot;&quot;
+<span class="k">class</span> <span class="nc">FidelityPromo</span><span class="p">(</span><span class="n">Promotion</span><span class="p">):</span> <span class="c1"># Concrete Strategy</span>
+    <span class="k">def</span> <span class="nf">discount</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
+        <span class="s2">&#34;&#34;&#34;
+</span><span class="s2">        5</span><span class="si">% d</span><span class="s2">iscount for customers with 1000 or more fidelity points
+</span><span class="s2">        &#34;&#34;&#34;</span>
+        <span class="k">return</span> <span class="n">order</span><span class="o">.</span><span class="n">total</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.05</span> <span class="k">if</span> <span class="n">order</span><span class="o">.</span><span class="n">customer</span><span class="o">.</span><span class="n">fidelity</span> <span class="o">&gt;=</span> <span class="mi">1000</span> <span class="k">else</span> <span class="mi">0</span>
 
-class FidelityPromo(Promotion): # Concrete Strategy
-    def discount(self, order):
-        &quot;&quot;&quot;
-        5% discount for customers with 1000 or more fidelity points
-        &quot;&quot;&quot;
-        return order.total() * 0.05 if order.customer.fidelity &gt;= 1000 else 0
+<span class="k">class</span> <span class="nc">BulkItemPromo</span><span class="p">(</span><span class="n">Promotion</span><span class="p">):</span> <span class="c1"># Concrete Strategy</span>
+    <span class="k">def</span> <span class="nf">discount</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
+        <span class="s2">&#34;&#34;&#34;
+</span><span class="s2">        10</span><span class="si">% d</span><span class="s2">iscount for each LineItem with 20 or more units
+</span><span class="s2">        &#34;&#34;&#34;</span>
+        <span class="n">discount</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">order</span><span class="o">.</span><span class="n">cart</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">quantity</span> <span class="o">&gt;=</span> <span class="mi">20</span><span class="p">:</span>
+                <span class="n">discount</span> <span class="o">+=</span> <span class="n">item</span><span class="o">.</span><span class="n">total</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.1</span>
 
-class BulkItemPromo(Promotion): # Concrete Strategy
-    def discount(self, order):
-        &quot;&quot;&quot;
-        10% discount for each LineItem with 20 or more units
-        &quot;&quot;&quot;
-        discount = 0
-        for item in order.cart:
-            if item.quantity &gt;= 20:
-                discount += item.total() * 0.1
+        <span class="k">return</span> <span class="n">discount</span>
 
-        return discount
+<span class="k">class</span> <span class="nc">LargeOrderPromo</span><span class="p">(</span><span class="n">Promotion</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">discount</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
+        <span class="s2">&#34;&#34;&#34;
+</span><span class="s2">        7</span><span class="si">% d</span><span class="s2">iscount for orders with 10 or more distinct items
+</span><span class="s2">        &#34;&#34;&#34;</span>
+        <span class="n">distinctItems</span> <span class="o">=</span> <span class="p">{</span><span class="n">item</span><span class="o">.</span><span class="n">product</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">order</span><span class="o">.</span><span class="n">cart</span><span class="p">}</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">distinctItems</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">order</span><span class="o">.</span><span class="n">total</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.07</span>
 
-class LargeOrderPromo(Promotion):
-    def discount(self, order):
-        &quot;&quot;&quot;
-        7% discount for orders with 10 or more distinct items
-        &quot;&quot;&quot;
-        distinctItems = {item.product for item in order.cart}
-        if len(distinctItems) &gt;= 10:
-            return order.total() * 0.07
+        <span class="k">return</span> <span class="mi">0</span>
 
-        return 0
+<span class="n">joe</span> <span class="o">=</span> <span class="n">Customer</span><span class="p">(</span><span class="s1">&#39;John Doe&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">ann</span> <span class="o">=</span> <span class="n">Customer</span><span class="p">(</span><span class="s1">&#39;Ann Smith&#39;</span><span class="p">,</span> <span class="mi">1100</span><span class="p">)</span>
+<span class="n">cart</span> <span class="o">=</span> <span class="p">[</span><span class="n">LineItem</span><span class="p">(</span><span class="s1">&#39;banana&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
+        <span class="n">LineItem</span><span class="p">(</span><span class="s1">&#39;apple&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">),</span>
+        <span class="n">LineItem</span><span class="p">(</span><span class="s1">&#39;watermellon&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">)]</span>
 
-joe = Customer('John Doe', 0)
-ann = Customer('Ann Smith', 1100)
-cart = [LineItem('banana', 4, 0.5),
-        LineItem('apple', 10, 1.5),
-        LineItem('watermellon', 5, 5.0)]
+<span class="k">print</span><span class="p">(</span><span class="n">Order</span><span class="p">(</span><span class="n">joe</span><span class="p">,</span> <span class="n">cart</span><span class="p">,</span> <span class="n">FidelityPromo</span><span class="p">()))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">Order</span><span class="p">(</span><span class="n">ann</span><span class="p">,</span> <span class="n">cart</span><span class="p">,</span> <span class="n">FidelityPromo</span><span class="p">()))</span>
 
-print(Order(joe, cart, FidelityPromo()))
-print(Order(ann, cart, FidelityPromo()))
+<span class="n">bananaCart</span> <span class="o">=</span> <span class="p">[</span><span class="n">LineItem</span><span class="p">(</span><span class="s1">&#39;banana&#39;</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">),</span> <span class="n">LineItem</span><span class="p">(</span><span class="s1">&#39;apple&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">)]</span>
+<span class="k">print</span><span class="p">(</span><span class="n">Order</span><span class="p">(</span><span class="n">joe</span><span class="p">,</span> <span class="n">bananaCart</span><span class="p">,</span> <span class="n">BulkItemPromo</span><span class="p">()))</span>
 
-bananaCart = [LineItem('banana', 30, 0.05), LineItem('apple', 10, 1.5)]
-print(Order(joe, bananaCart, BulkItemPromo()))
-
-longOrder = [LineItem(str(item), 1, 1.0) for item in range(10)]
-print(Order(joe, longOrder, LargeOrderPromo()))
-</code></pre>
-
+<span class="n">longOrder</span> <span class="o">=</span> <span class="p">[</span><span class="n">LineItem</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">item</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
+<span class="k">print</span><span class="p">(</span><span class="n">Order</span><span class="p">(</span><span class="n">joe</span><span class="p">,</span> <span class="n">longOrder</span><span class="p">,</span> <span class="n">LargeOrderPromo</span><span class="p">()))</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>The above code works perfectly well, but same functionality can be implemented with less code in Python.</p>
 
 <h1 id="functions-oriented-strategy">Functions-oriented Strategy</h1>
 
 <p>Each concrete strategy in our example is a class with a single method, which can be replaced with a simple function.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
 
-<pre><code class="language-python">from abc import ABC, abstractmethod
-from collections import namedtuple
+<span class="n">Customer</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Customer&#39;</span><span class="p">,</span> <span class="s1">&#39;name fidelity&#39;</span><span class="p">)</span>
 
-Customer = namedtuple('Customer', 'name fidelity')
+<span class="k">class</span> <span class="nc">LineItem</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">product</span><span class="p">,</span> <span class="n">quantity</span><span class="p">,</span> <span class="n">price</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">product</span> <span class="o">=</span> <span class="n">product</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">quantity</span> <span class="o">=</span> <span class="n">quantity</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">price</span> <span class="o">=</span> <span class="n">price</span>
 
-class LineItem:
-    def __init__(self, product, quantity, price):
-        self.product = product
-        self.quantity = quantity
-        self.price = price
+    <span class="k">def</span> <span class="nf">total</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">price</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">quantity</span>
 
-    def total(self):
-        return self.price * self.quantity
+<span class="k">class</span> <span class="nc">Order</span><span class="p">:</span> <span class="c1"># Context</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">customer</span><span class="p">,</span> <span class="n">cart</span><span class="p">,</span> <span class="n">promotion</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">customer</span> <span class="o">=</span> <span class="n">customer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cart</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">cart</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">promotion</span> <span class="o">=</span> <span class="n">promotion</span>
 
-class Order: # Context
-    def __init__(self, customer, cart, promotion=None):
-        self.customer = customer
-        self.cart = list(cart)
-        self.promotion = promotion
+    <span class="k">def</span> <span class="nf">total</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;__total&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">total</span><span class="p">()</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cart</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__total</span>
 
-    def total(self):
-        if not hasattr(self, '__total'):
-            self.__total = sum(item.total() for item in self.cart)
-            return self.__total
+    <span class="k">def</span> <span class="nf">due</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">discount</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">promotion</span> <span class="ow">is</span> <span class="bp">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">promotion</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-    def due(self):
-        discount = 0 if self.promotion is None else self.promotion(self)
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">total</span><span class="p">()</span> <span class="o">-</span> <span class="n">discount</span>
 
-        return self.total() - discount
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;&lt;Order total: {:.2f} due: {:.2f}&gt;&#39;</span>
+        <span class="k">return</span> <span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">due</span><span class="p">())</span>
 
-    def __repr__(self):
-        fmt = '&lt;Order total: {:.2f} due: {:.2f}&gt;'
-        return fmt.format(self.total(), self.due())
+<span class="k">def</span> <span class="nf">fidelityPromo</span><span class="p">(</span><span class="n">order</span><span class="p">):</span>
+    <span class="s2">&#34;&#34;&#34;
+</span><span class="s2">    5</span><span class="si">% d</span><span class="s2">iscount for customers with 1000 or more fidelity points
+</span><span class="s2">    &#34;&#34;&#34;</span>
+    <span class="k">return</span> <span class="n">order</span><span class="o">.</span><span class="n">total</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.05</span> <span class="k">if</span> <span class="n">order</span><span class="o">.</span><span class="n">customer</span><span class="o">.</span><span class="n">fidelity</span> <span class="o">&gt;=</span> <span class="mi">1000</span> <span class="k">else</span> <span class="mi">0</span>
 
-def fidelityPromo(order):
-    &quot;&quot;&quot;
-    5% discount for customers with 1000 or more fidelity points
-    &quot;&quot;&quot;
-    return order.total() * 0.05 if order.customer.fidelity &gt;= 1000 else 0
+<span class="k">def</span> <span class="nf">bulkItemPromo</span><span class="p">(</span><span class="n">order</span><span class="p">):</span>
+    <span class="s2">&#34;&#34;&#34;
+</span><span class="s2">    10</span><span class="si">% d</span><span class="s2">iscount for each LineItem with 20 or more units
+</span><span class="s2">    &#34;&#34;&#34;</span>
+    <span class="n">discount</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">order</span><span class="o">.</span><span class="n">cart</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">quantity</span> <span class="o">&gt;=</span> <span class="mi">20</span><span class="p">:</span>
+            <span class="n">discount</span> <span class="o">+=</span> <span class="n">item</span><span class="o">.</span><span class="n">total</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.1</span>
 
-def bulkItemPromo(order):
-    &quot;&quot;&quot;
-    10% discount for each LineItem with 20 or more units
-    &quot;&quot;&quot;
-    discount = 0
-    for item in order.cart:
-        if item.quantity &gt;= 20:
-            discount += item.total() * 0.1
+    <span class="k">return</span> <span class="n">discount</span>
 
-    return discount
+<span class="k">def</span> <span class="nf">largeOrderPromo</span><span class="p">(</span><span class="n">order</span><span class="p">):</span>
+    <span class="s2">&#34;&#34;&#34;
+</span><span class="s2">    7</span><span class="si">% d</span><span class="s2">iscount for orders with 10 or more distinct items
+</span><span class="s2">    &#34;&#34;&#34;</span>
+    <span class="n">distinctItems</span> <span class="o">=</span> <span class="p">{</span><span class="n">item</span><span class="o">.</span><span class="n">product</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">order</span><span class="o">.</span><span class="n">cart</span><span class="p">}</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">distinctItems</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">10</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">order</span><span class="o">.</span><span class="n">total</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.07</span>
 
-def largeOrderPromo(order):
-    &quot;&quot;&quot;
-    7% discount for orders with 10 or more distinct items
-    &quot;&quot;&quot;
-    distinctItems = {item.product for item in order.cart}
-    if len(distinctItems) &gt;= 10:
-        return order.total() * 0.07
+    <span class="k">return</span> <span class="mi">0</span>
 
-    return 0
+<span class="n">joe</span> <span class="o">=</span> <span class="n">Customer</span><span class="p">(</span><span class="s1">&#39;John Doe&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">ann</span> <span class="o">=</span> <span class="n">Customer</span><span class="p">(</span><span class="s1">&#39;Ann Smith&#39;</span><span class="p">,</span> <span class="mi">1100</span><span class="p">)</span>
+<span class="n">cart</span> <span class="o">=</span> <span class="p">[</span><span class="n">LineItem</span><span class="p">(</span><span class="s1">&#39;banana&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
+        <span class="n">LineItem</span><span class="p">(</span><span class="s1">&#39;apple&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">),</span>
+        <span class="n">LineItem</span><span class="p">(</span><span class="s1">&#39;watermellon&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">)]</span>
 
-joe = Customer('John Doe', 0)
-ann = Customer('Ann Smith', 1100)
-cart = [LineItem('banana', 4, 0.5),
-        LineItem('apple', 10, 1.5),
-        LineItem('watermellon', 5, 5.0)]
+<span class="k">print</span><span class="p">(</span><span class="n">Order</span><span class="p">(</span><span class="n">joe</span><span class="p">,</span> <span class="n">cart</span><span class="p">,</span> <span class="n">fidelityPromo</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">Order</span><span class="p">(</span><span class="n">ann</span><span class="p">,</span> <span class="n">cart</span><span class="p">,</span> <span class="n">fidelityPromo</span><span class="p">))</span>
 
-print(Order(joe, cart, fidelityPromo))
-print(Order(ann, cart, fidelityPromo))
+<span class="n">bananaCart</span> <span class="o">=</span> <span class="p">[</span><span class="n">LineItem</span><span class="p">(</span><span class="s1">&#39;banana&#39;</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">),</span> <span class="n">LineItem</span><span class="p">(</span><span class="s1">&#39;apple&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">)]</span>
+<span class="k">print</span><span class="p">(</span><span class="n">Order</span><span class="p">(</span><span class="n">joe</span><span class="p">,</span> <span class="n">bananaCart</span><span class="p">,</span> <span class="n">bulkItemPromo</span><span class="p">))</span>
 
-bananaCart = [LineItem('banana', 30, 0.05), LineItem('apple', 10, 1.5)]
-print(Order(joe, bananaCart, bulkItemPromo))
-
-longOrder = [LineItem(str(item), 1, 1.0) for item in range(10)]
-print(Order(joe, longOrder, largeOrderPromo))
-</code></pre>
-
+<span class="n">longOrder</span> <span class="o">=</span> <span class="p">[</span><span class="n">LineItem</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">item</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
+<span class="k">print</span><span class="p">(</span><span class="n">Order</span><span class="p">(</span><span class="n">joe</span><span class="p">,</span> <span class="n">longOrder</span><span class="p">,</span> <span class="n">largeOrderPromo</span><span class="p">))</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>There is no need to instantiate a new promotion object with each new order: the functions are ready to use.</p>
 
 <p><strong>Reference</strong></p>

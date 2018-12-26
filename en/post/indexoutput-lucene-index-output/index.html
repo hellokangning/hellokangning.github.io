@@ -53,7 +53,7 @@ Indexwriter: Lucene Index Creation and Maintenance, IndexOutput, a random-access
 
 <meta itemprop="datePublished" content="2018-04-09T11:25:40&#43;08:00" />
 <meta itemprop="dateModified" content="2018-04-09T11:25:40&#43;08:00" />
-<meta itemprop="wordCount" content="434">
+<meta itemprop="wordCount" content="512">
 
 
 
@@ -135,7 +135,7 @@ Indexwriter: Lucene Index Creation and Maintenance, IndexOutput, a random-access
         <div class="post-category">
             <a href="/en/categories/elasticsearch/"> Elasticsearch </a>
             </div>
-          <span class="more-meta"> 434 words </span>
+          <span class="more-meta"> 512 words </span>
           <span class="more-meta"> 3 mins read </span>
         
       </div>
@@ -165,29 +165,51 @@ Indexwriter: Lucene Index Creation and Maintenance</a>, <code>IndexOutput</code>
 <p><img src="/images/indexoutput-class-diagram.png" alt="" /></p>
 
 <p>and also from source code:</p>
-
-<pre><code class="language-java">// Directory.java
-
-public abstract class Directory implements Closeable {
-  /** Creates a new, empty file in the directory with the given name.
-      Returns a stream writing this file. */
-  public abstract IndexOutput createOutput(String name, IOContext context) throws IOException;
-}
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// Directory.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="kd">abstract</span> <span class="kd">class</span> <span class="nc">Directory</span> <span class="kd">implements</span> <span class="n">Closeable</span> <span class="o">{</span>
+  <span class="cm">/** Creates a new, empty file in the directory with the given name.
+</span><span class="cm">      Returns a stream writing this file. */</span>
+  <span class="kd">public</span> <span class="kd">abstract</span> <span class="n">IndexOutput</span> <span class="nf">createOutput</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">,</span> <span class="n">IOContext</span> <span class="n">context</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>Remember <a href="https://hellokangning.github.io/en/post/indexwriter-lucene-index-creation-maintenance/#storedfieldswriter"><code>SimpleTextStoredFieldsWriter</code></a>? It is initialized with one <code>Directory</code> instance.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// SimpleTextStoredFieldsFormat.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">SimpleTextStoredFieldsFormat</span> <span class="kd">extends</span> <span class="n">StoredFieldsFormat</span> <span class="o">{</span>
 
-<pre><code class="language-java">// SimpleTextStoredFieldsFormat.java
-
-public class SimpleTextStoredFieldsFormat extends StoredFieldsFormat {
-
-  @Override
-  public StoredFieldsWriter fieldsWriter(Directory directory, SegmentInfo si, IOContext context) throws IOException {
-    return new SimpleTextStoredFieldsWriter(directory, si.name, context);
-  }
-}
-</code></pre>
-
+  <span class="nd">@Override</span>
+  <span class="kd">public</span> <span class="n">StoredFieldsWriter</span> <span class="nf">fieldsWriter</span><span class="o">(</span><span class="n">Directory</span> <span class="n">directory</span><span class="o">,</span> <span class="n">SegmentInfo</span> <span class="n">si</span><span class="o">,</span> <span class="n">IOContext</span> <span class="n">context</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="n">SimpleTextStoredFieldsWriter</span><span class="o">(</span><span class="n">directory</span><span class="o">,</span> <span class="n">si</span><span class="o">.</span><span class="na">name</span><span class="o">,</span> <span class="n">context</span><span class="o">);</span>
+  <span class="o">}</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>Put <code>Directory</code> aside, let&rsquo;s focus on <code>IndexOutput</code>.</p>
 
 <h2 id="dataoutput"><code>DataOutput</code></h2>
@@ -199,83 +221,154 @@ public class SimpleTextStoredFieldsFormat extends StoredFieldsFormat {
 <li><code>writeInt</code></li>
 <li><code>writeString</code></li>
 </ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// DataOutput.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="kd">abstract</span> <span class="kd">class</span> <span class="nc">DataOutput</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="kd">abstract</span> <span class="kt">void</span> <span class="nf">writeByte</span><span class="o">(</span><span class="kt">byte</span> <span class="n">b</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
 
-<pre><code class="language-java">// DataOutput.java
+  <span class="c1">// Writes a single byte
+</span><span class="c1"></span>  <span class="kd">public</span> <span class="kd">abstract</span> <span class="kt">void</span> <span class="nf">writeByte</span><span class="o">(</span><span class="kt">byte</span> <span class="n">b</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
 
-public abstract class DataOutput {
-  public abstract void writeByte(byte b) throws IOException;
+  <span class="c1">// Writes an int as for bytes
+</span><span class="c1"></span>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">writeInt</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+    <span class="n">writeByte</span><span class="o">((</span><span class="kt">byte</span><span class="o">)(</span><span class="n">i</span> <span class="o">&gt;&gt;</span> <span class="n">24</span><span class="o">));</span>
+    <span class="n">writeByte</span><span class="o">((</span><span class="kt">byte</span><span class="o">)(</span><span class="n">i</span> <span class="o">&gt;&gt;</span> <span class="n">16</span><span class="o">));</span>
+    <span class="n">writeByte</span><span class="o">((</span><span class="kt">byte</span><span class="o">)(</span><span class="n">i</span> <span class="o">&gt;&gt;</span>  <span class="n">8</span><span class="o">));</span>
+    <span class="n">writeByte</span><span class="o">((</span><span class="kt">byte</span><span class="o">)</span> <span class="n">i</span><span class="o">);</span>
+  <span class="o">}</span>
 
-  // Writes a single byte
-  public abstract void writeByte(byte b) throws IOException;
-
-  // Writes an int as for bytes
-  public void writeInt(int i) throws IOException {
-    writeByte((byte)(i &gt;&gt; 24));
-    writeByte((byte)(i &gt;&gt; 16));
-    writeByte((byte)(i &gt;&gt;  8));
-    writeByte((byte) i);
-  }
-
-  // Writes a string
-  public void writeString(String s) throws IOException {
-    final BytesRef utf8Result = new BytesRef(s);
-    writeVInt(utf8Result.length);
-    writeBytes(utf8Result.bytes, utf8Result.offset, utf8Result.length);
-  }
-}
-</code></pre>
-
+  <span class="c1">// Writes a string
+</span><span class="c1"></span>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">writeString</span><span class="o">(</span><span class="n">String</span> <span class="n">s</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+    <span class="kd">final</span> <span class="n">BytesRef</span> <span class="n">utf8Result</span> <span class="o">=</span> <span class="k">new</span> <span class="n">BytesRef</span><span class="o">(</span><span class="n">s</span><span class="o">);</span>
+    <span class="n">writeVInt</span><span class="o">(</span><span class="n">utf8Result</span><span class="o">.</span><span class="na">length</span><span class="o">);</span>
+    <span class="n">writeBytes</span><span class="o">(</span><span class="n">utf8Result</span><span class="o">.</span><span class="na">bytes</span><span class="o">,</span> <span class="n">utf8Result</span><span class="o">.</span><span class="na">offset</span><span class="o">,</span> <span class="n">utf8Result</span><span class="o">.</span><span class="na">length</span><span class="o">);</span>
+  <span class="o">}</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <h1 id="indexoutput"><code>IndexOutput</code></h1>
 
 <p><code>IndexOutput</code> extends <code>DataOutput</code> and imlements <code>Closeable</code> which requires it override <code>close</code> method. Besides this, <code>IndexOutput</code> affiliates name and description for <code>DataOutput</code>.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// IndexOutput.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="kd">abstract</span> <span class="kd">class</span> <span class="nc">IndexOutput</span> <span class="kd">extends</span> <span class="n">DataOutput</span> <span class="kd">implements</span> <span class="n">Closeable</span> <span class="o">{</span>
+  <span class="cm">/** Full description of this output, e.g. which class such as FSIndexOutput, and the full path to the file */</span>
+  <span class="kd">private</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">resourceDescription</span><span class="o">;</span>
 
-<pre><code class="language-java">// IndexOutput.java
+  <span class="cm">/** Just the name part from resourceDescription */</span>
+  <span class="kd">private</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">name</span><span class="o">;</span>
 
-public abstract class IndexOutput extends DataOutput implements Closeable {
-  /** Full description of this output, e.g. which class such as FSIndexOutput, and the full path to the file */
-  private final String resourceDescription;
-
-  /** Just the name part from resourceDescription */
-  private final String name;
-
-  @Override
-  public abstract void close() throws IOException;
-}
-</code></pre>
-
+  <span class="nd">@Override</span>
+  <span class="kd">public</span> <span class="kd">abstract</span> <span class="kt">void</span> <span class="nf">close</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <h1 id="outputstreamindexoutput"><code>OutputStreamIndexOutput</code></h1>
 
 <p>When it comes to <code>OutputStreamIndexOutput</code>, the derived of <code>IndexOutput</code>, it implements for buffered that wites to an <code>OutputStream</code>.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// OutputStreamIndexOutput.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">OutputStreamIndexOutput</span> <span class="kd">extends</span> <span class="n">IndexOutput</span> <span class="o">{</span>
+  <span class="kd">private</span> <span class="kd">final</span> <span class="n">BufferedOutputStream</span> <span class="n">os</span><span class="o">;</span>
 
-<pre><code class="language-java">// OutputStreamIndexOutput.java
+  <span class="nd">@Override</span>
+  <span class="kd">public</span> <span class="kd">final</span> <span class="kt">void</span> <span class="nf">writeByte</span><span class="o">(</span><span class="kt">byte</span> <span class="n">b</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+    <span class="n">os</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="n">b</span><span class="o">);</span>
+    <span class="n">bytesWritten</span><span class="o">++;</span>
+  <span class="o">}</span>
 
-public class OutputStreamIndexOutput extends IndexOutput {
-  private final BufferedOutputStream os;
-
-  @Override
-  public final void writeByte(byte b) throws IOException {
-    os.write(b);
-    bytesWritten++;
-  }
-
-  @Override
-  public void close() throws IOException {
-    try (final OutputStream o = os) {
-      // We want to make sure that os.flush() was running before close:
-      // BufferedOutputStream may ignore IOExceptions while flushing on close().
-      // We keep this also in Java 8, although it claims to be fixed there,
-      // because there are more bugs around this! See:
-      // # https://bugs.openjdk.java.net/browse/JDK-7015589
-      // # https://bugs.openjdk.java.net/browse/JDK-8054565
-      if (!flushedOnClose) {
-        flushedOnClose = true; // set this BEFORE calling flush!
-        o.flush();
-      }
-    }
-  }
-}
-</code></pre>
-
+  <span class="nd">@Override</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">close</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+    <span class="k">try</span> <span class="o">(</span><span class="kd">final</span> <span class="n">OutputStream</span> <span class="n">o</span> <span class="o">=</span> <span class="n">os</span><span class="o">)</span> <span class="o">{</span>
+      <span class="c1">// We want to make sure that os.flush() was running before close:
+</span><span class="c1"></span>      <span class="c1">// BufferedOutputStream may ignore IOExceptions while flushing on close().
+</span><span class="c1"></span>      <span class="c1">// We keep this also in Java 8, although it claims to be fixed there,
+</span><span class="c1"></span>      <span class="c1">// because there are more bugs around this! See:
+</span><span class="c1"></span>      <span class="c1">// # https://bugs.openjdk.java.net/browse/JDK-7015589
+</span><span class="c1"></span>      <span class="c1">// # https://bugs.openjdk.java.net/browse/JDK-8054565
+</span><span class="c1"></span>      <span class="k">if</span> <span class="o">(!</span><span class="n">flushedOnClose</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">flushedOnClose</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span> <span class="c1">// set this BEFORE calling flush!
+</span><span class="c1"></span>        <span class="n">o</span><span class="o">.</span><span class="na">flush</span><span class="o">();</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>For more details about <code>BufferedOutputStream</code>, go to <a href="https://docs.oracle.com/javase/7/docs/api/java/io/BufferedOutputStream.html">java.io.BufferedOutputStream</a>.</p>
     </div>
 

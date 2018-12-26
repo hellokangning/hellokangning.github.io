@@ -33,13 +33,20 @@
       
       <guid>https://hellokangning.github.io/en/post/variables-are-labels-not-boxes/</guid>
       <description>&lt;p&gt;Variables are labels, not boxes. Take the following code for example:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;a = [1, 2, 3]
-b = a
-a.append(4)
-print(b)
-&lt;/code&gt;&lt;/pre&gt;
-
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;n&#34;&gt;a&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt;
+&lt;span class=&#34;n&#34;&gt;b&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt;
+&lt;span class=&#34;n&#34;&gt;a&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;append&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;4&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;span class=&#34;k&#34;&gt;print&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;b&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
 &lt;p&gt;&lt;img src=&#34;https://hellokangning.github.io/images/variables-are-labels.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;If you imagine that variables are like boxes, you cannot make sense of assignment in Python. For an assignment, you must always read the right-hand side first: that&amp;rsquo;s where the object is created or retrieved. After that, the variable on the left is bound to the object, like a label stuck to it. Just forget about the boxes.&lt;/p&gt;</description>
@@ -72,15 +79,24 @@ print(b)
       
       <guid>https://hellokangning.github.io/en/post/a-list-comprehension-puzzler/</guid>
       <description>&lt;p&gt;Sometimes, we need to initialize a list with a certain number of nested lists, for example, a list with 3 lists of length 3 that can represent a Tic-tac-toe board.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; board = [[&#39;&#39;] * 3] * 3
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&amp;gt;&amp;gt;&amp;gt; board = [[&amp;#39;&amp;#39;] * 3] * 3
 &amp;gt;&amp;gt; board
-[[&#39;&#39;, &#39;&#39;, &#39;&#39;], [&#39;&#39;, &#39;&#39;, &#39;&#39;], [&#39;&#39;, &#39;&#39;, &#39;&#39;]]
-&amp;gt;&amp;gt; board[1][2] = &#39;X&#39;
+[[&amp;#39;&amp;#39;, &amp;#39;&amp;#39;, &amp;#39;&amp;#39;], [&amp;#39;&amp;#39;, &amp;#39;&amp;#39;, &amp;#39;&amp;#39;], [&amp;#39;&amp;#39;, &amp;#39;&amp;#39;, &amp;#39;&amp;#39;]]
+&amp;gt;&amp;gt; board[1][2] = &amp;#39;X&amp;#39;
 &amp;gt;&amp;gt; board
-[[&#39;&#39;, &#39;&#39;, &#39;X&#39;], [&#39;&#39;, &#39;&#39;, &#39;X&#39;], [&#39;&#39;, &#39;&#39;, &#39;X&#39;]]
-&lt;/code&gt;&lt;/pre&gt;
-
+[[&amp;#39;&amp;#39;, &amp;#39;&amp;#39;, &amp;#39;X&amp;#39;], [&amp;#39;&amp;#39;, &amp;#39;&amp;#39;, &amp;#39;X&amp;#39;], [&amp;#39;&amp;#39;, &amp;#39;&amp;#39;, &amp;#39;X&amp;#39;]]&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
 &lt;p&gt;The output is not expected, why?&lt;/p&gt;</description>
     </item>
     
@@ -146,14 +162,22 @@ print(b)
       
       <guid>https://hellokangning.github.io/en/post/python-unpacking/</guid>
       <description>&lt;p&gt;Python provides many friendly advanced API for programmer, one of which is unpacking. By unpacking, it means getting all the elements from a container. A simplest case in the below demonstrates assigns the two items in tuple to variables.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; a, b = (1,2)
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&amp;gt;&amp;gt;&amp;gt; a, b = (1,2)
 &amp;gt;&amp;gt;&amp;gt; a
 1
 &amp;gt;&amp;gt;&amp;gt; b
-2
-&lt;/code&gt;&lt;/pre&gt;
-
+2&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
 &lt;p&gt;Besides tuple, every iterative object can support unpacking, such as list, dictionary, set, string, generator etc. Let&amp;rsquo;s traverse them one by one.&lt;/p&gt;</description>
     </item>
     
@@ -164,15 +188,26 @@ print(b)
       
       <guid>https://hellokangning.github.io/en/post/variable-scope-rules-in-python/</guid>
       <description>&lt;p&gt;What&amp;rsquo;s the output of the following code:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;n&#34;&gt;ans&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[]&lt;/span&gt;
+&lt;span class=&#34;k&#34;&gt;def&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;bt&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;():&lt;/span&gt;
+    &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;in&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;range&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;):&lt;/span&gt;
+        &lt;span class=&#34;n&#34;&gt;ans&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;+=&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;ans = []
-def bt():
-    for i in range(3):
-        ans += [i]
-
-bt()
-print(ans)
-&lt;/code&gt;&lt;/pre&gt;</description>
+&lt;span class=&#34;n&#34;&gt;bt&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
+&lt;span class=&#34;k&#34;&gt;print&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;ans&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description>
     </item>
     
     <item>

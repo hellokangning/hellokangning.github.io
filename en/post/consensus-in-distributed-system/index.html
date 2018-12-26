@@ -81,7 +81,7 @@ A visual diagram of this problem unfolds in the following. Each process pk with 
 
 <meta itemprop="datePublished" content="2018-08-19T16:07:16&#43;08:00" />
 <meta itemprop="dateModified" content="2018-08-22T14:05:16&#43;08:00" />
-<meta itemprop="wordCount" content="2298">
+<meta itemprop="wordCount" content="2343">
 
 
 
@@ -176,7 +176,7 @@ A visual diagram of this problem unfolds in the following. Each process pk with 
         <div class="post-category">
             <a href="/en/categories/distributed-system/"> Distributed System </a>
             </div>
-          <span class="more-meta"> 2298 words </span>
+          <span class="more-meta"> 2343 words </span>
           <span class="more-meta"> 11 mins read </span>
         
       </div>
@@ -314,8 +314,20 @@ A visual diagram of this problem unfolds in the following. Each process pk with 
 <h3 id="basic-paxos">Basic Paxos</h3>
 
 <p>This protocol is the most basic of the Paxos family. Each instance of the Basic Paxos protocol decides on a single output value. The protocol proceeds over several rounds ending until a successful one with two phases. A Proposer should not initiate Paxos if it cannot communicate with at least a Quorum of Acceptors.</p>
-
-<pre><code>Client   Proposer      Acceptor     Learner
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">Client   Proposer      Acceptor     Learner
    |         |          |  |  |       |  |
    X--------&gt;|          |  |  |       |  |  Request
    |         X---------&gt;|-&gt;|-&gt;|       |  |  Prepare(1)
@@ -323,9 +335,9 @@ A visual diagram of this problem unfolds in the following. Each process pk with 
    |         X---------&gt;|-&gt;|-&gt;|       |  |  Accept!(1,Vn)
    |         |&lt;---------X--X--X------&gt;|-&gt;|  Accepted(1,Vn)
    |&lt;---------------------------------X--X  Response
-   |         |          |  |  |       |  |
-</code></pre>
-
+   |         |          |  |  |       |  |</pre></td></tr></table>
+</div>
+</div>
 <p><strong>Phase 1a: Prepare</strong></p>
 
 <p>A Proposer (Leader) creates a proposal identified with a number N. This number must be greater than any previous <em>proposal number</em> used by this Proposer. Then, it sends a <em>Prepare</em> message containing this proposal to a Quorum of Acceptors. The Proposer decides who is in the Quorum.</p>
@@ -360,8 +372,21 @@ Notice that when Acceptors accept a request, they also acknowledge the leadershi
 <p><strong>Examples of failure</strong></p>
 
 <p>Failure of Acceptor (Quorum size = 2 Acceptors) is demonstrated in the following graphic representation.</p>
-
-<pre><code>Client   Proposer      Acceptor     Learner
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">Client   Proposer      Acceptor     Learner
    |         |          |  |  |       |  |
    X--------&gt;|          |  |  |       |  |  Request
    |         X---------&gt;|-&gt;|-&gt;|       |  |  Prepare(1)
@@ -370,12 +395,25 @@ Notice that when Acceptors accept a request, they also acknowledge the leadershi
    |         X---------&gt;|-&gt;|          |  |  Accept!(1,V)
    |         |&lt;---------X--X---------&gt;|-&gt;|  Accepted(1,V)
    |&lt;---------------------------------X--X  Response
-   |         |          |  |          |  |
-</code></pre>
-
+   |         |          |  |          |  |</pre></td></tr></table>
+</div>
+</div>
 <p>Here is a graph for failure of redundant Learner.</p>
-
-<pre><code>Client   Proposer      Acceptor     Learner
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">Client   Proposer      Acceptor     Learner
    |         |          |  |  |       |  |
    X--------&gt;|          |  |  |       |  |  Request
    |         X---------&gt;|-&gt;|-&gt;|       |  |  Prepare(1)
@@ -384,12 +422,31 @@ Notice that when Acceptors accept a request, they also acknowledge the leadershi
    |         |&lt;---------X--X--X------&gt;|-&gt;|  Accepted(1,V)
    |         |          |  |  |       |  !  !! FAIL !!
    |&lt;---------------------------------X     Response
-   |         |          |  |  |       |
-</code></pre>
-
+   |         |          |  |  |       |</pre></td></tr></table>
+</div>
+</div>
 <p>The next failure case is when a Proposer fails after proposing a value, but before agreement is reached.</p>
-
-<pre><code>Client  Proposer        Acceptor     Learner
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">Client  Proposer        Acceptor     Learner
    |      |             |  |  |       |  |
    X-----&gt;|             |  |  |       |  |  Request
    |      X------------&gt;|-&gt;|-&gt;|       |  |  Prepare(1)
@@ -404,9 +461,9 @@ Notice that when Acceptors accept a request, they also acknowledge the leadershi
    |         X---------&gt;|-&gt;|-&gt;|       |  |  Accept!(2,V)
    |         |&lt;---------X--X--X------&gt;|-&gt;|  Accepted(2,V)
    |&lt;---------------------------------X--X  Response
-   |         |          |  |  |       |  |
-</code></pre>
-
+   |         |          |  |  |       |  |</pre></td></tr></table>
+</div>
+</div>
 <h2 id="raft">Raft</h2>
 
 <p>Raft is a consensus algorithm designed as an alternative to Paxos, which is more understandable by means of separation of logic.</p>

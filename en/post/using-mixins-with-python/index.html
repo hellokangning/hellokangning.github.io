@@ -61,7 +61,7 @@ This post will illustrate how mixin works with a simple example.">
 
 <meta itemprop="datePublished" content="2018-10-18T08:15:29&#43;08:00" />
 <meta itemprop="dateModified" content="2018-10-18T21:15:29&#43;08:00" />
-<meta itemprop="wordCount" content="392">
+<meta itemprop="wordCount" content="471">
 
 
 
@@ -146,7 +146,7 @@ This post will illustrate how mixin works with a simple example."/>
         <div class="post-category">
             <a href="/en/categories/python/"> Python </a>
             </div>
-          <span class="more-meta"> 392 words </span>
+          <span class="more-meta"> 471 words </span>
           <span class="more-meta"> 1 min read </span>
         
       </div>
@@ -161,112 +161,212 @@ This post will illustrate how mixin works with a simple example."/>
 <p>This post will illustrate how mixin works with a simple example.</p>
 
 <p>Assume we have a class named <code>Animal</code> and its subclasses <code>Dog</code> and <code>Chicken</code>.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Animal</span><span class="p">:</span>
+    <span class="k">pass</span>
 
-<pre><code class="language-python">class Animal:
-    pass
+<span class="k">class</span> <span class="nc">Dog</span><span class="p">(</span><span class="n">Animal</span><span class="p">):</span>
+    <span class="k">pass</span>
 
-class Dog(Animal):
-    pass
-
-class Chicken(Animal):
-    pass
-</code></pre>
-
+<span class="k">class</span> <span class="nc">Chicken</span><span class="p">(</span><span class="n">Animal</span><span class="p">):</span>
+    <span class="k">pass</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>These classes make no sense since they have no any method. Let&rsquo;s add a method representing whether this animal eat meat or not.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Animal</span><span class="p">:</span>
+    <span class="k">pass</span>
 
-<pre><code class="language-python">class Animal:
-    pass
+<span class="k">class</span> <span class="nc">Dog</span><span class="p">(</span><span class="n">Animal</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">eatMeat</span><span class="p">():</span>
+        <span class="k">return</span> <span class="bp">True</span> 
 
-class Dog(Animal):
-    def eatMeat():
-        return True 
-
-class Chicken(Animal):
-    def eatMeat():
-        return False
-</code></pre>
-
+<span class="k">class</span> <span class="nc">Chicken</span><span class="p">(</span><span class="n">Animal</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">eatMeat</span><span class="p">():</span>
+        <span class="k">return</span> <span class="bp">False</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>It seems follows the rules of OOD, but how about more subclass, such as <code>Cat</code> and <code>Goose</code>.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Cat</span><span class="p">(</span><span class="n">Animal</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">eatMeat</span><span class="p">():</span>
+        <span class="k">return</span> <span class="bp">True</span> 
 
-<pre><code class="language-python">class Cat(Animal):
-    def eatMeat():
-        return True 
-
-class Goose(Animal):
-    def eatMeat():
-        return False
-</code></pre>
-
+<span class="k">class</span> <span class="nc">Goose</span><span class="p">(</span><span class="n">Animal</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">eatMeat</span><span class="p">():</span>
+        <span class="k">return</span> <span class="bp">False</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>It appears a code smell. The first idea that comes your mind is improve the inheritance.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">EatMeatAnimal</span><span class="p">(</span><span class="n">Animal</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">eatMeat</span><span class="p">():</span>
+        <span class="k">return</span> <span class="bp">True</span> 
 
-<pre><code class="language-python">class EatMeatAnimal(Animal):
-    def eatMeat():
-        return True 
+<span class="k">class</span> <span class="nc">NoMeatAnimal</span><span class="p">(</span><span class="n">Animal</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">eatMeat</span><span class="p">():</span>
+        <span class="k">return</span> <span class="bp">False</span>
 
-class NoMeatAnimal(Animal):
-    def eatMeat():
-        return False
-
-class Dog(EatMeatAnimal): pass
-class Chicken(NoMeatAnimal): pass
-class Cat(EatMeatAnimal): pass
-class Goose(NoMeatAnimal): pass
-</code></pre>
-
+<span class="k">class</span> <span class="nc">Dog</span><span class="p">(</span><span class="n">EatMeatAnimal</span><span class="p">):</span> <span class="k">pass</span>
+<span class="k">class</span> <span class="nc">Chicken</span><span class="p">(</span><span class="n">NoMeatAnimal</span><span class="p">):</span> <span class="k">pass</span>
+<span class="k">class</span> <span class="nc">Cat</span><span class="p">(</span><span class="n">EatMeatAnimal</span><span class="p">):</span> <span class="k">pass</span>
+<span class="k">class</span> <span class="nc">Goose</span><span class="p">(</span><span class="n">NoMeatAnimal</span><span class="p">):</span> <span class="k">pass</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>Next, if we want to implement another method <code>hasWings</code>, we have to append more classes.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">HasWingsEatMeatAnimal</span><span class="p">(</span><span class="n">EatMeatAnimal</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">hasWings</span><span class="p">():</span>
+        <span class="k">return</span> <span class="bp">True</span>
 
-<pre><code class="language-python">class HasWingsEatMeatAnimal(EatMeatAnimal):
-    def hasWings():
-        return True
+<span class="k">class</span> <span class="nc">HasWingsNoMeatAnimal</span><span class="p">(</span><span class="n">NoMeatAnimal</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">hasWings</span><span class="p">():</span>
+        <span class="k">return</span> <span class="bp">True</span>
 
-class HasWingsNoMeatAnimal(NoMeatAnimal):
-    def hasWings():
-        return True
+<span class="k">class</span> <span class="nc">NoWingsEatMeatAnimal</span><span class="p">(</span><span class="n">EatMeatAnimal</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">hasWings</span><span class="p">():</span>
+        <span class="k">return</span> <span class="bp">False</span>
 
-class NoWingsEatMeatAnimal(EatMeatAnimal):
-    def hasWings():
-        return False
-
-class NoWingsNoMeatAnimal(NoMeatAnimal):
-    def hasWings():
-        return False
-</code></pre>
-
+<span class="k">class</span> <span class="nc">NoWingsNoMeatAnimal</span><span class="p">(</span><span class="n">NoMeatAnimal</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">hasWings</span><span class="p">():</span>
+        <span class="k">return</span> <span class="bp">False</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>That&rsquo;s not enough, we must modify our concrete classes too.</p>
-
-<pre><code class="language-python">class Dog(NoWingsEatMeatAnimal): pass
-class Cat(NoWingsEatMeatAnimal): pass
-class Chicken(HasWingsNoMeatAnimal): pass
-class Goose(HasWingsNoMeatAnimal): pass
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Dog</span><span class="p">(</span><span class="n">NoWingsEatMeatAnimal</span><span class="p">):</span> <span class="k">pass</span>
+<span class="k">class</span> <span class="nc">Cat</span><span class="p">(</span><span class="n">NoWingsEatMeatAnimal</span><span class="p">):</span> <span class="k">pass</span>
+<span class="k">class</span> <span class="nc">Chicken</span><span class="p">(</span><span class="n">HasWingsNoMeatAnimal</span><span class="p">):</span> <span class="k">pass</span>
+<span class="k">class</span> <span class="nc">Goose</span><span class="p">(</span><span class="n">HasWingsNoMeatAnimal</span><span class="p">):</span> <span class="k">pass</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>I know few people has the patience to read the above dummy code. Let&rsquo;s see a pythonic way.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Animal</span><span class="p">:</span>
+    <span class="k">pass</span>
 
-<pre><code class="language-python">class Animal:
-    pass
+<span class="k">class</span> <span class="nc">EatMeatMixin</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">eatMeat</span><span class="p">():</span>
+        <span class="k">return</span> <span class="bp">True</span> 
 
-class EatMeatMixin:
-    def eatMeat():
-        return True 
+<span class="k">class</span> <span class="nc">NoMeatMixin</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">eatMeat</span><span class="p">():</span>
+        <span class="k">return</span> <span class="bp">False</span>
 
-class NoMeatMixin:
-    def eatMeat():
-        return False
+<span class="k">class</span> <span class="nc">HasWingsMixin</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">hasWings</span><span class="p">():</span>
+        <span class="k">return</span> <span class="bp">True</span>
 
-class HasWingsMixin:
-    def hasWings():
-        return True
+<span class="k">class</span> <span class="nc">NoWingsMixin</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">hasWings</span><span class="p">():</span>
+        <span class="k">return</span> <span class="bp">False</span>
 
-class NoWingsMixin:
-    def hasWings():
-        return False
-
-class Dog(EatMeatMixin, NoWingsMixin, Animal): pass
-class Cat(EatMeatMixin, NoWingsMixin, Animal): pass
-class Chicken(NoMeatMixin, HasWingsMixin, Animal): pass
-class Goose(NoMeatMixin, HasWingsMixin, Animal): pass
-</code></pre>
-
+<span class="k">class</span> <span class="nc">Dog</span><span class="p">(</span><span class="n">EatMeatMixin</span><span class="p">,</span> <span class="n">NoWingsMixin</span><span class="p">,</span> <span class="n">Animal</span><span class="p">):</span> <span class="k">pass</span>
+<span class="k">class</span> <span class="nc">Cat</span><span class="p">(</span><span class="n">EatMeatMixin</span><span class="p">,</span> <span class="n">NoWingsMixin</span><span class="p">,</span> <span class="n">Animal</span><span class="p">):</span> <span class="k">pass</span>
+<span class="k">class</span> <span class="nc">Chicken</span><span class="p">(</span><span class="n">NoMeatMixin</span><span class="p">,</span> <span class="n">HasWingsMixin</span><span class="p">,</span> <span class="n">Animal</span><span class="p">):</span> <span class="k">pass</span>
+<span class="k">class</span> <span class="nc">Goose</span><span class="p">(</span><span class="n">NoMeatMixin</span><span class="p">,</span> <span class="n">HasWingsMixin</span><span class="p">,</span> <span class="n">Animal</span><span class="p">):</span> <span class="k">pass</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>That&rsquo;s mixin attaching behaviors for the main class <code>Animal</code>.</p>
 
 <p>Actually, mixin is not an advanced feature of Python, but ubiquitous. For example, the built-in <code>socketserver.py</code> implements a server model based on process or thread with mixin, and this post pave the way for me to analyze the code in the future.</p>

@@ -51,7 +51,7 @@
 
 <meta itemprop="datePublished" content="2017-09-20T19:36:07&#43;08:00" />
 <meta itemprop="dateModified" content="2017-09-20T19:36:07&#43;08:00" />
-<meta itemprop="wordCount" content="625">
+<meta itemprop="wordCount" content="747">
 
 
 
@@ -132,7 +132,7 @@
         <div class="post-category">
             <a href="/en/categories/python/"> Python </a>
             </div>
-          <span class="more-meta"> 625 words </span>
+          <span class="more-meta"> 747 words </span>
           <span class="more-meta"> 2 mins read </span>
         
       </div>
@@ -157,175 +157,324 @@
       <p>A Python decorator, similar with <a href="http://en.wikipedia.org/wiki/Decorator_pattern">Decorator Pattern</a>, is a specific change to the Python syntax that allows us to more conveniently alter functions and methods. In this post, I will try my best to deep into this advanced feature in Python.</p>
 
 <p>The winning syntax as of now uses the <code>@</code> symbol</p>
-
-<pre><code class="language-python">@classmethod
-def foo():
-    # do something
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="nd">@classmethod</span>
+<span class="k">def</span> <span class="nf">foo</span><span class="p">():</span>
+    <span class="c1"># do something</span></code></pre></td></tr></table>
+</div>
+</div>
 <h1 id="first-class-function">First-class Function</h1>
 
 <p>It&rsquo;s simple to use but difficult to penetrate its fundamental. Before diving, what must be clear is that function is the first-class citizen, which can be dynamically created, destroyed, passed to a function, returned as a value, and have all the rights as other variables in the programming language have.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">say_hello</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s2">&#34;hello to &#34;</span> <span class="o">+</span> <span class="n">name</span>
 
-<pre><code class="language-python">def say_hello(name):
-    return &quot;hello to &quot; + name
+<span class="c1"># 1. assign function to a variable</span>
+<span class="n">say_hello_to</span> <span class="o">=</span> <span class="n">say_hello</span>
+<span class="k">print</span> <span class="n">say_hello_to</span><span class="p">(</span><span class="s1">&#39;John&#39;</span><span class="p">)</span> <span class="c1"># hello to John</span>
 
-# 1. assign function to a variable
-say_hello_to = say_hello
-print say_hello_to('John') # hello to John
+<span class="c1"># 2. pass function as parameter to other function</span>
+<span class="k">def</span> <span class="nf">call_func</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">call_func</span><span class="p">(</span><span class="n">say_hello</span><span class="p">,</span> <span class="s1">&#39;John&#39;</span><span class="p">)</span> <span class="c1"># hello to John</span>
 
-# 2. pass function as parameter to other function
-def call_func(func, name):
-    return func(name)
-print call_func(say_hello, 'John') # hello to John
+<span class="c1"># 3. return a function in other function</span>
+<span class="k">def</span> <span class="nf">compose_func</span><span class="p">():</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">():</span>
+        <span class="k">return</span> <span class="s1">&#39;John&#39;</span>
+    <span class="k">return</span> <span class="n">name</span>
 
-# 3. return a function in other function
-def compose_func():
-    def name():
-        return 'John'
-    return name
+<span class="k">print</span> <span class="n">compose_func</span><span class="p">()</span> <span class="c1"># &lt;function name at 0x10bcdccf8&gt;</span>
 
-print compose_func() # &lt;function name at 0x10bcdccf8&gt;
+<span class="n">hello</span> <span class="o">=</span> <span class="n">compose_func</span><span class="p">()</span>
+<span class="k">print</span> <span class="n">hello</span><span class="p">()</span> <span class="c1"># John</span>
 
-hello = compose_func()
-print hello() # John
+<span class="s1">&#39;&#39;&#39;
+</span><span class="s1">4. inner function has access to the enclosing scope
+</span><span class="s1">notice how to read a &#34;name&#34; argument from the enclosing scope of the inner function and return the new function.
+</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="k">def</span> <span class="nf">compose_func</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">complete_msg</span><span class="p">():</span>
+        <span class="k">return</span> <span class="s1">&#39;hello to &#39;</span> <span class="o">+</span> <span class="n">name</span>
+    <span class="k">return</span> <span class="n">complete_msg</span>
 
-'''
-4. inner function has access to the enclosing scope
-notice how to read a &quot;name&quot; argument from the enclosing scope of the inner function and return the new function.
-'''
-def compose_func(name):
-    def complete_msg():
-        return 'hello to ' + name
-    return complete_msg
-
-hello = compose_func('John')
-print greet() # hello to John
-</code></pre>
-
+<span class="n">hello</span> <span class="o">=</span> <span class="n">compose_func</span><span class="p">(</span><span class="s1">&#39;John&#39;</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">greet</span><span class="p">()</span> <span class="c1"># hello to John</span></code></pre></td></tr></table>
+</div>
+</div>
 <h1 id="rough-decorator-implemented-by-function">Rough Decorator Implemented by Function</h1>
 
 <p>The combination of attributes above will help us build a decorator. In this example, let&rsquo;s simply consider a function that wraps the string output to uppercase.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">name</span>
 
-<pre><code class="language-python">def get_name(name):
-    return name
+<span class="k">def</span> <span class="nf">p_decorate</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">name</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">wrapper</span>
 
-def p_decorate(func):
-    def wrapper(name):
-        return name.upper()
-    return wrapper
-
-my_name = p_decorate(get_name)
-print my_name('John') # JOHN
-</code></pre>
-
+<span class="n">my_name</span> <span class="o">=</span> <span class="n">p_decorate</span><span class="p">(</span><span class="n">get_name</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">my_name</span><span class="p">(</span><span class="s1">&#39;John&#39;</span><span class="p">)</span> <span class="c1"># JOHN</span></code></pre></td></tr></table>
+</div>
+</div>
 <h1 id="python-s-decorator-syntax">Python&rsquo;s Decorator Syntax</h1>
 
 <p>Python provides a syntactic sugar, a <code>@</code> symbol,  to decorate function easily, replacing <code>my_name = p_decorate(get_name)</code> above.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">p_decorate</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">name</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">wrapper</span>
 
-<pre><code class="language-python">def p_decorate(func):
-    def wrapper(name):
-        return name.upper()
-    return wrapper
+<span class="nd">@p_decorate</span>
+<span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">name</span>
 
-@p_decorate
-def get_name(name):
-    return name
-
-print my_name('John') # JOHN
-</code></pre>
-
+<span class="k">print</span> <span class="n">my_name</span><span class="p">(</span><span class="s1">&#39;John&#39;</span><span class="p">)</span> <span class="c1"># JOHN</span></code></pre></td></tr></table>
+</div>
+</div>
 <h1 id="decorating-method">Decorating Method</h1>
 
 <p>Same to function, method can also be wrapped by decorators. Whereas, the first parameter of wrapper function must be reference to the current object.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">p_decorate</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">wrapper</span>
 
-<pre><code class="language-python">def p_decorate(func):
-    def wrapper(self):
-        return func(self).upper()
-    return wrapper
-
-class Player(object):
-    def __init__(self):
-        self.name = 'Chris'
-        self.family = 'Paul'
+<span class="k">class</span> <span class="nc">Player</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Chris&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">family</span> <span class="o">=</span> <span class="s1">&#39;Paul&#39;</span>
     
-    @p_decorate
-    def get_fullname(self):
-        return self.name + &quot; &quot; + self.family
+    <span class="nd">@p_decorate</span>
+    <span class="k">def</span> <span class="nf">get_fullname</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&#34; &#34;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">family</span>
 
-cp3 = Player()
-print cp3.get_fullname() # CHRIS PAUL
-</code></pre>
-
+<span class="n">cp3</span> <span class="o">=</span> <span class="n">Player</span><span class="p">()</span>
+<span class="k">print</span> <span class="n">cp3</span><span class="o">.</span><span class="n">get_fullname</span><span class="p">()</span> <span class="c1"># CHRIS PAUL</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>A much better approach would be to make our decorator useful for functions and methods alike. This can be done by putting <code>args</code> and <code>*kwargs</code> as parameters for the wrapper, then it can accept any arbitrary number of arguments and keyword arguments.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">p_decorate</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">wrapper</span>
 
-<pre><code class="language-python">def p_decorate(func):
-    def wrapper(*args, **kwargs):
-        return func(*args, **kwargs).upper()
-    return wrapper
-
-class Player(object):
-    def __init__(self):
-        self.name = 'Chris'
-        self.family = 'Paul'
+<span class="k">class</span> <span class="nc">Player</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Chris&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">family</span> <span class="o">=</span> <span class="s1">&#39;Paul&#39;</span>
     
-    @p_decorate
-    def get_fullname(self):
-        return self.name + &quot; &quot; + self.family
+    <span class="nd">@p_decorate</span>
+    <span class="k">def</span> <span class="nf">get_fullname</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&#34; &#34;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">family</span>
 
-cp3 = Player()
-print cp3.get_fullname() # CHRIS PAUL
-</code></pre>
-
+<span class="n">cp3</span> <span class="o">=</span> <span class="n">Player</span><span class="p">()</span>
+<span class="k">print</span> <span class="n">cp3</span><span class="o">.</span><span class="n">get_fullname</span><span class="p">()</span> <span class="c1"># CHRIS PAUL</span></code></pre></td></tr></table>
+</div>
+</div>
 <h1 id="function-object">Function Object</h1>
 
 <p>We can also construct a function object using <code>class</code>, with a <code>__call__</code> member function inside.</p>
-
-<pre><code class="language-python">class FuncObj(object):
-    def __init__(self, name):
-        print 'init'
-        self.name = name
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">FuncObj</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s1">&#39;init&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
     
-    def __call__(self):
-        print 'hello', self.name
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s1">&#39;hello&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
 
-fo = FuncObj('chris') # init
-fo() # hello chris
-</code></pre>
-
+<span class="n">fo</span> <span class="o">=</span> <span class="n">FuncObj</span><span class="p">(</span><span class="s1">&#39;chris&#39;</span><span class="p">)</span> <span class="c1"># init</span>
+<span class="n">fo</span><span class="p">()</span> <span class="c1"># hello chris</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>From the example above, we infer that function calling can be decomposed to two steps: construct and call. Base on this, a decorator implemented by <code>class</code> is feasible.</p>
 
 <h1 id="decorator-implemented-by-class">Decorator Implemented by Class</h1>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">make_upper</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s1">&#39;init&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="o">=</span> <span class="n">func</span> 
 
-<pre><code class="language-python">class make_upper(object):
-    def __init__(self, func):
-        print 'init'
-        self.func = func 
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s1">&#39;call&#39;</span>
+        <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">()</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
 
-    def __call__(self):
-        print 'call'
-        print self.func().upper()
+<span class="c1"># init</span>
+<span class="nd">@make_upper</span>
+<span class="k">def</span> <span class="nf">get_name</span><span class="p">():</span>
+    <span class="k">return</span> <span class="s1">&#39;chris&#39;</span>
 
-# init
-@make_upper
-def get_name():
-    return 'chris'
-
-# call
-# CHRIS
-get_name()
-</code></pre>
-
+<span class="c1"># call</span>
+<span class="c1"># CHRIS</span>
+<span class="n">get_name</span><span class="p">()</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>The code above is much alike with the following without <code>@</code> syntax:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="c1"># call __init__</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">make_upper</span><span class="p">(</span><span class="n">get_name</span><span class="p">)</span>
 
-<pre><code class="language-python"># call __init__
-name = make_upper(get_name)
-
-# call
-# CHRIS
-name()
-</code></pre>
-
+<span class="c1"># call</span>
+<span class="c1"># CHRIS</span>
+<span class="n">name</span><span class="p">()</span></code></pre></td></tr></table>
+</div>
+</div>
 <p><strong>Reference</strong></p>
 
 <ul>

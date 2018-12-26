@@ -56,7 +56,7 @@ It&rsquo;s my habit to start from the entry when meeting a big project. In Redis
 
 <meta itemprop="datePublished" content="2018-10-22T17:23:59&#43;08:00" />
 <meta itemprop="dateModified" content="2018-10-22T17:23:59&#43;08:00" />
-<meta itemprop="wordCount" content="862">
+<meta itemprop="wordCount" content="1011">
 
 
 
@@ -139,8 +139,8 @@ It&rsquo;s my habit to start from the entry when meeting a big project. In Redis
         <div class="post-category">
             <a href="/en/categories/redis/"> Redis </a>
             </div>
-          <span class="more-meta"> 862 words </span>
-          <span class="more-meta"> 2 mins read </span>
+          <span class="more-meta"> 1011 words </span>
+          <span class="more-meta"> 3 mins read </span>
         
       </div>
     </header>
@@ -173,94 +173,175 @@ It&rsquo;s my habit to start from the entry when meeting a big project. In Redis
 <p><code>struct redisServer server;</code></p>
 
 <p>The fields of <code>redisServer</code> can be found in <code>server.h</code>, and we only focus on some ones that are used when starting.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="k">struct</span> <span class="n">redisServer</span> <span class="p">{</span>
+    <span class="kt">char</span> <span class="o">*</span><span class="n">configfile</span><span class="p">;</span>           <span class="cm">/* Absolute config file path, or NULL */</span>
+    <span class="kt">char</span> <span class="o">*</span><span class="n">executable</span><span class="p">;</span>           <span class="cm">/* Absolute executable file path. */</span>
+    <span class="kt">char</span> <span class="o">**</span><span class="n">exec_argv</span><span class="p">;</span>           <span class="cm">/* Executable argv vector (copy). */</span>
 
-<pre><code class="language-c">struct redisServer {
-    char *configfile;           /* Absolute config file path, or NULL */
-    char *executable;           /* Absolute executable file path. */
-    char **exec_argv;           /* Executable argv vector (copy). */
+    <span class="n">redisDb</span> <span class="o">*</span><span class="n">db</span><span class="p">;</span>
+    <span class="n">dict</span> <span class="o">*</span><span class="n">commands</span><span class="p">;</span>             <span class="cm">/* Command table */</span>
+    <span class="n">dict</span> <span class="o">*</span><span class="n">orig_commands</span><span class="p">;</span>        <span class="cm">/* Command table before command renaming. */</span>
 
-    redisDb *db;
-    dict *commands;             /* Command table */
-    dict *orig_commands;        /* Command table before command renaming. */
+    <span class="kt">int</span> <span class="n">port</span><span class="p">;</span>                   <span class="cm">/* TCP listening port */</span>
 
-    int port;                   /* TCP listening port */
+    <span class="kt">char</span> <span class="n">runid</span><span class="p">[</span><span class="n">CONFIG_RUN_ID_SIZE</span><span class="o">+</span><span class="mi">1</span><span class="p">];</span>  <span class="cm">/* ID always different at every exec. */</span>
 
-    char runid[CONFIG_RUN_ID_SIZE+1];  /* ID always different at every exec. */
+    <span class="kt">char</span> <span class="o">*</span><span class="n">masterhost</span><span class="p">;</span>               <span class="cm">/* Hostname of master */</span>
+    <span class="kt">int</span> <span class="n">masterport</span><span class="p">;</span>                 <span class="cm">/* Port of master */</span>
 
-    char *masterhost;               /* Hostname of master */
-    int masterport;                 /* Port of master */
+    <span class="kt">long</span> <span class="kt">long</span> <span class="n">slowlog_entry_id</span><span class="p">;</span>     <span class="cm">/* SLOWLOG current entry ID */</span>
+    <span class="kt">long</span> <span class="kt">long</span> <span class="n">slowlog_log_slower_than</span><span class="p">;</span> <span class="cm">/* SLOWLOG time limit (to get logged) */</span>
+    <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">slowlog_max_len</span><span class="p">;</span>     <span class="cm">/* SLOWLOG max number of items logged */</span>
 
-    long long slowlog_entry_id;     /* SLOWLOG current entry ID */
-    long long slowlog_log_slower_than; /* SLOWLOG time limit (to get logged) */
-    unsigned long slowlog_max_len;     /* SLOWLOG max number of items logged */
+    <span class="n">list</span> <span class="o">*</span><span class="n">clients</span><span class="p">;</span>              <span class="cm">/* List of active clients */</span>
+    <span class="n">list</span> <span class="o">*</span><span class="n">slaves</span><span class="p">,</span> <span class="o">*</span><span class="n">monitors</span><span class="p">;</span>    <span class="cm">/* List of slaves and MONITORs */</span>
 
-    list *clients;              /* List of active clients */
-    list *slaves, *monitors;    /* List of slaves and MONITORs */
-
-    aeEventLoop *el;
-}
-</code></pre>
-
+    <span class="n">aeEventLoop</span> <span class="o">*</span><span class="n">el</span><span class="p">;</span>
+<span class="p">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>The whole process of launching is implemented in <code>main()</code> method, and the first step is initializing <code>redisServer</code>, which is done by calling <code>initServerConfig()</code> method.</p>
 
 <h1 id="init-redisserver-struct">Init <code>redisServer</code> struct</h1>
 
 <p>Let&rsquo;s see what <code>initServerConfig()</code> does.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">void</span> <span class="nf">initServerConfig</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
 
-<pre><code class="language-c">void initServerConfig(void) {
-
-    // mutex
-    pthread_mutex_init(&amp;server.next_client_id_mutex,NULL);
-    pthread_mutex_init(&amp;server.lruclock_mutex,NULL);
-    pthread_mutex_init(&amp;server.unixtime_mutex,NULL);
+    <span class="c1">// mutex
+</span><span class="c1"></span>    <span class="n">pthread_mutex_init</span><span class="p">(</span><span class="o">&amp;</span><span class="n">server</span><span class="p">.</span><span class="n">next_client_id_mutex</span><span class="p">,</span><span class="nb">NULL</span><span class="p">);</span>
+    <span class="n">pthread_mutex_init</span><span class="p">(</span><span class="o">&amp;</span><span class="n">server</span><span class="p">.</span><span class="n">lruclock_mutex</span><span class="p">,</span><span class="nb">NULL</span><span class="p">);</span>
+    <span class="n">pthread_mutex_init</span><span class="p">(</span><span class="o">&amp;</span><span class="n">server</span><span class="p">.</span><span class="n">unixtime_mutex</span><span class="p">,</span><span class="nb">NULL</span><span class="p">);</span>
 
 
-    // run id
-    getRandomHexChars(server.runid,CONFIG_RUN_ID_SIZE);
-    server.runid[CONFIG_RUN_ID_SIZE] = '\0';
+    <span class="c1">// run id
+</span><span class="c1"></span>    <span class="n">getRandomHexChars</span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">runid</span><span class="p">,</span><span class="n">CONFIG_RUN_ID_SIZE</span><span class="p">);</span>
+    <span class="n">server</span><span class="p">.</span><span class="n">runid</span><span class="p">[</span><span class="n">CONFIG_RUN_ID_SIZE</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39;\0&#39;</span><span class="p">;</span>
 
-    // default port, 9379
-    server.port = CONFIG_DEFAULT_SERVER_PORT;    
+    <span class="c1">// default port, 9379
+</span><span class="c1"></span>    <span class="n">server</span><span class="p">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">CONFIG_DEFAULT_SERVER_PORT</span><span class="p">;</span>    
 
-    // LRU clock
-    unsigned int lruclock = getLRUClock();
-    atomicSet(server.lruclock,lruclock);
-    resetServerSaveParams();
+    <span class="c1">// LRU clock
+</span><span class="c1"></span>    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">lruclock</span> <span class="o">=</span> <span class="n">getLRUClock</span><span class="p">();</span>
+    <span class="n">atomicSet</span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">lruclock</span><span class="p">,</span><span class="n">lruclock</span><span class="p">);</span>
+    <span class="n">resetServerSaveParams</span><span class="p">();</span>
 
-    // replication
-    server.masterhost = NULL;
-    server.masterport = 6379;
-    server.repl_state = REPL_STATE_NONE;
-    server_slave_priority = CONFIG_DEFAULT_SLAVE_PRIORITY;
+    <span class="c1">// replication
+</span><span class="c1"></span>    <span class="n">server</span><span class="p">.</span><span class="n">masterhost</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="n">server</span><span class="p">.</span><span class="n">masterport</span> <span class="o">=</span> <span class="mi">6379</span><span class="p">;</span>
+    <span class="n">server</span><span class="p">.</span><span class="n">repl_state</span> <span class="o">=</span> <span class="n">REPL_STATE_NONE</span><span class="p">;</span>
+    <span class="n">server_slave_priority</span> <span class="o">=</span> <span class="n">CONFIG_DEFAULT_SLAVE_PRIORITY</span><span class="p">;</span>
 
 
-    // command table
-    server.commands = dictCreate(&amp;commandTableDictType,NULL);
-    server.orig_commands = dictCreate(&amp;commandTableDictType,NULL);
-    populateCommandTable();
+    <span class="c1">// command table
+</span><span class="c1"></span>    <span class="n">server</span><span class="p">.</span><span class="n">commands</span> <span class="o">=</span> <span class="n">dictCreate</span><span class="p">(</span><span class="o">&amp;</span><span class="n">commandTableDictType</span><span class="p">,</span><span class="nb">NULL</span><span class="p">);</span>
+    <span class="n">server</span><span class="p">.</span><span class="n">orig_commands</span> <span class="o">=</span> <span class="n">dictCreate</span><span class="p">(</span><span class="o">&amp;</span><span class="n">commandTableDictType</span><span class="p">,</span><span class="nb">NULL</span><span class="p">);</span>
+    <span class="n">populateCommandTable</span><span class="p">();</span>
 
-    // slow log
-    server.slowlog_log_slower_than = CONFIG_DEFAULT_SLOWLOG_LOG_SLOWER_THAN;
-    server.slowlog_max_len = CONFIG_DEFAULT_SLOWLOG_MAX_LEN;
-}
-</code></pre>
-
+    <span class="c1">// slow log
+</span><span class="c1"></span>    <span class="n">server</span><span class="p">.</span><span class="n">slowlog_log_slower_than</span> <span class="o">=</span> <span class="n">CONFIG_DEFAULT_SLOWLOG_LOG_SLOWER_THAN</span><span class="p">;</span>
+    <span class="n">server</span><span class="p">.</span><span class="n">slowlog_max_len</span> <span class="o">=</span> <span class="n">CONFIG_DEFAULT_SLOWLOG_MAX_LEN</span><span class="p">;</span>
+<span class="p">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>After <code>initServerConfig()</code>, Redis will store the executable path and arguments for restarting the server later.</p>
-
-<pre><code class="language-c">server.executable = getAbsolutePath(argv[0]);
-server.exec_argv = zmalloc(sizeof(char*)*(argc+1));
-server.exec_argv[argc] = NULL;
-for (j = 0; j &lt; argc; j++) server.exec_argv[j] = zstrdup(argv[j]);
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="n">server</span><span class="p">.</span><span class="n">executable</span> <span class="o">=</span> <span class="n">getAbsolutePath</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+<span class="n">server</span><span class="p">.</span><span class="n">exec_argv</span> <span class="o">=</span> <span class="n">zmalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">argc</span><span class="o">+</span><span class="mi">1</span><span class="p">));</span>
+<span class="n">server</span><span class="p">.</span><span class="n">exec_argv</span><span class="p">[</span><span class="n">argc</span><span class="p">]</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="k">for</span> <span class="p">(</span><span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">argc</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span> <span class="n">server</span><span class="p">.</span><span class="n">exec_argv</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">zstrdup</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="n">j</span><span class="p">]);</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>If Sentinel model is enabled, the following operations will be performed.</p>
-
-<pre><code class="language-c">if (server.sentinel_mode) {
-    initSentinelConfig();
-    initSentinel();
-}
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="k">if</span> <span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">sentinel_mode</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">initSentinelConfig</span><span class="p">();</span>
+    <span class="n">initSentinel</span><span class="p">();</span>
+<span class="p">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>The reason to init sentinel here is parsing the configuration file in Sentinel model will have the effect of populating the sentinel data structures with master nodes to monitor.</p>
 
 <h1 id="parsing-configuration-file">Parsing configuration file</h1>
@@ -268,19 +349,32 @@ for (j = 0; j &lt; argc; j++) server.exec_argv[j] = zstrdup(argv[j]);
 <p>Then, Redis parses and loads the server configuration from specified filename by <code>loadServerConfig(char *filename, char *options)</code>.</p>
 
 <p>I simplify the original code for easy understanding.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">void</span> <span class="nf">loadServerConfig</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">filename</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">options</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">sds</span> <span class="n">config</span> <span class="o">=</span> <span class="n">sdsempty</span><span class="p">();</span>
+    <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="n">CONFIG_MAX_LINE</span><span class="o">+</span><span class="mi">1</span><span class="p">];</span>
 
-<pre><code class="language-c">void loadServerConfig(char *filename, char *options) {
-    sds config = sdsempty();
-    char buf[CONFIG_MAX_LINE+1];
+    <span class="k">while</span><span class="p">(</span><span class="n">fgets</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span><span class="n">CONFIG_MAX_LINE</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">fp</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span>
+            <span class="n">config</span> <span class="o">=</span> <span class="n">sdscat</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">buf</span><span class="p">);</span>
 
-    while(fgets(buf,CONFIG_MAX_LINE+1,fp) != NULL)
-            config = sdscat(config,buf);
-
-   loadServerConfigFromString(config);
-    sdsfree(config);    
-}
-</code></pre>
-
+   <span class="n">loadServerConfigFromString</span><span class="p">(</span><span class="n">config</span><span class="p">);</span>
+    <span class="n">sdsfree</span><span class="p">(</span><span class="n">config</span><span class="p">);</span>    
+<span class="p">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>A new data structure named <code>sds</code> appears first, and we can deduce that it is something related to <code>String</code> from the statement <code>loadServerConfigFromString(config);</code>. Yes, it is short for &ldquo;Simple Dynamic String&rdquo;, and a representation for <code>String</code> in Redis.</p>
 
 <p><code>loadServerConfigFromString</code> method is full of string manipulations, such as,</p>
@@ -294,93 +388,172 @@ for (j = 0; j &lt; argc; j++) server.exec_argv[j] = zstrdup(argv[j]);
 <h1 id="init-the-state-of-server">Init the state of server</h1>
 
 <p>Up to now, many variables in <code>redisServer</code> struct is still dangling and need to be assigned dynamically. <code>initServer()</code> is responsible for doing this.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">void</span> <span class="nf">initServer</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// process id
+</span><span class="c1"></span>    <span class="n">server</span><span class="p">.</span><span class="n">pid</span> <span class="o">=</span> <span class="n">getpid</span><span class="p">();</span>
 
-<pre><code class="language-c">void initServer(void) {
-    // process id
-    server.pid = getpid();
+    <span class="c1">// clients list
+</span><span class="c1"></span>    <span class="n">server</span><span class="p">.</span><span class="n">clients</span> <span class="o">=</span> <span class="n">listCreate</span><span class="p">();</span>
 
-    // clients list
-    server.clients = listCreate();
+    <span class="c1">// slaves list
+</span><span class="c1"></span>    <span class="n">server</span><span class="p">.</span><span class="n">slaves</span> <span class="o">=</span> <span class="n">listCreate</span><span class="p">();</span>
 
-    // slaves list
-    server.slaves = listCreate();
+    <span class="c1">// shared objects for common values
+</span><span class="c1"></span>    <span class="n">createSharedObjects</span><span class="p">();</span>
 
-    // shared objects for common values
-    createSharedObjects();
+    <span class="c1">// event loop
+</span><span class="c1"></span>    <span class="n">server</span><span class="p">.</span><span class="n">el</span> <span class="o">=</span> <span class="n">aeCreateEventLoop</span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">maxclients</span><span class="o">+</span><span class="n">CONFIG_FDSET_INCR</span><span class="p">);</span>
 
-    // event loop
-    server.el = aeCreateEventLoop(server.maxclients+CONFIG_FDSET_INCR);
+    <span class="c1">// open TCP listening socket for user
+</span><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">port</span> <span class="o">!=</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span>
+        <span class="n">listenToPort</span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">port</span><span class="p">,</span><span class="n">server</span><span class="p">.</span><span class="n">ipfd</span><span class="p">,</span><span class="o">&amp;</span><span class="n">server</span><span class="p">.</span><span class="n">ipfd_count</span><span class="p">)</span> <span class="o">==</span> <span class="n">C_ERR</span><span class="p">)</span>
+        <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
 
-    // open TCP listening socket for user
-    if (server.port != 0 &amp;&amp;
-        listenToPort(server.port,server.ipfd,&amp;server.ipfd_count) == C_ERR)
-        exit(1);
+    <span class="c1">// create and init databases
+</span><span class="c1"></span>    <span class="n">server</span><span class="p">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">zmalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">redisDb</span><span class="p">)</span><span class="o">*</span><span class="n">server</span><span class="p">.</span><span class="n">dbnum</span><span class="p">);</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">server</span><span class="p">.</span><span class="n">dbnum</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">server</span><span class="p">.</span><span class="n">db</span><span class="p">[</span><span class="n">j</span><span class="p">].</span><span class="n">dict</span> <span class="o">=</span> <span class="n">dictCreate</span><span class="p">(</span><span class="o">&amp;</span><span class="n">dbDictType</span><span class="p">,</span><span class="nb">NULL</span><span class="p">);</span>
+        <span class="n">server</span><span class="p">.</span><span class="n">db</span><span class="p">[</span><span class="n">j</span><span class="p">].</span><span class="n">expires</span> <span class="o">=</span> <span class="n">dictCreate</span><span class="p">(</span><span class="o">&amp;</span><span class="n">keyptrDictType</span><span class="p">,</span><span class="nb">NULL</span><span class="p">);</span>
+        <span class="n">server</span><span class="p">.</span><span class="n">db</span><span class="p">[</span><span class="n">j</span><span class="p">].</span><span class="n">blocking_keys</span> <span class="o">=</span> <span class="n">dictCreate</span><span class="p">(</span><span class="o">&amp;</span><span class="n">keylistDictType</span><span class="p">,</span><span class="nb">NULL</span><span class="p">);</span>
+        <span class="n">server</span><span class="p">.</span><span class="n">db</span><span class="p">[</span><span class="n">j</span><span class="p">].</span><span class="n">ready_keys</span> <span class="o">=</span> <span class="n">dictCreate</span><span class="p">(</span><span class="o">&amp;</span><span class="n">objectKeyPointerValueDictType</span><span class="p">,</span><span class="nb">NULL</span><span class="p">);</span>
+        <span class="n">server</span><span class="p">.</span><span class="n">db</span><span class="p">[</span><span class="n">j</span><span class="p">].</span><span class="n">watched_keys</span> <span class="o">=</span> <span class="n">dictCreate</span><span class="p">(</span><span class="o">&amp;</span><span class="n">keylistDictType</span><span class="p">,</span><span class="nb">NULL</span><span class="p">);</span>
+        <span class="n">server</span><span class="p">.</span><span class="n">db</span><span class="p">[</span><span class="n">j</span><span class="p">].</span><span class="n">id</span> <span class="o">=</span> <span class="n">j</span><span class="p">;</span>
+    <span class="p">}</span>
 
-    // create and init databases
-    server.db = zmalloc(sizeof(redisDb)*server.dbnum);
-    for (j = 0; j &lt; server.dbnum; j++) {
-        server.db[j].dict = dictCreate(&amp;dbDictType,NULL);
-        server.db[j].expires = dictCreate(&amp;keyptrDictType,NULL);
-        server.db[j].blocking_keys = dictCreate(&amp;keylistDictType,NULL);
-        server.db[j].ready_keys = dictCreate(&amp;objectKeyPointerValueDictType,NULL);
-        server.db[j].watched_keys = dictCreate(&amp;keylistDictType,NULL);
-        server.db[j].id = j;
-    }
+    <span class="c1">// create timers for serverCron
+</span><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="n">aeCreateTimeEvent</span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">el</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">serverCron</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">)</span> <span class="o">==</span> <span class="n">AE_ERR</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">serverPanic</span><span class="p">(</span><span class="s">&#34;Can&#39;t create event loop timers.&#34;</span><span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+    <span class="p">}</span>
 
-    // create timers for serverCron
-    if (aeCreateTimeEvent(server.el, 1, serverCron, NULL, NULL) == AE_ERR) {
-        serverPanic(&quot;Can't create event loop timers.&quot;);
-        exit(1);
-    }
+    <span class="c1">// Open the AOF file
+</span><span class="c1"></span>    <span class="n">server</span><span class="p">.</span><span class="n">aof_fd</span> <span class="o">=</span> <span class="n">open</span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">aof_filename</span><span class="p">,</span>
+                               <span class="n">O_WRONLY</span><span class="o">|</span><span class="n">O_APPEND</span><span class="o">|</span><span class="n">O_CREAT</span><span class="p">,</span><span class="mo">0644</span><span class="p">);</span>
 
-    // Open the AOF file
-    server.aof_fd = open(server.aof_filename,
-                               O_WRONLY|O_APPEND|O_CREAT,0644);
+    <span class="c1">// slow log
+</span><span class="c1"></span>    <span class="n">slowlogInit</span><span class="p">();</span>
 
-    // slow log
-    slowlogInit();
-
-    // background system, spawning the thread
-    bioInit();
-}
-</code></pre>
-
+    <span class="c1">// background system, spawning the thread
+</span><span class="c1"></span>    <span class="n">bioInit</span><span class="p">();</span>
+<span class="p">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <h1 id="load-aof-rdb-file">Load AOF/RDB file</h1>
 
 <p><code>loadDataFromDisk()</code> is a function called startup to load AOF or RDB file in memory.</p>
-
-<pre><code class="language-c">void loadDataFromDisk(void) {
-    // if AOF is on
-    if (server.aof_state == AOF_ON) {
-        loadAppendOnlyFile(server.aof_filename)
-    } else {
-        // if RDF is on
-        rdbLoad(server.rdb_filename,&amp;rsi)
-    }
-}
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">void</span> <span class="nf">loadDataFromDisk</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// if AOF is on
+</span><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">aof_state</span> <span class="o">==</span> <span class="n">AOF_ON</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">loadAppendOnlyFile</span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">aof_filename</span><span class="p">)</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="c1">// if RDF is on
+</span><span class="c1"></span>        <span class="n">rdbLoad</span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">rdb_filename</span><span class="p">,</span><span class="o">&amp;</span><span class="n">rsi</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>The detail of AOF or RDB load is out of scope, and I will explain it later.</p>
 
 <h1 id="jump-to-event-loop">Jump to event loop</h1>
 
 <p>At last, Redis assigns the callbacks <code>beforeSleep</code> and <code>afterSeleep</code> for event loop, then start the loop with <code>asMain()</code>, which is an endless loop for listening and handling events.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="n">aeSetBeforeSleepProc</span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">el</span><span class="p">,</span><span class="n">beforeSleep</span><span class="p">);</span>
+<span class="n">aeSetAfterSleepProc</span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">el</span><span class="p">,</span><span class="n">afterSleep</span><span class="p">);</span>
+<span class="n">aeMain</span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">el</span><span class="p">);</span>
+<span class="n">aeDeleteEventLoop</span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">el</span><span class="p">);</span>
 
-<pre><code class="language-c">aeSetBeforeSleepProc(server.el,beforeSleep);
-aeSetAfterSleepProc(server.el,afterSleep);
-aeMain(server.el);
-aeDeleteEventLoop(server.el);
-
-void aeMain(aeEventLoop *eventLoop) {
-    eventLoop-&gt;stop = 0;
-    while (!eventLoop-&gt;stop) {
-        if (eventLoop-&gt;beforesleep != NULL)
-            eventLoop-&gt;beforesleep(eventLoop);
-        aeProcessEvents(eventLoop, AE_ALL_EVENTS|AE_CALL_AFTER_SLEEP);
-    }
-}
-</code></pre>
-
+<span class="kt">void</span> <span class="nf">aeMain</span><span class="p">(</span><span class="n">aeEventLoop</span> <span class="o">*</span><span class="n">eventLoop</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">eventLoop</span><span class="o">-&gt;</span><span class="n">stop</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">eventLoop</span><span class="o">-&gt;</span><span class="n">stop</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">eventLoop</span><span class="o">-&gt;</span><span class="n">beforesleep</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span>
+            <span class="n">eventLoop</span><span class="o">-&gt;</span><span class="n">beforesleep</span><span class="p">(</span><span class="n">eventLoop</span><span class="p">);</span>
+        <span class="n">aeProcessEvents</span><span class="p">(</span><span class="n">eventLoop</span><span class="p">,</span> <span class="n">AE_ALL_EVENTS</span><span class="o">|</span><span class="n">AE_CALL_AFTER_SLEEP</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p><strong>Reference</strong></p>
 
 <ul>

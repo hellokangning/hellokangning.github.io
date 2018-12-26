@@ -51,7 +51,7 @@
 
 <meta itemprop="datePublished" content="2017-08-31T14:25:37&#43;08:00" />
 <meta itemprop="dateModified" content="2017-08-31T14:25:37&#43;08:00" />
-<meta itemprop="wordCount" content="512">
+<meta itemprop="wordCount" content="577">
 
 
 
@@ -132,7 +132,7 @@
         <div class="post-category">
             <a href="/en/categories/python/"> Python </a>
             </div>
-          <span class="more-meta"> 512 words </span>
+          <span class="more-meta"> 577 words </span>
           <span class="more-meta"> 3 mins read </span>
         
       </div>
@@ -143,98 +143,181 @@
       <p><code>__slots__</code> tells the interpreter not to use a <code>dict</code>, and only allocate space for a fixed set of attributes.</p>
 
 <p>Every class have instance attributes, no matter what kind of programming language is. By default, Python uses a dict(<code>__dict__</code>) to store instance attributes of an object, which allows you to set arbitrary new attributes at runtime handily.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Bird</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">fly</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">age</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">age</span> <span class="o">=</span> <span class="n">age</span>
 
-<pre><code class="language-python">class Bird(object):
-    fly = True
-    def __init__(self, age):
-        self.age = age
+<span class="k">print</span> <span class="n">Bird</span><span class="o">.</span><span class="n">__dict</span> <span class="c1"># {&#39;fly&#39;: True, &#39;__module__&#39;: &#39;__main__&#39;, &#39;__dict__&#39;: &lt;attribute &#39;__dict__&#39; of &#39;Bird&#39; objects&gt;, &#39;__weakref__&#39;: &lt;attribute &#39;__weakref__&#39; of &#39;Bird&#39; objects&gt;, &#39;__doc__&#39;: None, &#39;__init__&#39;: &lt;function __init__ at 0x1052cbf50&gt;}</span>
 
-print Bird.__dict # {'fly': True, '__module__': '__main__', '__dict__': &lt;attribute '__dict__' of 'Bird' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'Bird' objects&gt;, '__doc__': None, '__init__': &lt;function __init__ at 0x1052cbf50&gt;}
+<span class="n">larry</span> <span class="o">=</span> <span class="n">Bird</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">larry</span><span class="o">.</span><span class="vm">__dict__</span> <span class="c1"># {&#39;age&#39;: 2}</span>
 
-larry = Bird(2)
-print larry.__dict__ # {'age': 2}
+<span class="n">larry</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;shoot&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="k">print</span> <span class="n">larry</span><span class="o">.</span><span class="vm">__dict__</span> <span class="c1"># {&#39;age&#39;: 2, &#39;shoot&#39;: True}</span>
 
-larry.__dict__['shoot'] = True
-print larry.__dict__ # {'age': 2, 'shoot': True}
-
-Bird.__dict__['three'] = 'excellent'  # TypeError: 'dictproxy' object does not support item assignment
-</code></pre>
-
+<span class="n">Bird</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;three&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;excellent&#39;</span>  <span class="c1"># TypeError: &#39;dictproxy&#39; object does not support item assignment</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>Nevertheless, the <code>__dict__</code> is not versatile, it wastes memory. Python can&rsquo;t just allocate a static amount of memory at object creation to store all the attributes, since more may be added. <code>__slots__</code> tells interpreter not to use a dict, and only allocate space for a fixed set of attributes.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Penny</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;shoot&#39;</span><span class="p">,</span> <span class="s1">&#39;assist&#39;</span><span class="p">]</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shoot</span><span class="p">,</span> <span class="n">assist</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shoot</span> <span class="o">=</span> <span class="n">shoot</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assist</span> <span class="o">=</span> <span class="n">assist</span>
 
-<pre><code class="language-python">class Penny(object):
-    __slots__ = ['shoot', 'assist']
-    def __init__(self, shoot, assist):
-        self.shoot = shoot
-        self.assist = assist
+<span class="c1"># {&#39;shoot&#39;: &lt;member &#39;shoot&#39; of &#39;Penny&#39; objects&gt;, &#39;__module__&#39;: &#39;__main__&#39;, &#39;assist&#39;: &lt;member &#39;assist&#39; of &#39;Penny&#39; objects&gt;, &#39;__slots__&#39;: [&#39;shoot&#39;, &#39;assist&#39;], &#39;__doc__&#39;: None, &#39;__init__&#39;: &lt;function __init__ at 0x105376c08&gt;}</span>
+<span class="k">print</span> <span class="n">Penny</span><span class="o">.</span><span class="vm">__dict__</span>
 
-# {'shoot': &lt;member 'shoot' of 'Penny' objects&gt;, '__module__': '__main__', 'assist': &lt;member 'assist' of 'Penny' objects&gt;, '__slots__': ['shoot', 'assist'], '__doc__': None, '__init__': &lt;function __init__ at 0x105376c08&gt;}
-print Penny.__dict__
-
-p = Penny(True, 'top')
-print p.__dict__ # AttributeError: 'Penny' object has no attribute '__dict__'
-
-</code></pre>
-
+<span class="n">p</span> <span class="o">=</span> <span class="n">Penny</span><span class="p">(</span><span class="bp">True</span><span class="p">,</span> <span class="s1">&#39;top&#39;</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">p</span><span class="o">.</span><span class="vm">__dict__</span> <span class="c1"># AttributeError: &#39;Penny&#39; object has no attribute &#39;__dict__&#39;</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>Without a <code>__dict__</code> variable, instances cannot be assigned new variables not listed in the <code>__slots__</code> definition. Attempts to assign to an unlisted variable name raise an <code>AttributeError</code>.</p>
 
 <p>Without a <code>__weakref__</code> variable for each instance, classes defining <code>__slots__</code> do not support weak references to its instances. If weak reference support is needed, then add <code>__weakref__</code> to the sequence of strings in the <code>__slots__</code>  declaration. Likewise, add <code>__dict__</code>&rsquo; to <code>__slots__</code>, so you can get dynamic assignment.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">weakref</span> <span class="kn">import</span> <span class="n">ref</span>
 
-<pre><code class="language-python">from weakref import ref
-
-class A(object):
-    __slots__ = ['b']
-    def __init__(self):
-        self.b = 1
+<span class="k">class</span> <span class="nc">A</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">]</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="mi">1</span>
 
 
-class B(object):
-    __slots__ = ['b', '__weakref__']
-    def __init__(self):
-        self.b = 1
+<span class="k">class</span> <span class="nc">B</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;__weakref__&#39;</span><span class="p">]</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="mi">1</span>
 
-a = A()
-r = ref(a) # TypeError: cannot create weak reference to 'A' object
+<span class="n">a</span> <span class="o">=</span> <span class="n">A</span><span class="p">()</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">ref</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="c1"># TypeError: cannot create weak reference to &#39;A&#39; object</span>
 
-b = B()
-r = ref(b) 
-r # &lt;weakref at 0x10468ff70; to 'type' at 0x7fde5d978430 (B)&gt;
-</code></pre>
-
+<span class="n">b</span> <span class="o">=</span> <span class="n">B</span><span class="p">()</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">ref</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> 
+<span class="n">r</span> <span class="c1"># &lt;weakref at 0x10468ff70; to &#39;type&#39; at 0x7fde5d978430 (B)&gt;</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>What will it be like if we involve inheritance? Let&rsquo;s try:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Base</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;desc&#39;</span><span class="p">]</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">desc</span> <span class="o">=</span> <span class="s2">&#34;Base&#34;</span>
 
-<pre><code class="language-python">class Base(object):
-    __slots__ = ['desc']
-    def __init__(self):
-        self.desc = &quot;Base&quot;
+<span class="k">class</span> <span class="nc">Derived</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
 
-class Derived(Base):
-    def __init__(self):
-        pass
-
-d = Derived()
-d.__dict__ # {}
-d.__slots__ # ['desc']
-</code></pre>
-
+<span class="n">d</span> <span class="o">=</span> <span class="n">Derived</span><span class="p">()</span>
+<span class="n">d</span><span class="o">.</span><span class="vm">__dict__</span> <span class="c1"># {}</span>
+<span class="n">d</span><span class="o">.</span><span class="vm">__slots__</span> <span class="c1"># [&#39;desc&#39;]</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>As you can see, you don&rsquo;t even need to declare <code>__slots__</code> in your subclass, and you will still use slots from the parents, but not restrict the creation of a <code>__dict__</code>.</p>
 
 <p>How about multiple inheritance?</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">BaseA</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span> <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">]</span>
+<span class="k">class</span> <span class="nc">BaseB</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span> <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">]</span>
 
-<pre><code class="language-python">class BaseA(object): __slots__ = ['a']
-class BaseB(object): __slots__ = ['b']
-
-# TypeError: Error when calling the metaclass bases
-#    multiple bases have instance lay-out conflict
-class Derived(BaseA, BaseB): pass
-</code></pre>
-
+<span class="c1"># TypeError: Error when calling the metaclass bases</span>
+<span class="c1">#    multiple bases have instance lay-out conflict</span>
+<span class="k">class</span> <span class="nc">Derived</span><span class="p">(</span><span class="n">BaseA</span><span class="p">,</span> <span class="n">BaseB</span><span class="p">):</span> <span class="k">pass</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>Using an empty <code>__slots__</code> in the parent seems to provide the most flexibility, allowing the child to choose to prevent or allow (by adding <code>__dict__</code> to get dynamic assignment, see section above) the creation of a <code>__dict__</code>.</p>
-
-<pre><code class="language-python">class BaseA(object): __slots__ = []
-class BaseB(object): __slots__ = []
-class Derived(BaseA, BaseB): __slots__ = ['a', 'b']
-</code></pre>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">BaseA</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span> <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">class</span> <span class="nc">BaseB</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span> <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">class</span> <span class="nc">Derived</span><span class="p">(</span><span class="n">BaseA</span><span class="p">,</span> <span class="n">BaseB</span><span class="p">):</span> <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">]</span></code></pre></td></tr></table>
+</div>
+</div>
     </div>
 
     <footer class="post-footer">

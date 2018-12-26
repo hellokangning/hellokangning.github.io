@@ -17,7 +17,7 @@
 
 
 <meta name="author" content="Guoqing Geng" /><meta name="description" content="这篇博客的起源是一位内部用户询问，Azure Cache for Redis 有没有 .pem 或者 .cem 的证书，然后可以在客户端指定它：
-import redis try: conn = redis.StrictRedis( host=&#39;&amp;lt;cache-name&amp;gt;.redis.cache.windows.net&#39;, port=6380, password=&#39;your password here&#39;, ssl=True, ssl_ca_certs=&#39;path to cert&#39;) print (conn) conn.ping() print (&#39;Connected!&#39;) except Exception as ex: print (&#39;Error:&#39;, ex) exit(&#39;Failed to connect, terminating.&#39;) " /><meta name="keywords" content="Redis, SSL" />
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15  import redis try: conn = redis.StrictRedis( host=&amp;#39;&amp;lt;cache-name&amp;gt;.redis.cache.windows.net&amp;#39;, port=6380, password=&amp;#39;your password here&amp;#39;, ssl=True, ssl_ca_certs=&amp;#39;path to cert&amp;#39;) print (conn) conn.ping() print (&amp;#39;Connected!&amp;#39;) except Exception as ex: print (&amp;#39;Error:&amp;#39;, ex) exit(&amp;#39;Failed to connect, terminating.&amp;#39;)  " /><meta name="keywords" content="Redis, SSL" />
 
 
 
@@ -42,6 +42,24 @@ import redis try: conn = redis.StrictRedis( host=&#39;&amp;lt;cache-name&amp;gt;
 <meta property="og:title" content="Redis 的 SSL" />
 <meta property="og:description" content="这篇博客的起源是一位内部用户询问，Azure Cache for Redis 有没有 .pem 或者 .cem 的证书，然后可以在客户端指定它：
 
+
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+
+
 import redis
 
 try:
@@ -57,6 +75,7 @@ try:
 except Exception as ex:
     print (&#39;Error:&#39;, ex)
     exit(&#39;Failed to connect, terminating.&#39;)
+
 " />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hellokangning.github.io/zh/post/redis-ssl/" /><meta property="article:published_time" content="2018-12-26T10:26:19&#43;08:00"/>
@@ -65,6 +84,24 @@ except Exception as ex:
 <meta itemprop="name" content="Redis 的 SSL">
 <meta itemprop="description" content="这篇博客的起源是一位内部用户询问，Azure Cache for Redis 有没有 .pem 或者 .cem 的证书，然后可以在客户端指定它：
 
+
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+
+
 import redis
 
 try:
@@ -80,12 +117,13 @@ try:
 except Exception as ex:
     print (&#39;Error:&#39;, ex)
     exit(&#39;Failed to connect, terminating.&#39;)
+
 ">
 
 
 <meta itemprop="datePublished" content="2018-12-26T10:26:19&#43;08:00" />
 <meta itemprop="dateModified" content="2018-12-26T10:26:19&#43;08:00" />
-<meta itemprop="wordCount" content="543">
+<meta itemprop="wordCount" content="563">
 
 
 
@@ -94,6 +132,24 @@ except Exception as ex:
 <meta name="twitter:title" content="Redis 的 SSL"/>
 <meta name="twitter:description" content="这篇博客的起源是一位内部用户询问，Azure Cache for Redis 有没有 .pem 或者 .cem 的证书，然后可以在客户端指定它：
 
+
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+
+
 import redis
 
 try:
@@ -109,6 +165,7 @@ try:
 except Exception as ex:
     print (&#39;Error:&#39;, ex)
     exit(&#39;Failed to connect, terminating.&#39;)
+
 "/>
 
 <!--[if lte IE 9]>
@@ -183,7 +240,7 @@ except Exception as ex:
         <div class="post-category">
             <a href="/zh/categories/redis/"> Redis </a>
             </div>
-          <span class="more-meta"> 543 words </span>
+          <span class="more-meta"> 563 words </span>
           <span class="more-meta"> 2 mins read </span>
         
       </div>
@@ -197,24 +254,42 @@ except Exception as ex:
 </div>
     <div class="post-content">
       <p>这篇博客的起源是一位内部用户询问，Azure Cache for Redis 有没有 <em>.pem</em> 或者 <em>.cem</em> 的证书，然后可以在客户端指定它：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">redis</span>
 
-<pre><code class="language-python">import redis
-
-try:
-    conn = redis.StrictRedis(
-        host='&lt;cache-name&gt;.redis.cache.windows.net',
-        port=6380,
-        password='your password here',
-        ssl=True,
-        ssl_ca_certs='path to cert')
-    print (conn)
-    conn.ping()
-    print ('Connected!')
-except Exception as ex:
-    print ('Error:', ex)
-    exit('Failed to connect, terminating.')
-</code></pre>
-
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">conn</span> <span class="o">=</span> <span class="n">redis</span><span class="o">.</span><span class="n">StrictRedis</span><span class="p">(</span>
+        <span class="n">host</span><span class="o">=</span><span class="s1">&#39;&lt;cache-name&gt;.redis.cache.windows.net&#39;</span><span class="p">,</span>
+        <span class="n">port</span><span class="o">=</span><span class="mi">6380</span><span class="p">,</span>
+        <span class="n">password</span><span class="o">=</span><span class="s1">&#39;your password here&#39;</span><span class="p">,</span>
+        <span class="n">ssl</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+        <span class="n">ssl_ca_certs</span><span class="o">=</span><span class="s1">&#39;path to cert&#39;</span><span class="p">)</span>
+    <span class="k">print</span> <span class="p">(</span><span class="n">conn</span><span class="p">)</span>
+    <span class="n">conn</span><span class="o">.</span><span class="n">ping</span><span class="p">()</span>
+    <span class="k">print</span> <span class="p">(</span><span class="s1">&#39;Connected!&#39;</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+    <span class="k">print</span> <span class="p">(</span><span class="s1">&#39;Error:&#39;</span><span class="p">,</span> <span class="n">ex</span><span class="p">)</span>
+    <span class="nb">exit</span><span class="p">(</span><span class="s1">&#39;Failed to connect, terminating.&#39;</span><span class="p">)</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>在 Azure 的<a href="https://docs.microsoft.com/en-us/azure/azure-cache-for-redis/cache-faq">官方文档</a>上，有这么一句：</p>
 
 <blockquote>
@@ -226,14 +301,22 @@ except Exception as ex:
 <p>关于 SSL 在 Redis 上的始先，争论由来已久。这个 issue <a href="https://github.com/antirez/redis/issues/2178">Redis SSL support</a>，最后无疾而终。官网的 <a href="https://redis.io/topics/encryption">Redis Encryption</a> 也是建议引入一个中间层来解决 SSL 的问题。我相信 Azure Cache 也是这么干的。</p>
 
 <p>所以，才有这篇文档 <a href="https://docs.microsoft.com/en-us/azure/azure-cache-for-redis/cache-python-get-started">Quickstart: Use Azure Cache for Redis with Python</a> 中的 <code>ssl = True</code>.</p>
-
-<pre><code class="language-python">import redis
-r = redis.StrictRedis(host='&lt;Your Host Name&gt;.redis.cache.windows.net',
-        port=6380, db=0, password='&lt;Your Access Key&gt;', ssl=True)
-r.set('foo', 'bar') # True
-r.get('foo') #b'bar'
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">redis</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">redis</span><span class="o">.</span><span class="n">StrictRedis</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="s1">&#39;&lt;Your Host Name&gt;.redis.cache.windows.net&#39;</span><span class="p">,</span>
+        <span class="n">port</span><span class="o">=</span><span class="mi">6380</span><span class="p">,</span> <span class="n">db</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s1">&#39;&lt;Your Access Key&gt;&#39;</span><span class="p">,</span> <span class="n">ssl</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">r</span><span class="o">.</span><span class="nb">set</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">)</span> <span class="c1"># True</span>
+<span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">)</span> <span class="c1">#b&#39;bar&#39;</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>既然 <code>ssl = True</code> 已经开启了 SSL，那 <code>ssl_ca_certs</code> 这个参数是做什么的呢？</p>
 
 <p>这就要说到 SSL 协议的加密过程了。SSL协议即用到了对称加密也用到了非对称加密(公钥加密)，在建立传输链路时，SSL首先对对称加密的密钥使用公钥进行非对称加密，链路建立好之后，SSL对传输内容使用对称加密。</p>

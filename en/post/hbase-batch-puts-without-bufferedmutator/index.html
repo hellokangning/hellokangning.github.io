@@ -56,7 +56,7 @@ In this post, BufferedMutator is excluded. It will be discussed in the near futu
 
 <meta itemprop="datePublished" content="2018-01-09T11:33:34&#43;08:00" />
 <meta itemprop="dateModified" content="2018-01-11T16:33:34&#43;08:00" />
-<meta itemprop="wordCount" content="781">
+<meta itemprop="wordCount" content="902">
 
 
 
@@ -139,8 +139,8 @@ In this post, BufferedMutator is excluded. It will be discussed in the near futu
         <div class="post-category">
             <a href="/en/categories/hbase/"> HBase </a>
             </div>
-          <span class="more-meta"> 781 words </span>
-          <span class="more-meta"> 4 mins read </span>
+          <span class="more-meta"> 902 words </span>
+          <span class="more-meta"> 5 mins read </span>
         
       </div>
     </header>
@@ -166,22 +166,38 @@ In this post, BufferedMutator is excluded. It will be discussed in the near futu
 <h1 id="htable"><code>HTable</code></h1>
 
 <p><code>batch</code> method does essential job for batch puts, we can see this fact in <code>HTable.java</code>.</p>
-
-<pre><code class="language-java">// HTable.java
-
-  public void put(final List&lt;Put&gt; puts) throws IOException {
-    for (Put put : puts) {
-      validatePut(put);
-    }
-    Object[] results = new Object[puts.size()];
-    try {
-      batch(puts, results, writeRpcTimeoutMs);
-    } catch (InterruptedException e) {
-      throw (InterruptedIOException) new InterruptedIOException().initCause(e);
-    }
-  }
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// HTable.java
+</span><span class="c1"></span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">put</span><span class="o">(</span><span class="kd">final</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">Put</span><span class="o">&gt;</span> <span class="n">puts</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+    <span class="k">for</span> <span class="o">(</span><span class="n">Put</span> <span class="n">put</span> <span class="o">:</span> <span class="n">puts</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">validatePut</span><span class="o">(</span><span class="n">put</span><span class="o">);</span>
+    <span class="o">}</span>
+    <span class="n">Object</span><span class="o">[]</span> <span class="n">results</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Object</span><span class="o">[</span><span class="n">puts</span><span class="o">.</span><span class="na">size</span><span class="o">()];</span>
+    <span class="k">try</span> <span class="o">{</span>
+      <span class="n">batch</span><span class="o">(</span><span class="n">puts</span><span class="o">,</span> <span class="n">results</span><span class="o">,</span> <span class="n">writeRpcTimeoutMs</span><span class="o">);</span>
+    <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">InterruptedException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">throw</span> <span class="o">(</span><span class="n">InterruptedIOException</span><span class="o">)</span> <span class="k">new</span> <span class="n">InterruptedIOException</span><span class="o">().</span><span class="na">initCause</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
+    <span class="o">}</span>
+  <span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>The interaction of <code>batch</code> lists in the following,</p>
 
 <p><img src="/images/hbase-batch-put-interaction.png" alt="" /></p>
@@ -202,28 +218,50 @@ In this post, BufferedMutator is excluded. It will be discussed in the near futu
 <p><img src="/images/hbase-batch-put-class.png" alt="" /></p>
 
 <p>Then, let&rsquo;s take look at source code of <code>batch</code> method.</p>
-
-<pre><code class="language-java">// HTable.java
-
-  public void batch(final List&lt;? extends Row&gt; actions, final Object[] results, int rpcTimeout)
-      throws InterruptedException, IOException {
-    AsyncProcessTask task = AsyncProcessTask.newBuilder()
-            .setPool(pool)
-            .setTableName(tableName)
-            .setRowAccess(actions)
-            .setResults(results)
-            .setRpcTimeout(rpcTimeout)
-            .setOperationTimeout(operationTimeoutMs)
-            .setSubmittedRows(AsyncProcessTask.SubmittedRows.ALL)
-            .build();
-    AsyncRequestFuture ars = multiAp.submit(task);
-    ars.waitUntilDone();
-    if (ars.hasError()) {
-      throw ars.getErrors();
-    }
-  }
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// HTable.java
+</span><span class="c1"></span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">batch</span><span class="o">(</span><span class="kd">final</span> <span class="n">List</span><span class="o">&lt;?</span> <span class="kd">extends</span> <span class="n">Row</span><span class="o">&gt;</span> <span class="n">actions</span><span class="o">,</span> <span class="kd">final</span> <span class="n">Object</span><span class="o">[]</span> <span class="n">results</span><span class="o">,</span> <span class="kt">int</span> <span class="n">rpcTimeout</span><span class="o">)</span>
+      <span class="kd">throws</span> <span class="n">InterruptedException</span><span class="o">,</span> <span class="n">IOException</span> <span class="o">{</span>
+    <span class="n">AsyncProcessTask</span> <span class="n">task</span> <span class="o">=</span> <span class="n">AsyncProcessTask</span><span class="o">.</span><span class="na">newBuilder</span><span class="o">()</span>
+            <span class="o">.</span><span class="na">setPool</span><span class="o">(</span><span class="n">pool</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">setTableName</span><span class="o">(</span><span class="n">tableName</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">setRowAccess</span><span class="o">(</span><span class="n">actions</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">setResults</span><span class="o">(</span><span class="n">results</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">setRpcTimeout</span><span class="o">(</span><span class="n">rpcTimeout</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">setOperationTimeout</span><span class="o">(</span><span class="n">operationTimeoutMs</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">setSubmittedRows</span><span class="o">(</span><span class="n">AsyncProcessTask</span><span class="o">.</span><span class="na">SubmittedRows</span><span class="o">.</span><span class="na">ALL</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">build</span><span class="o">();</span>
+    <span class="n">AsyncRequestFuture</span> <span class="n">ars</span> <span class="o">=</span> <span class="n">multiAp</span><span class="o">.</span><span class="na">submit</span><span class="o">(</span><span class="n">task</span><span class="o">);</span>
+    <span class="n">ars</span><span class="o">.</span><span class="na">waitUntilDone</span><span class="o">();</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">ars</span><span class="o">.</span><span class="na">hasError</span><span class="o">())</span> <span class="o">{</span>
+      <span class="k">throw</span> <span class="n">ars</span><span class="o">.</span><span class="na">getErrors</span><span class="o">();</span>
+    <span class="o">}</span>
+  <span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p><code>batch</code> method will</p>
 
 <ol>
@@ -242,32 +280,58 @@ In this post, BufferedMutator is excluded. It will be discussed in the near futu
 <li>Callbacks</li>
 <li>Timeout limitation</li>
 </ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// AsyncProcessTask.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">AsyncProcessTask</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="kd">static</span> <span class="n">Builder</span> <span class="nf">newBuilder</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="n">Builder</span><span class="o">();</span>
+  <span class="o">}</span>
 
-<pre><code class="language-java">// AsyncProcessTask.java
+  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">class</span> <span class="nc">Builder</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="o">{</span>
 
-public class AsyncProcessTask&lt;T&gt; {
-  public static Builder newBuilder() {
-    return new Builder();
-  }
+    <span class="kd">private</span> <span class="n">ExecutorService</span> <span class="n">pool</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="n">TableName</span> <span class="n">tableName</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="n">RowAccess</span><span class="o">&lt;?</span> <span class="kd">extends</span> <span class="n">Row</span><span class="o">&gt;</span> <span class="n">rows</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="n">SubmittedRows</span> <span class="n">submittedRows</span> <span class="o">=</span> <span class="n">SubmittedRows</span><span class="o">.</span><span class="na">ALL</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="n">Batch</span><span class="o">.</span><span class="na">Callback</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">callback</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kt">boolean</span> <span class="n">needResults</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kt">int</span> <span class="n">rpcTimeout</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kt">int</span> <span class="n">operationTimeout</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="n">CancellableRegionServerCallable</span> <span class="n">callable</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="n">Object</span><span class="o">[]</span> <span class="n">results</span><span class="o">;</span>
 
-  public static class Builder&lt;T&gt; {
-
-    private ExecutorService pool;
-    private TableName tableName;
-    private RowAccess&lt;? extends Row&gt; rows;
-    private SubmittedRows submittedRows = SubmittedRows.ALL;
-    private Batch.Callback&lt;T&gt; callback;
-    private boolean needResults;
-    private int rpcTimeout;
-    private int operationTimeout;
-    private CancellableRegionServerCallable callable;
-    private Object[] results;
-
-    // getters and setters
-  }
-}
-</code></pre>
-
+    <span class="c1">// getters and setters
+</span><span class="c1"></span>  <span class="o">}</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <h1 id="asyncprocess"><code>AsyncProcess</code></h1>
 
 <p>The new <code>AsyncProcessTask</code> will be submitted to <code>AsyncProcess</code> after initialization. <code>AsyncProcess</code> allows a continuous flow of requests from caller.</p>
@@ -275,18 +339,30 @@ public class AsyncProcessTask&lt;T&gt; {
 <p>This class extracts from this list the operations it can send, i.e. the operations that are on region that are not considered as busy. The process is asynchronous, i.e. it returns immediately when if has finished to iterate on the list. If, and only if, the maximum number of current task is reached, the call to submit will block. Alternatively, the caller can call submitAll, in which case all the operations will be sent. Each call to submit returns a future-like object that can be used to track operation progress.</p>
 
 <p>The class manages internally the retries.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// AsyncProcess.java
+</span><span class="c1"></span>
+<span class="kd">class</span> <span class="nc">AsyncProcess</span> <span class="o">{</span>
 
-<pre><code class="language-java">// AsyncProcess.java
-
-class AsyncProcess {
-
-  private &lt;CResult&gt; AsyncRequestFuture submit(AsyncProcessTask&lt;CResult&gt; task,
-    boolean atLeastOne) throws InterruptedIOException {
-      // ...
-    }
-}
-</code></pre>
-
+  <span class="kd">private</span> <span class="o">&lt;</span><span class="n">CResult</span><span class="o">&gt;</span> <span class="n">AsyncRequestFuture</span> <span class="nf">submit</span><span class="o">(</span><span class="n">AsyncProcessTask</span><span class="o">&lt;</span><span class="n">CResult</span><span class="o">&gt;</span> <span class="n">task</span><span class="o">,</span>
+    <span class="kt">boolean</span> <span class="n">atLeastOne</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">InterruptedIOException</span> <span class="o">{</span>
+      <span class="c1">// ...
+</span><span class="c1"></span>    <span class="o">}</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>Steps of <code>submit</code> method,</p>
 
 <ol>
@@ -301,70 +377,133 @@ class AsyncProcess {
 <h1 id="asyncrequestfutureimpl"><code>AsyncRequestFutureImpl</code></h1>
 
 <p>Note on how this class (one AP submit) works. Initially, all requests are split into groups by server. Request is sent to each server in parallel; the RPC calls are <strong>not async so a thread per server is used</strong>. Every time some actions fail, regions/locations might have changed, so we re-group them by server and region again and send these groups in parallel too. The result, in case of retries, is a &ldquo;tree&rdquo; of threads, with parent exiting after scheduling children. This is why lots of code doesn&rsquo;t require any synchronization.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// AsyncRequestFutureImpl.java
+</span><span class="c1"></span>
+<span class="kd">class</span> <span class="nc">AsyncRequestFutureImpl</span><span class="o">&lt;</span><span class="n">CResult</span><span class="o">&gt;</span> <span class="kd">implements</span> <span class="n">AsyncRequestFuture</span> <span class="o">{</span>
+  <span class="kt">void</span> <span class="nf">sendMultiAction</span><span class="o">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="n">ServerName</span><span class="o">,</span> <span class="n">MultiAction</span><span class="o">&gt;</span> <span class="n">actionsByServer</span><span class="o">,</span>
+                               <span class="kt">int</span> <span class="n">numAttempt</span><span class="o">,</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">Action</span><span class="o">&gt;</span> <span class="n">actionsForReplicaThread</span><span class="o">,</span> <span class="kt">boolean</span> <span class="n">reuseThread</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">Collection</span><span class="o">&lt;?</span> <span class="kd">extends</span> <span class="n">Runnable</span><span class="o">&gt;</span> <span class="n">runnables</span> <span class="o">=</span> <span class="n">getNewMultiActionRunnable</span><span class="o">(</span><span class="n">server</span><span class="o">,</span> <span class="n">multiAction</span><span class="o">,</span>
+          <span class="n">numAttempt</span><span class="o">);</span>
 
-<pre><code class="language-java">// AsyncRequestFutureImpl.java
+      <span class="c1">// run  all the runnables
+</span><span class="c1"></span>      <span class="k">for</span> <span class="o">(</span><span class="n">Runnable</span> <span class="n">runnable</span> <span class="o">:</span> <span class="n">runnables</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">runnable</span><span class="o">.</span><span class="na">run</span><span class="o">()</span>
+      <span class="o">}</span>     
+    <span class="o">}</span>
+  <span class="o">}</span>
 
-class AsyncRequestFutureImpl&lt;CResult&gt; implements AsyncRequestFuture {
-  void sendMultiAction(Map&lt;ServerName, MultiAction&gt; actionsByServer,
-                               int numAttempt, List&lt;Action&gt; actionsForReplicaThread, boolean reuseThread) {
-    Collection&lt;? extends Runnable&gt; runnables = getNewMultiActionRunnable(server, multiAction,
-          numAttempt);
+  <span class="kd">private</span> <span class="n">Collection</span><span class="o">&lt;?</span> <span class="kd">extends</span> <span class="n">Runnable</span><span class="o">&gt;</span> <span class="nf">getNewMultiActionRunnable</span><span class="o">(</span><span class="n">ServerName</span> <span class="n">server</span><span class="o">,</span>
+                                                                   <span class="n">MultiAction</span> <span class="n">multiAction</span><span class="o">,</span>
+                                                                   <span class="kt">int</span> <span class="n">numAttempt</span><span class="o">)</span> <span class="o">{</span>
 
-      // run  all the runnables
-      for (Runnable runnable : runnables) {
-        runnable.run()
-      }     
-    }
-  }
+    <span class="c1">// ...
+</span><span class="c1"></span>
+    <span class="n">Map</span><span class="o">&lt;</span><span class="n">Long</span><span class="o">,</span> <span class="n">DelayingRunner</span><span class="o">&gt;</span> <span class="n">actions</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&lt;&gt;(</span><span class="n">multiAction</span><span class="o">.</span><span class="na">size</span><span class="o">());</span>
+    <span class="n">List</span><span class="o">&lt;</span><span class="n">Runnable</span><span class="o">&gt;</span> <span class="n">toReturn</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;(</span><span class="n">actions</span><span class="o">.</span><span class="na">size</span><span class="o">());</span>
+    <span class="k">for</span> <span class="o">(</span><span class="n">DelayingRunner</span> <span class="n">runner</span> <span class="o">:</span> <span class="n">actions</span><span class="o">.</span><span class="na">values</span><span class="o">())</span> <span class="o">{</span>
+      <span class="n">Runnable</span> <span class="n">runnable</span> <span class="o">=</span> <span class="n">createSingleServerRequest</span><span class="o">(</span><span class="n">runner</span><span class="o">.</span><span class="na">getActions</span><span class="o">(),</span> <span class="n">numAttempt</span><span class="o">,</span> <span class="n">server</span><span class="o">,</span> <span class="n">callsInProgress</span><span class="o">);</span>
+      <span class="c1">// use a delay runner only if we need to sleep for some time
+</span><span class="c1"></span>      <span class="k">if</span> <span class="o">(</span><span class="n">runner</span><span class="o">.</span><span class="na">getSleepTime</span><span class="o">()</span> <span class="o">&gt;</span> <span class="n">0</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">runner</span><span class="o">.</span><span class="na">setRunner</span><span class="o">(</span><span class="n">runnable</span><span class="o">);</span>
+        <span class="n">traceText</span> <span class="o">=</span> <span class="s">&#34;AsyncProcess.clientBackoff.sendMultiAction&#34;</span><span class="o">;</span>
+        <span class="n">runnable</span> <span class="o">=</span> <span class="n">runner</span><span class="o">;</span>
+      <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">asyncProcess</span><span class="o">.</span><span class="na">connection</span><span class="o">.</span><span class="na">getConnectionMetrics</span><span class="o">()</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span><span class="n">asyncProcess</span><span class="o">.</span><span class="na">connection</span><span class="o">.</span><span class="na">getConnectionMetrics</span><span class="o">().</span><span class="na">incrNormalRunners</span><span class="o">();</span>
+        <span class="o">}</span>
+      <span class="o">}</span>
 
-  private Collection&lt;? extends Runnable&gt; getNewMultiActionRunnable(ServerName server,
-                                                                   MultiAction multiAction,
-                                                                   int numAttempt) {
+      <span class="n">runnable</span> <span class="o">=</span> <span class="n">Trace</span><span class="o">.</span><span class="na">wrap</span><span class="o">(</span><span class="n">traceText</span><span class="o">,</span> <span class="n">runnable</span><span class="o">);</span>
+      <span class="n">toReturn</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">runnable</span><span class="o">);</span>
+    <span class="o">}</span>
 
-    // ...
-
-    Map&lt;Long, DelayingRunner&gt; actions = new HashMap&lt;&gt;(multiAction.size());
-    List&lt;Runnable&gt; toReturn = new ArrayList&lt;&gt;(actions.size());
-    for (DelayingRunner runner : actions.values()) {
-      Runnable runnable = createSingleServerRequest(runner.getActions(), numAttempt, server, callsInProgress);
-      // use a delay runner only if we need to sleep for some time
-      if (runner.getSleepTime() &gt; 0) {
-        runner.setRunner(runnable);
-        traceText = &quot;AsyncProcess.clientBackoff.sendMultiAction&quot;;
-        runnable = runner;
-      } else {
-        if (asyncProcess.connection.getConnectionMetrics() != null) {asyncProcess.connection.getConnectionMetrics().incrNormalRunners();
-        }
-      }
-
-      runnable = Trace.wrap(traceText, runnable);
-      toReturn.add(runnable);
-    }
-
-    return toReturn;
-  }
-}
-</code></pre>
-
+    <span class="k">return</span> <span class="n">toReturn</span><span class="o">;</span>
+  <span class="o">}</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p><code>SingleServerRequestRunnable</code>, nested class of <code>AsyncRequestFutureImpl</code>, is <code>Runnable</code> (that can be submitted to thread pool) that submits <code>MultiAction</code> to a single server. The server call is <strong>synchronous</strong>, therefore we do it on a thread pool.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// AsyncRequestFutureImpl.java
+</span><span class="c1"></span><span class="kd">final</span> <span class="kd">class</span> <span class="nc">SingleServerRequestRunnable</span> <span class="kd">implements</span> <span class="n">Runnable</span> <span class="o">{</span>
+  <span class="kd">private</span> <span class="kd">final</span> <span class="n">MultiAction</span> <span class="n">multiAction</span><span class="o">;</span>
+  <span class="kd">private</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">numAttempt</span><span class="o">;</span>
+  <span class="kd">private</span> <span class="kd">final</span> <span class="n">ServerName</span> <span class="n">server</span><span class="o">;</span>
+  <span class="kd">private</span> <span class="kd">final</span> <span class="n">Set</span><span class="o">&lt;</span><span class="n">CancellableRegionServerCallable</span><span class="o">&gt;</span> <span class="n">callsInProgress</span><span class="o">;</span>
 
-<pre><code class="language-java">// AsyncRequestFutureImpl.java
-final class SingleServerRequestRunnable implements Runnable {
-  private final MultiAction multiAction;
-  private final int numAttempt;
-  private final ServerName server;
-  private final Set&lt;CancellableRegionServerCallable&gt; callsInProgress;
-
-  @Override
-  public void run() {
-    // for short
-    callable = createCallable(server, tableName, multiAction);
-    RpcRetryingCaller&lt;AbstractResponse&gt; caller = asyncProcess.createCaller(callable,rpcTimeout);
-    caller.callWithoutRetries(callable, operationTimeout);
-  }
-}
-</code></pre>
-
+  <span class="nd">@Override</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">run</span><span class="o">()</span> <span class="o">{</span>
+    <span class="c1">// for short
+</span><span class="c1"></span>    <span class="n">callable</span> <span class="o">=</span> <span class="n">createCallable</span><span class="o">(</span><span class="n">server</span><span class="o">,</span> <span class="n">tableName</span><span class="o">,</span> <span class="n">multiAction</span><span class="o">);</span>
+    <span class="n">RpcRetryingCaller</span><span class="o">&lt;</span><span class="n">AbstractResponse</span><span class="o">&gt;</span> <span class="n">caller</span> <span class="o">=</span> <span class="n">asyncProcess</span><span class="o">.</span><span class="na">createCaller</span><span class="o">(</span><span class="n">callable</span><span class="o">,</span><span class="n">rpcTimeout</span><span class="o">);</span>
+    <span class="n">caller</span><span class="o">.</span><span class="na">callWithoutRetries</span><span class="o">(</span><span class="n">callable</span><span class="o">,</span> <span class="n">operationTimeout</span><span class="o">);</span>
+  <span class="o">}</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>Finally, all requests are sent by <code>RpcRetryingCaller</code>. For more about <a href="https://hellokangning.github.io/en/post/a-lifecycle-of-hbase-put-client-side/#rpcretryingcaller">RpcRetryingCaller</a>.</p>
     </div>
 

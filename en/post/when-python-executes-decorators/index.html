@@ -50,7 +50,7 @@
 
 <meta itemprop="datePublished" content="2018-10-29T14:55:25&#43;08:00" />
 <meta itemprop="dateModified" content="2018-10-29T14:55:25&#43;08:00" />
-<meta itemprop="wordCount" content="375">
+<meta itemprop="wordCount" content="449">
 
 
 
@@ -131,8 +131,8 @@
         <div class="post-category">
             <a href="/en/categories/python/"> Python </a>
             </div>
-          <span class="more-meta"> 375 words </span>
-          <span class="more-meta"> 2 mins read </span>
+          <span class="more-meta"> 449 words </span>
+          <span class="more-meta"> 3 mins read </span>
         
       </div>
     </header>
@@ -142,59 +142,107 @@
       <p>A key feature of decorators is that they run right after the decorated function is defined. This is usually at import time.</p>
 
 <p>What is the output of the following code?</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="n">registry</span> <span class="o">=</span> <span class="p">[]</span>
 
-<pre><code class="language-python">registry = []
+<span class="k">def</span> <span class="nf">register</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;running register(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">func</span><span class="p">)</span>
+    <span class="n">registry</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">func</span>
 
-def register(func):
-    print('running register(%s)' % func)
-    registry.append(func)
-    return func
+<span class="nd">@register</span>
+<span class="k">def</span> <span class="nf">f1</span><span class="p">():</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;running f1()&#39;</span><span class="p">)</span>
 
-@register
-def f1():
-    print('running f1()')
+<span class="nd">@register</span>
+<span class="k">def</span> <span class="nf">f2</span><span class="p">():</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;running f2()&#39;</span><span class="p">)</span>
 
-@register
-def f2():
-    print('running f2()')
+<span class="k">def</span> <span class="nf">f3</span><span class="p">():</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;running f3()&#39;</span><span class="p">)</span>
 
-def f3():
-    print('running f3()')
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;registry -&gt;&#39;</span><span class="p">,</span> <span class="n">registry</span><span class="p">)</span>
+    <span class="n">f1</span><span class="p">()</span>
+    <span class="n">f2</span><span class="p">()</span>
+    <span class="n">f3</span><span class="p">()</span>
 
-def main():
-    print('registry -&gt;', registry)
-    f1()
-    f2()
-    f3()
-
-if __name__ == '__main__':
-    main()
-</code></pre>
-
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>The result may surprise you.</p>
-
-<pre><code>running register(&lt;function f1 at 0x1055ae378&gt;)
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">running register(&lt;function f1 at 0x1055ae378&gt;)
 running register(&lt;function f2 at 0x1055ae400&gt;)
 registry -&gt; [&lt;function f1 at 0x1055ae378&gt;, &lt;function f2 at 0x1055ae400&gt;]
 running f1()
-running f2()
-</code></pre>
-
+running f2()</pre></td></tr></table>
+</div>
+</div>
 <p>Note that <code>register</code> runs twice before any other function in the module. It infers that decorators run right after the decorated function is defined. This is usually at import time, when a module is loaded by Python.</p>
 
 <p>Save the above code in <code>registration.py</code> file and import it as a script:</p>
-
-<pre><code>&gt;&gt;&gt; import registration
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">&gt;&gt;&gt; import registration
 running register(&lt;function f1 at 0x104679840&gt;)
-running register(&lt;function f2 at 0x1046798c8&gt;)
-</code></pre>
-
+running register(&lt;function f2 at 0x1046798c8&gt;)</pre></td></tr></table>
+</div>
+</div>
 <p>At this time, if you look at the variable <code>registry</code>, here is that you get:</p>
-
-<pre><code>&gt;&gt;&gt; registration.registry
-[&lt;function f1 at 0x104679840&gt;, &lt;function f2 at 0x1046798c8&gt;]
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">&gt;&gt;&gt; registration.registry
+[&lt;function f1 at 0x104679840&gt;, &lt;function f2 at 0x1046798c8&gt;]</pre></td></tr></table>
+</div>
+</div>
 <p>The function decorators are executed as soon as the module is imported, but the decorated functions only run when they are explicitly invoked.</p>
 
 <p>Similar decorators are used in many Python Web frameworks to add functions to some central registry, for example, a registry mapping URL patterns to functions that generate HTTP responses.</p>
@@ -202,46 +250,88 @@ running register(&lt;function f2 at 0x1046798c8&gt;)
 <p>Back to <a href="https://hellokangning.github.io/en/post/design-patterns-with-first-class-functions/">Refactoring Strategy</a>, it&rsquo;s difficult to compute the highest discount applicable. You must append all strategy functions to one list manually.</p>
 
 <p>We can solve this problem with a registration decorator.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="n">promos</span> <span class="o">=</span> <span class="p">[]</span>
 
-<pre><code class="language-python">promos = []
+<span class="k">def</span> <span class="nf">promotion</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="n">promos</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">func</span>
 
-def promotion(func):
-    promos.append(func)
-    return func
+<span class="nd">@promotion</span>
+<span class="k">def</span> <span class="nf">fidelityPromo</span><span class="p">(</span><span class="n">order</span><span class="p">):</span>
+    <span class="s2">&#34;&#34;&#34;
+</span><span class="s2">    5</span><span class="si">% d</span><span class="s2">iscount for customers with 1000 or more fidelity points
+</span><span class="s2">    &#34;&#34;&#34;</span>
+    <span class="k">return</span> <span class="n">order</span><span class="o">.</span><span class="n">total</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.05</span> <span class="k">if</span> <span class="n">order</span><span class="o">.</span><span class="n">customer</span><span class="o">.</span><span class="n">fidelity</span> <span class="o">&gt;=</span> <span class="mi">1000</span> <span class="k">else</span> <span class="mi">0</span>
 
-@promotion
-def fidelityPromo(order):
-    &quot;&quot;&quot;
-    5% discount for customers with 1000 or more fidelity points
-    &quot;&quot;&quot;
-    return order.total() * 0.05 if order.customer.fidelity &gt;= 1000 else 0
+<span class="nd">@promotion</span>
+<span class="k">def</span> <span class="nf">bulkItemPromo</span><span class="p">(</span><span class="n">order</span><span class="p">):</span>
+    <span class="s2">&#34;&#34;&#34;
+</span><span class="s2">    10</span><span class="si">% d</span><span class="s2">iscount for each LineItem with 20 or more units
+</span><span class="s2">    &#34;&#34;&#34;</span>
+    <span class="n">discount</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">order</span><span class="o">.</span><span class="n">cart</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">quantity</span> <span class="o">&gt;=</span> <span class="mi">20</span><span class="p">:</span>
+            <span class="n">discount</span> <span class="o">+=</span> <span class="n">item</span><span class="o">.</span><span class="n">total</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.1</span>
 
-@promotion
-def bulkItemPromo(order):
-    &quot;&quot;&quot;
-    10% discount for each LineItem with 20 or more units
-    &quot;&quot;&quot;
-    discount = 0
-    for item in order.cart:
-        if item.quantity &gt;= 20:
-            discount += item.total() * 0.1
+    <span class="k">return</span> <span class="n">discount</span>
 
-    return discount
+<span class="nd">@promotion</span>
+<span class="k">def</span> <span class="nf">largeOrderPromo</span><span class="p">(</span><span class="n">order</span><span class="p">):</span>
+    <span class="s2">&#34;&#34;&#34;
+</span><span class="s2">    7</span><span class="si">% d</span><span class="s2">iscount for orders with 10 or more distinct items
+</span><span class="s2">    &#34;&#34;&#34;</span>
+    <span class="n">distinctItems</span> <span class="o">=</span> <span class="p">{</span><span class="n">item</span><span class="o">.</span><span class="n">product</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">order</span><span class="o">.</span><span class="n">cart</span><span class="p">}</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">distinctItems</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">10</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">order</span><span class="o">.</span><span class="n">total</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.07</span>
 
-@promotion
-def largeOrderPromo(order):
-    &quot;&quot;&quot;
-    7% discount for orders with 10 or more distinct items
-    &quot;&quot;&quot;
-    distinctItems = {item.product for item in order.cart}
-    if len(distinctItems) &gt;= 10:
-        return order.total() * 0.07
+    <span class="k">return</span> <span class="mi">0</span>
 
-    return 0
-
-def bestPromo(order):
-    return max(promo(order) for promo in promos)
-</code></pre>
+<span class="k">def</span> <span class="nf">bestPromo</span><span class="p">(</span><span class="n">order</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">promo</span><span class="p">(</span><span class="n">order</span><span class="p">)</span> <span class="k">for</span> <span class="n">promo</span> <span class="ow">in</span> <span class="n">promos</span><span class="p">)</span></code></pre></td></tr></table>
+</div>
+</div>
     </div>
 
     <footer class="post-footer">

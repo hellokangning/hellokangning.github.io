@@ -61,7 +61,7 @@ With the help of HashMap, HashSet offers constant time performance for the basic
 
 <meta itemprop="datePublished" content="2016-08-01T11:45:53&#43;08:00" />
 <meta itemprop="dateModified" content="2018-08-01T11:45:53&#43;08:00" />
-<meta itemprop="wordCount" content="365">
+<meta itemprop="wordCount" content="400">
 
 
 
@@ -146,7 +146,7 @@ With the help of HashMap, HashSet offers constant time performance for the basic
         <div class="post-category">
             <a href="/en/categories/java/"> Java </a>
             </div>
-          <span class="more-meta"> 365 words </span>
+          <span class="more-meta"> 400 words </span>
           <span class="more-meta"> 2 mins read </span>
         
       </div>
@@ -178,35 +178,61 @@ With the help of HashMap, HashSet offers constant time performance for the basic
 <h1 id="hashmap-underneath">HashMap Underneath</h1>
 
 <p>HashSet involves a <code>map</code> variable referring to a HashMap, in which the elements are stored. All operations on HashSet will read or write this <code>map</code> accordingly.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// HashSet.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">HashSet</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span>
+    <span class="kd">extends</span> <span class="n">AbstractSet</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span>
+    <span class="kd">implements</span> <span class="n">Set</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;,</span> <span class="n">Cloneable</span><span class="o">,</span> <span class="n">java</span><span class="o">.</span><span class="na">io</span><span class="o">.</span><span class="na">Serializable</span>
+<span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">transient</span> <span class="n">HashMap</span><span class="o">&lt;</span><span class="n">E</span><span class="o">,</span><span class="n">Object</span><span class="o">&gt;</span> <span class="n">map</span><span class="o">;</span>
+    <span class="kd">public</span> <span class="nf">HashSet</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">map</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&lt;&gt;();</span>
+    <span class="o">}</span>
 
-<pre><code class="language-java">// HashSet.java
-
-public class HashSet&lt;E&gt;
-    extends AbstractSet&lt;E&gt;
-    implements Set&lt;E&gt;, Cloneable, java.io.Serializable
-{
-    private transient HashMap&lt;E,Object&gt; map;
-    public HashSet() {
-        map = new HashMap&lt;&gt;();
-    }
-
-     public HashSet(int initialCapacity, float loadFactor) {
-        map = new HashMap&lt;&gt;(initialCapacity, loadFactor);
-    }
-}
-</code></pre>
-
+     <span class="kd">public</span> <span class="nf">HashSet</span><span class="o">(</span><span class="kt">int</span> <span class="n">initialCapacity</span><span class="o">,</span> <span class="kt">float</span> <span class="n">loadFactor</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">map</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&lt;&gt;(</span><span class="n">initialCapacity</span><span class="o">,</span> <span class="n">loadFactor</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <h1 id="add"><code>add</code></h1>
 
 <p><code>add</code> adds the specified element to this set if not already present.</p>
-
-<pre><code class="language-java">// HashSet.java
-
-public boolean add(E e) {
-    return map.put(e, PRESENT)==null;
-}
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// HashSet.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">add</span><span class="o">(</span><span class="n">E</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">map</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">e</span><span class="o">,</span> <span class="n">PRESENT</span><span class="o">)==</span><span class="kc">null</span><span class="o">;</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>For <code>PRESENT</code>, it is a dummy value to associate with an <code>Object</code> in the backing Map.</p>
 
 <p>The details of <code>put</code> method in HashMap lists here: <a href="https://hellokangning.github.io/en/post/java-hashmap/#put"><code>put</code></a>.</p>
@@ -214,38 +240,62 @@ public boolean add(E e) {
 <h1 id="remove"><code>remove</code></h1>
 
 <p><code>remove</code> removes the specified element from this set if present.</p>
-
-<pre><code class="language-java">// HashSet.java
-
-public boolean remove(Object o) {
-    return map.remove(o)==PRESENT;
-}
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// HashSet.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">remove</span><span class="o">(</span><span class="n">Object</span> <span class="n">o</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">map</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="n">o</span><span class="o">)==</span><span class="n">PRESENT</span><span class="o">;</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <h1 id="contains"><code>contains</code></h1>
 
 <p><code>contains</code> inquire whether or not the given element exist in this set.</p>
-
-<pre><code class="language-java">// HashSet.java
-
-public boolean contains(Object o) {
-    return map.containsKey(o);
-}
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// HashSet.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">contains</span><span class="o">(</span><span class="n">Object</span> <span class="n">o</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">map</span><span class="o">.</span><span class="na">containsKey</span><span class="o">(</span><span class="n">o</span><span class="o">);</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>Just like <code>get</code> in HashMap, <code>containsKey</code> also call <code>getNode</code> for further. See <a href="https://hellokangning.github.io/en/post/java-hashmap/#get"><code>getNode</code></a>.</p>
 
 <h1 id="size"><code>size</code></h1>
 
 <p>If you want to get the size of HashSet, you actually query how many keys in HashMap.</p>
-
-<pre><code class="language-java">// HashSet.java
-
-public int size() {
-    return map.size();
-}
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// HashSet.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="kt">int</span> <span class="nf">size</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">map</span><span class="o">.</span><span class="na">size</span><span class="o">();</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>Note that this implementation is not synchronized. If multiple threads access a hash set concurrently, and at least one of the threads modifies the set, it must be synchronized externally. This is typically accomplished by synchronizing on some object that naturally encapsulates the set.</p>
     </div>
 

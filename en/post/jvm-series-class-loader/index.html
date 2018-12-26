@@ -51,7 +51,7 @@
 
 <meta itemprop="datePublished" content="2018-04-18T18:27:20&#43;08:00" />
 <meta itemprop="dateModified" content="2018-04-18T18:27:20&#43;08:00" />
-<meta itemprop="wordCount" content="974">
+<meta itemprop="wordCount" content="1102">
 
 
 
@@ -132,8 +132,8 @@
         <div class="post-category">
             <a href="/en/categories/java/"> Java </a>
             </div>
-          <span class="more-meta"> 974 words </span>
-          <span class="more-meta"> 2 mins read </span>
+          <span class="more-meta"> 1102 words </span>
+          <span class="more-meta"> 3 mins read </span>
         
       </div>
     </header>
@@ -173,35 +173,63 @@
 <p><img src="/images/jvm-classloader-hierarchy.png" alt="" /></p>
 
 <p>We can verify that with code:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">JavaTestApp</span> <span class="o">{</span>
 
-<pre><code class="language-java">public class JavaTestApp {
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">Class</span><span class="o">&lt;?&gt;</span> <span class="n">clazz</span> <span class="o">=</span> <span class="n">Class</span><span class="o">.</span><span class="na">forName</span><span class="o">(</span><span class="s">&#34;com.qiniu.fusion.app.Demo&#34;</span><span class="o">);</span>
+            <span class="n">ClassLoader</span> <span class="n">classLoader</span> <span class="o">=</span> <span class="n">clazz</span><span class="o">.</span><span class="na">getClassLoader</span><span class="o">();</span>
+            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">printf</span><span class="o">(</span><span class="s">&#34;currentClassLoader is %s\n&#34;</span><span class="o">,</span> <span class="n">classLoader</span><span class="o">.</span><span class="na">getClass</span><span class="o">().</span><span class="na">getSimpleName</span><span class="o">());</span>
+            <span class="k">while</span> <span class="o">(</span><span class="n">classLoader</span><span class="o">.</span><span class="na">getParent</span><span class="o">()</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">classLoader</span> <span class="o">=</span> <span class="n">classLoader</span><span class="o">.</span><span class="na">getParent</span><span class="o">();</span>
+                <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">printf</span><span class="o">(</span><span class="s">&#34;Parent is %s\n&#34;</span><span class="o">,</span> <span class="n">classLoader</span><span class="o">.</span><span class="na">getClass</span><span class="o">().</span><span class="na">getSimpleName</span><span class="o">());</span>
+            <span class="o">}</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
 
-    public static void main(String[] args) {
-        try {
-            Class&lt;?&gt; clazz = Class.forName(&quot;com.qiniu.fusion.app.Demo&quot;);
-            ClassLoader classLoader = clazz.getClassLoader();
-            System.out.printf(&quot;currentClassLoader is %s\n&quot;, classLoader.getClass().getSimpleName());
-            while (classLoader.getParent() != null) {
-                classLoader = classLoader.getParent();
-                System.out.printf(&quot;Parent is %s\n&quot;, classLoader.getClass().getSimpleName());
-            }
-        } catch (Exception e) {
-            System.out.println(e);
-        }
-    }
-}
-
-class Demo {
-    static int count = 0;
-}
-</code></pre>
-
+<span class="kd">class</span> <span class="nc">Demo</span> <span class="o">{</span>
+    <span class="kd">static</span> <span class="kt">int</span> <span class="n">count</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>The output is,</p>
-
-<pre><code>currentClassLoader is AppClassLoader
-Parent is ExtClassLoader
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">currentClassLoader is AppClassLoader
+Parent is ExtClassLoader</pre></td></tr></table>
+</div>
+</div>
 <p>The parent of <code>AppClassLoader</code> is <code>ExtClassLoader</code>, while <code>ExtClassLoader.getParent() = null</code>. <code>BootstrapClassLoader</code> is built-in of JVM.</p>
 
 <h1 id="every-class-object-has-a-classloader">Every <code>Class</code> object has a <code>ClassLoader</code></h1>
@@ -209,105 +237,195 @@ Parent is ExtClassLoader
 <p>Every <code>Class</code> object contains a <code>getClassLoader()</code> reference to the <code>ClassLoader</code> that defined it.</p>
 
 <p>For example, this snippet of code outputs <code>sun.misc.Launcher$AppClassLoader@42a57993</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">AppTest</span> <span class="o">{</span>
 
-<pre><code class="language-java">public class AppTest {
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">Demo</span> <span class="n">d</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Demo</span><span class="o">();</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">d</span><span class="o">.</span><span class="na">getClass</span><span class="o">().</span><span class="na">getClassLoader</span><span class="o">());</span>
+    <span class="o">}</span>
+<span class="o">}</span>
 
-    public static void main(String[] args) {
-        Demo d = new Demo();
-        System.out.println(d.getClass().getClassLoader());
-    }
-}
-
-class Demo {
-    static int count = 0;
-}
-</code></pre>
-
+<span class="kd">class</span> <span class="nc">Demo</span> <span class="o">{</span>
+    <span class="kd">static</span> <span class="kt">int</span> <span class="n">count</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>It arouses my interest to see what <code>getClassLoader()</code> does.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// Class.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="n">ClassLoader</span> <span class="nf">getClassLoader</span><span class="o">()</span> <span class="o">{</span>
+    <span class="n">ClassLoader</span> <span class="n">cl</span> <span class="o">=</span> <span class="n">getClassLoader0</span><span class="o">();</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">cl</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span>
+        <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="n">SecurityManager</span> <span class="n">sm</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="na">getSecurityManager</span><span class="o">();</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">sm</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">ClassLoader</span><span class="o">.</span><span class="na">checkClassLoaderPermission</span><span class="o">(</span><span class="n">cl</span><span class="o">,</span> <span class="n">Reflection</span><span class="o">.</span><span class="na">getCallerClass</span><span class="o">());</span>
+    <span class="o">}</span>
+    <span class="k">return</span> <span class="n">cl</span><span class="o">;</span>
+<span class="o">}</span>
 
-<pre><code class="language-java">// Class.java
+<span class="n">ClassLoader</span> <span class="nf">getClassLoader0</span><span class="o">()</span> <span class="o">{</span> <span class="k">return</span> <span class="n">classLoader</span><span class="o">;</span> <span class="o">}</span>
 
-public ClassLoader getClassLoader() {
-    ClassLoader cl = getClassLoader0();
-    if (cl == null)
-        return null;
-    SecurityManager sm = System.getSecurityManager();
-    if (sm != null) {
-        ClassLoader.checkClassLoaderPermission(cl, Reflection.getCallerClass());
-    }
-    return cl;
-}
+<span class="kd">private</span> <span class="kd">final</span> <span class="n">ClassLoader</span> <span class="n">classLoader</span><span class="o">;</span>
 
-ClassLoader getClassLoader0() { return classLoader; }
-
-private final ClassLoader classLoader;
-
-private Class(ClassLoader loader) {
-    classLoader = loader;
-}
-</code></pre>
-
+<span class="kd">private</span> <span class="nf">Class</span><span class="o">(</span><span class="n">ClassLoader</span> <span class="n">loader</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">classLoader</span> <span class="o">=</span> <span class="n">loader</span><span class="o">;</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>Each <code>Class</code> object includes a private field <code>classLoader</code>, which is initialized in JVM not by private constructor.</p>
 
 <h1 id="parent-delegation-model">Parent Delegation Model</h1>
 
 <p>Allow me back to <code>ClassLoader</code>.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// ClassLoader.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="kd">abstract</span> <span class="kd">class</span> <span class="nc">ClassLoader</span> <span class="o">{</span>
+    <span class="c1">// The parent class loader for delegation
+</span><span class="c1"></span>    <span class="kd">private</span> <span class="kd">final</span> <span class="n">ClassLoader</span> <span class="n">parent</span><span class="o">;</span>
 
-<pre><code class="language-java">// ClassLoader.java
-
-public abstract class ClassLoader {
-    // The parent class loader for delegation
-    private final ClassLoader parent;
-
-    // The classes loaded by this class loader. The only purpose of this table
-    // is to keep the classes from being GC'ed until the loader is GC'ed.
-    private final Vector&lt;Class&lt;?&gt;&gt; classes = new Vector&lt;&gt;();
-}
-</code></pre>
-
+    <span class="c1">// The classes loaded by this class loader. The only purpose of this table
+</span><span class="c1"></span>    <span class="c1">// is to keep the classes from being GC&#39;ed until the loader is GC&#39;ed.
+</span><span class="c1"></span>    <span class="kd">private</span> <span class="kd">final</span> <span class="n">Vector</span><span class="o">&lt;</span><span class="n">Class</span><span class="o">&lt;?&gt;&gt;</span> <span class="n">classes</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Vector</span><span class="o">&lt;&gt;();</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>The <code>ClassLoader</code> class uses a delegation model to search for classes and resources.  Each instance of <code>ClassLoader</code> has an associated parent class loader.</p>
 
 <p>Let&rsquo;s see how a <code>Class</code> object is loaded.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">protected</span> <span class="n">Class</span><span class="o">&lt;?&gt;</span> <span class="n">loadClass</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">,</span> <span class="kt">boolean</span> <span class="n">resolve</span><span class="o">)</span>
+        <span class="kd">throws</span> <span class="n">ClassNotFoundException</span>
+<span class="o">{</span>
+    <span class="kd">synchronized</span> <span class="o">(</span><span class="n">getClassLoadingLock</span><span class="o">(</span><span class="n">name</span><span class="o">))</span> <span class="o">{</span>
+        <span class="c1">// First, check if the class has already been loaded
+</span><span class="c1"></span>        <span class="n">Class</span><span class="o">&lt;?&gt;</span> <span class="n">c</span> <span class="o">=</span> <span class="n">findLoadedClass</span><span class="o">(</span><span class="n">name</span><span class="o">);</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">c</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="kt">long</span> <span class="n">t0</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="na">nanoTime</span><span class="o">();</span>
+            <span class="k">try</span> <span class="o">{</span>
+                <span class="k">if</span> <span class="o">(</span><span class="n">parent</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="n">c</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="na">loadClass</span><span class="o">(</span><span class="n">name</span><span class="o">,</span> <span class="kc">false</span><span class="o">);</span>
+                <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+                    <span class="n">c</span> <span class="o">=</span> <span class="n">findBootstrapClassOrNull</span><span class="o">(</span><span class="n">name</span><span class="o">);</span>
+                <span class="o">}</span>
+            <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">ClassNotFoundException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+                <span class="c1">// ClassNotFoundException thrown if class not found
+</span><span class="c1"></span>                <span class="c1">// from the non-null parent class loader
+</span><span class="c1"></span>            <span class="o">}</span>
 
-<pre><code class="language-java">protected Class&lt;?&gt; loadClass(String name, boolean resolve)
-        throws ClassNotFoundException
-{
-    synchronized (getClassLoadingLock(name)) {
-        // First, check if the class has already been loaded
-        Class&lt;?&gt; c = findLoadedClass(name);
-        if (c == null) {
-            long t0 = System.nanoTime();
-            try {
-                if (parent != null) {
-                    c = parent.loadClass(name, false);
-                } else {
-                    c = findBootstrapClassOrNull(name);
-                }
-            } catch (ClassNotFoundException e) {
-                // ClassNotFoundException thrown if class not found
-                // from the non-null parent class loader
-            }
+            <span class="k">if</span> <span class="o">(</span><span class="n">c</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+                <span class="c1">// If still not found, then invoke findClass in order
+</span><span class="c1"></span>                <span class="c1">// to find the class.
+</span><span class="c1"></span>                <span class="kt">long</span> <span class="n">t1</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="na">nanoTime</span><span class="o">();</span>
+                <span class="n">c</span> <span class="o">=</span> <span class="n">findClass</span><span class="o">(</span><span class="n">name</span><span class="o">);</span>
 
-            if (c == null) {
-                // If still not found, then invoke findClass in order
-                // to find the class.
-                long t1 = System.nanoTime();
-                c = findClass(name);
-
-                // this is the defining class loader; record the stats
-                sun.misc.PerfCounter.getParentDelegationTime().addTime(t1 - t0);
-                sun.misc.PerfCounter.getFindClassTime().addElapsedTimeFrom(t1);
-                sun.misc.PerfCounter.getFindClasses().increment();
-            }
-        }
-        if (resolve) {
-            resolveClass(c);
-        }
-        return c;
-    }
-}
-</code></pre>
-
+                <span class="c1">// this is the defining class loader; record the stats
+</span><span class="c1"></span>                <span class="n">sun</span><span class="o">.</span><span class="na">misc</span><span class="o">.</span><span class="na">PerfCounter</span><span class="o">.</span><span class="na">getParentDelegationTime</span><span class="o">().</span><span class="na">addTime</span><span class="o">(</span><span class="n">t1</span> <span class="o">-</span> <span class="n">t0</span><span class="o">);</span>
+                <span class="n">sun</span><span class="o">.</span><span class="na">misc</span><span class="o">.</span><span class="na">PerfCounter</span><span class="o">.</span><span class="na">getFindClassTime</span><span class="o">().</span><span class="na">addElapsedTimeFrom</span><span class="o">(</span><span class="n">t1</span><span class="o">);</span>
+                <span class="n">sun</span><span class="o">.</span><span class="na">misc</span><span class="o">.</span><span class="na">PerfCounter</span><span class="o">.</span><span class="na">getFindClasses</span><span class="o">().</span><span class="na">increment</span><span class="o">();</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">resolve</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">resolveClass</span><span class="o">(</span><span class="n">c</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="n">c</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>When requested to find a class or resource,</p>
 
 <ol>
@@ -325,21 +443,36 @@ public abstract class ClassLoader {
 <p>However, some classes may not originate from a file; they may originate from other sources, such as the network, or they could be constructed by an application.  The method <code>defineClass(String, byte[], int, int)</code> converts an array of bytes into an instance of class <code>Class</code>.</p>
 
 <p>Instances of this newly defined class can be created using <code>Class#newInstance</code>.</p>
-
-<pre><code class="language-java">// ClassLoader.java
-
-protected final Class&lt;?&gt; defineClass(String name, byte[] b, int off, int len,
-                                     ProtectionDomain protectionDomain)
-    throws ClassFormatError
-{
-    protectionDomain = preDefineClass(name, protectionDomain);
-    String source = defineClassSourceLocation(protectionDomain);
-    Class&lt;?&gt; c = defineClass1(name, b, off, len, protectionDomain, source);
-    postDefineClass(c, protectionDomain);
-    return c;
-}
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// ClassLoader.java
+</span><span class="c1"></span>
+<span class="kd">protected</span> <span class="kd">final</span> <span class="n">Class</span><span class="o">&lt;?&gt;</span> <span class="n">defineClass</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">,</span> <span class="kt">byte</span><span class="o">[]</span> <span class="n">b</span><span class="o">,</span> <span class="kt">int</span> <span class="n">off</span><span class="o">,</span> <span class="kt">int</span> <span class="n">len</span><span class="o">,</span>
+                                     <span class="n">ProtectionDomain</span> <span class="n">protectionDomain</span><span class="o">)</span>
+    <span class="kd">throws</span> <span class="n">ClassFormatError</span>
+<span class="o">{</span>
+    <span class="n">protectionDomain</span> <span class="o">=</span> <span class="n">preDefineClass</span><span class="o">(</span><span class="n">name</span><span class="o">,</span> <span class="n">protectionDomain</span><span class="o">);</span>
+    <span class="n">String</span> <span class="n">source</span> <span class="o">=</span> <span class="n">defineClassSourceLocation</span><span class="o">(</span><span class="n">protectionDomain</span><span class="o">);</span>
+    <span class="n">Class</span><span class="o">&lt;?&gt;</span> <span class="n">c</span> <span class="o">=</span> <span class="n">defineClass1</span><span class="o">(</span><span class="n">name</span><span class="o">,</span> <span class="n">b</span><span class="o">,</span> <span class="n">off</span><span class="o">,</span> <span class="n">len</span><span class="o">,</span> <span class="n">protectionDomain</span><span class="o">,</span> <span class="n">source</span><span class="o">);</span>
+    <span class="n">postDefineClass</span><span class="o">(</span><span class="n">c</span><span class="o">,</span> <span class="n">protectionDomain</span><span class="o">);</span>
+    <span class="k">return</span> <span class="n">c</span><span class="o">;</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p><code>preDefineClass</code> determines protection domain, and check that:</p>
 
 <ul>
@@ -352,29 +485,51 @@ protected final Class&lt;?&gt; defineClass(String name, byte[] b, int off, int l
 <p>An example is necessary to illustrate the <code>Parent Delegation Model</code>.</p>
 
 <p>Compile <code>Demo</code> class to jar, and move it to <code>$JAVA_HOME/jre/lib/ext/</code>.</p>
-
-<pre><code class="language-java">javac classloader/Demo.java
-jar cvf Demo.jar classloader/Demo.class
-mv Demo.jar $JAVA_HOME/jre/lib/ext/
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="n">javac</span> <span class="n">classloader</span><span class="o">/</span><span class="n">Demo</span><span class="o">.</span><span class="na">java</span>
+<span class="n">jar</span> <span class="n">cvf</span> <span class="n">Demo</span><span class="o">.</span><span class="na">jar</span> <span class="n">classloader</span><span class="o">/</span><span class="n">Demo</span><span class="o">.</span><span class="na">class</span>
+<span class="n">mv</span> <span class="n">Demo</span><span class="o">.</span><span class="na">jar</span> <span class="n">$JAVA_HOME</span><span class="o">/</span><span class="n">jre</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">ext</span><span class="o">/</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>Then, loads <code>Demo</code> class with explicit <code>AppClassLoader</code>.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">JavaTestApp</span> <span class="o">{</span>
 
-<pre><code class="language-java">public class JavaTestApp {
-
-    public static void main(String[] args) {
-        try {
-            ClassLoader appClassLoader = ClassLoader.getSystemClassLoader(); // AppClassLoader
-            Class&lt;?&gt; clazz = appClassLoader.loadClass(&quot;com.qiniu.fusion.app.Demo&quot;);
-            ClassLoader classLoader = clazz.getClassLoader();
-            System.out.printf(&quot;ClassLoader is %s&quot;, classLoader.getClass().getSimpleName());
-        } catch (Exception e) {
-            System.out.println(e);
-        }
-    }
-}
-</code></pre>
-
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">ClassLoader</span> <span class="n">appClassLoader</span> <span class="o">=</span> <span class="n">ClassLoader</span><span class="o">.</span><span class="na">getSystemClassLoader</span><span class="o">();</span> <span class="c1">// AppClassLoader
+</span><span class="c1"></span>            <span class="n">Class</span><span class="o">&lt;?&gt;</span> <span class="n">clazz</span> <span class="o">=</span> <span class="n">appClassLoader</span><span class="o">.</span><span class="na">loadClass</span><span class="o">(</span><span class="s">&#34;com.qiniu.fusion.app.Demo&#34;</span><span class="o">);</span>
+            <span class="n">ClassLoader</span> <span class="n">classLoader</span> <span class="o">=</span> <span class="n">clazz</span><span class="o">.</span><span class="na">getClassLoader</span><span class="o">();</span>
+            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">printf</span><span class="o">(</span><span class="s">&#34;ClassLoader is %s&#34;</span><span class="o">,</span> <span class="n">classLoader</span><span class="o">.</span><span class="na">getClass</span><span class="o">().</span><span class="na">getSimpleName</span><span class="o">());</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>However, the outputs, <code>currentClassLoader is ExtClassLoader</code>, means <code>Demo</code> class is loaded with <code>ExtClassLoader</code> still.</p>
 
 <p><strong>Reference</strong></p>

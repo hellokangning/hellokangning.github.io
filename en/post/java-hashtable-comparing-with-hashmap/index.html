@@ -70,7 +70,7 @@ I am wondering how these arguments are supported by code. This post will give a 
 
 <meta itemprop="datePublished" content="2016-08-05T12:01:40&#43;08:00" />
 <meta itemprop="dateModified" content="2018-08-05T12:01:40&#43;08:00" />
-<meta itemprop="wordCount" content="1205">
+<meta itemprop="wordCount" content="1390">
 
 
 
@@ -160,8 +160,8 @@ I am wondering how these arguments are supported by code. This post will give a 
         <div class="post-category">
             <a href="/en/categories/java/"> Java </a>
             </div>
-          <span class="more-meta"> 1205 words </span>
-          <span class="more-meta"> 6 mins read </span>
+          <span class="more-meta"> 1390 words </span>
+          <span class="more-meta"> 7 mins read </span>
         
       </div>
     </header>
@@ -216,146 +216,281 @@ not fail-fast.</p>
 </blockquote>
 
 <p>Take <code>keys()</code> for example, it will construct an instance of <code>Enumerator</code> directly.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// Hashtable.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="kd">synchronized</span> <span class="n">Enumeration</span><span class="o">&lt;</span><span class="n">K</span><span class="o">&gt;</span> <span class="nf">keys</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="o">.&lt;</span><span class="n">K</span><span class="o">&gt;</span><span class="n">getEnumeration</span><span class="o">(</span><span class="n">KEYS</span><span class="o">);</span>
+<span class="o">}</span>
 
-<pre><code class="language-java">// Hashtable.java
-
-public synchronized Enumeration&lt;K&gt; keys() {
-    return this.&lt;K&gt;getEnumeration(KEYS);
-}
-
-private &lt;T&gt; Enumeration&lt;T&gt; getEnumeration(int type) {
-    if (count == 0) {
-        return Collections.emptyEnumeration();
-    } else {
-        return new Enumerator&lt;&gt;(type, false);
-    }
-}
-</code></pre>
-
+<span class="kd">private</span> <span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">Enumeration</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="nf">getEnumeration</span><span class="o">(</span><span class="kt">int</span> <span class="n">type</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">count</span> <span class="o">==</span> <span class="n">0</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">Collections</span><span class="o">.</span><span class="na">emptyEnumeration</span><span class="o">();</span>
+    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="n">Enumerator</span><span class="o">&lt;&gt;(</span><span class="n">type</span><span class="o">,</span> <span class="kc">false</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>The code of <code>Enumerator</code>, a private and nested class in Hashtable.java, lists here.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// Hashtable.java
+</span><span class="c1"></span>
+<span class="kd">private</span> <span class="kd">class</span> <span class="nc">Enumerator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="kd">implements</span> <span class="n">Enumeration</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;,</span> <span class="n">Iterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="o">{</span>
+    <span class="n">Entry</span><span class="o">&lt;?,?&gt;[]</span> <span class="n">table</span> <span class="o">=</span> <span class="n">Hashtable</span><span class="o">.</span><span class="na">this</span><span class="o">.</span><span class="na">table</span><span class="o">;</span>
+    <span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="na">length</span><span class="o">;</span>
+    <span class="n">Entry</span><span class="o">&lt;?,?&gt;</span> <span class="n">entry</span><span class="o">;</span>
+    <span class="n">Entry</span><span class="o">&lt;?,?&gt;</span> <span class="n">lastReturned</span><span class="o">;</span>
+    <span class="kt">int</span> <span class="n">type</span><span class="o">;</span>
 
-<pre><code class="language-java">// Hashtable.java
+    <span class="cm">/**
+</span><span class="cm">     * Indicates whether this Enumerator is serving as an Iterator
+</span><span class="cm">     * or an Enumeration.  (true -&gt; Iterator).
+</span><span class="cm">     */</span>
+    <span class="kt">boolean</span> <span class="n">iterator</span><span class="o">;</span>
 
-private class Enumerator&lt;T&gt; implements Enumeration&lt;T&gt;, Iterator&lt;T&gt; {
-    Entry&lt;?,?&gt;[] table = Hashtable.this.table;
-    int index = table.length;
-    Entry&lt;?,?&gt; entry;
-    Entry&lt;?,?&gt; lastReturned;
-    int type;
+    <span class="cm">/**
+</span><span class="cm">     * The modCount value that the iterator believes that the backing
+</span><span class="cm">     * Hashtable should have.  If this expectation is violated, the iterator
+</span><span class="cm">     * has detected concurrent modification.
+</span><span class="cm">     */</span>
+    <span class="kd">protected</span> <span class="kt">int</span> <span class="n">expectedModCount</span> <span class="o">=</span> <span class="n">modCount</span><span class="o">;</span>
 
-    /**
-     * Indicates whether this Enumerator is serving as an Iterator
-     * or an Enumeration.  (true -&gt; Iterator).
-     */
-    boolean iterator;
+    <span class="n">Enumerator</span><span class="o">(</span><span class="kt">int</span> <span class="n">type</span><span class="o">,</span> <span class="kt">boolean</span> <span class="n">iterator</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">type</span> <span class="o">=</span> <span class="n">type</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">iterator</span> <span class="o">=</span> <span class="n">iterator</span><span class="o">;</span>
+    <span class="o">}</span>
 
-    /**
-     * The modCount value that the iterator believes that the backing
-     * Hashtable should have.  If this expectation is violated, the iterator
-     * has detected concurrent modification.
-     */
-    protected int expectedModCount = modCount;
+    <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">hasMoreElements</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">Entry</span><span class="o">&lt;?,?&gt;</span> <span class="n">e</span> <span class="o">=</span> <span class="n">entry</span><span class="o">;</span>
+        <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">index</span><span class="o">;</span>
+        <span class="n">Entry</span><span class="o">&lt;?,?&gt;[]</span> <span class="n">t</span> <span class="o">=</span> <span class="n">table</span><span class="o">;</span>
+        <span class="cm">/* Use locals for faster loop iteration */</span>
+        <span class="k">while</span> <span class="o">(</span><span class="n">e</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="n">0</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">e</span> <span class="o">=</span> <span class="n">t</span><span class="o">[--</span><span class="n">i</span><span class="o">];</span>
+        <span class="o">}</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="n">e</span><span class="o">;</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">i</span><span class="o">;</span>
+        <span class="k">return</span> <span class="n">e</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="o">}</span>
 
-    Enumerator(int type, boolean iterator) {
-        this.type = type;
-        this.iterator = iterator;
-    }
-
-    public boolean hasMoreElements() {
-        Entry&lt;?,?&gt; e = entry;
-        int i = index;
-        Entry&lt;?,?&gt;[] t = table;
-        /* Use locals for faster loop iteration */
-        while (e == null &amp;&amp; i &gt; 0) {
-            e = t[--i];
-        }
-        entry = e;
-        index = i;
-        return e != null;
-    }
-
-    @SuppressWarnings(&quot;unchecked&quot;)
-    public T nextElement() {
-        Entry&lt;?,?&gt; et = entry;
-        int i = index;
-        Entry&lt;?,?&gt;[] t = table;
-        /* Use locals for faster loop iteration */
-        while (et == null &amp;&amp; i &gt; 0) {
-            et = t[--i];
-        }
-        entry = et;
-        index = i;
-        if (et != null) {
-            Entry&lt;?,?&gt; e = lastReturned = entry;
-            entry = e.next;
-            return type == KEYS ? (T)e.key : (type == VALUES ? (T)e.value : (T)e);
-        }
-        throw new NoSuchElementException(&quot;Hashtable Enumerator&quot;);
-    }
-}
-</code></pre>
-
+    <span class="nd">@SuppressWarnings</span><span class="o">(</span><span class="s">&#34;unchecked&#34;</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="n">T</span> <span class="nf">nextElement</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">Entry</span><span class="o">&lt;?,?&gt;</span> <span class="n">et</span> <span class="o">=</span> <span class="n">entry</span><span class="o">;</span>
+        <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">index</span><span class="o">;</span>
+        <span class="n">Entry</span><span class="o">&lt;?,?&gt;[]</span> <span class="n">t</span> <span class="o">=</span> <span class="n">table</span><span class="o">;</span>
+        <span class="cm">/* Use locals for faster loop iteration */</span>
+        <span class="k">while</span> <span class="o">(</span><span class="n">et</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="n">0</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">et</span> <span class="o">=</span> <span class="n">t</span><span class="o">[--</span><span class="n">i</span><span class="o">];</span>
+        <span class="o">}</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="n">et</span><span class="o">;</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">i</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">et</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">Entry</span><span class="o">&lt;?,?&gt;</span> <span class="n">e</span> <span class="o">=</span> <span class="n">lastReturned</span> <span class="o">=</span> <span class="n">entry</span><span class="o">;</span>
+            <span class="n">entry</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="na">next</span><span class="o">;</span>
+            <span class="k">return</span> <span class="n">type</span> <span class="o">==</span> <span class="n">KEYS</span> <span class="o">?</span> <span class="o">(</span><span class="n">T</span><span class="o">)</span><span class="n">e</span><span class="o">.</span><span class="na">key</span> <span class="o">:</span> <span class="o">(</span><span class="n">type</span> <span class="o">==</span> <span class="n">VALUES</span> <span class="o">?</span> <span class="o">(</span><span class="n">T</span><span class="o">)</span><span class="n">e</span><span class="o">.</span><span class="na">value</span> <span class="o">:</span> <span class="o">(</span><span class="n">T</span><span class="o">)</span><span class="n">e</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="n">NoSuchElementException</span><span class="o">(</span><span class="s">&#34;Hashtable Enumerator&#34;</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>The reason why Enumerator is not fail-fast is it record the current element with index rather than reference in HashMap.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// HashMap
+</span><span class="c1"></span>
+<span class="kd">final</span> <span class="kd">class</span> <span class="nc">EntryIterator</span> <span class="kd">extends</span> <span class="n">HashIterator</span>
+    <span class="kd">implements</span> <span class="n">Iterator</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">.</span><span class="na">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;&gt;</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kd">final</span> <span class="n">Map</span><span class="o">.</span><span class="na">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="nf">next</span><span class="o">()</span> <span class="o">{</span> <span class="k">return</span> <span class="n">nextNode</span><span class="o">();</span> <span class="o">}</span>
+<span class="o">}</span>
 
-<pre><code class="language-java">// HashMap
-
-final class EntryIterator extends HashIterator
-    implements Iterator&lt;Map.Entry&lt;K,V&gt;&gt; {
-    public final Map.Entry&lt;K,V&gt; next() { return nextNode(); }
-}
-
-abstract class HashIterator {
-    Node&lt;K,V&gt; next;        // next entry to return
-    Node&lt;K,V&gt; current;     // current entry
-    int expectedModCount;  // for fast-fail
-    int index;             // current slot
-
-    final Node&lt;K,V&gt; nextNode() {
-        Node&lt;K,V&gt;[] t;
-        Node&lt;K,V&gt; e = next;
-        if (modCount != expectedModCount)
-            throw new ConcurrentModificationException();
-        if (e == null)
-            throw new NoSuchElementException();
-        if ((next = (current = e).next) == null &amp;&amp; (t = table) != null) {
-            do {} while (index &lt; t.length &amp;&amp; (next = t[index++]) == null);
-        }
-        return e;
-    }
-}
-</code></pre>
-
+<span class="kd">abstract</span> <span class="kd">class</span> <span class="nc">HashIterator</span> <span class="o">{</span>
+    <span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">next</span><span class="o">;</span>        <span class="c1">// next entry to return
+</span><span class="c1"></span>    <span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">current</span><span class="o">;</span>     <span class="c1">// current entry
+</span><span class="c1"></span>    <span class="kt">int</span> <span class="n">expectedModCount</span><span class="o">;</span>  <span class="c1">// for fast-fail
+</span><span class="c1"></span>    <span class="kt">int</span> <span class="n">index</span><span class="o">;</span>             <span class="c1">// current slot
+</span><span class="c1"></span>
+    <span class="kd">final</span> <span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="nf">nextNode</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;[]</span> <span class="n">t</span><span class="o">;</span>
+        <span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">e</span> <span class="o">=</span> <span class="n">next</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">modCount</span> <span class="o">!=</span> <span class="n">expectedModCount</span><span class="o">)</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="n">ConcurrentModificationException</span><span class="o">();</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">e</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="n">NoSuchElementException</span><span class="o">();</span>
+        <span class="k">if</span> <span class="o">((</span><span class="n">next</span> <span class="o">=</span> <span class="o">(</span><span class="n">current</span> <span class="o">=</span> <span class="n">e</span><span class="o">).</span><span class="na">next</span><span class="o">)</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="o">(</span><span class="n">t</span> <span class="o">=</span> <span class="n">table</span><span class="o">)</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">do</span> <span class="o">{}</span> <span class="k">while</span> <span class="o">(</span><span class="n">index</span> <span class="o">&lt;</span> <span class="n">t</span><span class="o">.</span><span class="na">length</span> <span class="o">&amp;&amp;</span> <span class="o">(</span><span class="n">next</span> <span class="o">=</span> <span class="n">t</span><span class="o">[</span><span class="n">index</span><span class="o">++])</span> <span class="o">==</span> <span class="kc">null</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="n">e</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <h1 id="synchronized">Synchronized</h1>
 
 <p>Hashtable is synchronized while HashMap is not. You cannot find any code related to synchronization in HashMap.java. But in Hashtable.java, keyword <code>synchronized</code> appears everywhere when you read or write.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// Hashtable.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="kd">synchronized</span> <span class="n">V</span> <span class="nf">put</span><span class="o">(</span><span class="n">K</span> <span class="n">key</span><span class="o">,</span> <span class="n">V</span> <span class="n">value</span><span class="o">)</span> <span class="o">{</span>
+    <span class="c1">// Make sure the value is not null
+</span><span class="c1"></span>    <span class="k">if</span> <span class="o">(</span><span class="n">value</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="n">NullPointerException</span><span class="o">();</span>
+    <span class="o">}</span>
 
-<pre><code class="language-java">// Hashtable.java
+    <span class="c1">// Makes sure the key is not already in the hashtable.
+</span><span class="c1"></span>    <span class="n">Entry</span><span class="o">&lt;?,?&gt;</span> <span class="n">tab</span><span class="o">[]</span> <span class="o">=</span> <span class="n">table</span><span class="o">;</span>
+    <span class="kt">int</span> <span class="n">hash</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="na">hashCode</span><span class="o">();</span>
+    <span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="o">(</span><span class="n">hash</span> <span class="o">&amp;</span> <span class="n">0x7FFFFFFF</span><span class="o">)</span> <span class="o">%</span> <span class="n">tab</span><span class="o">.</span><span class="na">length</span><span class="o">;</span>
+    <span class="nd">@SuppressWarnings</span><span class="o">(</span><span class="s">&#34;unchecked&#34;</span><span class="o">)</span>
+    <span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">entry</span> <span class="o">=</span> <span class="o">(</span><span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;)</span><span class="n">tab</span><span class="o">[</span><span class="n">index</span><span class="o">];</span>
+    <span class="k">for</span><span class="o">(;</span> <span class="n">entry</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">;</span> <span class="n">entry</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="na">next</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">((</span><span class="n">entry</span><span class="o">.</span><span class="na">hash</span> <span class="o">==</span> <span class="n">hash</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="n">entry</span><span class="o">.</span><span class="na">key</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">key</span><span class="o">))</span> <span class="o">{</span>
+            <span class="n">V</span> <span class="n">old</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="na">value</span><span class="o">;</span>
+            <span class="n">entry</span><span class="o">.</span><span class="na">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">;</span>
+            <span class="k">return</span> <span class="n">old</span><span class="o">;</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
 
-public synchronized V put(K key, V value) {
-    // Make sure the value is not null
-    if (value == null) {
-        throw new NullPointerException();
-    }
-
-    // Makes sure the key is not already in the hashtable.
-    Entry&lt;?,?&gt; tab[] = table;
-    int hash = key.hashCode();
-    int index = (hash &amp; 0x7FFFFFFF) % tab.length;
-    @SuppressWarnings(&quot;unchecked&quot;)
-    Entry&lt;K,V&gt; entry = (Entry&lt;K,V&gt;)tab[index];
-    for(; entry != null ; entry = entry.next) {
-        if ((entry.hash == hash) &amp;&amp; entry.key.equals(key)) {
-            V old = entry.value;
-            entry.value = value;
-            return old;
-        }
-    }
-
-    addEntry(hash, key, value, index);
-    return null;
-    }
-</code></pre>
-
+    <span class="n">addEntry</span><span class="o">(</span><span class="n">hash</span><span class="o">,</span> <span class="n">key</span><span class="o">,</span> <span class="n">value</span><span class="o">,</span> <span class="n">index</span><span class="o">);</span>
+    <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <h1 id="null-support"><code>null</code> Support</h1>
 
 <p>Before insert a key into Hashtable, neither the key nor the value can be <code>null</code>, which you can see from the above <code>put</code>. A <code>NullPointerException</code> will be thrown if you try to do this.</p>
@@ -365,81 +500,152 @@ public synchronized V put(K key, V value) {
 <p>In order to accommodate and access its entries more efficiently, both HashMap and Hashtable increases the capacity when the number of keys exceeds.</p>
 
 <p>The difference is that the new capacity of Hashtable is <code>(oldCapacity &lt;&lt; 1) + 1</code> while the one of HashMap is <code>oldCapacity &lt;&lt; 1</code>.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// Hashtable.java
+</span><span class="c1"></span>
+<span class="kd">protected</span> <span class="kt">void</span> <span class="nf">rehash</span><span class="o">()</span> <span class="o">{</span>
+    <span class="kt">int</span> <span class="n">oldCapacity</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="na">length</span><span class="o">;</span>
+    <span class="n">Entry</span><span class="o">&lt;?,?&gt;[]</span> <span class="n">oldMap</span> <span class="o">=</span> <span class="n">table</span><span class="o">;</span>
 
-<pre><code class="language-java">// Hashtable.java
+    <span class="c1">// overflow-conscious code
+</span><span class="c1"></span>    <span class="kt">int</span> <span class="n">newCapacity</span> <span class="o">=</span> <span class="o">(</span><span class="n">oldCapacity</span> <span class="o">&lt;&lt;</span> <span class="n">1</span><span class="o">)</span> <span class="o">+</span> <span class="n">1</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">newCapacity</span> <span class="o">-</span> <span class="n">MAX_ARRAY_SIZE</span> <span class="o">&gt;</span> <span class="n">0</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">oldCapacity</span> <span class="o">==</span> <span class="n">MAX_ARRAY_SIZE</span><span class="o">)</span>
+            <span class="c1">// Keep running with MAX_ARRAY_SIZE buckets
+</span><span class="c1"></span>            <span class="k">return</span><span class="o">;</span>
+        <span class="n">newCapacity</span> <span class="o">=</span> <span class="n">MAX_ARRAY_SIZE</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="n">Entry</span><span class="o">&lt;?,?&gt;[]</span> <span class="n">newMap</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Entry</span><span class="o">&lt;?,?&gt;[</span><span class="n">newCapacity</span><span class="o">];</span>
 
-protected void rehash() {
-    int oldCapacity = table.length;
-    Entry&lt;?,?&gt;[] oldMap = table;
+    <span class="n">modCount</span><span class="o">++;</span>
+    <span class="n">threshold</span> <span class="o">=</span> <span class="o">(</span><span class="kt">int</span><span class="o">)</span><span class="n">Math</span><span class="o">.</span><span class="na">min</span><span class="o">(</span><span class="n">newCapacity</span> <span class="o">*</span> <span class="n">loadFactor</span><span class="o">,</span> <span class="n">MAX_ARRAY_SIZE</span> <span class="o">+</span> <span class="n">1</span><span class="o">);</span>
+    <span class="n">table</span> <span class="o">=</span> <span class="n">newMap</span><span class="o">;</span>
 
-    // overflow-conscious code
-    int newCapacity = (oldCapacity &lt;&lt; 1) + 1;
-    if (newCapacity - MAX_ARRAY_SIZE &gt; 0) {
-        if (oldCapacity == MAX_ARRAY_SIZE)
-            // Keep running with MAX_ARRAY_SIZE buckets
-            return;
-        newCapacity = MAX_ARRAY_SIZE;
-    }
-    Entry&lt;?,?&gt;[] newMap = new Entry&lt;?,?&gt;[newCapacity];
+    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">oldCapacity</span> <span class="o">;</span> <span class="n">i</span><span class="o">--</span> <span class="o">&gt;</span> <span class="n">0</span> <span class="o">;)</span> <span class="o">{</span>
+        <span class="k">for</span> <span class="o">(</span><span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">old</span> <span class="o">=</span> <span class="o">(</span><span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;)</span><span class="n">oldMap</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">;</span> <span class="n">old</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">;</span> <span class="o">)</span> <span class="o">{</span>
+            <span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">e</span> <span class="o">=</span> <span class="n">old</span><span class="o">;</span>
+            <span class="n">old</span> <span class="o">=</span> <span class="n">old</span><span class="o">.</span><span class="na">next</span><span class="o">;</span>
 
-    modCount++;
-    threshold = (int)Math.min(newCapacity * loadFactor, MAX_ARRAY_SIZE + 1);
-    table = newMap;
-
-    for (int i = oldCapacity ; i-- &gt; 0 ;) {
-        for (Entry&lt;K,V&gt; old = (Entry&lt;K,V&gt;)oldMap[i] ; old != null ; ) {
-            Entry&lt;K,V&gt; e = old;
-            old = old.next;
-
-            int index = (e.hash &amp; 0x7FFFFFFF) % newCapacity;
-            e.next = (Entry&lt;K,V&gt;)newMap[index];
-            newMap[index] = e;
-        }
-    }
-}
-</code></pre>
-
+            <span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="o">(</span><span class="n">e</span><span class="o">.</span><span class="na">hash</span> <span class="o">&amp;</span> <span class="n">0x7FFFFFFF</span><span class="o">)</span> <span class="o">%</span> <span class="n">newCapacity</span><span class="o">;</span>
+            <span class="n">e</span><span class="o">.</span><span class="na">next</span> <span class="o">=</span> <span class="o">(</span><span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;)</span><span class="n">newMap</span><span class="o">[</span><span class="n">index</span><span class="o">];</span>
+            <span class="n">newMap</span><span class="o">[</span><span class="n">index</span><span class="o">]</span> <span class="o">=</span> <span class="n">e</span><span class="o">;</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <h1 id="hash">Hash</h1>
 
 <p>The algorithms of hash are also different in Hashtable and HashMap. For Hashtable, it use <code>hashCode()</code> method straightway and calculate the remainder divided by the length of table.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// Hashtable.java
+</span><span class="c1"></span>
+<span class="kd">private</span> <span class="kt">void</span> <span class="nf">addEntry</span><span class="o">(</span><span class="kt">int</span> <span class="n">hash</span><span class="o">,</span> <span class="n">K</span> <span class="n">key</span><span class="o">,</span> <span class="n">V</span> <span class="n">value</span><span class="o">,</span> <span class="kt">int</span> <span class="n">index</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">modCount</span><span class="o">++;</span>
 
-<pre><code class="language-java">// Hashtable.java
+    <span class="n">Entry</span><span class="o">&lt;?,?&gt;</span> <span class="n">tab</span><span class="o">[]</span> <span class="o">=</span> <span class="n">table</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">count</span> <span class="o">&gt;=</span> <span class="n">threshold</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// Rehash the table if the threshold is exceeded
+</span><span class="c1"></span>        <span class="n">rehash</span><span class="o">();</span>
 
-private void addEntry(int hash, K key, V value, int index) {
-    modCount++;
+        <span class="n">tab</span> <span class="o">=</span> <span class="n">table</span><span class="o">;</span>
+        <span class="n">hash</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="na">hashCode</span><span class="o">();</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="o">(</span><span class="n">hash</span> <span class="o">&amp;</span> <span class="n">0x7FFFFFFF</span><span class="o">)</span> <span class="o">%</span> <span class="n">tab</span><span class="o">.</span><span class="na">length</span><span class="o">;</span>
+    <span class="o">}</span>
 
-    Entry&lt;?,?&gt; tab[] = table;
-    if (count &gt;= threshold) {
-        // Rehash the table if the threshold is exceeded
-        rehash();
-
-        tab = table;
-        hash = key.hashCode();
-        index = (hash &amp; 0x7FFFFFFF) % tab.length;
-    }
-
-    // Creates the new entry.
-    @SuppressWarnings(&quot;unchecked&quot;)
-    Entry&lt;K,V&gt; e = (Entry&lt;K,V&gt;) tab[index];
-    tab[index] = new Entry&lt;&gt;(hash, key, value, e);
-    count++;
-}
-</code></pre>
-
+    <span class="c1">// Creates the new entry.
+</span><span class="c1"></span>    <span class="nd">@SuppressWarnings</span><span class="o">(</span><span class="s">&#34;unchecked&#34;</span><span class="o">)</span>
+    <span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">e</span> <span class="o">=</span> <span class="o">(</span><span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;)</span> <span class="n">tab</span><span class="o">[</span><span class="n">index</span><span class="o">];</span>
+    <span class="n">tab</span><span class="o">[</span><span class="n">index</span><span class="o">]</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Entry</span><span class="o">&lt;&gt;(</span><span class="n">hash</span><span class="o">,</span> <span class="n">key</span><span class="o">,</span> <span class="n">value</span><span class="o">,</span> <span class="n">e</span><span class="o">);</span>
+    <span class="n">count</span><span class="o">++;</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>If you put a Key-Value into HashMap, it will calls <code>hash(Object)</code> method to calculate the hash value.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// HashMap.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="n">V</span> <span class="nf">put</span><span class="o">(</span><span class="n">K</span> <span class="n">key</span><span class="o">,</span> <span class="n">V</span> <span class="n">value</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">putVal</span><span class="o">(</span><span class="n">hash</span><span class="o">(</span><span class="n">key</span><span class="o">),</span> <span class="n">key</span><span class="o">,</span> <span class="n">value</span><span class="o">,</span> <span class="kc">false</span><span class="o">,</span> <span class="kc">true</span><span class="o">);</span>
+<span class="o">}</span>
 
-<pre><code class="language-java">// HashMap.java
-
-public V put(K key, V value) {
-    return putVal(hash(key), key, value, false, true);
-}
-
-static final int hash(Object key) {
-    int h;
-    return (key == null) ? 0 : (h = key.hashCode()) ^ (h &gt;&gt;&gt; 16);
-}
-</code></pre>
-
+<span class="kd">static</span> <span class="kd">final</span> <span class="kt">int</span> <span class="nf">hash</span><span class="o">(</span><span class="n">Object</span> <span class="n">key</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kt">int</span> <span class="n">h</span><span class="o">;</span>
+    <span class="k">return</span> <span class="o">(</span><span class="n">key</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">?</span> <span class="n">0</span> <span class="o">:</span> <span class="o">(</span><span class="n">h</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="na">hashCode</span><span class="o">())</span> <span class="o">^</span> <span class="o">(</span><span class="n">h</span> <span class="o">&gt;&gt;&gt;</span> <span class="n">16</span><span class="o">);</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>The comment says,</p>
 
 <blockquote>

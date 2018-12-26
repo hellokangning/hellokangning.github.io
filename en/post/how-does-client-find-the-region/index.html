@@ -55,7 +55,7 @@ client-related source code is located in the module hbase-client.
 
 <meta itemprop="datePublished" content="2017-09-08T11:04:57&#43;08:00" />
 <meta itemprop="dateModified" content="2017-09-08T11:04:57&#43;08:00" />
-<meta itemprop="wordCount" content="1344">
+<meta itemprop="wordCount" content="1579">
 
 
 
@@ -138,8 +138,8 @@ client-related source code is located in the module hbase-client.
         <div class="post-category">
             <a href="/en/categories/hbase/"> HBase </a>
             </div>
-          <span class="more-meta"> 1344 words </span>
-          <span class="more-meta"> 7 mins read </span>
+          <span class="more-meta"> 1579 words </span>
+          <span class="more-meta"> 8 mins read </span>
         
       </div>
     </header>
@@ -155,26 +155,46 @@ client-related source code is located in the module hbase-client.
 <p><code>ConnectionImpletation</code> also encapsulates connection to ZooKeeper and RegionServers.</p>
 
 <p>There are a few overloaded <code>locateRegion</code> methods in <code>ConnectionImpletation</code>. The one which really executes actual work is:</p>
-
-<pre><code class="language-java">  public RegionLocations locateRegion(final TableName tableName,
-    final byte [] row, boolean useCache, boolean retry, int replicaId)
-  throws IOException {
-    if (this.closed) {
-      throw new DoNotRetryIOException(toString() + &quot; closed&quot;);
-    }
-    if (tableName== null || tableName.getName().length == 0) {
-      throw new IllegalArgumentException(
-          &quot;table name cannot be null or zero length&quot;);
-    }
-    if (tableName.equals(TableName.META_TABLE_NAME)) {
-      return locateMeta(tableName, useCache, replicaId);
-    } else {
-      // Region not in the cache - have to go to the meta RS
-      return locateRegionInMeta(tableName, row, useCache, retry, replicaId);
-    }
-  }
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java">  <span class="kd">public</span> <span class="n">RegionLocations</span> <span class="nf">locateRegion</span><span class="o">(</span><span class="kd">final</span> <span class="n">TableName</span> <span class="n">tableName</span><span class="o">,</span>
+    <span class="kd">final</span> <span class="kt">byte</span> <span class="o">[]</span> <span class="n">row</span><span class="o">,</span> <span class="kt">boolean</span> <span class="n">useCache</span><span class="o">,</span> <span class="kt">boolean</span> <span class="n">retry</span><span class="o">,</span> <span class="kt">int</span> <span class="n">replicaId</span><span class="o">)</span>
+  <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">closed</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">throw</span> <span class="k">new</span> <span class="n">DoNotRetryIOException</span><span class="o">(</span><span class="n">toString</span><span class="o">()</span> <span class="o">+</span> <span class="s">&#34; closed&#34;</span><span class="o">);</span>
+    <span class="o">}</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">tableName</span><span class="o">==</span> <span class="kc">null</span> <span class="o">||</span> <span class="n">tableName</span><span class="o">.</span><span class="na">getName</span><span class="o">().</span><span class="na">length</span> <span class="o">==</span> <span class="n">0</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">throw</span> <span class="k">new</span> <span class="n">IllegalArgumentException</span><span class="o">(</span>
+          <span class="s">&#34;table name cannot be null or zero length&#34;</span><span class="o">);</span>
+    <span class="o">}</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">tableName</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">TableName</span><span class="o">.</span><span class="na">META_TABLE_NAME</span><span class="o">))</span> <span class="o">{</span>
+      <span class="k">return</span> <span class="n">locateMeta</span><span class="o">(</span><span class="n">tableName</span><span class="o">,</span> <span class="n">useCache</span><span class="o">,</span> <span class="n">replicaId</span><span class="o">);</span>
+    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+      <span class="c1">// Region not in the cache - have to go to the meta RS
+</span><span class="c1"></span>      <span class="k">return</span> <span class="n">locateRegionInMeta</span><span class="o">(</span><span class="n">tableName</span><span class="o">,</span> <span class="n">row</span><span class="o">,</span> <span class="n">useCache</span><span class="o">,</span> <span class="n">retry</span><span class="o">,</span> <span class="n">replicaId</span><span class="o">);</span>
+    <span class="o">}</span>
+  <span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>The following list the brief steps of this method:</p>
 
 <ol>
@@ -185,42 +205,78 @@ client-related source code is located in the module hbase-client.
 </ol>
 
 <p>Then let&rsquo;s go to the detail of <code>locateMeta</code> method which is also lated in <code>ConnectionImpletation</code>.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java">  <span class="kd">private</span> <span class="n">RegionLocations</span> <span class="nf">locateMeta</span><span class="o">(</span><span class="kd">final</span> <span class="n">TableName</span> <span class="n">tableName</span><span class="o">,</span>
+      <span class="kt">boolean</span> <span class="n">useCache</span><span class="o">,</span> <span class="kt">int</span> <span class="n">replicaId</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+    <span class="c1">// HBASE-10785: We cache the location of the META itself, so that we are not overloading
+</span><span class="c1"></span>    <span class="c1">// zookeeper with one request for every region lookup. We cache the META with empty row
+</span><span class="c1"></span>    <span class="c1">// key in MetaCache.
+</span><span class="c1"></span>    <span class="kt">byte</span><span class="o">[]</span> <span class="n">metaCacheKey</span> <span class="o">=</span> <span class="n">HConstants</span><span class="o">.</span><span class="na">EMPTY_START_ROW</span><span class="o">;</span> <span class="c1">// use byte[0] as the row for meta
+</span><span class="c1"></span>    <span class="n">RegionLocations</span> <span class="n">locations</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">useCache</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">locations</span> <span class="o">=</span> <span class="n">getCachedLocation</span><span class="o">(</span><span class="n">tableName</span><span class="o">,</span> <span class="n">metaCacheKey</span><span class="o">);</span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">locations</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">locations</span><span class="o">.</span><span class="na">getRegionLocation</span><span class="o">(</span><span class="n">replicaId</span><span class="o">)</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">locations</span><span class="o">;</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
 
-<pre><code class="language-java">  private RegionLocations locateMeta(final TableName tableName,
-      boolean useCache, int replicaId) throws IOException {
-    // HBASE-10785: We cache the location of the META itself, so that we are not overloading
-    // zookeeper with one request for every region lookup. We cache the META with empty row
-    // key in MetaCache.
-    byte[] metaCacheKey = HConstants.EMPTY_START_ROW; // use byte[0] as the row for meta
-    RegionLocations locations = null;
-    if (useCache) {
-      locations = getCachedLocation(tableName, metaCacheKey);
-      if (locations != null &amp;&amp; locations.getRegionLocation(replicaId) != null) {
-        return locations;
-      }
-    }
+    <span class="c1">// only one thread should do the lookup.
+</span><span class="c1"></span>    <span class="kd">synchronized</span> <span class="o">(</span><span class="n">metaRegionLock</span><span class="o">)</span> <span class="o">{</span>
+      <span class="c1">// Check the cache again for a hit in case some other thread made the
+</span><span class="c1"></span>      <span class="c1">// same query while we were waiting on the lock.
+</span><span class="c1"></span>      <span class="k">if</span> <span class="o">(</span><span class="n">useCache</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">locations</span> <span class="o">=</span> <span class="n">getCachedLocation</span><span class="o">(</span><span class="n">tableName</span><span class="o">,</span> <span class="n">metaCacheKey</span><span class="o">);</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">locations</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">locations</span><span class="o">.</span><span class="na">getRegionLocation</span><span class="o">(</span><span class="n">replicaId</span><span class="o">)</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+          <span class="k">return</span> <span class="n">locations</span><span class="o">;</span>
+        <span class="o">}</span>
+      <span class="o">}</span>
 
-    // only one thread should do the lookup.
-    synchronized (metaRegionLock) {
-      // Check the cache again for a hit in case some other thread made the
-      // same query while we were waiting on the lock.
-      if (useCache) {
-        locations = getCachedLocation(tableName, metaCacheKey);
-        if (locations != null &amp;&amp; locations.getRegionLocation(replicaId) != null) {
-          return locations;
-        }
-      }
-
-      // Look up from zookeeper
-      locations = this.registry.getMetaRegionLocation();
-      if (locations != null) {
-        cacheLocation(tableName, locations);
-      }
-    }
-    return locations;
-  }
-</code></pre>
-
+      <span class="c1">// Look up from zookeeper
+</span><span class="c1"></span>      <span class="n">locations</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">registry</span><span class="o">.</span><span class="na">getMetaRegionLocation</span><span class="o">();</span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">locations</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">cacheLocation</span><span class="o">(</span><span class="n">tableName</span><span class="o">,</span> <span class="n">locations</span><span class="o">);</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
+    <span class="k">return</span> <span class="n">locations</span><span class="o">;</span>
+  <span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>As the comment said, the location of META is always cached. The steps to get meta location:</p>
 
 <ol>
@@ -231,203 +287,394 @@ This would ask for help from <code>MetaCache</code> class, which is a cache impl
 </ol>
 
 <p>step 2 turns to <code>getMetaRegionLocation</code> method in <code>ZooKeeperRegistry</code>, A cluster registry that stores to zookeeper. Here is its code:</p>
-
-<pre><code class="language-java">  public RegionLocations getMetaRegionLocation() throws IOException {
-    ZooKeeperKeepAliveConnection zkw = hci.getKeepAliveZooKeeperWatcher();
-    try {
-      if (LOG.isTraceEnabled()) {
-        LOG.trace(&quot;Looking up meta region location in ZK,&quot; + &quot; connection=&quot; + this);
-      }
-      List&lt;ServerName&gt; servers = new MetaTableLocator().blockUntilAvailable(zkw, hci.rpcTimeout,
-          hci.getConfiguration());
-      if (LOG.isTraceEnabled()) {
-        if (servers == null) {
-          LOG.trace(&quot;Looked up meta region location, connection=&quot; + this +
-            &quot;; servers = null&quot;);
-        } else {
-          StringBuilder str = new StringBuilder();
-          for (ServerName s : servers) {
-            str.append(s.toString());
-            str.append(&quot; &quot;);
-          }
-          LOG.trace(&quot;Looked up meta region location, connection=&quot; + this +
-            &quot;; servers = &quot; + str.toString());
-        }
-      }
-      if (servers == null) return null;
-      HRegionLocation[] locs = new HRegionLocation[servers.size()];
-      int i = 0;
-      for (ServerName server : servers) {
-        HRegionInfo h = RegionReplicaUtil.getRegionInfoForReplica(
-                HRegionInfo.FIRST_META_REGIONINFO, i);
-        if (server == null) locs[i++] = null;
-        else locs[i++] = new HRegionLocation(h, server, 0);
-      }
-      return new RegionLocations(locs);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-      return null;
-    } finally {
-      zkw.close();
-    }
-  }
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java">  <span class="kd">public</span> <span class="n">RegionLocations</span> <span class="nf">getMetaRegionLocation</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+    <span class="n">ZooKeeperKeepAliveConnection</span> <span class="n">zkw</span> <span class="o">=</span> <span class="n">hci</span><span class="o">.</span><span class="na">getKeepAliveZooKeeperWatcher</span><span class="o">();</span>
+    <span class="k">try</span> <span class="o">{</span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">LOG</span><span class="o">.</span><span class="na">isTraceEnabled</span><span class="o">())</span> <span class="o">{</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="na">trace</span><span class="o">(</span><span class="s">&#34;Looking up meta region location in ZK,&#34;</span> <span class="o">+</span> <span class="s">&#34; connection=&#34;</span> <span class="o">+</span> <span class="k">this</span><span class="o">);</span>
+      <span class="o">}</span>
+      <span class="n">List</span><span class="o">&lt;</span><span class="n">ServerName</span><span class="o">&gt;</span> <span class="n">servers</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MetaTableLocator</span><span class="o">().</span><span class="na">blockUntilAvailable</span><span class="o">(</span><span class="n">zkw</span><span class="o">,</span> <span class="n">hci</span><span class="o">.</span><span class="na">rpcTimeout</span><span class="o">,</span>
+          <span class="n">hci</span><span class="o">.</span><span class="na">getConfiguration</span><span class="o">());</span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">LOG</span><span class="o">.</span><span class="na">isTraceEnabled</span><span class="o">())</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">servers</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+          <span class="n">LOG</span><span class="o">.</span><span class="na">trace</span><span class="o">(</span><span class="s">&#34;Looked up meta region location, connection=&#34;</span> <span class="o">+</span> <span class="k">this</span> <span class="o">+</span>
+            <span class="s">&#34;; servers = null&#34;</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+          <span class="n">StringBuilder</span> <span class="n">str</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StringBuilder</span><span class="o">();</span>
+          <span class="k">for</span> <span class="o">(</span><span class="n">ServerName</span> <span class="n">s</span> <span class="o">:</span> <span class="n">servers</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">str</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="n">s</span><span class="o">.</span><span class="na">toString</span><span class="o">());</span>
+            <span class="n">str</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">&#34; &#34;</span><span class="o">);</span>
+          <span class="o">}</span>
+          <span class="n">LOG</span><span class="o">.</span><span class="na">trace</span><span class="o">(</span><span class="s">&#34;Looked up meta region location, connection=&#34;</span> <span class="o">+</span> <span class="k">this</span> <span class="o">+</span>
+            <span class="s">&#34;; servers = &#34;</span> <span class="o">+</span> <span class="n">str</span><span class="o">.</span><span class="na">toString</span><span class="o">());</span>
+        <span class="o">}</span>
+      <span class="o">}</span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">servers</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+      <span class="n">HRegionLocation</span><span class="o">[]</span> <span class="n">locs</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HRegionLocation</span><span class="o">[</span><span class="n">servers</span><span class="o">.</span><span class="na">size</span><span class="o">()];</span>
+      <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span>
+      <span class="k">for</span> <span class="o">(</span><span class="n">ServerName</span> <span class="n">server</span> <span class="o">:</span> <span class="n">servers</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">HRegionInfo</span> <span class="n">h</span> <span class="o">=</span> <span class="n">RegionReplicaUtil</span><span class="o">.</span><span class="na">getRegionInfoForReplica</span><span class="o">(</span>
+                <span class="n">HRegionInfo</span><span class="o">.</span><span class="na">FIRST_META_REGIONINFO</span><span class="o">,</span> <span class="n">i</span><span class="o">);</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">server</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="n">locs</span><span class="o">[</span><span class="n">i</span><span class="o">++]</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="k">else</span> <span class="n">locs</span><span class="o">[</span><span class="n">i</span><span class="o">++]</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HRegionLocation</span><span class="o">(</span><span class="n">h</span><span class="o">,</span> <span class="n">server</span><span class="o">,</span> <span class="n">0</span><span class="o">);</span>
+      <span class="o">}</span>
+      <span class="k">return</span> <span class="k">new</span> <span class="n">RegionLocations</span><span class="o">(</span><span class="n">locs</span><span class="o">);</span>
+    <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">InterruptedException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">().</span><span class="na">interrupt</span><span class="o">();</span>
+      <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+      <span class="n">zkw</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+    <span class="o">}</span>
+  <span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <ol>
 <li>get server list from <code>MetaTableLocator</code>.</li>
 <li>constructs the region location list with <code>RegionLocations</code> from <code>RegionLocations</code> class.</li>
 </ol>
 
 <p>Next, let&rsquo;s see how to locate region of user table <code>locateRegionInMeta()</code>, which would search the <code>hbase:meta</code> table for the <code>HRegionLocation</code> info that contains the table and row your are seeking:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span><span class="lnt">106
+</span><span class="lnt">107
+</span><span class="lnt">108
+</span><span class="lnt">109
+</span><span class="lnt">110
+</span><span class="lnt">111
+</span><span class="lnt">112
+</span><span class="lnt">113
+</span><span class="lnt">114
+</span><span class="lnt">115
+</span><span class="lnt">116
+</span><span class="lnt">117
+</span><span class="lnt">118
+</span><span class="lnt">119
+</span><span class="lnt">120
+</span><span class="lnt">121
+</span><span class="lnt">122
+</span><span class="lnt">123
+</span><span class="lnt">124
+</span><span class="lnt">125
+</span><span class="lnt">126
+</span><span class="lnt">127
+</span><span class="lnt">128
+</span><span class="lnt">129
+</span><span class="lnt">130
+</span><span class="lnt">131
+</span><span class="lnt">132
+</span><span class="lnt">133
+</span><span class="lnt">134
+</span><span class="lnt">135
+</span><span class="lnt">136
+</span><span class="lnt">137
+</span><span class="lnt">138
+</span><span class="lnt">139
+</span><span class="lnt">140
+</span><span class="lnt">141
+</span><span class="lnt">142
+</span><span class="lnt">143
+</span><span class="lnt">144
+</span><span class="lnt">145
+</span><span class="lnt">146
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java">  <span class="kd">private</span> <span class="n">RegionLocations</span> <span class="nf">locateRegionInMeta</span><span class="o">(</span><span class="n">TableName</span> <span class="n">tableName</span><span class="o">,</span> <span class="kt">byte</span><span class="o">[]</span> <span class="n">row</span><span class="o">,</span>
+                 <span class="kt">boolean</span> <span class="n">useCache</span><span class="o">,</span> <span class="kt">boolean</span> <span class="n">retry</span><span class="o">,</span> <span class="kt">int</span> <span class="n">replicaId</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
 
-<pre><code class="language-java">  private RegionLocations locateRegionInMeta(TableName tableName, byte[] row,
-                 boolean useCache, boolean retry, int replicaId) throws IOException {
+    <span class="c1">// If we are supposed to be using the cache, look in the cache to see if
+</span><span class="c1"></span>    <span class="c1">// we already have the region.
+</span><span class="c1"></span>    <span class="k">if</span> <span class="o">(</span><span class="n">useCache</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">RegionLocations</span> <span class="n">locations</span> <span class="o">=</span> <span class="n">getCachedLocation</span><span class="o">(</span><span class="n">tableName</span><span class="o">,</span> <span class="n">row</span><span class="o">);</span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">locations</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">locations</span><span class="o">.</span><span class="na">getRegionLocation</span><span class="o">(</span><span class="n">replicaId</span><span class="o">)</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">locations</span><span class="o">;</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
 
-    // If we are supposed to be using the cache, look in the cache to see if
-    // we already have the region.
-    if (useCache) {
-      RegionLocations locations = getCachedLocation(tableName, row);
-      if (locations != null &amp;&amp; locations.getRegionLocation(replicaId) != null) {
-        return locations;
-      }
-    }
+    <span class="c1">// build the key of the meta region we should be looking for.
+</span><span class="c1"></span>    <span class="c1">// the extra 9&#39;s on the end are necessary to allow &#34;exact&#34; matches
+</span><span class="c1"></span>    <span class="c1">// without knowing the precise region names.
+</span><span class="c1"></span>    <span class="kt">byte</span><span class="o">[]</span> <span class="n">metaKey</span> <span class="o">=</span> <span class="n">HRegionInfo</span><span class="o">.</span><span class="na">createRegionName</span><span class="o">(</span><span class="n">tableName</span><span class="o">,</span> <span class="n">row</span><span class="o">,</span> <span class="n">HConstants</span><span class="o">.</span><span class="na">NINES</span><span class="o">,</span> <span class="kc">false</span><span class="o">);</span>
 
-    // build the key of the meta region we should be looking for.
-    // the extra 9's on the end are necessary to allow &quot;exact&quot; matches
-    // without knowing the precise region names.
-    byte[] metaKey = HRegionInfo.createRegionName(tableName, row, HConstants.NINES, false);
+    <span class="n">Scan</span> <span class="n">s</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Scan</span><span class="o">();</span>
+    <span class="n">s</span><span class="o">.</span><span class="na">setReversed</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+    <span class="n">s</span><span class="o">.</span><span class="na">withStartRow</span><span class="o">(</span><span class="n">metaKey</span><span class="o">);</span>
+    <span class="n">s</span><span class="o">.</span><span class="na">addFamily</span><span class="o">(</span><span class="n">HConstants</span><span class="o">.</span><span class="na">CATALOG_FAMILY</span><span class="o">);</span>
+    <span class="n">s</span><span class="o">.</span><span class="na">setOneRowLimit</span><span class="o">();</span>
+    <span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">useMetaReplicas</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">s</span><span class="o">.</span><span class="na">setConsistency</span><span class="o">(</span><span class="n">Consistency</span><span class="o">.</span><span class="na">TIMELINE</span><span class="o">);</span>
+    <span class="o">}</span>
 
-    Scan s = new Scan();
-    s.setReversed(true);
-    s.withStartRow(metaKey);
-    s.addFamily(HConstants.CATALOG_FAMILY);
-    s.setOneRowLimit();
-    if (this.useMetaReplicas) {
-      s.setConsistency(Consistency.TIMELINE);
-    }
+    <span class="kt">int</span> <span class="n">maxAttempts</span> <span class="o">=</span> <span class="o">(</span><span class="n">retry</span> <span class="o">?</span> <span class="n">numTries</span> <span class="o">:</span> <span class="n">1</span><span class="o">);</span>
 
-    int maxAttempts = (retry ? numTries : 1);
+    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">tries</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span> <span class="kc">true</span><span class="o">;</span> <span class="n">tries</span><span class="o">++)</span> <span class="o">{</span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">tries</span> <span class="o">&gt;=</span> <span class="n">maxAttempts</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="n">NoServerForRegionException</span><span class="o">(</span><span class="s">&#34;Unable to find region for &#34;</span>
+            <span class="o">+</span> <span class="n">Bytes</span><span class="o">.</span><span class="na">toStringBinary</span><span class="o">(</span><span class="n">row</span><span class="o">)</span> <span class="o">+</span> <span class="s">&#34; in &#34;</span> <span class="o">+</span> <span class="n">tableName</span> <span class="o">+</span>
+            <span class="s">&#34; after &#34;</span> <span class="o">+</span> <span class="n">tries</span> <span class="o">+</span> <span class="s">&#34; tries.&#34;</span><span class="o">);</span>
+      <span class="o">}</span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">useCache</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">RegionLocations</span> <span class="n">locations</span> <span class="o">=</span> <span class="n">getCachedLocation</span><span class="o">(</span><span class="n">tableName</span><span class="o">,</span> <span class="n">row</span><span class="o">);</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">locations</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">locations</span><span class="o">.</span><span class="na">getRegionLocation</span><span class="o">(</span><span class="n">replicaId</span><span class="o">)</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+          <span class="k">return</span> <span class="n">locations</span><span class="o">;</span>
+        <span class="o">}</span>
+      <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+        <span class="c1">// If we are not supposed to be using the cache, delete any existing cached location
+</span><span class="c1"></span>        <span class="c1">// so it won&#39;t interfere.
+</span><span class="c1"></span>        <span class="c1">// We are only supposed to clean the cache for the specific replicaId
+</span><span class="c1"></span>        <span class="n">metaCache</span><span class="o">.</span><span class="na">clearCache</span><span class="o">(</span><span class="n">tableName</span><span class="o">,</span> <span class="n">row</span><span class="o">,</span> <span class="n">replicaId</span><span class="o">);</span>
+      <span class="o">}</span>
 
-    for (int tries = 0; true; tries++) {
-      if (tries &gt;= maxAttempts) {
-        throw new NoServerForRegionException(&quot;Unable to find region for &quot;
-            + Bytes.toStringBinary(row) + &quot; in &quot; + tableName +
-            &quot; after &quot; + tries + &quot; tries.&quot;);
-      }
-      if (useCache) {
-        RegionLocations locations = getCachedLocation(tableName, row);
-        if (locations != null &amp;&amp; locations.getRegionLocation(replicaId) != null) {
-          return locations;
-        }
-      } else {
-        // If we are not supposed to be using the cache, delete any existing cached location
-        // so it won't interfere.
-        // We are only supposed to clean the cache for the specific replicaId
-        metaCache.clearCache(tableName, row, replicaId);
-      }
+      <span class="c1">// Query the meta region
+</span><span class="c1"></span>      <span class="kt">long</span> <span class="n">pauseBase</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">pause</span><span class="o">;</span>
+      <span class="k">try</span> <span class="o">{</span>
+        <span class="n">Result</span> <span class="n">regionInfoRow</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="n">s</span><span class="o">.</span><span class="na">resetMvccReadPoint</span><span class="o">();</span>
+        <span class="k">try</span> <span class="o">(</span><span class="n">ReversedClientScanner</span> <span class="n">rcs</span> <span class="o">=</span>
+            <span class="k">new</span> <span class="n">ReversedClientScanner</span><span class="o">(</span><span class="n">conf</span><span class="o">,</span> <span class="n">s</span><span class="o">,</span> <span class="n">TableName</span><span class="o">.</span><span class="na">META_TABLE_NAME</span><span class="o">,</span> <span class="k">this</span><span class="o">,</span> <span class="n">rpcCallerFactory</span><span class="o">,</span>
+                <span class="n">rpcControllerFactory</span><span class="o">,</span> <span class="n">getMetaLookupPool</span><span class="o">(),</span> <span class="n">metaReplicaCallTimeoutScanInMicroSecond</span><span class="o">))</span> <span class="o">{</span>
+          <span class="n">regionInfoRow</span> <span class="o">=</span> <span class="n">rcs</span><span class="o">.</span><span class="na">next</span><span class="o">();</span>
+        <span class="o">}</span>
 
-      // Query the meta region
-      long pauseBase = this.pause;
-      try {
-        Result regionInfoRow = null;
-        s.resetMvccReadPoint();
-        try (ReversedClientScanner rcs =
-            new ReversedClientScanner(conf, s, TableName.META_TABLE_NAME, this, rpcCallerFactory,
-                rpcControllerFactory, getMetaLookupPool(), metaReplicaCallTimeoutScanInMicroSecond)) {
-          regionInfoRow = rcs.next();
-        }
+        <span class="k">if</span> <span class="o">(</span><span class="n">regionInfoRow</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+          <span class="k">throw</span> <span class="k">new</span> <span class="n">TableNotFoundException</span><span class="o">(</span><span class="n">tableName</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="c1">// convert the row result into the HRegionLocation we need!
+</span><span class="c1"></span>        <span class="n">RegionLocations</span> <span class="n">locations</span> <span class="o">=</span> <span class="n">MetaTableAccessor</span><span class="o">.</span><span class="na">getRegionLocations</span><span class="o">(</span><span class="n">regionInfoRow</span><span class="o">);</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">locations</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">||</span> <span class="n">locations</span><span class="o">.</span><span class="na">getRegionLocation</span><span class="o">(</span><span class="n">replicaId</span><span class="o">)</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+          <span class="k">throw</span> <span class="k">new</span> <span class="n">IOException</span><span class="o">(</span><span class="s">&#34;HRegionInfo was null in &#34;</span> <span class="o">+</span>
+            <span class="n">tableName</span> <span class="o">+</span> <span class="s">&#34;, row=&#34;</span> <span class="o">+</span> <span class="n">regionInfoRow</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="n">HRegionInfo</span> <span class="n">regionInfo</span> <span class="o">=</span> <span class="n">locations</span><span class="o">.</span><span class="na">getRegionLocation</span><span class="o">(</span><span class="n">replicaId</span><span class="o">).</span><span class="na">getRegionInfo</span><span class="o">();</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">regionInfo</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+          <span class="k">throw</span> <span class="k">new</span> <span class="n">IOException</span><span class="o">(</span><span class="s">&#34;HRegionInfo was null or empty in &#34;</span> <span class="o">+</span>
+            <span class="n">TableName</span><span class="o">.</span><span class="na">META_TABLE_NAME</span> <span class="o">+</span> <span class="s">&#34;, row=&#34;</span> <span class="o">+</span> <span class="n">regionInfoRow</span><span class="o">);</span>
+        <span class="o">}</span>
 
-        if (regionInfoRow == null) {
-          throw new TableNotFoundException(tableName);
-        }
-        // convert the row result into the HRegionLocation we need!
-        RegionLocations locations = MetaTableAccessor.getRegionLocations(regionInfoRow);
-        if (locations == null || locations.getRegionLocation(replicaId) == null) {
-          throw new IOException(&quot;HRegionInfo was null in &quot; +
-            tableName + &quot;, row=&quot; + regionInfoRow);
-        }
-        HRegionInfo regionInfo = locations.getRegionLocation(replicaId).getRegionInfo();
-        if (regionInfo == null) {
-          throw new IOException(&quot;HRegionInfo was null or empty in &quot; +
-            TableName.META_TABLE_NAME + &quot;, row=&quot; + regionInfoRow);
-        }
+        <span class="c1">// possible we got a region of a different table...
+</span><span class="c1"></span>        <span class="k">if</span> <span class="o">(!</span><span class="n">regionInfo</span><span class="o">.</span><span class="na">getTable</span><span class="o">().</span><span class="na">equals</span><span class="o">(</span><span class="n">tableName</span><span class="o">))</span> <span class="o">{</span>
+          <span class="k">throw</span> <span class="k">new</span> <span class="n">TableNotFoundException</span><span class="o">(</span>
+            <span class="s">&#34;Region of &#39;&#34;</span> <span class="o">+</span> <span class="n">regionInfo</span><span class="o">.</span><span class="na">getRegionNameAsString</span><span class="o">()</span> <span class="o">+</span> <span class="s">&#34;&#39; is expected in the table of &#39;&#34;</span> <span class="o">+</span> <span class="n">tableName</span> <span class="o">+</span> <span class="s">&#34;&#39;, &#34;</span> <span class="o">+</span>
+            <span class="s">&#34;but hbase:meta says it is in the table of &#39;&#34;</span> <span class="o">+</span> <span class="n">regionInfo</span><span class="o">.</span><span class="na">getTable</span><span class="o">()</span> <span class="o">+</span> <span class="s">&#34;&#39;. &#34;</span> <span class="o">+</span>
+            <span class="s">&#34;hbase:meta might be damaged.&#34;</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">regionInfo</span><span class="o">.</span><span class="na">isSplit</span><span class="o">())</span> <span class="o">{</span>
+          <span class="k">throw</span> <span class="k">new</span> <span class="n">RegionOfflineException</span><span class="o">(</span><span class="s">&#34;the only available region for&#34;</span> <span class="o">+</span>
+            <span class="s">&#34; the required row is a split parent,&#34;</span> <span class="o">+</span>
+            <span class="s">&#34; the daughters should be online soon: &#34;</span> <span class="o">+</span>
+            <span class="n">regionInfo</span><span class="o">.</span><span class="na">getRegionNameAsString</span><span class="o">());</span>
+        <span class="o">}</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">regionInfo</span><span class="o">.</span><span class="na">isOffline</span><span class="o">())</span> <span class="o">{</span>
+          <span class="k">throw</span> <span class="k">new</span> <span class="n">RegionOfflineException</span><span class="o">(</span><span class="s">&#34;the region is offline, could&#34;</span> <span class="o">+</span>
+            <span class="s">&#34; be caused by a disable table call: &#34;</span> <span class="o">+</span>
+            <span class="n">regionInfo</span><span class="o">.</span><span class="na">getRegionNameAsString</span><span class="o">());</span>
+        <span class="o">}</span>
 
-        // possible we got a region of a different table...
-        if (!regionInfo.getTable().equals(tableName)) {
-          throw new TableNotFoundException(
-            &quot;Region of '&quot; + regionInfo.getRegionNameAsString() + &quot;' is expected in the table of '&quot; + tableName + &quot;', &quot; +
-            &quot;but hbase:meta says it is in the table of '&quot; + regionInfo.getTable() + &quot;'. &quot; +
-            &quot;hbase:meta might be damaged.&quot;);
-        }
-        if (regionInfo.isSplit()) {
-          throw new RegionOfflineException(&quot;the only available region for&quot; +
-            &quot; the required row is a split parent,&quot; +
-            &quot; the daughters should be online soon: &quot; +
-            regionInfo.getRegionNameAsString());
-        }
-        if (regionInfo.isOffline()) {
-          throw new RegionOfflineException(&quot;the region is offline, could&quot; +
-            &quot; be caused by a disable table call: &quot; +
-            regionInfo.getRegionNameAsString());
-        }
+        <span class="n">ServerName</span> <span class="n">serverName</span> <span class="o">=</span> <span class="n">locations</span><span class="o">.</span><span class="na">getRegionLocation</span><span class="o">(</span><span class="n">replicaId</span><span class="o">).</span><span class="na">getServerName</span><span class="o">();</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">serverName</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+          <span class="k">throw</span> <span class="k">new</span> <span class="n">NoServerForRegionException</span><span class="o">(</span><span class="s">&#34;No server address listed &#34;</span> <span class="o">+</span>
+            <span class="s">&#34;in &#34;</span> <span class="o">+</span> <span class="n">TableName</span><span class="o">.</span><span class="na">META_TABLE_NAME</span> <span class="o">+</span> <span class="s">&#34; for region &#34;</span> <span class="o">+</span>
+            <span class="n">regionInfo</span><span class="o">.</span><span class="na">getRegionNameAsString</span><span class="o">()</span> <span class="o">+</span> <span class="s">&#34; containing row &#34;</span> <span class="o">+</span>
+            <span class="n">Bytes</span><span class="o">.</span><span class="na">toStringBinary</span><span class="o">(</span><span class="n">row</span><span class="o">));</span>
+        <span class="o">}</span>
 
-        ServerName serverName = locations.getRegionLocation(replicaId).getServerName();
-        if (serverName == null) {
-          throw new NoServerForRegionException(&quot;No server address listed &quot; +
-            &quot;in &quot; + TableName.META_TABLE_NAME + &quot; for region &quot; +
-            regionInfo.getRegionNameAsString() + &quot; containing row &quot; +
-            Bytes.toStringBinary(row));
-        }
-
-        if (isDeadServer(serverName)){
-          throw new RegionServerStoppedException(&quot;hbase:meta says the region &quot;+
-              regionInfo.getRegionNameAsString()+&quot; is managed by the server &quot; + serverName +
-              &quot;, but it is dead.&quot;);
-        }
-        // Instantiate the location
-        cacheLocation(tableName, locations);
-        return locations;
-      } catch (TableNotFoundException e) {
-        // if we got this error, probably means the table just plain doesn't
-        // exist. rethrow the error immediately. this should always be coming
-        // from the HTable constructor.
-        throw e;
-      } catch (IOException e) {
-        ExceptionUtil.rethrowIfInterrupt(e);
-        if (e instanceof RemoteException) {
-          e = ((RemoteException)e).unwrapRemoteException();
-        }
-        if (e instanceof CallQueueTooBigException) {
-          // Give a special check on CallQueueTooBigException, see #HBASE-17114
-          pauseBase = this.pauseForCQTBE;
-        }
-        if (tries &lt; maxAttempts - 1) {
-          if (LOG.isDebugEnabled()) {
-            LOG.debug(&quot;locateRegionInMeta parentTable=&quot; +
-                TableName.META_TABLE_NAME + &quot;, metaLocation=&quot; +
-              &quot;, attempt=&quot; + tries + &quot; of &quot; +
-              maxAttempts + &quot; failed; retrying after sleep of &quot; +
-              ConnectionUtils.getPauseTime(pauseBase, tries) + &quot; because: &quot; + e.getMessage());
-          }
-        } else {
-          throw e;
-        }
-        // Only relocate the parent region if necessary
-        if(!(e instanceof RegionOfflineException ||
-            e instanceof NoServerForRegionException)) {
-          relocateRegion(TableName.META_TABLE_NAME, metaKey, replicaId);
-        }
-      }
-      try{
-        Thread.sleep(ConnectionUtils.getPauseTime(pauseBase, tries));
-      } catch (InterruptedException e) {
-        throw new InterruptedIOException(&quot;Giving up trying to location region in &quot; +
-          &quot;meta: thread is interrupted.&quot;);
-      }
-    }
-  }
-</code></pre>
-
+        <span class="k">if</span> <span class="o">(</span><span class="n">isDeadServer</span><span class="o">(</span><span class="n">serverName</span><span class="o">)){</span>
+          <span class="k">throw</span> <span class="k">new</span> <span class="n">RegionServerStoppedException</span><span class="o">(</span><span class="s">&#34;hbase:meta says the region &#34;</span><span class="o">+</span>
+              <span class="n">regionInfo</span><span class="o">.</span><span class="na">getRegionNameAsString</span><span class="o">()+</span><span class="s">&#34; is managed by the server &#34;</span> <span class="o">+</span> <span class="n">serverName</span> <span class="o">+</span>
+              <span class="s">&#34;, but it is dead.&#34;</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="c1">// Instantiate the location
+</span><span class="c1"></span>        <span class="n">cacheLocation</span><span class="o">(</span><span class="n">tableName</span><span class="o">,</span> <span class="n">locations</span><span class="o">);</span>
+        <span class="k">return</span> <span class="n">locations</span><span class="o">;</span>
+      <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">TableNotFoundException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// if we got this error, probably means the table just plain doesn&#39;t
+</span><span class="c1"></span>        <span class="c1">// exist. rethrow the error immediately. this should always be coming
+</span><span class="c1"></span>        <span class="c1">// from the HTable constructor.
+</span><span class="c1"></span>        <span class="k">throw</span> <span class="n">e</span><span class="o">;</span>
+      <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">IOException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">ExceptionUtil</span><span class="o">.</span><span class="na">rethrowIfInterrupt</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">e</span> <span class="k">instanceof</span> <span class="n">RemoteException</span><span class="o">)</span> <span class="o">{</span>
+          <span class="n">e</span> <span class="o">=</span> <span class="o">((</span><span class="n">RemoteException</span><span class="o">)</span><span class="n">e</span><span class="o">).</span><span class="na">unwrapRemoteException</span><span class="o">();</span>
+        <span class="o">}</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">e</span> <span class="k">instanceof</span> <span class="n">CallQueueTooBigException</span><span class="o">)</span> <span class="o">{</span>
+          <span class="c1">// Give a special check on CallQueueTooBigException, see #HBASE-17114
+</span><span class="c1"></span>          <span class="n">pauseBase</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">pauseForCQTBE</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">tries</span> <span class="o">&lt;</span> <span class="n">maxAttempts</span> <span class="o">-</span> <span class="n">1</span><span class="o">)</span> <span class="o">{</span>
+          <span class="k">if</span> <span class="o">(</span><span class="n">LOG</span><span class="o">.</span><span class="na">isDebugEnabled</span><span class="o">())</span> <span class="o">{</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="na">debug</span><span class="o">(</span><span class="s">&#34;locateRegionInMeta parentTable=&#34;</span> <span class="o">+</span>
+                <span class="n">TableName</span><span class="o">.</span><span class="na">META_TABLE_NAME</span> <span class="o">+</span> <span class="s">&#34;, metaLocation=&#34;</span> <span class="o">+</span>
+              <span class="s">&#34;, attempt=&#34;</span> <span class="o">+</span> <span class="n">tries</span> <span class="o">+</span> <span class="s">&#34; of &#34;</span> <span class="o">+</span>
+              <span class="n">maxAttempts</span> <span class="o">+</span> <span class="s">&#34; failed; retrying after sleep of &#34;</span> <span class="o">+</span>
+              <span class="n">ConnectionUtils</span><span class="o">.</span><span class="na">getPauseTime</span><span class="o">(</span><span class="n">pauseBase</span><span class="o">,</span> <span class="n">tries</span><span class="o">)</span> <span class="o">+</span> <span class="s">&#34; because: &#34;</span> <span class="o">+</span> <span class="n">e</span><span class="o">.</span><span class="na">getMessage</span><span class="o">());</span>
+          <span class="o">}</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+          <span class="k">throw</span> <span class="n">e</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="c1">// Only relocate the parent region if necessary
+</span><span class="c1"></span>        <span class="k">if</span><span class="o">(!(</span><span class="n">e</span> <span class="k">instanceof</span> <span class="n">RegionOfflineException</span> <span class="o">||</span>
+            <span class="n">e</span> <span class="k">instanceof</span> <span class="n">NoServerForRegionException</span><span class="o">))</span> <span class="o">{</span>
+          <span class="n">relocateRegion</span><span class="o">(</span><span class="n">TableName</span><span class="o">.</span><span class="na">META_TABLE_NAME</span><span class="o">,</span> <span class="n">metaKey</span><span class="o">,</span> <span class="n">replicaId</span><span class="o">);</span>
+        <span class="o">}</span>
+      <span class="o">}</span>
+      <span class="k">try</span><span class="o">{</span>
+        <span class="n">Thread</span><span class="o">.</span><span class="na">sleep</span><span class="o">(</span><span class="n">ConnectionUtils</span><span class="o">.</span><span class="na">getPauseTime</span><span class="o">(</span><span class="n">pauseBase</span><span class="o">,</span> <span class="n">tries</span><span class="o">));</span>
+      <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">InterruptedException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="n">InterruptedIOException</span><span class="o">(</span><span class="s">&#34;Giving up trying to location region in &#34;</span> <span class="o">+</span>
+          <span class="s">&#34;meta: thread is interrupted.&#34;</span><span class="o">);</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
+  <span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <ol>
 <li>if using the cache, look in the cache to see if already have the region.</li>
 <li>construct a <code>Scan</code> object with the given <code>tableName</code> and <code>row</code>.</li>

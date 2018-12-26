@@ -55,7 +55,7 @@ For those impatient: OS X EI Capitan shipped a security feature named System Int
 
 <meta itemprop="datePublished" content="2017-08-03T15:23:36&#43;08:00" />
 <meta itemprop="dateModified" content="2017-08-03T15:23:36&#43;08:00" />
-<meta itemprop="wordCount" content="274">
+<meta itemprop="wordCount" content="278">
 
 
 
@@ -138,7 +138,7 @@ For those impatient: OS X EI Capitan shipped a security feature named System Int
         <div class="post-category">
             <a href="/en/categories/python/"> Python </a>
             </div>
-          <span class="more-meta"> 274 words </span>
+          <span class="more-meta"> 278 words </span>
           <span class="more-meta"> 2 mins read </span>
         
       </div>
@@ -153,10 +153,14 @@ For those impatient: OS X EI Capitan shipped a security feature named System Int
 <p>As a new Pythoner, I want to learn <a href="https://ipython.org/">IPython</a> spontaneously. I read the release notes carefully and found that the latest IPython 6.0 drops Python 2.7 support. This is not a good news for me, who works on OS X EI Caption and built-in Python 2.7.10.</p>
 
 <p>Nonetheless, <code>pip</code> can easily find the last compatible version, so I execute the following command with confidence:</p>
-
-<pre><code class="language-shell">pip install ipython
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">pip install ipython</code></pre></td></tr></table>
+</div>
+</div>
 <p>At the beginning of log, I can see that <code>pip</code> successfully located IPython 5.4.1, so the <code>pip install ipython==5.4.1</code> is redundant.</p>
 
 <p><img src="/images/pipinstall1.png" alt="" /></p>
@@ -166,24 +170,36 @@ For those impatient: OS X EI Capitan shipped a security feature named System Int
 <p><img src="/images/pipinstall2.png" alt="" /></p>
 
 <p>It struck me that I encountered a permission issue, and the quickest solution is <code>sudo</code>:</p>
-
-<pre><code class="language-shell">sudo pip install ipython
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">sudo pip install ipython</code></pre></td></tr></table>
+</div>
+</div>
 <p>Again I got the same Exception. How about <code>easy_install</code>? Let me try my shot. Oh, no luck.</p>
 
 <p>After googling a while, I found that EI Capitan should be blamed. EI Capitan introduced a <strong>System Integrity Protection</strong>, which would protect system directory from writing. Okay, it&rsquo;s the culprit, should we put it in jail? Of course you can, but before that you must deliberate the <a href="https://developer.apple.com/library/content/documentation/Security/Conceptual/System_Integrity_Protection_Guide/Introduction/Introduction.html">official guide</a>.</p>
 
 <p>So if you decide to enable SIP, the workaround (not workaround, it is highly recommended to install Python package in user mode) to install IPython is :</p>
-
-<pre><code class="language-python">pip install ipython --user
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="n">pip</span> <span class="n">install</span> <span class="n">ipython</span> <span class="o">--</span><span class="n">user</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>After that, IPython would be placed under <code>/Users/guoqing/Library/Python/2.7/lib</code>. <code>ipython</code> command is still available now, you have to involve <code>/Users/guoqing/Library/Python/2.7/bin</code> into <code>$PATH</code>:</p>
-
-<pre><code class="language-shell">export PATH=&quot;$PATH:/Users/guoqing/Library/Python/2.7/bin&quot;
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="s2">&#34;</span><span class="nv">$PATH</span><span class="s2">:/Users/guoqing/Library/Python/2.7/bin&#34;</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>End. Hope this helps.</p>
     </div>
 

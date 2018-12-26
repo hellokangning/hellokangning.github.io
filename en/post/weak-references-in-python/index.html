@@ -66,7 +66,7 @@ But sometimes, it is useful to have a reference to an object that does not keep 
 
 <meta itemprop="datePublished" content="2018-11-05T20:46:15&#43;08:00" />
 <meta itemprop="dateModified" content="2018-11-05T20:46:15&#43;08:00" />
-<meta itemprop="wordCount" content="389">
+<meta itemprop="wordCount" content="418">
 
 
 
@@ -153,7 +153,7 @@ But sometimes, it is useful to have a reference to an object that does not keep 
         <div class="post-category">
             <a href="/en/categories/python/"> Python </a>
             </div>
-          <span class="more-meta"> 389 words </span>
+          <span class="more-meta"> 418 words </span>
           <span class="more-meta"> 2 mins read </span>
         
       </div>
@@ -180,44 +180,79 @@ But sometimes, it is useful to have a reference to an object that does not keep 
 <p>But sometimes, it is useful to have a reference to an object that does not keep it around longer than necessary. Week references to an object do not increase its reference count. A weak reference does not prevent the referent from being garbage collected.</p>
 
 <p>The following example shows how a <code>weakref.ref</code> instance can be called to reach its referent.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">weakref</span>
+<span class="n">s</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">}</span>
+<span class="n">wref</span> <span class="o">=</span> <span class="n">weakref</span><span class="o">.</span><span class="n">ref</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">wref</span><span class="p">)</span> <span class="c1"># &lt;weakref at 0x10767bb88; to &#39;set&#39; at 0x1076a5f28&gt;</span>
+<span class="k">print</span><span class="p">(</span><span class="n">wref</span><span class="p">())</span> <span class="c1"># {0, 1}</span>
 
-<pre><code class="language-python">import weakref
-s = {0,1}
-wref = weakref.ref(s)
-print(wref) # &lt;weakref at 0x10767bb88; to 'set' at 0x1076a5f28&gt;
-print(wref()) # {0, 1}
-
-s = {2,3,4}
-print(wref) # &lt;weakref at 0x109871b88; dead&gt;
-print(wref()) # None
-print(wref() is None) # True
-</code></pre>
-
+<span class="n">s</span> <span class="o">=</span> <span class="p">{</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">}</span>
+<span class="k">print</span><span class="p">(</span><span class="n">wref</span><span class="p">)</span> <span class="c1"># &lt;weakref at 0x109871b88; dead&gt;</span>
+<span class="k">print</span><span class="p">(</span><span class="n">wref</span><span class="p">())</span> <span class="c1"># None</span>
+<span class="k">print</span><span class="p">(</span><span class="n">wref</span><span class="p">()</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">)</span> <span class="c1"># True</span></code></pre></td></tr></table>
+</div>
+</div>
 <h1 id="weekvaluedictionary"><code>WeekValueDictionary</code></h1>
 
 <p>The class <code>WeekValueDictionary</code> implements a mutable mapping where the values are weak reference to objects. When a referred object is garbage collected, the corresponding key is automatically removed from the <code>WeekValueDictionary</code>. This is commonly used for caching.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Cheese</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kind</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kind</span> <span class="o">=</span> <span class="n">kind</span>
 
-<pre><code class="language-python">class Cheese:
-    def __init__(self, kind):
-        self.kind = kind
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;Cheese(</span><span class="si">%r</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">kind</span>
 
-    def __repr__(self):
-        return 'Cheese(%r)' % self.kind
+<span class="kn">import</span> <span class="nn">weakref</span>
+<span class="n">stock</span> <span class="o">=</span> <span class="n">weakref</span><span class="o">.</span><span class="n">WeakValueDictionary</span><span class="p">()</span>
+<span class="n">catalog</span> <span class="o">=</span> <span class="p">[</span><span class="n">Cheese</span><span class="p">(</span><span class="s1">&#39;Red Leicester&#39;</span><span class="p">),</span> <span class="n">Cheese</span><span class="p">(</span><span class="s1">&#39;Tilsit&#39;</span><span class="p">),</span>
+            <span class="n">Cheese</span><span class="p">(</span><span class="s1">&#39;Brie&#39;</span><span class="p">),</span> <span class="n">Cheese</span><span class="p">(</span><span class="s1">&#39;Parmesan&#39;</span><span class="p">)]</span>
+<span class="k">for</span> <span class="n">ce</span> <span class="ow">in</span> <span class="n">catalog</span><span class="p">:</span>
+    <span class="n">stock</span><span class="p">[</span><span class="n">ce</span><span class="o">.</span><span class="n">kind</span><span class="p">]</span> <span class="o">=</span> <span class="n">ce</span>
 
-import weakref
-stock = weakref.WeakValueDictionary()
-catalog = [Cheese('Red Leicester'), Cheese('Tilsit'),
-            Cheese('Brie'), Cheese('Parmesan')]
-for ce in catalog:
-    stock[ce.kind] = ce
-
-print(sorted(stock.keys())) # ['Brie', 'Parmesan', 'Red Leicester', 'Tilsit']
-del catalog
-print(sorted(stock.keys())) # ['Parmesan']
-del ce
-print(sorted(stock.keys())) # []
-</code></pre>
-
+<span class="k">print</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">stock</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span> <span class="c1"># [&#39;Brie&#39;, &#39;Parmesan&#39;, &#39;Red Leicester&#39;, &#39;Tilsit&#39;]</span>
+<span class="k">del</span> <span class="n">catalog</span>
+<span class="k">print</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">stock</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span> <span class="c1"># [&#39;Parmesan&#39;]</span>
+<span class="k">del</span> <span class="n">ce</span>
+<span class="k">print</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">stock</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span> <span class="c1"># []</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>After <code>catelog</code> is deleted, most cheeses are gone from the <code>stock</code> except one. Because a temporary variable may cause an object to last longer than expected by holding a reference to it.</p>
 
 <p>A counterpart to the <code>WeakValueDictionary</code> is <code>WeakKeyDictionary</code> in which the keys are week references. <code>WeakKeyDictionary</code> can be used to associate additional data with an object owned by other parts of an application without adding attributes to those objects.</p>

@@ -56,7 +56,7 @@ This post elucidates the steps of binary search by illustrating some common mist
 
 <meta itemprop="datePublished" content="2018-08-03T10:55:27&#43;08:00" />
 <meta itemprop="dateModified" content="2018-08-03T10:55:27&#43;08:00" />
-<meta itemprop="wordCount" content="641">
+<meta itemprop="wordCount" content="730">
 
 
 
@@ -139,7 +139,7 @@ This post elucidates the steps of binary search by illustrating some common mist
         <div class="post-category">
             <a href="/en/categories/algorithm/"> Algorithm </a>
             </div>
-          <span class="more-meta"> 641 words </span>
+          <span class="more-meta"> 730 words </span>
           <span class="more-meta"> 4 mins read </span>
         
       </div>
@@ -168,26 +168,46 @@ This post elucidates the steps of binary search by illustrating some common mist
 <h1 id="terminal-condition-for-loop">Terminal Condition for Loop</h1>
 
 <p>Some candidates wrote the following code confidently.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Solution</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">nextGreatestLetter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">letters</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+        <span class="s2">&#34;&#34;&#34;
+</span><span class="s2">        :type letters: List[str]
+</span><span class="s2">        :type target: str
+</span><span class="s2">        :rtype: str
+</span><span class="s2">        &#34;&#34;&#34;</span>
+        <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">letters</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">double</span> <span class="o">=</span> <span class="n">letters</span> <span class="o">+</span> <span class="p">[</span><span class="n">letters</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="k">while</span> <span class="n">start</span> <span class="o">&lt;=</span> <span class="n">end</span><span class="p">:</span>
+            <span class="n">mid</span> <span class="o">=</span> <span class="p">(</span><span class="n">start</span> <span class="o">+</span> <span class="n">end</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+            <span class="k">if</span> <span class="n">double</span><span class="p">[</span><span class="n">mid</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">target</span><span class="p">:</span>
+                <span class="n">start</span> <span class="o">=</span> <span class="n">mid</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">end</span> <span class="o">=</span> <span class="n">mid</span>
 
-<pre><code class="language-python">class Solution:
-    def nextGreatestLetter(self, letters, target):
-        &quot;&quot;&quot;
-        :type letters: List[str]
-        :type target: str
-        :rtype: str
-        &quot;&quot;&quot;
-        start, end = 0, len(letters) - 1
-        double = letters + [letters[0]]
-        while start &lt;= end:
-            mid = (start + end) // 2
-            if double[mid] &lt;= target:
-                start = mid + 1
-            else:
-                end = mid
-
-        return double[start] if double[start] &gt; target else double[start + 1]
-</code></pre>
-
+        <span class="k">return</span> <span class="n">double</span><span class="p">[</span><span class="n">start</span><span class="p">]</span> <span class="k">if</span> <span class="n">double</span><span class="p">[</span><span class="n">start</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">target</span> <span class="k">else</span> <span class="n">double</span><span class="p">[</span><span class="n">start</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>A skilled programmer can detect the endless loop by <code>while start &lt;= end</code>. If the condtion goes to <code>else: end = mid</code>, the <code>end</code> is equal to <code>start</code> perpetually.</p>
 
 <p>This is a manifest mistake, but few people may not notice.</p>
@@ -195,51 +215,95 @@ This post elucidates the steps of binary search by illustrating some common mist
 <h1 id="shrink-searching-scope">Shrink Searching Scope</h1>
 
 <p>A more sophisticated engineer bypasses the above trap and wrote down,</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Solution</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">nextGreatestLetter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">letters</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+        <span class="s2">&#34;&#34;&#34;
+</span><span class="s2">        :type letters: List[str]
+</span><span class="s2">        :type target: str
+</span><span class="s2">        :rtype: str
+</span><span class="s2">        &#34;&#34;&#34;</span>
+        <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">letters</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">double</span> <span class="o">=</span> <span class="n">letters</span> <span class="o">+</span> <span class="p">[</span><span class="n">letters</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="k">while</span> <span class="n">start</span> <span class="o">&lt;</span> <span class="n">end</span><span class="p">:</span>
+            <span class="n">mid</span> <span class="o">=</span> <span class="p">(</span><span class="n">start</span> <span class="o">+</span> <span class="n">end</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+            <span class="k">if</span> <span class="n">double</span><span class="p">[</span><span class="n">mid</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">target</span><span class="p">:</span>
+                <span class="n">end</span> <span class="o">=</span> <span class="n">mid</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">start</span> <span class="o">=</span> <span class="n">mid</span>
 
-<pre><code class="language-python">class Solution:
-    def nextGreatestLetter(self, letters, target):
-        &quot;&quot;&quot;
-        :type letters: List[str]
-        :type target: str
-        :rtype: str
-        &quot;&quot;&quot;
-        start, end = 0, len(letters) - 1
-        double = letters + [letters[0]]
-        while start &lt; end:
-            mid = (start + end) // 2
-            if double[mid] &gt; target:
-                end = mid - 1
-            else:
-                start = mid
-
-        return double[start] if double[start] &gt; target else double[start + 1]
-</code></pre>
-
+        <span class="k">return</span> <span class="n">double</span><span class="p">[</span><span class="n">start</span><span class="p">]</span> <span class="k">if</span> <span class="n">double</span><span class="p">[</span><span class="n">start</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">target</span> <span class="k">else</span> <span class="n">double</span><span class="p">[</span><span class="n">start</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>It is also an endless loop, as many of candidates may not realized. Take Case 3 into consideration:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">unittest</span>
 
-<pre><code class="language-python">import unittest
+<span class="kn">from</span> <span class="nn">code</span> <span class="kn">import</span> <span class="n">Solution</span>
 
-from code import Solution
+<span class="k">class</span> <span class="nc">TestDict</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">testResult</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">Solution</span><span class="p">()</span>
+        <span class="c1"># Case 1</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">nextGreatestLetter</span><span class="p">([</span><span class="s2">&#34;c&#34;</span><span class="p">,</span> <span class="s2">&#34;f&#34;</span><span class="p">,</span> <span class="s2">&#34;j&#34;</span><span class="p">],</span> <span class="s2">&#34;a&#34;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="s2">&#34;c&#34;</span><span class="p">)</span>
 
-class TestDict(unittest.TestCase):
-    def testResult(self):
-        s = Solution()
-        # Case 1
-        ret = s.nextGreatestLetter([&quot;c&quot;, &quot;f&quot;, &quot;j&quot;], &quot;a&quot;)
-        self.assertEqual(ret, &quot;c&quot;)
+        <span class="c1"># Case 2</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">nextGreatestLetter</span><span class="p">([</span><span class="s2">&#34;c&#34;</span><span class="p">,</span> <span class="s2">&#34;f&#34;</span><span class="p">,</span> <span class="s2">&#34;j&#34;</span><span class="p">],</span> <span class="s2">&#34;c&#34;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="s2">&#34;f&#34;</span><span class="p">)</span>
 
-        # Case 2
-        ret = s.nextGreatestLetter([&quot;c&quot;, &quot;f&quot;, &quot;j&quot;], &quot;c&quot;)
-        self.assertEqual(ret, &quot;f&quot;)
+        <span class="c1"># Case 3</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">nextGreatestLetter</span><span class="p">([</span><span class="s2">&#34;c&#34;</span><span class="p">,</span> <span class="s2">&#34;f&#34;</span><span class="p">,</span> <span class="s2">&#34;f&#34;</span><span class="p">,</span> <span class="s2">&#34;j&#34;</span><span class="p">],</span> <span class="s2">&#34;f&#34;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="s2">&#34;j&#34;</span><span class="p">)</span>
 
-        # Case 3
-        ret = s.nextGreatestLetter([&quot;c&quot;, &quot;f&quot;, &quot;f&quot;, &quot;j&quot;], &quot;f&quot;)
-        self.assertEqual(ret, &quot;j&quot;)
-
-if __name__ == '__main__':
-    unittest.main()
-</code></pre>
-
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>Do you get the point? You want to address the upper bound for <code>target</code> and you move the <code>end</code> index backwards. That&rsquo;s the root cause. The condition <code>double[mid] &gt; target</code> cannot ensure the element at the index <code>mid - 1</code> is larger than <code>target</code>.</p>
 
 <p>So when you try to locate the upper bound, move <code>start</code> index on the left rather than <code>end</code> index on the right.</p>
@@ -247,51 +311,91 @@ if __name__ == '__main__':
 <h1 id="condition-for-shrinking">Condition for Shrinking</h1>
 
 <p>OK, let&rsquo;s take a look at the following snippet which move <code>start</code> forward.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Solution</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">nextGreatestLetter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">letters</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+        <span class="s2">&#34;&#34;&#34;
+</span><span class="s2">        :type letters: List[str]
+</span><span class="s2">        :type target: str
+</span><span class="s2">        :rtype: str
+</span><span class="s2">        &#34;&#34;&#34;</span>
+        <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">letters</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">double</span> <span class="o">=</span> <span class="n">letters</span> <span class="o">+</span> <span class="p">[</span><span class="n">letters</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="k">while</span> <span class="n">start</span> <span class="o">&lt;</span> <span class="n">end</span><span class="p">:</span>
+            <span class="n">mid</span> <span class="o">=</span> <span class="p">(</span><span class="n">start</span> <span class="o">+</span> <span class="n">end</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+            <span class="k">if</span> <span class="n">double</span><span class="p">[</span><span class="n">mid</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">target</span><span class="p">:</span>
+                <span class="n">start</span> <span class="o">=</span> <span class="n">mid</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">end</span> <span class="o">=</span> <span class="n">mid</span>
 
-<pre><code class="language-python">class Solution:
-    def nextGreatestLetter(self, letters, target):
-        &quot;&quot;&quot;
-        :type letters: List[str]
-        :type target: str
-        :rtype: str
-        &quot;&quot;&quot;
-        start, end = 0, len(letters) - 1
-        double = letters + [letters[0]]
-        while start &lt; end:
-            mid = (start + end) // 2
-            if double[mid] &lt; target:
-                start = mid + 1
-            else:
-                end = mid
-
-        return double[start] if double[start] &gt; target else double[start + 1]
-</code></pre>
-
+        <span class="k">return</span> <span class="n">double</span><span class="p">[</span><span class="n">start</span><span class="p">]</span> <span class="k">if</span> <span class="n">double</span><span class="p">[</span><span class="n">start</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">target</span> <span class="k">else</span> <span class="n">double</span><span class="p">[</span><span class="n">start</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>The title of this section may hint you that the condition for moving index <code>double[mid] &lt; target</code> is wrong. Yes it is. when <code>double[mid] == target</code> in this case, you move the <code>end</code> to <code>mid</code>, which may include the element equal to the given target. The correct operation is moving <code>start</code> to <code>mid + 1</code>.</p>
 
 <h1 id="accepted-version">Accepted Version</h1>
 
 <p>Finally, this version seems advisable, and it is accepted.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Solution</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">nextGreatestLetter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">letters</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+        <span class="s2">&#34;&#34;&#34;
+</span><span class="s2">        :type letters: List[str]
+</span><span class="s2">        :type target: str
+</span><span class="s2">        :rtype: str
+</span><span class="s2">        &#34;&#34;&#34;</span>
+        <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">letters</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">double</span> <span class="o">=</span> <span class="n">letters</span> <span class="o">+</span> <span class="p">[</span><span class="n">letters</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="k">while</span> <span class="n">start</span> <span class="o">&lt;</span> <span class="n">end</span><span class="p">:</span>
+            <span class="n">mid</span> <span class="o">=</span> <span class="p">(</span><span class="n">start</span> <span class="o">+</span> <span class="n">end</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+            <span class="k">if</span> <span class="n">double</span><span class="p">[</span><span class="n">mid</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">target</span><span class="p">:</span>
+                <span class="n">start</span> <span class="o">=</span> <span class="n">mid</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">end</span> <span class="o">=</span> <span class="n">mid</span>
 
-<pre><code class="language-python">class Solution:
-    def nextGreatestLetter(self, letters, target):
-        &quot;&quot;&quot;
-        :type letters: List[str]
-        :type target: str
-        :rtype: str
-        &quot;&quot;&quot;
-        start, end = 0, len(letters) - 1
-        double = letters + [letters[0]]
-        while start &lt; end:
-            mid = (start + end) // 2
-            if double[mid] &lt;= target:
-                start = mid + 1
-            else:
-                end = mid
-
-        return double[start] if double[start] &gt; target else double[start + 1]
-</code></pre>
-
+        <span class="k">return</span> <span class="n">double</span><span class="p">[</span><span class="n">start</span><span class="p">]</span> <span class="k">if</span> <span class="n">double</span><span class="p">[</span><span class="n">start</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">target</span> <span class="k">else</span> <span class="n">double</span><span class="p">[</span><span class="n">start</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>See this problem <a href="https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/description/">Find Minimum in Rotated Sorted Array</a> if you need more practice.</p>
     </div>
 

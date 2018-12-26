@@ -51,7 +51,7 @@
 
 <meta itemprop="datePublished" content="2017-09-14T16:20:46&#43;08:00" />
 <meta itemprop="dateModified" content="2017-09-14T16:20:46&#43;08:00" />
-<meta itemprop="wordCount" content="963">
+<meta itemprop="wordCount" content="1075">
 
 
 
@@ -132,8 +132,8 @@
         <div class="post-category">
             <a href="/en/categories/java/"> Java </a>
             </div>
-          <span class="more-meta"> 963 words </span>
-          <span class="more-meta"> 5 mins read </span>
+          <span class="more-meta"> 1075 words </span>
+          <span class="more-meta"> 6 mins read </span>
         
       </div>
     </header>
@@ -158,18 +158,39 @@
 <h1 id="jps"><code>jps</code></h1>
 
 <p>This utility lists the instrumented Java HotSpot VMs on the target system. The utility is very useful in environments where the VM is embedded, that is, it is started using the JNI Invocation API rather than the <code>java</code> launcher.</p>
-
-<pre><code>jps [ options ] [ hostid ]
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">jps [ options ] [ hostid ]</pre></td></tr></table>
+</div>
+</div>
 <p>The output of the jps command follows the following pattern:</p>
-
-<pre><code>lvmid [ [ classname | JARfilename | &quot;Unknown&quot;] [ arg* ] [ jvmarg* ] ]
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">lvmid [ [ classname | JARfilename | &#34;Unknown&#34;] [ arg* ] [ jvmarg* ] ]</pre></td></tr></table>
+</div>
+</div>
 <p>For example,</p>
-
-<pre><code>$ jps
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ jps
 32515 LogPuller
 17461 SparkServerKt
 17770 SparkServerKt
@@ -178,9 +199,9 @@
 893 MainKt
 26991 Logmgr
 26303 LogAdmin
-6703 jar
-</code></pre>
-
+6703 jar</pre></td></tr></table>
+</div>
+</div>
 <p>The utility lists the virtual machines for which the user has access rights. This is determined by <strong>access-control mechanisms specific to the operating system</strong>. On Oracle Solaris operating system, for example, if a non-root user executes the jps utility, then the output is a list of the virtual machines that were started with that user&rsquo;s uid.</p>
 
 <p>If the jps command is run without specifying a <code>hostid</code>, then it searches for instrumented JVMs on the local host. If started with a <code>hostid</code>, then it searches for JVMs on the indicated host, using the specified protocol and port. A <code>jstatd</code> process is assumed to be running on the target host.</p>
@@ -188,13 +209,69 @@
 <h1 id="jmap"><code>jmap</code></h1>
 
 <p>This utility can obtain memory map information, including a heap histogram, from a Java process, a core file, or a remote debug server.</p>
-
-<pre><code>jmap [ options ] pid
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">jmap [ options ] pid
 jmap [ options ] executable core
-jmap [ options ] [ pid ] server-id@ ] remote-hostname-or-IP
-</code></pre>
-
-<pre><code>$ jmap -heap 32515
+jmap [ options ] [ pid ] server-id@ ] remote-hostname-or-IP</pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ jmap -heap 32515
 Attaching to process ID 32515, please wait...
 Debugger attached successfully.
 Server compiler detected.
@@ -240,9 +317,9 @@ PS Old Generation
    free     = 897012248 (855.4575424194336MB)
    84.33658257952149% used
 
-15987 interned Strings occupying 1405880 bytes.
-</code></pre>
-
+15987 interned Strings occupying 1405880 bytes.</pre></td></tr></table>
+</div>
+</div>
 <p>The <code>-heap</code> option is used to obtain the following Java heap information:</p>
 
 <ul>
@@ -256,8 +333,52 @@ PS Old Generation
 <p>The <code>jstack</code> command-line utility attaches to the specified process or core file and prints the stack traces of all threads that are attached to the virtual machine, including Java threads and VM internal threads, and optionally native stack frames. The utility also performs deadlock detection.</p>
 
 <p>The utility can also use the jsadebugd daemon to query a process or core file on a remote machine.</p>
-
-<pre><code>$ jstack -F 8321
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ jstack -F 8321
 Attaching to process ID 8321, please wait...
 Debugger attached successfully.
 Client compiler detected.
@@ -267,12 +388,12 @@ Deadlock Detection:
 Found one Java-level deadlock:
 =============================
 
-&quot;Thread2&quot;:
+&#34;Thread2&#34;:
   waiting to lock Monitor@0x000af398 (Object@0xf819aa10, a java/lang/String),
-  which is held by &quot;Thread1&quot;
-&quot;Thread1&quot;:
+  which is held by &#34;Thread1&#34;
+&#34;Thread1&#34;:
   waiting to lock Monitor@0x000af400 (Object@0xf819aa48, a java/lang/String),
-  which is held by &quot;Thread2&quot;
+  which is held by &#34;Thread2&#34;
 
 Found a total of 1 deadlock.
 
@@ -297,16 +418,28 @@ Thread t@4: (state = BLOCKED)
  - java.lang.Object.wait(long) @bci=0 (Interpreted frame)
  - java.lang.Object.wait(long) @bci=0 (Interpreted frame)
  - java.lang.Object.wait() @bci=2, line=485 (Interpreted frame)
- - java.lang.ref.Reference$ReferenceHandler.run() @bci=46, line=116 (Interpreted frame)
-</code></pre>
-
+ - java.lang.ref.Reference$ReferenceHandler.run() @bci=46, line=116 (Interpreted frame)</pre></td></tr></table>
+</div>
+</div>
 <h1 id="jstat"><code>jstat</code></h1>
 
 <p>This utility uses the built-in instrumentation in Java to provide information about performance and resource consumption of running applications. The tool can be used when diagnosing performance issues, especially those related to heap sizing and garbage collection.</p>
 
 <p>The jstat utility does not require the VM to be started with any special options. The built-in instrumentation in the Java HotSpot VM is enabled by default.</p>
-
-<pre><code>$ jstat -gcutil 2834 250 7
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ jstat -gcutil 2834 250 7
   S0     S1     E      O      M     YGC     YGCT    FGC    FGCT     GCT   
   0.00  99.74  13.49   7.86  95.82      3    0.124     0    0.000    0.124
   0.00  99.74  13.49   7.86  95.82      3    0.124     0    0.000    0.124
@@ -314,9 +447,9 @@ Thread t@4: (state = BLOCKED)
   0.00  99.74  13.49   7.86  95.82      3    0.124     0    0.000    0.124
   0.00  99.74  13.49   7.86  95.82      3    0.124     0    0.000    0.124
   0.00  99.74  13.49   7.86  95.82      3    0.124     0    0.000    0.124
-  0.00  99.74  13.49   7.86  95.82      3    0.124     0    0.000    0.124
-</code></pre>
-
+  0.00  99.74  13.49   7.86  95.82      3    0.124     0    0.000    0.124</pre></td></tr></table>
+</div>
+</div>
 <h1 id="jcmd"><code>jcmd</code></h1>
 
 <p>The <code>jcmd</code> utility is used to send diagnostic command requests to the JVM, where these requests are useful for controlling Java Flight Recordings. The JFRs are used to troubleshoot and diagnose JVM and Java Applications with flight recording events.</p>

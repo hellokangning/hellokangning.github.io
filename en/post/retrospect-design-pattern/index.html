@@ -55,7 +55,7 @@
 
 <meta itemprop="datePublished" content="2018-08-13T15:24:26&#43;08:00" />
 <meta itemprop="dateModified" content="2018-08-13T15:24:26&#43;08:00" />
-<meta itemprop="wordCount" content="1295">
+<meta itemprop="wordCount" content="1850">
 
 
 
@@ -138,8 +138,8 @@
         <div class="post-category">
             <a href="/en/categories/programming/"> Programming </a>
             </div>
-          <span class="more-meta"> 1295 words </span>
-          <span class="more-meta"> 7 mins read </span>
+          <span class="more-meta"> 1850 words </span>
+          <span class="more-meta"> 9 mins read </span>
         
       </div>
     </header>
@@ -197,39 +197,72 @@
 </ul>
 
 <p><img src="/images/design-pattern-factory.png" alt="" /></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span>
 
-<pre><code class="language-python">from abc import ABCMeta, abstractmethod
+<span class="k">class</span> <span class="nc">Shape</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
 
-class Shape(metaclass=ABCMeta):
-    @abstractmethod
-    def op(self):
-        pass
+<span class="k">class</span> <span class="nc">Triangle</span><span class="p">(</span><span class="n">Shape</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&#34;triangle&#34;</span><span class="p">)</span>
 
-class Triangle(Shape):
-    def op(self):
-        print(&quot;triangle&quot;)
+<span class="k">class</span> <span class="nc">Circle</span><span class="p">(</span><span class="n">Shape</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&#34;circle&#34;</span><span class="p">)</span>
 
-class Circle(Shape):
-    def op(self):
-        print(&quot;circle&quot;)
+<span class="k">class</span> <span class="nc">Factory</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getInstance</span><span class="p">()</span>
 
-class Factory(metaclass=ABCMeta):
-    def __init__(self):
-        self.shape = self.getInstance()
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">getInstance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
 
-    @abstractmethod
-    def getInstance(self):
-        pass
+<span class="k">class</span> <span class="nc">ConcreteFactoryA</span><span class="p">(</span><span class="n">Factory</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">getInstance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Triangle</span><span class="p">()</span>
 
-class ConcreteFactoryA(Factory):
-    def getInstance(self):
-        return Triangle()
-
-class ConcreteFactoryB(Factory):
-    def getInstance(self):
-        return Circle()
-</code></pre>
-
+<span class="k">class</span> <span class="nc">ConcreteFactoryB</span><span class="p">(</span><span class="n">Factory</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">getInstance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Circle</span><span class="p">()</span></code></pre></td></tr></table>
+</div>
+</div>
 <h2 id="abstract-factory">Abstract Factory</h2>
 
 <ul>
@@ -238,49 +271,92 @@ class ConcreteFactoryB(Factory):
 </ul>
 
 <p><img src="/images/design-pattern-abstract-factory.png" alt="" /></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span>
 
-<pre><code class="language-python">from abc import ABCMeta, abstractmethod
+<span class="k">class</span> <span class="nc">Shape</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
 
-class Shape(metaclass=ABCMeta):
-    @abstractmethod
-    def op(self):
-        pass
+<span class="k">class</span> <span class="nc">Triangle</span><span class="p">(</span><span class="n">Shape</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&#34;triangle&#34;</span><span class="p">)</span>
 
-class Triangle(Shape):
-    def op(self):
-        print(&quot;triangle&quot;)
+<span class="k">class</span> <span class="nc">Color</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
 
-class Color(metaclass=ABCMeta):
-    @abstractmethod
-    def op(self):
-        pass
+<span class="k">class</span> <span class="nc">Red</span><span class="p">(</span><span class="n">Color</span><span class="p">):</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&#34;red&#34;</span><span class="p">)</span>
 
-class Red(Color):
-    @abstractmethod
-    def op(self):
-        print(&quot;red&quot;)
+<span class="k">class</span> <span class="nc">Factory</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getInstance</span><span class="p">()</span>
 
-class Factory(metaclass=ABCMeta):
-    def __init__(self):
-        self.shape = self.getInstance()
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">getShape</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
 
-    @abstractmethod
-    def getShape(self):
-        pass
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">getColor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
 
-    @abstractmethod
-    def getColor(self):
-        pass
+<span class="k">class</span> <span class="nc">ShapeFactory</span><span class="p">(</span><span class="n">Factory</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">getShape</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Triangle</span><span class="p">()</span>
 
-class ShapeFactory(Factory):
-    def getShape(self):
-        return Triangle()
-
-class ColorFactory(Factory):
-    def getColor(self):
-        return Red()
-</code></pre>
-
+<span class="k">class</span> <span class="nc">ColorFactory</span><span class="p">(</span><span class="n">Factory</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">getColor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Red</span><span class="p">()</span></code></pre></td></tr></table>
+</div>
+</div>
 <h2 id="builder">Builder</h2>
 
 <ul>
@@ -288,39 +364,72 @@ class ColorFactory(Factory):
 </ul>
 
 <p><img src="/images/design-pattern-builder.png" alt="" /></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Director</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_builder</span> <span class="o">=</span> <span class="bp">None</span>
 
-<pre><code class="language-python">class Director:
-    def __init__(self):
-        self._builder = None
+    <span class="k">def</span> <span class="nf">construct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">builder</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_builder</span> <span class="o">=</span> <span class="n">builder</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_builder</span><span class="o">.</span><span class="n">buildPartA</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_builder</span><span class="o">.</span><span class="n">buildPartB</span><span class="p">()</span>
 
-    def construct(self, builder):
-        self._builder = builder
-        self._builder.buildPartA()
-        self._builder.buildPartB()
+<span class="k">class</span> <span class="nc">Builder</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">product</span> <span class="o">=</span> <span class="n">Product</span><span class="p">()</span>
 
-class Builder(metaclass=ABCMeta):
-    def __init__(self):
-        self.product = Product()
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">buildPartA</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
 
-    @abstractmethod
-    def buildPartA(self):
-        pass
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">buildPartB</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
 
-    @abstractmethod
-    def buildPartB(self):
-        pass
+<span class="k">class</span> <span class="nc">ConcreteBuilder</span><span class="p">(</span><span class="n">Builder</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">buildPartA</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
 
-class ConcreteBuilder(Builder):
-    def buildPartA(self):
-        pass
+    <span class="k">def</span> <span class="nf">buildPartB</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
 
-    def buildPartB(self):
-        pass
-
-class Product:
-    pass
-</code></pre>
-
+<span class="k">class</span> <span class="nc">Product</span><span class="p">:</span>
+    <span class="k">pass</span></code></pre></td></tr></table>
+</div>
+</div>
 <h2 id="singleton">Singleton</h2>
 
 <ul>
@@ -330,18 +439,30 @@ class Product:
 </ul>
 
 <p><img src="/images/design-pattern-singleton.png" alt="" /></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Singleton</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">attrs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">attrs</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">_instance</span> <span class="o">=</span> <span class="bp">None</span>
 
-<pre><code class="language-python">class Singleton(type):
-    def __init__(cls, name, bases, attrs, **kwargs):
-        super().__init__(name, bases, attrs)
-        cls._instance = None
-
-    def __call__(cls, *args, **kwargs):
-        if cls._instance is None:
-            cls._instance = super().__call__(*args, **kwargs)
-        return cls._instance
-</code></pre>
-
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_instance</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">_instance</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__call__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_instance</span></code></pre></td></tr></table>
+</div>
+</div>
 <h2 id="prototype">Prototype</h2>
 
 <ul>
@@ -350,21 +471,36 @@ class Product:
 </ul>
 
 <p><img src="/images/design-pattern-prototype.png" alt="" /></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">copy</span>
 
-<pre><code class="language-python">import copy
+<span class="k">class</span> <span class="nc">Prototype</span><span class="p">:</span>
+    <span class="s2">&#34;&#34;&#34;
+</span><span class="s2">    Example class to be copied.
+</span><span class="s2">    &#34;&#34;&#34;</span>
 
-class Prototype:
-    &quot;&quot;&quot;
-    Example class to be copied.
-    &quot;&quot;&quot;
+    <span class="k">pass</span>
 
-    pass
-
-def main():
-    prototype = Prototype()
-    prototype_copy = copy.deepcopy(prototype)
-</code></pre>
-
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">prototype</span> <span class="o">=</span> <span class="n">Prototype</span><span class="p">()</span>
+    <span class="n">prototype_copy</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">prototype</span><span class="p">)</span></code></pre></td></tr></table>
+</div>
+</div>
 <h1 id="structural-pattern">Structural Pattern</h1>
 
 <h2 id="adapter">Adapter</h2>
@@ -375,26 +511,46 @@ def main():
 </ul>
 
 <p><img src="/images/design-pattern-adapter.png" alt="" /></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span>
 
-<pre><code class="language-python">from abc import ABCMeta, abstractmethod
+<span class="k">class</span> <span class="nc">Shape</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">display</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">):</span>
+        <span class="k">pass</span>
 
-class Shape(metaclass=ABCMeta):
-    @abstractmethod
-    def display(self, x1, y1, x2, y2):
-        pass
+<span class="k">class</span> <span class="nc">Rectangle</span><span class="p">(</span><span class="n">Shape</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_adaptee</span> <span class="o">=</span> <span class="n">LegacyRectangle</span><span class="p">()</span>
 
-class Rectangle(Shape):
-    def __init__(self):
-        self._adaptee = LegacyRectangle()
+    <span class="k">def</span> <span class="nf">display</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_adaptee</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="o">-</span><span class="n">x1</span><span class="p">,</span> <span class="n">y2</span><span class="o">-</span><span class="n">y1</span><span class="p">)</span>
 
-    def display(self, x1, y1, x2, y2):
-        self._adaptee.display(x1, y1, x2-x1, y2-y1)
-
-class LegacyRectangle:
-    def display(self, x1, y1, w, h):
-        pass
-</code></pre>
-
+<span class="k">class</span> <span class="nc">LegacyRectangle</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">display</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">):</span>
+        <span class="k">pass</span></code></pre></td></tr></table>
+</div>
+</div>
 <h2 id="bridge">Bridge</h2>
 
 <ul>
@@ -403,26 +559,46 @@ class LegacyRectangle:
 </ul>
 
 <p><img src="/images/design-pattern-bridge.png" alt="" /></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">abstractmethod</span><span class="p">,</span> <span class="n">ABCMeta</span>
 
-<pre><code class="language-python">from abc import abstractmethod, ABCMeta
+<span class="k">class</span> <span class="nc">Shape</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">api</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_api</span> <span class="o">=</span> <span class="n">api</span>
 
-class Shape:
-    def __init__(self, api):
-        self._api = api
+    <span class="k">def</span> <span class="nf">draw</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="o">.</span><span class="n">drawCircle</span><span class="p">()</span>
 
-    def draw(self):
-        self._api.drawCircle()
+<span class="k">class</span> <span class="nc">DrawAPI</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">drawCircle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
 
-class DrawAPI(metaclass=ABCMeta):
-    @abstractmethod
-    def drawCircle(self):
-        pass
-
-class RedCircle(DrawAPI):
-    def drawCircle(self):
-        pass
-</code></pre>
-
+<span class="k">class</span> <span class="nc">RedCircle</span><span class="p">(</span><span class="n">DrawAPI</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">drawCircle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></code></pre></td></tr></table>
+</div>
+</div>
 <h2 id="composite">Composite</h2>
 
 <ul>
@@ -431,33 +607,60 @@ class RedCircle(DrawAPI):
 </ul>
 
 <p><img src="/images/design-pattern-composite.png" alt="" /></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">abstractmethod</span><span class="p">,</span> <span class="n">ABCMeta</span>
 
-<pre><code class="language-python">from abc import abstractmethod, ABCMeta
+<span class="k">class</span> <span class="nc">Component</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">do</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
 
-class Component(metaclass=ABCMeta):
-    @abstractmethod
-    def do(self):
-        pass
+<span class="k">class</span> <span class="nc">Composite</span><span class="p">(</span><span class="n">Component</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_children</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
 
-class Composite(Component):
-    def __init__(self):
-        self._children = set()
+    <span class="k">def</span> <span class="nf">do</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_children</span><span class="p">:</span>
+            <span class="n">child</span><span class="o">.</span><span class="n">do</span><span class="p">()</span>
 
-    def do(self):
-        for child in self._children:
-            child.do()
+    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">component</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_children</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">component</span><span class="p">)</span>
 
-    def add(self, component):
-        self._children.add(component)
+    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">component</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_children</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="n">component</span><span class="p">)</span>
 
-    def remove(self, component):
-        self._children.discard(component)
-
-class Leaf(Component):
-    def do(self):
-        pass
-</code></pre>
-
+<span class="k">class</span> <span class="nc">Leaf</span><span class="p">(</span><span class="n">Component</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">do</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></code></pre></td></tr></table>
+</div>
+</div>
 <h2 id="decorator">Decorator</h2>
 
 <ul>
@@ -467,36 +670,66 @@ class Leaf(Component):
 </ul>
 
 <p><img src="/images/design-pattern-decorator.png" alt="" /></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">abstractmethod</span><span class="p">,</span> <span class="n">ABCMeta</span>
 
-<pre><code class="language-python">from abc import abstractmethod, ABCMeta
+<span class="k">class</span> <span class="nc">Shape</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">draw</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
 
-class Shape(metaclass=ABCMeta):
-    @abstractmethod
-    def draw(self):
-        pass
+<span class="k">class</span> <span class="nc">ShapeDecorator</span><span class="p">(</span><span class="n">Shape</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shape</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_shape</span><span class="o">=</span> <span class="n">shape</span>
 
-class ShapeDecorator(Shape, metaclass=ABCMeta):
-    def __init__(self, shape):
-        self._shape= shape
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">operation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
 
-    @abstractmethod
-    def operation(self):
-        pass
+<span class="k">class</span> <span class="nc">RedShapeDecorator</span><span class="p">(</span><span class="n">ShapeDecorator</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">operation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_shape</span><span class="o">.</span><span class="n">operation</span><span class="p">()</span>
 
-class RedShapeDecorator(ShapeDecorator):
-    def operation(self):
-        self._shape.operation()
+<span class="k">class</span> <span class="nc">Circle</span><span class="p">(</span><span class="n">Shape</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">operation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
 
-class Circle(Shape):
-    def operation(self):
-        pass
-
-def main():
-    cc = Circle()
-    decorator = RedShapeDecorator(cc)
-    decorator.operation()
-</code></pre>
-
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">cc</span> <span class="o">=</span> <span class="n">Circle</span><span class="p">()</span>
+    <span class="n">decorator</span> <span class="o">=</span> <span class="n">RedShapeDecorator</span><span class="p">(</span><span class="n">cc</span><span class="p">)</span>
+    <span class="n">decorator</span><span class="o">.</span><span class="n">operation</span><span class="p">()</span></code></pre></td></tr></table>
+</div>
+</div>
 <h2 id="facade">Facade</h2>
 
 <ul>
@@ -505,38 +738,70 @@ def main():
 </ul>
 
 <p><img src="/images/design-pattern-facade.png" alt="" /></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Facade</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_subsystem_1</span> <span class="o">=</span> <span class="n">Subsystem1</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_subsystem_2</span> <span class="o">=</span> <span class="n">Subsystem2</span><span class="p">()</span>
 
-<pre><code class="language-python">class Facade:
-    def __init__(self):
-        self._subsystem_1 = Subsystem1()
-        self._subsystem_2 = Subsystem2()
+    <span class="k">def</span> <span class="nf">operation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_subsystem_1</span><span class="o">.</span><span class="n">operation1</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_subsystem_1</span><span class="o">.</span><span class="n">operation2</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_subsystem_2</span><span class="o">.</span><span class="n">operation1</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_subsystem_2</span><span class="o">.</span><span class="n">operation2</span><span class="p">()</span>
 
-    def operation(self):
-        self._subsystem_1.operation1()
-        self._subsystem_1.operation2()
-        self._subsystem_2.operation1()
-        self._subsystem_2.operation2()
+<span class="k">class</span> <span class="nc">Subsystem1</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">operation1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
 
-class Subsystem1:
-    def operation1(self):
-        pass
+    <span class="k">def</span> <span class="nf">operation2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
 
-    def operation2(self):
-        pass
+<span class="k">class</span> <span class="nc">Subsystem2</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">operation1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
 
-class Subsystem2:
-    def operation1(self):
-        pass
-
-    def operation2(self):
-        pass
+    <span class="k">def</span> <span class="nf">operation2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
 
 
-def main():
-    facade = Facade()
-    facade.operation()
-</code></pre>
-
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">facade</span> <span class="o">=</span> <span class="n">Facade</span><span class="p">()</span>
+    <span class="n">facade</span><span class="o">.</span><span class="n">operation</span><span class="p">()</span></code></pre></td></tr></table>
+</div>
+</div>
 <h2 id="flyweight">Flyweight</h2>
 
 <ul>
@@ -544,40 +809,74 @@ def main():
 </ul>
 
 <p><img src="/images/design-pattern-flyweight.png" alt="" /></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span>
 
-<pre><code class="language-python">from abc import ABCMeta, abstractmethod
+<span class="k">class</span> <span class="nc">ShapeFactory</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_circleDict</span> <span class="o">=</span> <span class="p">{}</span>
 
-class ShapeFactory:
-    def __init__(self):
-        self._circleDict = {}
+    <span class="k">def</span> <span class="nf">getShape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_circleDict</span><span class="p">:</span>
+            <span class="n">circle</span> <span class="o">=</span> <span class="n">Circle</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_circleDict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">circle</span>
 
-    def getShape(self, key):
-        if key not in self._circleDict:
-            circle = Circle()
-            self._circleDict[key] = circle
-
-        return self._circleDict[key]
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_circleDict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
 
 
-class Shape(metaclass=ABCMeta):
-    def __init__(self):
-        self.intrinsic_state = None
+<span class="k">class</span> <span class="nc">Shape</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">intrinsic_state</span> <span class="o">=</span> <span class="bp">None</span>
 
-    @abstractmethod
-    def draw(self):
-        pass
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">draw</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
 
 
-class Circle(Shape):
-    def draw(self):
-        pass
+<span class="k">class</span> <span class="nc">Circle</span><span class="p">(</span><span class="n">Shape</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">draw</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
 
-def main():
-    factory = ShapeFactory()
-    concrete = factory.getShape(&quot;key&quot;)
-    concrete.draw()
-</code></pre>
-
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">factory</span> <span class="o">=</span> <span class="n">ShapeFactory</span><span class="p">()</span>
+    <span class="n">concrete</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">getShape</span><span class="p">(</span><span class="s2">&#34;key&#34;</span><span class="p">)</span>
+    <span class="n">concrete</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span></code></pre></td></tr></table>
+</div>
+</div>
 <h2 id="proxy">Proxy</h2>
 
 <ul>
@@ -586,32 +885,58 @@ def main():
 </ul>
 
 <p><img src="/images/design-pattern-proxy.png" alt="" /></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span>
 
-<pre><code class="language-python">from abc import ABCMeta, abstractmethod
+<span class="k">class</span> <span class="nc">Subject</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
 
-class Subject(metaclass=ABCMeta):
-    @abstractmethod
-    def op(self):
-        pass
+<span class="k">class</span> <span class="nc">Proxy</span><span class="p">(</span><span class="n">Subject</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">real_subject</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_real_subject</span> <span class="o">=</span> <span class="n">real_subject</span>
 
-class Proxy(Subject):
-    def __init__(self, real_subject):
-        self._real_subject = real_subject
-
-    def op(self):
-        self._real_subject.op()
+    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_real_subject</span><span class="o">.</span><span class="n">op</span><span class="p">()</span>
 
 
-class RealSubject(Subject):
-    def op(self):
-        print(&quot;real&quot;)
+<span class="k">class</span> <span class="nc">RealSubject</span><span class="p">(</span><span class="n">Subject</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&#34;real&#34;</span><span class="p">)</span>
 
-def main():
-    real_subject = RealSubject()
-    proxy = Proxy(real_subject)
-    proxy.op()
-</code></pre>
-
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">real_subject</span> <span class="o">=</span> <span class="n">RealSubject</span><span class="p">()</span>
+    <span class="n">proxy</span> <span class="o">=</span> <span class="n">Proxy</span><span class="p">(</span><span class="n">real_subject</span><span class="p">)</span>
+    <span class="n">proxy</span><span class="o">.</span><span class="n">op</span><span class="p">()</span></code></pre></td></tr></table>
+</div>
+</div>
 <h1 id="behavioral-pattern">Behavioral Pattern</h1>
 
 <h2 id="chain-of-responsibility">Chain of Responsibility</h2>
@@ -622,36 +947,66 @@ def main():
 </ul>
 
 <p><img src="/images/design-pattern-chain-of-responsibility.png" alt="" /></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Handler</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">next</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_next</span> <span class="o">=</span> <span class="nb">next</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_canHandle</span> <span class="o">=</span> <span class="bp">True</span>
 
-<pre><code class="language-python">class Handler(metaclass=ABCMeta):
-    def __init__(self, next=None):
-        self._next = next
-        self._canHandle = True
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
 
-    @abstractmethod
-    def handle(self):
-        pass
+<span class="k">class</span> <span class="nc">HandlerOne</span><span class="p">(</span><span class="n">Handler</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">handle_request</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">canHandle</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_next</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_next</span><span class="o">.</span><span class="n">handle</span><span class="p">()</span>
 
-class HandlerOne(Handler):
-    def handle_request(self):
-        if self.canHandle:
-            pass
-        elif self._next:
-            self._next.handle()
+<span class="k">class</span> <span class="nc">HandlerTwo</span><span class="p">(</span><span class="n">Handler</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_canHandle</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_next</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_next</span><span class="o">.</span><span class="n">handle</span><span class="p">()</span>
 
-class HandlerTwo(Handler):
-    def handle(self):
-        if self._canHandle:
-            pass
-        elif self._next:
-            self._next.handle()
-
-def main():
-    handler1 = HandlerOne()
-    handler2 = HandlerTwo(handler1)
-    handler2.handle()
-</code></pre>
-
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">handler1</span> <span class="o">=</span> <span class="n">HandlerOne</span><span class="p">()</span>
+    <span class="n">handler2</span> <span class="o">=</span> <span class="n">HandlerTwo</span><span class="p">(</span><span class="n">handler1</span><span class="p">)</span>
+    <span class="n">handler2</span><span class="o">.</span><span class="n">handle</span><span class="p">()</span></code></pre></td></tr></table>
+</div>
+</div>
 <h2 id="command">Command</h2>
 
 <ul>
@@ -660,42 +1015,78 @@ def main():
 </ul>
 
 <p><img src="/images/design-pattern-command.png" alt="" /></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Invoker</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_commands</span> <span class="o">=</span> <span class="p">[]</span>
 
-<pre><code class="language-python">class Invoker:
-    def __init__(self):
-        self._commands = []
+    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_commands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
 
-    def add(self, command):
-        self._commands.append(command)
+    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">command</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_commands</span><span class="p">:</span>
+            <span class="n">command</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
 
-    def call(self):
-        for command in self._commands:
-            command.execute()
+<span class="k">class</span> <span class="nc">Command</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">receiver</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_receiver</span> <span class="o">=</span> <span class="n">receiver</span>
 
-class Command(metaclass=ABCMeta):
-    def __init__(self, receiver):
-        self._receiver = receiver
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
 
-    @abstractmethod
-    def execute(self):
-        pass
+<span class="k">class</span> <span class="nc">ConcreteCommand</span><span class="p">(</span><span class="n">Command</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_receiver</span><span class="o">.</span><span class="n">action</span><span class="p">()</span>
 
-class ConcreteCommand(Command):
-    def execute(self):
-        self._receiver.action()
+<span class="k">class</span> <span class="nc">Receiver</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">action</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
 
-class Receiver:
-    def action(self):
-        pass
-
-def main():
-    receiver = Receiver()
-    cmd = ConcreteCommand(receiver)
-    invoker = Invoker()
-    invoker.add(cmd)
-    invoker.call()
-</code></pre>
-
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">receiver</span> <span class="o">=</span> <span class="n">Receiver</span><span class="p">()</span>
+    <span class="n">cmd</span> <span class="o">=</span> <span class="n">ConcreteCommand</span><span class="p">(</span><span class="n">receiver</span><span class="p">)</span>
+    <span class="n">invoker</span> <span class="o">=</span> <span class="n">Invoker</span><span class="p">()</span>
+    <span class="n">invoker</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+    <span class="n">invoker</span><span class="o">.</span><span class="n">call</span><span class="p">()</span></code></pre></td></tr></table>
+</div>
+</div>
 <h2 id="mediator">Mediator</h2>
 
 <ul>
@@ -704,56 +1095,106 @@ def main():
 </ul>
 
 <p><img src="/images/design-pattern-mediator.png" alt="" /></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span>
 
-<pre><code class="language-python">from abc import ABCMeta, abstractmethod
+<span class="k">class</span> <span class="nc">Mediator</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_colleagues</span> <span class="o">=</span> <span class="p">{}</span>
 
-class Mediator(metaclass=ABCMeta):
-    def __init__(self):
-        self._colleagues = {}
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">register</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">colleague</span><span class="p">):</span>
+        <span class="k">pass</span>
 
-    @abstractmethod
-    def register(self, colleague):
-        pass
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
 
-    @abstractmethod
-    def op(self):
-        pass
+<span class="k">class</span> <span class="nc">ConcreteMediator</span><span class="p">(</span><span class="n">Mediator</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">register</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">colleague</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_colleagues</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">colleague</span><span class="p">)</span>
+        <span class="n">colleague</span><span class="o">.</span><span class="n">setMeidator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-class ConcreteMediator(Mediator):
-    def register(self, colleague):
-        self._colleagues.append(colleague)
-        colleague.setMeidator(self)
+<span class="k">class</span> <span class="nc">Colleague</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mediator</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mediator</span> <span class="o">=</span> <span class="n">mediator</span>
 
-class Colleague(metaclass=ABCMeta):
-    def __init__(self, mediator=None):
-        self._mediator = mediator
+    <span class="k">def</span> <span class="nf">setMediator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mediator</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mediator</span> <span class="o">=</span> <span class="n">mediator</span>
 
-    def setMediator(self, mediator):
-        self._mediator = mediator
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
 
-    @abstractmethod
-    def op(self):
-        pass
+<span class="k">class</span> <span class="nc">ColleagueA</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
 
-class ColleagueA:
-    def op(self):
-        pass
+<span class="k">class</span> <span class="nc">ColleagueB</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
 
-class ColleagueB:
-    def op(self):
-        pass
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">c1</span> <span class="o">=</span> <span class="n">ColleagueA</span><span class="p">()</span>
+    <span class="n">c2</span> <span class="o">=</span> <span class="n">ColleagueB</span><span class="p">()</span>
+    <span class="n">mediator</span> <span class="o">=</span> <span class="n">ConcreteMediator</span><span class="p">()</span>
+    <span class="n">mediator</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">c1</span><span class="p">)</span>
+    <span class="n">mediator</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">c2</span><span class="p">)</span>
 
-def main():
-    c1 = ColleagueA()
-    c2 = ColleagueB()
-    mediator = ConcreteMediator()
-    mediator.register(c1)
-    mediator.register(c2)
-
-    c1.op()
-    c2.op()
-</code></pre>
-
+    <span class="n">c1</span><span class="o">.</span><span class="n">op</span><span class="p">()</span>
+    <span class="n">c2</span><span class="o">.</span><span class="n">op</span><span class="p">()</span></code></pre></td></tr></table>
+</div>
+</div>
 <h2 id="memento">Memento</h2>
 
 <ul>
@@ -762,47 +1203,88 @@ def main():
 </ul>
 
 <p><img src="/images/design-pattern-memento.png" alt="" /></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Memnto</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="o">=</span> <span class="n">state</span>
 
-<pre><code class="language-python">class Memnto:
-    def __init__(self, state=None):
-        self._state = state
+    <span class="k">def</span> <span class="nf">getState</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state</span>
 
-    def getState(self):
-        return self._state
+<span class="k">class</span> <span class="nc">Originator</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="o">=</span> <span class="n">state</span>
 
-class Originator:
-    def __init__(self, state=None):
-        self._state = state
+    <span class="k">def</span> <span class="nf">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="o">=</span> <span class="n">state</span>
 
-    def setState(self, state):
-        self._state = state
+    <span class="k">def</span> <span class="nf">getStateFromMemento</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">memento</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="o">=</span> <span class="n">memento</span><span class="o">.</span><span class="n">getState</span><span class="p">()</span>
 
-    def getStateFromMemento(self, memento):
-        self._state = memento.getState()
+    <span class="k">def</span> <span class="nf">createMemento</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Memnto</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_state</span><span class="p">)</span>
 
-    def createMemento(self):
-        return Memnto(self._state)
+<span class="k">class</span> <span class="nc">CareTaker</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mem</span> <span class="o">=</span> <span class="p">[]</span>
 
-class CareTaker:
-    def __init__(self):
-        self._mem = []
+    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mem</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 
-    def add(self, state):
-        self._mem.append(state)
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mem</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mem</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">originator</span> <span class="o">=</span> <span class="n">Originator</span><span class="p">()</span>
+    <span class="n">taker</span> <span class="o">=</span> <span class="n">CareTaker</span><span class="p">()</span>
 
-    def get(self, index):
-        if index &lt; len(self._mem):
-            return self._mem[index]
-def main():
-    originator = Originator()
-    taker = CareTaker()
+    <span class="n">originator</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">taker</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">originator</span><span class="o">.</span><span class="n">createMemento</span><span class="p">())</span>
 
-    originator.setState(True)
-    taker.add(originator.createMemento())
-
-    originator.getStateFromMemento(taker.get(0))
-</code></pre>
-
+    <span class="n">originator</span><span class="o">.</span><span class="n">getStateFromMemento</span><span class="p">(</span><span class="n">taker</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span></code></pre></td></tr></table>
+</div>
+</div>
 <h2 id="observer">Observer</h2>
 
 <ul>
@@ -811,48 +1293,90 @@ def main():
 </ul>
 
 <p><img src="/images/design-pattern-observer.png" alt="" /></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Subject</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_obList</span> <span class="o">=</span> <span class="p">[]</span>
 
-<pre><code class="language-python">class Subject:
-    def __init__(self):
-        self._state = None
-        self._obList = []
+    <span class="k">def</span> <span class="nf">attach</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">observer</span><span class="p">):</span>
+        <span class="n">observer</span><span class="o">.</span><span class="n">_subject</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_obList</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">observer</span><span class="p">)</span>
 
-    def attach(self, observer):
-        observer._subject = self
-        self._obList.add(observer)
+    <span class="k">def</span> <span class="nf">detach</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">observer</span><span class="p">):</span>
+        <span class="n">observer</span><span class="o">.</span><span class="n">_subject</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_obList</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="n">observer</span><span class="p">)</span>
 
-    def detach(self, observer):
-        observer._subject = None
-        self._obList.discard(observer)
+    <span class="k">def</span> <span class="nf">_notify</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">observer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obList</span><span class="p">:</span>
+            <span class="n">observer</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_state</span><span class="p">)</span>
 
-    def _notify(self):
-        for observer in self._obList:
-            observer.update(self._state)
+    <span class="k">def</span> <span class="nf">updateState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="o">=</span> <span class="n">state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_notify</span><span class="p">()</span>
 
-    def updateState(self, state):
-        self._state = state
-        self._notify()
+<span class="k">class</span> <span class="nc">Observer</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_subject</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="o">=</span> <span class="bp">None</span>
 
-class Observer(metaclass=ABCMeta):
-    def __init__(self):
-        self._subject = None
-        self._state = None
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="p">):</span>
+        <span class="k">pass</span>
 
-    @abstractmethod
-    def update(self, arg):
-        pass
+<span class="k">class</span> <span class="nc">ConcreteObserver</span><span class="p">(</span><span class="n">Observer</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="o">=</span> <span class="n">state</span>
 
-class ConcreteObserver(Observer):
-    def update(self, state):
-        self._state = state
-
-def main():
-    subject = Subject()
-    observer =  ConcreteObserver()
-    subject.attach(observer)
-    subject.updateState(123)
-</code></pre>
-
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">subject</span> <span class="o">=</span> <span class="n">Subject</span><span class="p">()</span>
+    <span class="n">observer</span> <span class="o">=</span>  <span class="n">ConcreteObserver</span><span class="p">()</span>
+    <span class="n">subject</span><span class="o">.</span><span class="n">attach</span><span class="p">(</span><span class="n">observer</span><span class="p">)</span>
+    <span class="n">subject</span><span class="o">.</span><span class="n">updateState</span><span class="p">(</span><span class="mi">123</span><span class="p">)</span></code></pre></td></tr></table>
+</div>
+</div>
 <h2 id="state">State</h2>
 
 <ul>
@@ -861,33 +1385,60 @@ def main():
 </ul>
 
 <p><img src="/images/design-pattern-state.png" alt="" /></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Context</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="o">=</span> <span class="n">state</span>
 
-<pre><code class="language-python">class Context:
-    def __init__(self, state):
-        self._state = state
+    <span class="k">def</span> <span class="nf">request</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_state</span><span class="o">.</span><span class="n">handle</span><span class="p">()</span>
 
-    def request(self):
-        self._state.handle()
+<span class="k">class</span> <span class="nc">State</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
 
-class State(metaclass=ABCMeta):
-    @abstractmethod
-    def handle(self):
-        pass
+<span class="k">class</span> <span class="nc">ConcreteStateA</span><span class="p">(</span><span class="n">State</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
 
-class ConcreteStateA(State):
-    def handle(self):
-        pass
+<span class="k">class</span> <span class="nc">ConcreteStateB</span><span class="p">(</span><span class="n">State</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
 
-class ConcreteStateB(State):
-    def handle(self):
-        pass
-
-def main():
-    state = ConcreteStateA()
-    context = Context(state)
-    context.request()
-</code></pre>
-
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">state</span> <span class="o">=</span> <span class="n">ConcreteStateA</span><span class="p">()</span>
+    <span class="n">context</span> <span class="o">=</span> <span class="n">Context</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+    <span class="n">context</span><span class="o">.</span><span class="n">request</span><span class="p">()</span></code></pre></td></tr></table>
+</div>
+</div>
 <h2 id="strategy">Strategy</h2>
 
 <ul>
@@ -896,34 +1447,62 @@ def main():
 </ul>
 
 <p><img src="/images/design-pattern-strategy.png" alt="" /></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Context</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strategy</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_strategy</span> <span class="o">=</span> <span class="n">strategy</span>
 
-<pre><code class="language-python">class Context:
-    def __init__(self, strategy):
-        self._strategy = strategy
-
-    def algorithm(self):
-        self._strategy.algorithm()
+    <span class="k">def</span> <span class="nf">algorithm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_strategy</span><span class="o">.</span><span class="n">algorithm</span><span class="p">()</span>
 
 
-class Strategy(metaclass=ABCMeta):
-    @abstractmethod
-    def algorithm(self):
-        pass
+<span class="k">class</span> <span class="nc">Strategy</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">algorithm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
 
-class ConcreteStrategyA(Strategy):
-    def algorithm(self):
-        pass
+<span class="k">class</span> <span class="nc">ConcreteStrategyA</span><span class="p">(</span><span class="n">Strategy</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">algorithm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
 
-class ConcreteStrategyB(Strategy):
-    def algorithm(self):
-        pass
+<span class="k">class</span> <span class="nc">ConcreteStrategyB</span><span class="p">(</span><span class="n">Strategy</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">algorithm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
 
-def main():
-    strategy = ConcreteStrategyA()
-    context = Context(strategy)
-    context.algorithm()
-</code></pre>
-
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">strategy</span> <span class="o">=</span> <span class="n">ConcreteStrategyA</span><span class="p">()</span>
+    <span class="n">context</span> <span class="o">=</span> <span class="n">Context</span><span class="p">(</span><span class="n">strategy</span><span class="p">)</span>
+    <span class="n">context</span><span class="o">.</span><span class="n">algorithm</span><span class="p">()</span></code></pre></td></tr></table>
+</div>
+</div>
 <h2 id="visitor">Visitor</h2>
 
 <ul>
@@ -932,42 +1511,78 @@ def main():
 </ul>
 
 <p><img src="/images/design-pattern-visitor.png" alt="" /></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Element</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">accept</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">visitor</span><span class="p">):</span>
+        <span class="k">pass</span>
 
-<pre><code class="language-python">class Element(metaclass=ABCMeta):
-    @abstractmethod
-    def accept(self, visitor):
-        pass
+<span class="k">class</span> <span class="nc">ConcreteElementA</span><span class="p">(</span><span class="n">Element</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">accept</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">visitor</span><span class="p">):</span>
+        <span class="n">visitor</span><span class="o">.</span><span class="n">visitA</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-class ConcreteElementA(Element):
-    def accept(self, visitor):
-        visitor.visitA(self)
+<span class="k">class</span> <span class="nc">ConcreteElementB</span><span class="p">(</span><span class="n">Element</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">accept</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">visitor</span><span class="p">):</span>
+        <span class="n">visitor</span><span class="o">.</span><span class="n">visitB</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-class ConcreteElementB(Element):
-    def accept(self, visitor):
-        visitor.visitB(self)
+<span class="k">class</span> <span class="nc">Visitor</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">visitA</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eleA</span><span class="p">):</span>
+        <span class="k">pass</span>
 
-class Visitor(metaclass=ABCMeta):
-    @abstractmethod
-    def visitA(self, eleA):
-        pass
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">visitB</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eleB</span><span class="p">):</span>
+        <span class="k">pass</span>
 
-    @abstractmethod
-    def visitB(self, eleB):
-        pass
+<span class="k">class</span> <span class="nc">ConcreteVisitorA</span><span class="p">(</span><span class="n">Visitor</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">visitA</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eleA</span><span class="p">):</span>
+        <span class="k">pass</span>
 
-class ConcreteVisitorA(Visitor):
-    def visitA(self, eleA):
-        pass
+    <span class="k">def</span> <span class="nf">visitB</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eleB</span><span class="p">):</span>
+        <span class="k">pass</span>
 
-    def visitB(self, eleB):
-        pass
-
-def main():
-    visitor = ConcreteVisitorA()
-    element = ConcreteElementA()
-    element.accept(visitor)
-</code></pre>
-
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">visitor</span> <span class="o">=</span> <span class="n">ConcreteVisitorA</span><span class="p">()</span>
+    <span class="n">element</span> <span class="o">=</span> <span class="n">ConcreteElementA</span><span class="p">()</span>
+    <span class="n">element</span><span class="o">.</span><span class="n">accept</span><span class="p">(</span><span class="n">visitor</span><span class="p">)</span></code></pre></td></tr></table>
+</div>
+</div>
 <p><strong>Reference</strong></p>
 
 <ul>
