@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Jedis 的常见异常 - Qing&#39;s Landing</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Guoqing Geng" /><meta name="description" content="最近在读的 Redis开发与运维，很好地总结了客户端的常见异常。这篇博客权且作为读书笔记。
+" /><meta name="keywords" content="elasticsearch, python, hbase, redis" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.52 with even 4.0.0" />
+
+
+<link rel="canonical" href="https://hellokangning.github.io/zh/post/exceptions-thrown-by-jedis/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.93844dae.min.css" rel="stylesheet">
+<link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+
+<meta property="og:title" content="Jedis 的常见异常" />
+<meta property="og:description" content="最近在读的 Redis开发与运维，很好地总结了客户端的常见异常。这篇博客权且作为读书笔记。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hellokangning.github.io/zh/post/exceptions-thrown-by-jedis/" /><meta property="article:published_time" content="2019-01-02T16:21:00&#43;08:00"/>
+<meta property="article:modified_time" content="2019-01-02T16:21:00&#43;08:00"/>
+
+<meta itemprop="name" content="Jedis 的常见异常">
+<meta itemprop="description" content="最近在读的 Redis开发与运维，很好地总结了客户端的常见异常。这篇博客权且作为读书笔记。">
+
+
+<meta itemprop="datePublished" content="2019-01-02T16:21:00&#43;08:00" />
+<meta itemprop="dateModified" content="2019-01-02T16:21:00&#43;08:00" />
+<meta itemprop="wordCount" content="975">
+
+
+
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Jedis 的常见异常"/>
+<meta name="twitter:description" content="最近在读的 Redis开发与运维，很好地总结了客户端的常见异常。这篇博客权且作为读书笔记。"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/zh/" class="logo">Qing&#39;s Landing</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/zh/">
+        <li class="mobile-menu-item">首页</li>
+      </a><a href="/zh/post/">
+        <li class="mobile-menu-item">归档</li>
+      </a><a href="/zh/categories/">
+        <li class="mobile-menu-item">分类</li>
+      </a><a href="/zh/tags/">
+        <li class="mobile-menu-item">标签</li>
+      </a><a href="/en/">
+        <li class="mobile-menu-item">EN</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/zh/" class="logo">Qing&#39;s Landing</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/zh/">首页</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/zh/post/">归档</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/zh/categories/">分类</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/zh/tags/">标签</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/en/">EN</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Jedis 的常见异常</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> Jan 02, 2019 </span>
+        <div class="post-category">
+            <a href="/zh/categories/redis/"> Redis </a>
+            </div>
+          <span class="more-meta"> 约 975 字 </span>
+          <span class="more-meta"> 预计阅读 2 分钟 </span>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+<ul>
+<li><a href="#无法从连接池获取到连接">无法从连接池获取到连接</a></li>
+<li><a href="#客户端读写超时">客户端读写超时</a></li>
+<li><a href="#客户端连接超时">客户端连接超时</a></li>
+<li><a href="#客户端缓冲区异常">客户端缓冲区异常</a></li>
+<li><a href="#redis-正在加载持久化文件">Redis 正在加载持久化文件</a></li>
+<li><a href="#redis-使用的内存超过-maxmemory-配置">Redis 使用的内存超过 <code>maxmemory</code> 配置</a></li>
+<li><a href="#客户端连接数过大">客户端连接数过大</a></li>
+</ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <p>最近在读的 <a href="https://book.douban.com/subject/26971561/">Redis开发与运维</a>，很好地总结了客户端的常见异常。这篇博客权且作为读书笔记。</p>
+
+<h1 id="无法从连接池获取到连接">无法从连接池获取到连接</h1>
+
+<p>JedisPool 中的 Jedis 对象个数默认是 8 个。如果有 8 个 Jedis 对象被占用，并且没有归还，此时调用者还要从 JedisPool 中借用 Jedis，就需要进行等待（例如设置了 <code>maxWaitMillis &gt; 0</code>），如果在 <code>maxWaitMillis</code> 时间内仍然无法获取到 Jedis 对象就会抛出如下异常：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">redis.clients.jedis.exceptions.JedisConnectionException: Could not get a resource
+from the pool
+…
+Caused by: java.util.NoSuchElementException: Timeout waiting for idle object
+at org.apache.commons.pool2.impl.GenericObjectPool.borrowObject(GenericObjectPool.
+java:449)</pre></td></tr></table>
+</div>
+</div>
+<p>另外一种情况，是设置了 <code>blockWhenExhausted = false</code>。调用者不会等待，直接抛出异常。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">redis.clients.jedis.exceptions.JedisConnectionException: Could not get a resource
+from the pool
+…
+Caused by: java.util.NoSuchElementException: Pool exhausted
+at org.apache.commons.pool2.impl.GenericObjectPool.borrowObject(GenericObjectPool.
+java:464)</pre></td></tr></table>
+</div>
+</div>
+<p>为甚么连接池没有资源了呢，原因非常多，首先检查下客户端：</p>
+
+<ol>
+<li>高并发下连接池设置过小。</li>
+<li>没有正确释放连接池。</li>
+<li>存在慢查询时，该 Jedis 对象归还速度会很慢，导致池子满了。</li>
+</ol>
+
+<p>如果客户端正常，服务端的某些原因可能导致用户命令的阻塞，也会使客户端抛出这种异常。</p>
+
+<h1 id="客户端读写超时">客户端读写超时</h1>
+
+<p>Jedis 在调用 Redis 时，如果出现了读写超时后，会出现下面的异常：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">redis.clients.jedis.exceptions.JedisConnectionException:
+java.net.SocketTimeoutException: Read timed out</pre></td></tr></table>
+</div>
+</div>
+<p>造成该异常的原因也有以下几种：</p>
+
+<ul>
+<li>读写超时间设置得过短。</li>
+<li>命令本身就比较慢。</li>
+<li>客户端与服务端网络不正常。</li>
+<li>Redis自身发生阻塞。</li>
+</ul>
+
+<h1 id="客户端连接超时">客户端连接超时</h1>
+
+<p>Jedis 在调用 Redis 时，如果出现了连接超时后，会出现下面的异常：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">redis.clients.jedis.exceptions.JedisConnectionException:
+java.net.SocketTimeoutException: connect timed out</pre></td></tr></table>
+</div>
+</div>
+<p>造成该异常的原因也有以下几种：</p>
+
+<ol>
+<li>连接超时设置得过短，</li>
+<li>Redis发生阻塞，造成tcp-backlog已满，造成新的连接失败。</li>
+<li>客户端与服务端网络不正常。</li>
+</ol>
+
+<h1 id="客户端缓冲区异常">客户端缓冲区异常</h1>
+
+<p>Jedis 在调用 Redis 时，如果出现客户端数据流异常，会出现下面的异常：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">redis.clients.jedis.exceptions.JedisConnectionException: Unexpected end of stream.</pre></td></tr></table>
+</div>
+</div>
+<p>造成这个异常的原因可能有如下几种：</p>
+
+<ol>
+<li>输出缓冲区满。例如将普通客户端的输出缓冲区设置为 <code>1M 1M 60</code>： <code>config set client-output-buffer-limit &quot;normal 1048576 1048576 60 slave 268435456 67108864 60 pubsub 33554432 8388608 60</code>。如果使用get命令获取一个bigkey（例如3M），就会出现这个异常。</li>
+<li>长时间闲置连接被服务端主动断开。</li>
+<li>不正常并发读写：Jedis对象同时被多个线程并发操作，可能会出现上述异常。</li>
+</ol>
+
+<h1 id="redis-正在加载持久化文件">Redis 正在加载持久化文件</h1>
+
+<p>Jedis 调用 Redis 时，如果 Redis 正在加载持久化文件，那么会收到下面的异常：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">redis.clients.jedis.exceptions.JedisDataException: LOADING Redis is loading the dataset in memory</pre></td></tr></table>
+</div>
+</div>
+<h1 id="redis-使用的内存超过-maxmemory-配置">Redis 使用的内存超过 <code>maxmemory</code> 配置</h1>
+
+<p>Jedis 执行写操作时，如果 Redis 的使用内存大于 <code>maxmemory</code> 的设置，会收到下面的异常，此时应该调整 <code>maxmemory</code> 并找到造成内存增长的原因：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">redis.clients.jedis.exceptions.JedisDataException: OOM command not allowed when used memory &gt; &#39;maxmemory&#39;.</pre></td></tr></table>
+</div>
+</div>
+<h1 id="客户端连接数过大">客户端连接数过大</h1>
+
+<p>如果客户端连接数超过了maxclients，新申请的连接就会出现如下异常：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">redis.clients.jedis.exceptions.JedisDataException: ERR max number of clients reached</pre></td></tr></table>
+</div>
+</div>
+<p>此时新的客户端连接执行任何命令，返回结果都是如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">127.0.0.1:6379&gt; get hello
+(error) ERR max number of clients reached</pre></td></tr></table>
+</div>
+</div>
+    </div>
+
+    <footer class="post-footer">
+      
+      <nav class="post-nav">
+        <a class="prev" href="/zh/post/redis-anomalous-latency-because-of-page-fault/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">页错误引发的 Redis 延迟</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        <a class="next" href="/zh/post/redis-ssl/">
+            <span class="next-text nav-default">Redis 的 SSL</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        <div id="disqus_thread"></div>
+    <script type="text/javascript">
+    (function() {
+      
+      
+      if (window.location.hostname === 'localhost') return;
+
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      var disqus_shortname = 'guoqing';
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:hellokangning@hotmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://www.linkedin.com/in/guoqing-geng-9032b820/" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="https://github.com/hellokangning" class="iconfont icon-github" title="github"></a>
+      <a href="https://www.douban.com/people/hellokangning/" class="iconfont icon-douban" title="douban"></a>
+      <a href="https://www.instagram.com/hellokangning/" class="iconfont icon-instagram" title="instagram"></a>
+  <a href="https://hellokangning.github.io/zh/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2016 - 
+    2019
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Guoqing Geng</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  <script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+<script type="text/javascript" src="/dist/even.ece58db6.min.js"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-105833321-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>
