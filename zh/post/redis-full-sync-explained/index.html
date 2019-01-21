@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Redis 全量同步解析 - Qing&#39;s Landing</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Guoqing Geng" /><meta name="description" content="复制功能是高可用 Redis 的基础，同时也是 Redis 日常运维的常见问题。深刻理解复制的工作原理与使用姿势对我们的日常开发和运维都非常重要。
+本文从同步的过程讲起，重点是全量同步的可能问题和运维方法。
+" /><meta name="keywords" content="Replication, Full Sync" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.53 with even 4.0.0" />
+
+
+<link rel="canonical" href="https://hellokangning.github.io/zh/post/redis-full-sync-explained/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+
+<meta property="og:title" content="Redis 全量同步解析" />
+<meta property="og:description" content="复制功能是高可用 Redis 的基础，同时也是 Redis 日常运维的常见问题。深刻理解复制的工作原理与使用姿势对我们的日常开发和运维都非常重要。
+
+本文从同步的过程讲起，重点是全量同步的可能问题和运维方法。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hellokangning.github.io/zh/post/redis-full-sync-explained/" /><meta property="article:published_time" content="2019-01-20T21:38:27-08:00"/>
+<meta property="article:modified_time" content="2019-01-21T09:38:27-08:00"/>
+
+<meta itemprop="name" content="Redis 全量同步解析">
+<meta itemprop="description" content="复制功能是高可用 Redis 的基础，同时也是 Redis 日常运维的常见问题。深刻理解复制的工作原理与使用姿势对我们的日常开发和运维都非常重要。
+
+本文从同步的过程讲起，重点是全量同步的可能问题和运维方法。">
+
+
+<meta itemprop="datePublished" content="2019-01-20T21:38:27-08:00" />
+<meta itemprop="dateModified" content="2019-01-21T09:38:27-08:00" />
+<meta itemprop="wordCount" content="2119">
+
+
+
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Redis 全量同步解析"/>
+<meta name="twitter:description" content="复制功能是高可用 Redis 的基础，同时也是 Redis 日常运维的常见问题。深刻理解复制的工作原理与使用姿势对我们的日常开发和运维都非常重要。
+
+本文从同步的过程讲起，重点是全量同步的可能问题和运维方法。"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/zh/" class="logo">Qing&#39;s Landing</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/zh/">
+        <li class="mobile-menu-item">首页</li>
+      </a><a href="/zh/post/">
+        <li class="mobile-menu-item">归档</li>
+      </a><a href="/zh/categories/">
+        <li class="mobile-menu-item">分类</li>
+      </a><a href="/zh/tags/">
+        <li class="mobile-menu-item">标签</li>
+      </a><a href="/en/">
+        <li class="mobile-menu-item">EN</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/zh/" class="logo">Qing&#39;s Landing</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/zh/">首页</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/zh/post/">归档</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/zh/categories/">分类</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/zh/tags/">标签</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/en/">EN</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Redis 全量同步解析</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> Jan 20, 2019 </span>
+        <div class="post-category">
+            <a href="/zh/categories/redis/"> Redis </a>
+            </div>
+          <span class="more-meta"> 约 2119 字 </span>
+          <span class="more-meta"> 预计阅读 5 分钟 </span>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+<ul>
+<li><a href="#同步的过程">同步的过程</a>
+<ul>
+<li><a href="#1-保存主节点的信息">1. 保存主节点的信息</a></li>
+<li><a href="#2-主从建立-socket-连接">2. 主从建立 socket 连接</a></li>
+<li><a href="#3-发送-ping-命令">3. 发送 ping 命令</a></li>
+<li><a href="#4-权限验证">4. 权限验证</a></li>
+<li><a href="#5-同步数据集">5. 同步数据集</a></li>
+<li><a href="#6-命令持续复制">6. 命令持续复制</a></li>
+</ul></li>
+<li><a href="#全量同步和部分同步">全量同步和部分同步</a></li>
+<li><a href="#psync">psync</a></li>
+<li><a href="#全量同步">全量同步</a></li>
+<li><a href="#全量同步的可能问题">全量同步的可能问题</a>
+<ul>
+<li><a href="#网络传输超时">网络传输超时</a></li>
+<li><a href="#缓冲区溢出">缓冲区溢出</a></li>
+</ul></li>
+<li><a href="#规避全量同步">规避全量同步</a></li>
+</ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <p>复制功能是高可用 Redis 的基础，同时也是 Redis 日常运维的常见问题。深刻理解复制的工作原理与使用姿势对我们的日常开发和运维都非常重要。</p>
+
+<p>本文从同步的过程讲起，重点是全量同步的可能问题和运维方法。</p>
+
+<h1 id="同步的过程">同步的过程</h1>
+
+<p>slave 的 <em>slaveof</em> 命令执行之后，同步过程便开始了：</p>
+
+<h2 id="1-保存主节点的信息">1. 保存主节点的信息</h2>
+
+<p>执行 <em>slaveof</em> 后，slave 只保存 master 的地址信息便直接返回，这时复制流程开没有开始。</p>
+
+<p>在 slave 上执行 <em>info replication</em> 可以看到如下信息：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">master_host: 127.0.0.1
+master_port: 6379
+master_link_status: down</pre></td></tr></table>
+</div>
+</div>
+<p>注意这个 <em>master_link_status</em> 是下线的状态。</p>
+
+<h2 id="2-主从建立-socket-连接">2. 主从建立 socket 连接</h2>
+
+<p>slave 内部通过每秒运行的定时任务维护复制的逻辑。当定时任务发现新的 master 之后（先抑制住内心的激动：终于不用干活了），会尝试与 master 建立连接。</p>
+
+<p>如果 slave 建立连接失败，定时任务会无限重试直到成功或者 <em>slave no one</em> 命令。</p>
+
+<p>slave 的 <em>info replication</em> 输出的 <em>master_link_down_since_seconds</em> 会记录与 master 连接失败的系统时间。</p>
+
+<h2 id="3-发送-ping-命令">3. 发送 ping 命令</h2>
+
+<p>连接建立成功后，slave 会发送 <em>ping</em> 请求进行首次通信，就像加了微信之后先发个“在吗”一样，检测一下 socket 是否可用以及 master 当前能否处理请求。</p>
+
+<p>如果 slave 没有收到 <em>pong</em> 的回复，就会很知趣地断开复制连接，不再死缠烂打。</p>
+
+<h2 id="4-权限验证">4. 权限验证</h2>
+
+<p>如果 master 设置了 <em>requirepass</em> 参数，则 slave 必须配置 <em>masterauth</em> 参数才能通过验证。</p>
+
+<h2 id="5-同步数据集">5. 同步数据集</h2>
+
+<p>主从正常通信后，对于首次建立连接的场景，master 会把全部的数据发送给 slave。Redis 在 2.8 之后采用新的复制命令：<em>psync</em> ，原来的 <em>sync</em> 仍然支持，只是为了保持兼容性。新版同步分两种，即全量同步和部分同步，本文的重点就是全量同步。</p>
+
+<h2 id="6-命令持续复制">6. 命令持续复制</h2>
+
+<p>当 master 把当前的数据发给 slave 之后，便完成了复制的建立流程。接下来，master 会持续地把写命令发送给 slave，保证主从数据的一致性。</p>
+
+<h1 id="全量同步和部分同步">全量同步和部分同步</h1>
+
+<p>Reids 使用 <em>psync</em> 命令完成同步，同步过程分为两种：</p>
+
+<ul>
+<li>全量同步：一般用于初次复制的场景。</li>
+<li>部分同步：用于处理在主从复制中因为网络闪断等原因造成的数据丢失。当 slave 再次连上 master 之后，尽可能地补发丢失部分的数据给 slave，以此来避免全量同步的开销。</li>
+</ul>
+
+<h1 id="psync">psync</h1>
+
+<p>slave 使用 <em>psync</em> 命令完成部分同步和全量同步，<em>psync</em> 命令需要以下组件的支持:</p>
+
+<ul>
+<li>主从节点的各自复制偏移量</li>
+<li>master 复制积压缓冲区</li>
+<li>master 的运行 ID</li>
+</ul>
+
+<p><em>psync</em> 命令的格式如下 <em>psync {runid} {offset}</em> ，参数的含义如下：</p>
+
+<ul>
+<li><em>runid</em> ：slave 要复制 master 的运行的 ID。</li>
+<li><em>offset</em> ：当前 slave 已经复制的数据偏移量。</li>
+</ul>
+
+<p>流程说明：</p>
+
+<ol>
+<li>slave 发送 <em>psync</em> 命令给 master。</li>
+<li>master 根据 <em>psync</em> 参数和自身情况决定相应结果。
+
+<ul>
+<li><em>+FULLRESYNC {runid} {offset}</em> 表示 slave 将触发全量同步。</li>
+<li><em>+CONTINUE</em> 表示 slave 将触发部分同步。</li>
+<li><em>+ERR</em> 表示 master 版本低于2.8，无法识别 <em>psync</em> 命令。</li>
+</ul></li>
+</ol>
+
+<h1 id="全量同步">全量同步</h1>
+
+<p>全量同步的流程说明：</p>
+
+<ol>
+<li>发送 <em>psync</em> 命令进行数据同步，如果是第一次进行复制，slave 没有复制偏移量和主节点的运行 ID，只能发送 <em>psync -1</em> 。</li>
+<li>master 根据 slave 的 <em>psync</em> 命令解析出全量同步的请求，并回复 <em>+FULLRESYNC</em> 。</li>
+<li>slave 接到 master 的响应数据，保存运行 ID 和偏移量，并打印日志：
+<code>
+Partial resynchronization not possible (no cached master)
+Full resync from master: xxxxx
+</code></li>
+<li>master 执行 <em>bgsave</em> 保存 RDB 文件到本地。</li>
+<li>master 发送 RDB 文件给 slave，slave 把接收到的 RDB 保存在本地，接受完 RDB 后，slave 的日志中可以看到:
+<code>
+16:24:01.057 * MASTER &lt;-&gt; SLAVE sync: receiving 2778899 bytes from master
+</code></li>
+<li>slave 开始接收 RDB 文件到接收完成这u但时间，master 仍然相应读写命令，并将它们保存在客户端缓冲区。slave 加载 RDB 完成后，master 把缓冲区中的数据再发给 slave。</li>
+<li>slave 接收完 master 发来的全部数据后，会清空自身旧数据，对应日志如下：
+<code>
+16:24:02:034 * MASTER &lt;-&gt; SLAVE sync: Flushing old data
+</code></li>
+<li>slave 清空数据后，开始加载 RDB 快照，对应日志如下：
+<code>
+16:24:03:034 * MASTER &lt;-&gt; SLAVE sync: Loading DB in memory
+16:24:04:034 * MASTER &lt;-&gt; SLAVE sync: Finished with sucess
+</code></li>
+<li>slave 加载 RDB 完成后，如果当前节点开启了 AOF，会立刻做 <em>bgrewriteaof</em> 操作，为了保证全量同步后 AOF 文件立即可用。</li>
+</ol>
+
+<h1 id="全量同步的可能问题">全量同步的可能问题</h1>
+
+<p>全量同步是一个非常消耗资源的操作，它的时间开销包括：</p>
+
+<ul>
+<li>master <em>bgsave</em> 的时间</li>
+<li>RDB 文件的网络传输时间</li>
+<li>slave 清空数据时间</li>
+<li>slave 加载 RDB 的时间</li>
+<li>可能的 AOF 重写时间</li>
+</ul>
+
+<p>除此之外，全量同步可能引发的问题还有：</p>
+
+<h2 id="网络传输超时">网络传输超时</h2>
+
+<p>RDB 文件超过 6GB 以上时，要格外小心，传输文件会非常耗时。通过分析 Full resync 和 MASTER &lt;-&gt; SLAVE 这两行日志之间的时间差，可以算出 RDB 文件的传输时间。</p>
+
+<p>如果传输时间超过 <em>repl-timeout</em> 配置的值（默认 60 秒），slave 将放弃接收 RDB 文件并清理已下载的临时文件，导致同步失败。此时打印的日志:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">#Timeout receiving bulk data from MASTER...If the problem persists try to set the &#39;repl-time&#39; parameter in redis.conf to a larger value.</pre></td></tr></table>
+</div>
+</div>
+<h2 id="缓冲区溢出">缓冲区溢出</h2>
+
+<p>如果 master 创建和传输 RDB 文件的时间较长，对于高流量的写入场景，容易造成客户端缓冲区的溢出。</p>
+
+<p>默认配置为 <em>client-output-buffer-limit slave 256MB 64MB 60</em> ，如果 60 秒内缓冲区消耗持续大于 64MB 或直接超过 256MB，master 将关闭客户端连接。</p>
+
+<p>对应日志如下:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">M 27 May 12:13:33.669 # Client id=2 addr=127.0.0.1:24555 age=1 idle=1 flags=S qbuf=0 qbuf-free=0 obl=18824 oll=21382 omem=26844240 events=r cmd=psync scheduled to be closed ASAP for overcoming of output buffer limits.</pre></td></tr></table>
+</div>
+</div>
+<p>这时候要根据 master 数据量和写命令并发量调整 <em>client-output-buffer-limit slave</em> 参数。</p>
+
+<h1 id="规避全量同步">规避全量同步</h1>
+
+<p>如何规避全量同步是需要重点关注的运维点，下面针对需要全量同步的场景逐个分析。</p>
+
+<p>第一次建立连接：这时必须进行全量同步，无法避免。可以在低峰时操作，或者避免使用大数据量的 Redis 节点。</p>
+
+<p>节点运行 ID 不匹配：主从关系建立后，slave 会保存 master 的运行 ID。如果 master 发生故障重启，运行 ID 会改变。slave 发现该变化之后，会认为自己从一个新 master 复制数据。对于这种情况，可以手动提升 slave 为主节点。采用 Sentinel 或集群方案也是不错的选择。</p>
+
+<p>复制缓冲区不足：主从失联之后，slave 再次连上 master，会请求部分同步。但是，如果请求的偏移量不在 master 的缓冲区里，那么部分同步将退化为全量同步。为避免这种情况，要根据写的数据量，合理规划缓冲区的大小。之前的这篇 <a href="https://hellokangning.github.io/zh/post/100-server-load-because-of-redis-sync/">Redis 同步引发的系统过载</a> 讲述的就是由此而引发的系统过载问题。</p>
+    </div>
+
+    <footer class="post-footer">
+      
+      <nav class="post-nav">
+        
+        <a class="next" href="/zh/post/redis-anomalous-latency-because-of-page-fault/">
+            <span class="next-text nav-default">页错误引发的 Redis 延迟</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        <div id="disqus_thread"></div>
+    <script type="text/javascript">
+    (function() {
+      
+      
+      if (window.location.hostname === 'localhost') return;
+
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      var disqus_shortname = 'guoqing';
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:hellokangning@hotmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://www.linkedin.com/in/guoqing-geng-9032b820/" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="https://github.com/hellokangning" class="iconfont icon-github" title="github"></a>
+      <a href="https://www.douban.com/people/hellokangning/" class="iconfont icon-douban" title="douban"></a>
+      <a href="https://www.instagram.com/hellokangning/" class="iconfont icon-instagram" title="instagram"></a>
+  <a href="https://hellokangning.github.io/zh/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2016 - 
+    2019
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Guoqing Geng</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  <script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-105833321-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>
