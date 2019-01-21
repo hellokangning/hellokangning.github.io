@@ -103,7 +103,7 @@ Id:900900 When:(1/1/2019 6:16:08 PM) Duration:29050us Command:(get PRIVATE ARG)
 
 <meta itemprop="datePublished" content="2019-01-07T14:11:18&#43;08:00" />
 <meta itemprop="dateModified" content="2019-01-07T14:11:18&#43;08:00" />
-<meta itemprop="wordCount" content="572">
+<meta itemprop="wordCount" content="592">
 
 
 
@@ -210,7 +210,7 @@ Id:900900 When:(1/1/2019 6:16:08 PM) Duration:29050us Command:(get PRIVATE ARG)
         <div class="post-category">
             <a href="/zh/categories/redis/"> Redis </a>
             </div>
-          <span class="more-meta"> 约 572 字 </span>
+          <span class="more-meta"> 约 592 字 </span>
           <span class="more-meta"> 预计阅读 2 分钟 </span>
         
       </div>
@@ -255,7 +255,7 @@ Id:900900 When:(1/1/2019 6:16:08 PM) Duration:29050us Command:(get PRIVATE ARG)<
 
 <p>赶紧跟客户反映了一下，估计是使用姿势的问题。Cache 这么用，是极大的浪费。</p>
 
-<p>另外一个异常情况就是响应大小，20KB。Redis 对于大文件的支持很有限，具体可以参见：[]</p>
+<p>另外一个异常情况就是响应大小，20KB。Redis 对于大文件的支持很有限，具体可以参见：<a href="https://groups.google.com/forum/#!topic/redis-db/n7aa2A4DZDs">What is the ideal value size range for redis? Is 100KB too large?</a>。</p>
 
 <p><img src="/images/redis-page-fault-response-size.png" alt="" /></p>
 
@@ -275,7 +275,7 @@ Id:900900 When:(1/1/2019 6:16:08 PM) Duration:29050us Command:(get PRIVATE ARG)<
 
 <ol>
 <li>分配的内存不够用了。</li>
-<li>Redis 里的大部分数据闲置着，没有访问，本文遇到的就吃这种情况。</li>
+<li>Redis 里的大部分数据闲置着，没有访问，本文遇到的就是这种情况。</li>
 <li>大量的 I/O 也可能是罪魁祸首。文件被 cache 住，需要用到系统缓存，导致了 swap。RDB 和 AOF 都可能产生大文件。</li>
 </ol>
 
