@@ -16,7 +16,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
 
-<meta name="author" content="Guoqing Geng" /><meta name="description" content="Redis 的主从复制模式下，一旦 master 不可达，需要人工干预进行故障转移，无论对于 Redis 的使用方还是运维方都带来了极大不便。对应用方来说无法感知 master 的变化，可能会造势数据丢失或读错误，也可能会造成短暂的服务不可用。对于运维来说，整个故障转移需要人工介入，实时性和准确性都无法保障。
+<meta name="author" content="Guoqing Geng" /><meta name="description" content="Redis 的主从复制模式下，一旦 master 不可达，需要人工干预进行故障转移，无论对于 Redis 的使用方还是运维方都带来了极大不便。对应用方来说无法感知 master 的变化，可能会造成数据丢失或读错误，也可能会短暂的服务不可用。对于运维来说，整个故障转移需要人工介入，实时性和准确性都无法保障。
 Redis 哨兵就是为了解决这些问题而生的，它是 Redis 2.8 引入的高可用实现方案，包括故障发现、故障转移、配置中心、客户端通知等。
 本文的关注点是哨兵下的客户端连接问题。
  本文大部分摘录自：Redis开发与运维
@@ -43,7 +43,7 @@ Redis 哨兵就是为了解决这些问题而生的，它是 Redis 2.8 引入的
 
 
 <meta property="og:title" content="Redis 哨兵: 客户端连接" />
-<meta property="og:description" content="Redis 的主从复制模式下，一旦 master 不可达，需要人工干预进行故障转移，无论对于 Redis 的使用方还是运维方都带来了极大不便。对应用方来说无法感知 master 的变化，可能会造势数据丢失或读错误，也可能会造成短暂的服务不可用。对于运维来说，整个故障转移需要人工介入，实时性和准确性都无法保障。
+<meta property="og:description" content="Redis 的主从复制模式下，一旦 master 不可达，需要人工干预进行故障转移，无论对于 Redis 的使用方还是运维方都带来了极大不便。对应用方来说无法感知 master 的变化，可能会造成数据丢失或读错误，也可能会短暂的服务不可用。对于运维来说，整个故障转移需要人工介入，实时性和准确性都无法保障。
 
 Redis 哨兵就是为了解决这些问题而生的，它是 Redis 2.8 引入的高可用实现方案，包括故障发现、故障转移、配置中心、客户端通知等。
 
@@ -57,7 +57,7 @@ Redis 哨兵就是为了解决这些问题而生的，它是 Redis 2.8 引入的
 <meta property="article:modified_time" content="2019-01-29T10:21:46&#43;08:00"/>
 
 <meta itemprop="name" content="Redis 哨兵: 客户端连接">
-<meta itemprop="description" content="Redis 的主从复制模式下，一旦 master 不可达，需要人工干预进行故障转移，无论对于 Redis 的使用方还是运维方都带来了极大不便。对应用方来说无法感知 master 的变化，可能会造势数据丢失或读错误，也可能会造成短暂的服务不可用。对于运维来说，整个故障转移需要人工介入，实时性和准确性都无法保障。
+<meta itemprop="description" content="Redis 的主从复制模式下，一旦 master 不可达，需要人工干预进行故障转移，无论对于 Redis 的使用方还是运维方都带来了极大不便。对应用方来说无法感知 master 的变化，可能会造成数据丢失或读错误，也可能会短暂的服务不可用。对于运维来说，整个故障转移需要人工介入，实时性和准确性都无法保障。
 
 Redis 哨兵就是为了解决这些问题而生的，它是 Redis 2.8 引入的高可用实现方案，包括故障发现、故障转移、配置中心、客户端通知等。
 
@@ -70,14 +70,14 @@ Redis 哨兵就是为了解决这些问题而生的，它是 Redis 2.8 引入的
 
 <meta itemprop="datePublished" content="2019-01-29T10:21:46&#43;08:00" />
 <meta itemprop="dateModified" content="2019-01-29T10:21:46&#43;08:00" />
-<meta itemprop="wordCount" content="2153">
+<meta itemprop="wordCount" content="2148">
 
 
 
 <meta itemprop="keywords" content="" />
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Redis 哨兵: 客户端连接"/>
-<meta name="twitter:description" content="Redis 的主从复制模式下，一旦 master 不可达，需要人工干预进行故障转移，无论对于 Redis 的使用方还是运维方都带来了极大不便。对应用方来说无法感知 master 的变化，可能会造势数据丢失或读错误，也可能会造成短暂的服务不可用。对于运维来说，整个故障转移需要人工介入，实时性和准确性都无法保障。
+<meta name="twitter:description" content="Redis 的主从复制模式下，一旦 master 不可达，需要人工干预进行故障转移，无论对于 Redis 的使用方还是运维方都带来了极大不便。对应用方来说无法感知 master 的变化，可能会造成数据丢失或读错误，也可能会短暂的服务不可用。对于运维来说，整个故障转移需要人工介入，实时性和准确性都无法保障。
 
 Redis 哨兵就是为了解决这些问题而生的，它是 Redis 2.8 引入的高可用实现方案，包括故障发现、故障转移、配置中心、客户端通知等。
 
@@ -159,7 +159,7 @@ Redis 哨兵就是为了解决这些问题而生的，它是 Redis 2.8 引入的
         <div class="post-category">
             <a href="/zh/categories/redis/"> Redis </a>
             </div>
-          <span class="more-meta"> 约 2153 字 </span>
+          <span class="more-meta"> 约 2148 字 </span>
           <span class="more-meta"> 预计阅读 5 分钟 </span>
         
       </div>
@@ -178,7 +178,7 @@ Redis 哨兵就是为了解决这些问题而生的，它是 Redis 2.8 引入的
   </div>
 </div>
     <div class="post-content">
-      <p>Redis 的主从复制模式下，一旦 master 不可达，需要人工干预进行故障转移，无论对于 Redis 的使用方还是运维方都带来了极大不便。对应用方来说无法感知 master 的变化，可能会造势数据丢失或读错误，也可能会造成短暂的服务不可用。对于运维来说，整个故障转移需要人工介入，实时性和准确性都无法保障。</p>
+      <p>Redis 的主从复制模式下，一旦 master 不可达，需要人工干预进行故障转移，无论对于 Redis 的使用方还是运维方都带来了极大不便。对应用方来说无法感知 master 的变化，可能会造成数据丢失或读错误，也可能会短暂的服务不可用。对于运维来说，整个故障转移需要人工介入，实时性和准确性都无法保障。</p>
 
 <p>Redis 哨兵就是为了解决这些问题而生的，它是 Redis 2.8 引入的高可用实现方案，包括故障发现、故障转移、配置中心、客户端通知等。</p>
 
@@ -225,7 +225,7 @@ Redis 哨兵就是为了解决这些问题而生的，它是 Redis 2.8 引入的
 <li>节点不可达或者故障转移后，可以通过 info 命令实时更新节点拓扑信息。</li>
 </ul>
 
-<p><strong>2. 每隔2秒，每个 哨兵 节点会向 Redis 数据节点的 <em><strong>sentinel</strong>：hello</em> 频道上发送该 哨兵 节点对于主节点的判断以及当前 哨兵 节点的信息，同时每个哨兵节点也会订阅该频道，来了解其他 哨兵 节点以及它们对主节点的判断。</strong></p>
+<p><strong>2. 每隔2秒，每个哨兵节点会向 Redis 数据节点的 <em><strong>sentinel</strong>：hello</em> 频道上发送该哨兵节点对于主节点的判断以及当前哨兵节点的信息，同时每个哨兵节点也会订阅该频道，来了解其他 哨兵 节点以及它们对主节点的判断。</strong></p>
 
 <p>所以这个定时任务可以完成以下两个工作：</p>
 
@@ -234,9 +234,9 @@ Redis 哨兵就是为了解决这些问题而生的，它是 Redis 2.8 引入的
 <li>哨兵节点之间交换主节点的状态，作为后面客观下线以及领导者选举的依据。</li>
 </ul>
 
-<p><strong>3. 每隔1秒，每个 哨兵 节点会向主节点、从节点、其余哨兵节点发送一条 <em>ping</em> 命令做一次心跳检测，来确认这些节点当前是否可达。</strong></p>
+<p><strong>3. 每隔1秒，每个哨兵节点会向主节点、从节点、其余哨兵节点发送一条 <em>ping</em> 命令做一次心跳检测，来确认这些节点当前是否可达。</strong></p>
 
-<p>通过上面的定时任务，哨兵节点对主节点、从节点、其余 哨兵 节点都建立起连接，实现了对每个节点的监控，这个定时任务是节点失败判定的重要依据。</p>
+<p>通过上面的定时任务，哨兵节点对主节点、从节点、其余 哨兵节点都建立起连接，实现了对每个节点的监控，这个定时任务是节点失败判定的重要依据。</p>
 
 <h1 id="jedis-操作哨兵">Jedis 操作哨兵</h1>
 
@@ -355,7 +355,7 @@ Redis 哨兵就是为了解决这些问题而生的，它是 Redis 2.8 引入的
 </span><span class="c1"></span>        <span class="k">throw</span> <span class="k">new</span> <span class="n">Exception</span><span class="o">();</span>
     <span class="o">}</span>
 
-    <span class="c1">// 为每个  节点开启主节点 switch 的监控线程
+    <span class="c1">// 为每个哨兵节点开启主节点 switch 的监控线程
 </span><span class="c1"></span>    <span class="k">for</span> <span class="o">(</span><span class="n">String</span> <span class="n">sentinel</span> <span class="o">:</span> <span class="n">sentinels</span><span class="o">)</span> <span class="o">{</span>
         <span class="kd">final</span> <span class="n">HostAndPort</span> <span class="n">hap</span> <span class="o">=</span> <span class="n">toHostAndPort</span><span class="o">(</span><span class="n">Arrays</span><span class="o">.</span><span class="na">asList</span><span class="o">(</span><span class="n">sentinel</span><span class="o">.</span><span class="na">split</span><span class="o">(</span><span class="s">&#34;:&#34;</span><span class="o">)));</span>
         <span class="n">MasterListener</span> <span class="n">masterListener</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MasterListener</span><span class="o">(</span><span class="n">masterName</span><span class="o">,</span> <span class="n">hap</span><span class="o">.</span><span class="na">getHost</span><span class="o">(),</span>
@@ -374,7 +374,7 @@ Redis 哨兵就是为了解决这些问题而生的，它是 Redis 2.8 引入的
 <li>遍历节点集合，找到一个可用的节点，如果找不到就从节点集合中去找下一个，如果都找不到直接抛出异常给客户端：</li>
 <li>找到一个可用的节点，执行 <code>sentinelGetMasterAddrByName(masterName)</code>，找到对应主节点信息：</li>
 <li><code>JedisSentinelPool</code> 中没有发现对主节点角色验证的代码，这是因为 <code>get-master-addr-by-name master-name</code> 这个API本身就会自动获取真正的主节点（例如故障转移期间）。</li>
-<li>为每一个节点单独启动一个线程，利用Redis的发布订阅功能，每个线程订阅节点上切换master的相关频道 <strong>+switch-master</strong>。</li>
+<li>为每一个节点单独启动一个线程，利用Redis的发布订阅功能，每个线程订阅节点上切换 master 的相关频道 <strong>+switch-master</strong>。</li>
 </ol>
 
 <p>下面代码就是 <code>MasterListener</code> 的核心监听代码，代码中比较重要的部分就是订阅节点的+switch-master频道，它就是Redis 在结束对主节点故障转移后会发布切换主节点的消息，哨兵节点基本将故障转移的各个阶段发生的行为都通过这种发布订阅的形式对外提供，开发者只需订阅感兴趣的频道即可。</p>
