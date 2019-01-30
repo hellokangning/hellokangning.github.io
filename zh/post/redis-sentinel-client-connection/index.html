@@ -70,7 +70,7 @@ Redis 哨兵就是为了解决这些问题而生的，它是 Redis 2.8 引入的
 
 <meta itemprop="datePublished" content="2019-01-29T10:21:46&#43;08:00" />
 <meta itemprop="dateModified" content="2019-01-29T10:21:46&#43;08:00" />
-<meta itemprop="wordCount" content="2148">
+<meta itemprop="wordCount" content="2216">
 
 
 
@@ -159,7 +159,7 @@ Redis 哨兵就是为了解决这些问题而生的，它是 Redis 2.8 引入的
         <div class="post-category">
             <a href="/zh/categories/redis/"> Redis </a>
             </div>
-          <span class="more-meta"> 约 2148 字 </span>
+          <span class="more-meta"> 约 2216 字 </span>
           <span class="more-meta"> 预计阅读 5 分钟 </span>
         
       </div>
@@ -188,7 +188,7 @@ Redis 哨兵就是为了解决这些问题而生的，它是 Redis 2.8 引入的
 <p>本文大部分摘录自：<a href="https://book.douban.com/subject/26971561/">Redis开发与运维</a></p>
 </blockquote>
 
-<p>在引入哨兵之后，客户端连接的就是哨兵，而不是 Redis Server。如果发生了故障转移，哨兵会通知到客户端。这也需要客户端对哨兵的显式支持。</p>
+<p>哨兵是一个配置提供者，而不是代理。在引入哨兵之后，客户端会先连接哨兵，再获取到 master 之后，客户端会和 master 直接通信。如果发生了故障转移，哨兵会通知到客户端。这也需要客户端对哨兵的显式支持。</p>
 
 <p>最了解 master 信息的就是哨兵节点集合，各个 master 是用 <master-name> 进行标识。所以无论是哪种编程语言的客户端，都需要知道哨兵节点集合和 <code>masterName</code> 两个参数才能正确连接哨兵。</p>
 
@@ -414,6 +414,12 @@ Redis 哨兵就是为了解决这些问题而生的，它是 Redis 2.8 引入的
 <span class="o">},</span> <span class="s">&#34;+switch-master&#34;</span><span class="o">);</span></code></pre></td></tr></table>
 </div>
 </div>
+<p><strong>Reference</strong></p>
+
+<ul>
+<li><a href="https://dbaplus.cn/news-158-2278-1.html">实现故障恢复自动化：详解Redis哨兵技术</a></li>
+<li><a href="https://mp.weixin.qq.com/s?__biz=MzI4NTA1MDEwNg==&amp;mid=2650774648&amp;idx=1&amp;sn=97f585eadbb3ce0b1cc10caf5230280b&amp;chksm=f3f929edc48ea0fb372dc206bcb6363521e23d65e27c1852de137dc24165967c8d53e3fa11ce#rd">为什么不搞集群服务也能实现Redis高可用？</a></li>
+</ul>
     </div>
 
     <footer class="post-footer">
