@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Redis 哨兵：自动故障转移 - Qing&#39;s Landing</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Guoqing Geng" /><meta name="description" content="Redis 哨兵是 Redis 的高可用实现方案。本节首先会回顾主从复制模式下故障处理可能产生的问题，而后引出高可用的概念，最后重点分析 Redis 哨兵的基本架构、优势，以及是如何实现高可用的。
+ 本文大部分摘录自：Redis开发与运维
+" /><meta name="keywords" content="Redis, Sentinel" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.53 with even 4.0.0" />
+
+
+<link rel="canonical" href="https://hellokangning.github.io/zh/post/redis-sentinel-automatic-failover/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+
+<meta property="og:title" content="Redis 哨兵：自动故障转移" />
+<meta property="og:description" content="Redis 哨兵是 Redis 的高可用实现方案。本节首先会回顾主从复制模式下故障处理可能产生的问题，而后引出高可用的概念，最后重点分析 Redis 哨兵的基本架构、优势，以及是如何实现高可用的。
+
+
+本文大部分摘录自：Redis开发与运维
+" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hellokangning.github.io/zh/post/redis-sentinel-automatic-failover/" /><meta property="article:published_time" content="2019-02-02T14:21:53&#43;08:00"/>
+<meta property="article:modified_time" content="2019-02-02T14:21:53&#43;08:00"/>
+
+<meta itemprop="name" content="Redis 哨兵：自动故障转移">
+<meta itemprop="description" content="Redis 哨兵是 Redis 的高可用实现方案。本节首先会回顾主从复制模式下故障处理可能产生的问题，而后引出高可用的概念，最后重点分析 Redis 哨兵的基本架构、优势，以及是如何实现高可用的。
+
+
+本文大部分摘录自：Redis开发与运维
+">
+
+
+<meta itemprop="datePublished" content="2019-02-02T14:21:53&#43;08:00" />
+<meta itemprop="dateModified" content="2019-02-02T14:21:53&#43;08:00" />
+<meta itemprop="wordCount" content="1506">
+
+
+
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Redis 哨兵：自动故障转移"/>
+<meta name="twitter:description" content="Redis 哨兵是 Redis 的高可用实现方案。本节首先会回顾主从复制模式下故障处理可能产生的问题，而后引出高可用的概念，最后重点分析 Redis 哨兵的基本架构、优势，以及是如何实现高可用的。
+
+
+本文大部分摘录自：Redis开发与运维
+"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/zh/" class="logo">Qing&#39;s Landing</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/zh/">
+        <li class="mobile-menu-item">首页</li>
+      </a><a href="/zh/post/">
+        <li class="mobile-menu-item">归档</li>
+      </a><a href="/zh/categories/">
+        <li class="mobile-menu-item">分类</li>
+      </a><a href="/zh/tags/">
+        <li class="mobile-menu-item">标签</li>
+      </a><a href="/en/">
+        <li class="mobile-menu-item">EN</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/zh/" class="logo">Qing&#39;s Landing</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/zh/">首页</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/zh/post/">归档</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/zh/categories/">分类</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/zh/tags/">标签</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/en/">EN</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Redis 哨兵：自动故障转移</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> Feb 02, 2019 </span>
+        <div class="post-category">
+            <a href="/zh/categories/redis/"> Redis </a>
+            </div>
+          <span class="more-meta"> 约 1506 字 </span>
+          <span class="more-meta"> 预计阅读 4 分钟 </span>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+<ul>
+<li><a href="#主从复制的问题">主从复制的问题</a></li>
+<li><a href="#故障转移">故障转移</a></li>
+<li><a href="#哨兵的自动故障转移">哨兵的自动故障转移</a></li>
+</ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <p>Redis 哨兵是 Redis 的高可用实现方案。本节首先会回顾主从复制模式下故障处理可能产生的问题，而后引出高可用的概念，最后重点分析 Redis 哨兵的基本架构、优势，以及是如何实现高可用的。</p>
+
+<blockquote>
+<p>本文大部分摘录自：<a href="https://book.douban.com/subject/26971561/">Redis开发与运维</a></p>
+</blockquote>
+
+<h1 id="主从复制的问题">主从复制的问题</h1>
+
+<p>Redis 的主从复制模式可以将主节点的数据改变同步给从节点，这样从节点就可以起到两个作用：</p>
+
+<ol>
+<li>作为主节点的一个备份，一旦主节点出了故障不可达的情况，从节点可以作为后备“顶”上来，并且保证数据尽量不丢失（主从复制是最终一致性）。</li>
+<li>从节点可以扩展主节点的读能力，一旦主节点不能支撑住大并发量的读操作，从节点可以在一定程度上帮助主节点分担读压力。</li>
+</ol>
+
+<p>但是主从复制也带来了以下问题：</p>
+
+<ol>
+<li>一旦主节点出现故障，需要手动将一个从节点晋升为主节点，同时需要修改应用方的主节点地址，还需要命令其他从节点去复制新的主节点，整个过程都需要人工干预。</li>
+<li>主节点的写能力受到单机的限制。</li>
+<li>主节点的存储能力受到单机的限制。</li>
+</ol>
+
+<p>其中第一个问题就是Redis的高可用问题，也是 Redis 引入哨兵机制的原因。</p>
+
+<h1 id="故障转移">故障转移</h1>
+
+<p>在没有哨兵的情况下，Redis 的主节点发生故障后：</p>
+
+<ol>
+<li><p>客户端连接主节点失败，两个从节点与主节点连接失败造成复制中断。
+<img src="/images/redis-failover-master-disconnected.png" alt="" /></p></li>
+
+<li><p>如果主节点无法启动，则要选出一个从节点（slave-1），对其执行 <em>slaveof no one</em> 命令使其成为新的主节点。
+<img src="/images/redis-failover-slaveof-no-one.png" alt="" /></p></li>
+
+<li><p>原来的从节点（slave-1）成为新的主节点后，更新应用方的主节点信息，重新启动应用方。
+<img src="/images/redis-failover-restart-client.png" alt="" /></p></li>
+
+<li><p>客户端命令另一个从节点（slave-2）去复制新的主节点（new-master）。
+<img src="/images/redis-failover-slave-new-master.png" alt="" /></p></li>
+
+<li><p>待原来的主节点恢复后，让它去复制新的主节点。
+<img src="/images/redis-failover-replicate-new-master.png" alt="" /></p></li>
+</ol>
+
+<p>整个过程需要人工介入，且仍然存在以下问题：</p>
+
+<ol>
+<li>判断节点不可达的机制是否健全和标准。</li>
+<li>如果有多个从节点，怎样保证只有一个被晋升为主节点。</li>
+<li>通知客户端新的主节点机制是否足够健壮。</li>
+</ol>
+
+<p>Redis 哨兵正是用于解决这些问题。</p>
+
+<h1 id="哨兵的自动故障转移">哨兵的自动故障转移</h1>
+
+<p>当主节点出现故障时，Redis 哨兵能自动完成故障发现和故障转移，并通知应用方，从而实现真正的高可用。</p>
+
+<p>Redis 哨兵是一个分布式架构，其中包含若干个哨兵节点和 Redis 数据节点，每个哨兵节点会对数据节点和其余哨兵节点进行监控，当它发现节点不可达时，会对节点做下线标识。如果被标识的是主节点，它还会和其他哨兵节点进行“协商”，当大多数哨兵节点都认为主节点不可达时，它们会选举出一个哨兵节点来完成自动故障转移的工作，同时会将这个变化实时通知给 Redis 应用方。整个过程完全是自动的，不需要人工来介入，所以这套方案很有效地解决了 Redis 的高可用问题。</p>
+
+<p><img src="/images/redis-sentinel-architecture.png" alt="" /></p>
+
+<p>有了哨兵之后，整个故障转移的逻辑就变成：</p>
+
+<ol>
+<li><p>主节点出现故障，此时两个从节点与主节点失去连接，主从复制失败。
+<img src="/images/redis-failover-master-disconnected.png" alt="" /></p></li>
+
+<li><p>每个哨兵节点通过定期监控发现主节点出现了故障。
+<img src="/images/redis-failover-sentinel-monitor.png" alt="" /></p></li>
+
+<li><p>多个哨兵节点对主节点的故障达成一致，选举出 sentinel-3 节点作为领导者负责故障转移。
+<img src="/images/redis-failover-sentinel-vote.png" alt="" /></p></li>
+
+<li><p>哨兵领导者节点执行了故障转移，整个过程和上节完全一致，只不过是自动完成的。
+<img src="/images/redis-failover-sentinel-automatic.png" alt="" /></p></li>
+
+<li><p>故障转移后整个 Redis 哨兵的拓扑结构如下图所示：
+<img src="/images/redis-failover-sentinel-finished.png" alt="" /></p></li>
+</ol>
+
+<p>通过上面介绍的 Redis 哨兵逻辑架构以及故障转移的处理，可以看出：</p>
+
+<ul>
+<li>监控：哨兵节点会定期检测 Redis 数据节点、其余哨兵是否可达。</li>
+<li>通知：哨兵节点会将故障转移的结果通知给应用方。</li>
+<li>主节点故障转移：实现从节点晋升为主节点并维护后续正确的主从关系。</li>
+<li>配置提供者：在 Redis 哨兵结构中，客户端在初始化的时候连接的是哨兵节点集合，从中获取主节点信息。</li>
+</ul>
+
+<p>同时看到，Redis 哨兵包含了若个节点，这样做也带来了两个好处：</p>
+
+<ol>
+<li>对于节点的故障判断是由多个哨兵节点共同完成，这样可以有效地防止误判。</li>
+<li>哨兵节点集合是由若干个哨兵节点组成的，这样即使个别哨兵节点不可用，整个哨兵节点集合依然是健壮的。</li>
+</ol>
+
+<p>哨兵本身就是独立的 Redis 节点，只不过它们有一些特殊，它们不存储数据 (这里指接收用户的写命令，毕竟哨兵节点必须存储 <strong>+switch-master</strong> 信息)，只支持部分命令。</p>
+    </div>
+
+    <footer class="post-footer">
+      
+      <nav class="post-nav">
+        
+        <a class="next" href="/zh/post/redis-weekly-1/">
+            <span class="next-text nav-default">Redis Weekly #1</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        <div id="disqus_thread"></div>
+    <script type="text/javascript">
+    (function() {
+      
+      
+      if (window.location.hostname === 'localhost') return;
+
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      var disqus_shortname = 'guoqing';
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:hellokangning@hotmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://www.linkedin.com/in/guoqing-geng-9032b820/" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="https://github.com/hellokangning" class="iconfont icon-github" title="github"></a>
+      <a href="https://www.douban.com/people/hellokangning/" class="iconfont icon-douban" title="douban"></a>
+      <a href="https://www.instagram.com/hellokangning/" class="iconfont icon-instagram" title="instagram"></a>
+  <a href="https://hellokangning.github.io/zh/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2016 - 
+    2019
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Guoqing Geng</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  <script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-105833321-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>
