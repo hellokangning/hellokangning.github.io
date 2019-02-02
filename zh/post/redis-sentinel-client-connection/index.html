@@ -16,8 +16,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
 
-<meta name="author" content="Guoqing Geng" /><meta name="description" content="Redis 的主从复制模式下，一旦 master 不可达，需要人工干预进行故障转移，无论对于 Redis 的使用方还是运维方都带来了极大不便。对应用方来说无法感知 master 的变化，可能会造成数据丢失或读错误，也可能会短暂的服务不可用。对于运维来说，整个故障转移需要人工介入，实时性和准确性都无法保障。
-Redis 哨兵就是为了解决这些问题而生的，它是 Redis 2.8 引入的高可用实现方案，包括故障发现、故障转移、配置中心、客户端通知等。
+<meta name="author" content="Guoqing Geng" /><meta name="description" content="Redis 的主从复制模式下，一旦主节点不可达，需要人工干预进行故障转移，无论对于 Redis 的使用方还是运维方都带来了极大不便。对应用方来说无法感知主节点的变化，可能会造成数据丢失或读错误，也可能会短暂的服务不可用。对于运维来说，整个故障转移需要人工介入，实时性和准确性都无法保障。
+Redis Sentinel(哨兵) 就是为了解决这些问题而生的，它是 Redis 2.8 引入的高可用实现方案，包括故障发现、故障转移、配置中心、客户端通知等。
 本文的关注点是哨兵下的客户端连接问题。
  本文大部分摘录自：Redis开发与运维
 " /><meta name="keywords" content="Redis, Sentinel" />
@@ -43,9 +43,9 @@ Redis 哨兵就是为了解决这些问题而生的，它是 Redis 2.8 引入的
 
 
 <meta property="og:title" content="Redis 哨兵: 客户端连接" />
-<meta property="og:description" content="Redis 的主从复制模式下，一旦 master 不可达，需要人工干预进行故障转移，无论对于 Redis 的使用方还是运维方都带来了极大不便。对应用方来说无法感知 master 的变化，可能会造成数据丢失或读错误，也可能会短暂的服务不可用。对于运维来说，整个故障转移需要人工介入，实时性和准确性都无法保障。
+<meta property="og:description" content="Redis 的主从复制模式下，一旦主节点不可达，需要人工干预进行故障转移，无论对于 Redis 的使用方还是运维方都带来了极大不便。对应用方来说无法感知主节点的变化，可能会造成数据丢失或读错误，也可能会短暂的服务不可用。对于运维来说，整个故障转移需要人工介入，实时性和准确性都无法保障。
 
-Redis 哨兵就是为了解决这些问题而生的，它是 Redis 2.8 引入的高可用实现方案，包括故障发现、故障转移、配置中心、客户端通知等。
+Redis Sentinel(哨兵) 就是为了解决这些问题而生的，它是 Redis 2.8 引入的高可用实现方案，包括故障发现、故障转移、配置中心、客户端通知等。
 
 本文的关注点是哨兵下的客户端连接问题。
 
@@ -57,9 +57,9 @@ Redis 哨兵就是为了解决这些问题而生的，它是 Redis 2.8 引入的
 <meta property="article:modified_time" content="2019-01-29T10:21:46&#43;08:00"/>
 
 <meta itemprop="name" content="Redis 哨兵: 客户端连接">
-<meta itemprop="description" content="Redis 的主从复制模式下，一旦 master 不可达，需要人工干预进行故障转移，无论对于 Redis 的使用方还是运维方都带来了极大不便。对应用方来说无法感知 master 的变化，可能会造成数据丢失或读错误，也可能会短暂的服务不可用。对于运维来说，整个故障转移需要人工介入，实时性和准确性都无法保障。
+<meta itemprop="description" content="Redis 的主从复制模式下，一旦主节点不可达，需要人工干预进行故障转移，无论对于 Redis 的使用方还是运维方都带来了极大不便。对应用方来说无法感知主节点的变化，可能会造成数据丢失或读错误，也可能会短暂的服务不可用。对于运维来说，整个故障转移需要人工介入，实时性和准确性都无法保障。
 
-Redis 哨兵就是为了解决这些问题而生的，它是 Redis 2.8 引入的高可用实现方案，包括故障发现、故障转移、配置中心、客户端通知等。
+Redis Sentinel(哨兵) 就是为了解决这些问题而生的，它是 Redis 2.8 引入的高可用实现方案，包括故障发现、故障转移、配置中心、客户端通知等。
 
 本文的关注点是哨兵下的客户端连接问题。
 
@@ -70,16 +70,16 @@ Redis 哨兵就是为了解决这些问题而生的，它是 Redis 2.8 引入的
 
 <meta itemprop="datePublished" content="2019-01-29T10:21:46&#43;08:00" />
 <meta itemprop="dateModified" content="2019-01-29T10:21:46&#43;08:00" />
-<meta itemprop="wordCount" content="2216">
+<meta itemprop="wordCount" content="2257">
 
 
 
 <meta itemprop="keywords" content="" />
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Redis 哨兵: 客户端连接"/>
-<meta name="twitter:description" content="Redis 的主从复制模式下，一旦 master 不可达，需要人工干预进行故障转移，无论对于 Redis 的使用方还是运维方都带来了极大不便。对应用方来说无法感知 master 的变化，可能会造成数据丢失或读错误，也可能会短暂的服务不可用。对于运维来说，整个故障转移需要人工介入，实时性和准确性都无法保障。
+<meta name="twitter:description" content="Redis 的主从复制模式下，一旦主节点不可达，需要人工干预进行故障转移，无论对于 Redis 的使用方还是运维方都带来了极大不便。对应用方来说无法感知主节点的变化，可能会造成数据丢失或读错误，也可能会短暂的服务不可用。对于运维来说，整个故障转移需要人工介入，实时性和准确性都无法保障。
 
-Redis 哨兵就是为了解决这些问题而生的，它是 Redis 2.8 引入的高可用实现方案，包括故障发现、故障转移、配置中心、客户端通知等。
+Redis Sentinel(哨兵) 就是为了解决这些问题而生的，它是 Redis 2.8 引入的高可用实现方案，包括故障发现、故障转移、配置中心、客户端通知等。
 
 本文的关注点是哨兵下的客户端连接问题。
 
@@ -159,7 +159,7 @@ Redis 哨兵就是为了解决这些问题而生的，它是 Redis 2.8 引入的
         <div class="post-category">
             <a href="/zh/categories/redis/"> Redis </a>
             </div>
-          <span class="more-meta"> 约 2216 字 </span>
+          <span class="more-meta"> 约 2257 字 </span>
           <span class="more-meta"> 预计阅读 5 分钟 </span>
         
       </div>
@@ -178,9 +178,9 @@ Redis 哨兵就是为了解决这些问题而生的，它是 Redis 2.8 引入的
   </div>
 </div>
     <div class="post-content">
-      <p>Redis 的主从复制模式下，一旦 master 不可达，需要人工干预进行故障转移，无论对于 Redis 的使用方还是运维方都带来了极大不便。对应用方来说无法感知 master 的变化，可能会造成数据丢失或读错误，也可能会短暂的服务不可用。对于运维来说，整个故障转移需要人工介入，实时性和准确性都无法保障。</p>
+      <p>Redis 的主从复制模式下，一旦主节点不可达，需要人工干预进行故障转移，无论对于 Redis 的使用方还是运维方都带来了极大不便。对应用方来说无法感知主节点的变化，可能会造成数据丢失或读错误，也可能会短暂的服务不可用。对于运维来说，整个故障转移需要人工介入，实时性和准确性都无法保障。</p>
 
-<p>Redis 哨兵就是为了解决这些问题而生的，它是 Redis 2.8 引入的高可用实现方案，包括故障发现、故障转移、配置中心、客户端通知等。</p>
+<p>Redis Sentinel(哨兵) 就是为了解决这些问题而生的，它是 Redis 2.8 引入的高可用实现方案，包括故障发现、故障转移、配置中心、客户端通知等。</p>
 
 <p>本文的关注点是哨兵下的客户端连接问题。</p>
 
@@ -188,34 +188,37 @@ Redis 哨兵就是为了解决这些问题而生的，它是 Redis 2.8 引入的
 <p>本文大部分摘录自：<a href="https://book.douban.com/subject/26971561/">Redis开发与运维</a></p>
 </blockquote>
 
-<p>哨兵是一个配置提供者，而不是代理。在引入哨兵之后，客户端会先连接哨兵，再获取到 master 之后，客户端会和 master 直接通信。如果发生了故障转移，哨兵会通知到客户端。这也需要客户端对哨兵的显式支持。</p>
+<p>哨兵是一个配置提供者，而不是代理。在引入哨兵之后，客户端会先连接哨兵，再获取到主节点之后，客户端会和主节点直接通信。如果发生了故障转移，哨兵会通知到客户端。这也需要客户端对哨兵的显式支持。</p>
 
-<p>最了解 master 信息的就是哨兵节点集合，各个 master 是用 <master-name> 进行标识。所以无论是哪种编程语言的客户端，都需要知道哨兵节点集合和 <code>masterName</code> 两个参数才能正确连接哨兵。</p>
+<p>最了解主节点信息的就是哨兵节点集合，各个主节点是用 <master-name> 进行标识。所以无论是哪种编程语言的客户端，都需要知道哨兵节点集合和 <code>masterName</code> 两个参数才能正确连接哨兵。</p>
 
 <h1 id="哨兵客户端的基本原理">哨兵客户端的基本原理</h1>
 
 <p>实现一个哨兵客户端的基本步骤如下：</p>
 
 <ol>
-<li>遍历哨兵集合获取到一个可用的哨兵节点。因为哨兵节点之间是共享数据的，任意节点都可以获取到 master 的信息。
-<img src="/images/redis-sentinel-get-sentinel-node.png" alt="" /></li>
-<li>通过 <em>sentinel get-master-addr-by-name master-name</em> API 来获取对应 master 的信息。
-<img src="/images/redis-sentinel-get-master-info.png" alt="" /></li>
-<li>验证获取到的 master 是不是真正的 master，防止故障转移期间主节点的变化。
-<img src="/images/redis-sentinel-verify-master-node.png" alt="" /></li>
-<li>保持和 哨兵 节点集合的联系，时刻获取关于 master 的相关信息。
-<img src="/images/redis-sentinel-sub-sentinel-channel.png" alt="" /></li>
+<li><p>遍历哨兵集合获取到一个可用的哨兵节点。因为哨兵节点之间是共享数据的，任意节点都可以获取到主节点的信息。
+<img src="/images/redis-sentinel-get-sentinel-node.png" alt="" /></p></li>
+
+<li><p>通过 <em>sentinel get-master-addr-by-name master-name</em> API 来获取对应主节点的信息。
+<img src="/images/redis-sentinel-get-master-info.png" alt="" /></p></li>
+
+<li><p>验证获取到的主节点是不是真正的主节点，防止故障转移期间主节点的变化。
+<img src="/images/redis-sentinel-verify-master-node.png" alt="" /></p></li>
+
+<li><p>保持和哨兵节点集合的联系，时刻获取关于主节点的相关信息。
+<img src="/images/redis-sentinel-sub-sentinel-channel.png" alt="" /></p></li>
 </ol>
 
-<p>从上面的模型可以看出，哨兵客户端只在初始化和切换 master 时才需要和哨兵集合通信，来获取 master 的信息。</p>
+<p>从上面的模型可以看出，哨兵客户端只在初始化和切换主节点时才需要和哨兵集合通信，来获取主节点的信息。</p>
 
-<p>那么，哨兵是如何发现 master 变化的呢？答案是通过定时监控任务。</p>
+<p>那么，哨兵是如何发现主节点变化的呢？答案是通过定时监控任务。</p>
 
 <h1 id="哨兵监控任务">哨兵监控任务</h1>
 
 <p>一套合理的监控机制是哨兵节点判定节点不可达的重要保证，Redis 哨兵通过三个定时监控任务完成对各个节点发现和监控：</p>
 
-<p><strong>1. 每隔10秒，每个哨兵节点会向主节点和从节点发送info命令获取最新的拓扑结构。</strong></p>
+<p><strong>1. 每隔10秒，每个哨兵节点会向主节点和从节点发送 info 命令获取最新的拓扑结构。</strong></p>
 
 <p>这个定时任务的作用具体可以表现在三个方面：</p>
 
@@ -225,18 +228,18 @@ Redis 哨兵就是为了解决这些问题而生的，它是 Redis 2.8 引入的
 <li>节点不可达或者故障转移后，可以通过 info 命令实时更新节点拓扑信息。</li>
 </ul>
 
-<p><strong>2. 每隔2秒，每个哨兵节点会向 Redis 数据节点的 <em><strong>sentinel</strong>：hello</em> 频道上发送该哨兵节点对于主节点的判断以及当前哨兵节点的信息，同时每个哨兵节点也会订阅该频道，来了解其他 哨兵 节点以及它们对主节点的判断。</strong></p>
+<p><strong>2. 每隔2秒，每个哨兵节点会向 Redis 数据节点的 <em><strong>sentinel</strong>：hello</em> 频道上发送该哨兵节点对于主节点的判断以及当前哨兵节点的信息，同时每个哨兵节点也会订阅该频道，来了解其他哨兵节点以及它们对主节点的判断。</strong></p>
 
 <p>所以这个定时任务可以完成以下两个工作：</p>
 
 <ul>
-<li>发现新的哨兵节点：通过订阅 master 的 <em><strong>sentinel</strong>：hello</em> 了解其他的哨兵节点信息，如果是新加入的哨兵节点，将该哨兵节点信息保存起来，并与该哨兵节点创建连接。</li>
+<li>发现新的哨兵节点：通过订阅主节点的 <em><strong>sentinel</strong>：hello</em> 了解其他的哨兵节点信息，如果是新加入的哨兵节点，将该哨兵节点信息保存起来，并与该哨兵节点创建连接。</li>
 <li>哨兵节点之间交换主节点的状态，作为后面客观下线以及领导者选举的依据。</li>
 </ul>
 
 <p><strong>3. 每隔1秒，每个哨兵节点会向主节点、从节点、其余哨兵节点发送一条 <em>ping</em> 命令做一次心跳检测，来确认这些节点当前是否可达。</strong></p>
 
-<p>通过上面的定时任务，哨兵节点对主节点、从节点、其余 哨兵节点都建立起连接，实现了对每个节点的监控，这个定时任务是节点失败判定的重要依据。</p>
+<p>通过上面的定时任务，哨兵节点对主节点、从节点、其余哨兵节点都建立起连接，实现了对每个节点的监控，这个定时任务是节点失败判定的重要依据。</p>
 
 <h1 id="jedis-操作哨兵">Jedis 操作哨兵</h1>
 
@@ -376,10 +379,10 @@ Redis 哨兵就是为了解决这些问题而生的，它是 Redis 2.8 引入的
 <li>遍历节点集合，找到一个可用的节点，如果找不到就从节点集合中去找下一个，如果都找不到直接抛出异常给客户端：</li>
 <li>找到一个可用的节点，执行 <code>sentinelGetMasterAddrByName(masterName)</code>，找到对应主节点信息：</li>
 <li><code>JedisSentinelPool</code> 中没有发现对主节点角色验证的代码，这是因为 <code>get-master-addr-by-name master-name</code> 这个API本身就会自动获取真正的主节点（例如故障转移期间）。</li>
-<li>为每一个节点单独启动一个线程，利用Redis的发布订阅功能，每个线程订阅节点上切换 master 的相关频道 <strong>+switch-master</strong>。</li>
+<li>为每一个节点单独启动一个线程，利用 Redis 的发布订阅功能，每个线程订阅哨兵节点上切换主节点的相关频道 <strong>+switch-master</strong>。</li>
 </ol>
 
-<p>下面代码就是 <code>MasterListener</code> 的核心监听代码，代码中比较重要的部分就是订阅节点的+switch-master频道，它就是Redis 在结束对主节点故障转移后会发布切换主节点的消息，哨兵节点基本将故障转移的各个阶段发生的行为都通过这种发布订阅的形式对外提供，开发者只需订阅感兴趣的频道即可。</p>
+<p>下面代码就是 <code>MasterListener</code> 的核心监听代码，代码中比较重要的部分就是订阅节点的 <strong>+switch-master</strong> 频道，它就是 Redis 在结束对主节点故障转移后会发布切换主节点的消息，哨兵节点基本将故障转移的各个阶段发生的行为都通过这种发布订阅的形式对外提供，开发者只需订阅感兴趣的频道即可。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
@@ -400,7 +403,7 @@ Redis 哨兵就是为了解决这些问题而生的，它是 Redis 2.8 引入的
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="n">Jedis</span> <span class="n">sentinelJedis</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Jedis</span><span class="o">(</span><span class="n">sentinelHost</span><span class="o">,</span> <span class="n">sentinelPort</span><span class="o">);</span>
-<span class="c1">// 客户端订阅  节点上 &#34;+switch-master&#34;( 切换主节点 ) 频道
+<span class="c1">// 客户端订阅哨兵节点上&#34;+switch-master&#34;(切换主节点)频道
 </span><span class="c1"></span><span class="n">sentinelJedis</span><span class="o">.</span><span class="na">subscribe</span><span class="o">(</span><span class="k">new</span> <span class="n">JedisPubSub</span><span class="o">()</span> <span class="o">{</span>
     <span class="nd">@Override</span>
     <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onMessage</span><span class="o">(</span><span class="n">String</span> <span class="n">channel</span><span class="o">,</span> <span class="n">String</span> <span class="n">message</span><span class="o">)</span> <span class="o">{</span>
