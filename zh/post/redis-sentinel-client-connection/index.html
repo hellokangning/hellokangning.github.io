@@ -70,7 +70,7 @@ Redis Sentinel(哨兵) 就是为了解决这些问题而生的，它是 Redis 2.
 
 <meta itemprop="datePublished" content="2019-01-29T10:21:46&#43;08:00" />
 <meta itemprop="dateModified" content="2019-01-29T10:21:46&#43;08:00" />
-<meta itemprop="wordCount" content="2257">
+<meta itemprop="wordCount" content="2265">
 
 
 
@@ -159,7 +159,7 @@ Redis Sentinel(哨兵) 就是为了解决这些问题而生的，它是 Redis 2.
         <div class="post-category">
             <a href="/zh/categories/redis/"> Redis </a>
             </div>
-          <span class="more-meta"> 约 2257 字 </span>
+          <span class="more-meta"> 约 2265 字 </span>
           <span class="more-meta"> 预计阅读 5 分钟 </span>
         
       </div>
@@ -228,12 +228,12 @@ Redis Sentinel(哨兵) 就是为了解决这些问题而生的，它是 Redis 2.
 <li>节点不可达或者故障转移后，可以通过 info 命令实时更新节点拓扑信息。</li>
 </ul>
 
-<p><strong>2. 每隔2秒，每个哨兵节点会向 Redis 数据节点的 <em><strong>sentinel</strong>：hello</em> 频道上发送该哨兵节点对于主节点的判断以及当前哨兵节点的信息，同时每个哨兵节点也会订阅该频道，来了解其他哨兵节点以及它们对主节点的判断。</strong></p>
+<p><strong>2. 每隔2秒，每个哨兵节点会向 Redis 数据节点的 <code>__sentinel__：hello</code> 频道上发送该哨兵节点对于主节点的判断以及当前哨兵节点的信息，同时每个哨兵节点也会订阅该频道，来了解其他哨兵节点以及它们对主节点的判断。</strong></p>
 
 <p>所以这个定时任务可以完成以下两个工作：</p>
 
 <ul>
-<li>发现新的哨兵节点：通过订阅主节点的 <em><strong>sentinel</strong>：hello</em> 了解其他的哨兵节点信息，如果是新加入的哨兵节点，将该哨兵节点信息保存起来，并与该哨兵节点创建连接。</li>
+<li>发现新的哨兵节点：通过订阅主节点的 <code>__sentinel__：hello</code> 了解其他的哨兵节点信息，如果是新加入的哨兵节点，将该哨兵节点信息保存起来，并与该哨兵节点创建连接。</li>
 <li>哨兵节点之间交换主节点的状态，作为后面客观下线以及领导者选举的依据。</li>
 </ul>
 
