@@ -70,7 +70,7 @@ Redis Sentinel(哨兵) 就是为了解决这些问题而生的，它是 Redis 2.
 
 <meta itemprop="datePublished" content="2019-01-29T10:21:46&#43;08:00" />
 <meta itemprop="dateModified" content="2019-01-29T10:21:46&#43;08:00" />
-<meta itemprop="wordCount" content="2265">
+<meta itemprop="wordCount" content="2263">
 
 
 
@@ -159,7 +159,7 @@ Redis Sentinel(哨兵) 就是为了解决这些问题而生的，它是 Redis 2.
         <div class="post-category">
             <a href="/zh/categories/redis/"> Redis </a>
             </div>
-          <span class="more-meta"> 约 2265 字 </span>
+          <span class="more-meta"> 约 2263 字 </span>
           <span class="more-meta"> 预计阅读 5 分钟 </span>
         
       </div>
@@ -230,7 +230,9 @@ Redis Sentinel(哨兵) 就是为了解决这些问题而生的，它是 Redis 2.
 
 <p><strong>2. 每隔2秒，每个哨兵节点会向 Redis 数据节点的 <code>__sentinel__：hello</code> 频道上发送该哨兵节点对于主节点的判断以及当前哨兵节点的信息，同时每个哨兵节点也会订阅该频道，来了解其他哨兵节点以及它们对主节点的判断。</strong></p>
 
-<p>所以这个定时任务可以完成以下两个工作：</p>
+<p><img src="/images/redis-sentinel-sub-sentinel-hello.png" alt="" /></p>
+
+<p>这个定时任务可以完成以下两个工作：</p>
 
 <ul>
 <li>发现新的哨兵节点：通过订阅主节点的 <code>__sentinel__：hello</code> 了解其他的哨兵节点信息，如果是新加入的哨兵节点，将该哨兵节点信息保存起来，并与该哨兵节点创建连接。</li>
@@ -238,6 +240,8 @@ Redis Sentinel(哨兵) 就是为了解决这些问题而生的，它是 Redis 2.
 </ul>
 
 <p><strong>3. 每隔1秒，每个哨兵节点会向主节点、从节点、其余哨兵节点发送一条 <em>ping</em> 命令做一次心跳检测，来确认这些节点当前是否可达。</strong></p>
+
+<p><img src="/images/redis-sentinel-ping-servers.png" alt="" /></p>
 
 <p>通过上面的定时任务，哨兵节点对主节点、从节点、其余哨兵节点都建立起连接，实现了对每个节点的监控，这个定时任务是节点失败判定的重要依据。</p>
 
