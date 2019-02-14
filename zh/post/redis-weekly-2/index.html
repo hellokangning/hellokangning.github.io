@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Redis Weekly 2 - Qing&#39;s Landing</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Guoqing Geng" /><meta name="description" content=" 文章  从Redis连接池获取连接失败的原因说起 Redis GEO &amp;amp; 实现原理深度分析 when will fsync() occur if snapshotting and AOF both are disabled Clustering in Redis 用Python实现redis方轮子-第0篇-了解通信协议 Redis 基础梳理以及其在渗透测试中的利用  " /><meta name="keywords" content="elasticsearch, python, hbase, redis" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.53 with even 4.0.0" />
+
+
+<link rel="canonical" href="https://hellokangning.github.io/zh/post/redis-weekly-2/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+
+<meta property="og:title" content="Redis Weekly 2" />
+<meta property="og:description" content="
+文章
+
+
+从Redis连接池获取连接失败的原因说起
+Redis GEO &amp; 实现原理深度分析
+when will fsync() occur if snapshotting and AOF both are disabled
+Clustering in Redis
+用Python实现redis方轮子-第0篇-了解通信协议
+Redis 基础梳理以及其在渗透测试中的利用
+
+" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hellokangning.github.io/zh/post/redis-weekly-2/" /><meta property="article:published_time" content="2019-02-14T07:32:28&#43;08:00"/>
+<meta property="article:modified_time" content="2019-02-14T07:32:28&#43;08:00"/>
+
+<meta itemprop="name" content="Redis Weekly 2">
+<meta itemprop="description" content="
+文章
+
+
+从Redis连接池获取连接失败的原因说起
+Redis GEO &amp; 实现原理深度分析
+when will fsync() occur if snapshotting and AOF both are disabled
+Clustering in Redis
+用Python实现redis方轮子-第0篇-了解通信协议
+Redis 基础梳理以及其在渗透测试中的利用
+
+">
+
+
+<meta itemprop="datePublished" content="2019-02-14T07:32:28&#43;08:00" />
+<meta itemprop="dateModified" content="2019-02-14T07:32:28&#43;08:00" />
+<meta itemprop="wordCount" content="553">
+
+
+
+<meta itemprop="keywords" content="Redis Weekly," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Redis Weekly 2"/>
+<meta name="twitter:description" content="
+文章
+
+
+从Redis连接池获取连接失败的原因说起
+Redis GEO &amp; 实现原理深度分析
+when will fsync() occur if snapshotting and AOF both are disabled
+Clustering in Redis
+用Python实现redis方轮子-第0篇-了解通信协议
+Redis 基础梳理以及其在渗透测试中的利用
+
+"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/zh/" class="logo">Qing&#39;s Landing</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/zh/">
+        <li class="mobile-menu-item">首页</li>
+      </a><a href="/zh/post/">
+        <li class="mobile-menu-item">归档</li>
+      </a><a href="/zh/categories/">
+        <li class="mobile-menu-item">分类</li>
+      </a><a href="/zh/tags/">
+        <li class="mobile-menu-item">标签</li>
+      </a><a href="/en/">
+        <li class="mobile-menu-item">EN</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/zh/" class="logo">Qing&#39;s Landing</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/zh/">首页</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/zh/post/">归档</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/zh/categories/">分类</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/zh/tags/">标签</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/en/">EN</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Redis Weekly 2</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> Feb 14, 2019 </span>
+        <div class="post-category">
+            <a href="/zh/categories/redis/"> Redis </a>
+            </div>
+          <span class="more-meta"> 约 553 字 </span>
+          <span class="more-meta"> 预计阅读 2 分钟 </span>
+        
+      </div>
+    </header>
+
+    
+    <div class="post-content">
+      <ul>
+<li><a href="#%E6%96%87%E7%AB%A0">文章</a>
+
+<ul>
+<li>从Redis连接池获取连接失败的原因说起</li>
+<li>Redis GEO &amp; 实现原理深度分析</li>
+<li>when will fsync() occur if snapshotting and AOF both are disabled</li>
+<li>Clustering in Redis</li>
+<li>用Python实现redis方轮子-第0篇-了解通信协议</li>
+<li>Redis 基础梳理以及其在渗透测试中的利用</li>
+</ul></li>
+</ul>
+
+<h1 id="文章">文章</h1>
+
+<h2 id="从redis连接池获取连接失败的原因说起-http-coderjerry-com-2017-07-05-redis-e8-bf-9e-e6-8e-a5-e6-b1-a0-e8-8e-b7-e5-8f-96-e8-bf-9e-e6-8e-a5-e5-a4-b1-e8-b4-a5-e5-8e-9f-e5-9b-a0-e8-b0-83-e6-9f-a5-e4-b8-80-e5-88-99"><a href="http://coderjerry.com/2017/07/05/Redis%E8%BF%9E%E6%8E%A5%E6%B1%A0%E8%8E%B7%E5%8F%96%E8%BF%9E%E6%8E%A5%E5%A4%B1%E8%B4%A5%E5%8E%9F%E5%9B%A0%E8%B0%83%E6%9F%A5%E4%B8%80%E5%88%99/">从Redis连接池获取连接失败的原因说起</a></h2>
+
+<p>今天正好也碰到一个 <code>RedisConnectionFailureException</code> 异常，google 到了这篇博客。我们常在 jedis 中将 <code>testOnBorrow</code> 设置为 <code>true</code>，使用 PING 命令测试连接是否有效。本文遇到的情况是收到 &ldquo;MISCONF Redis is configured to save RDB snapshots&rdquo; 的响应，而非正常的 PONG。这就导致 jedis 判断连接无效，强制断开了连接。</p>
+
+<p>文中还对 TCP 的 RST 标志位做了少许的分析，值得一看。</p>
+
+<h2 id="redis-geo-实现原理深度分析-https-juejin-im-post-5c525f696fb9a049aa6f806a"><a href="https://juejin.im/post/5c525f696fb9a049aa6f806a">Redis GEO &amp; 实现原理深度分析</a></h2>
+
+<p>GEO 底层是用集合 <code>zset</code> 实现的，文章提到的 GeoHash，详情看这里：<a href="https://www.cnblogs.com/LBSer/p/3310455.html">GeoHash核心原理解析</a></p>
+
+<h2 id="when-will-fsync-occur-if-snapshotting-and-aof-both-are-disabled-https-groups-google-com-forum-topic-redis-db-kjcyssle-60"><a href="https://groups.google.com/forum/#!topic/redis-db/kjCYsSle_60">when will fsync() occur if snapshotting and AOF both are disabled</a></h2>
+
+<p>题主问的是 <code>fsync()</code> 的问题，但回答中详细地说明了全量同步和部分同步的场景，👍</p>
+
+<h2 id="clustering-in-redis-https-groups-google-com-forum-topic-redis-db-drx-qy2sroe"><a href="https://groups.google.com/forum/#!topic/redis-db/DrX-qy2SRoE">Clustering in Redis</a></h2>
+
+<p>一个 Redis 实例要么是 master，要么是 slave。不能既是 master，又是 slave。但可以再一台机器上同时部署两个实例，分别为 master 和 slave，但不推荐这么做。</p>
+
+<h2 id="用python实现redis方轮子-第0篇-了解通信协议-https-zhuanlan-zhihu-com-p-44135297"><a href="https://zhuanlan.zhihu.com/p/44135297">用Python实现redis方轮子-第0篇-了解通信协议</a></h2>
+
+<p>Redis 使用的是纯文本通信协议，叫做 RESP(Redis Serialization Protocol)。实现简单，解析起来也方便。至于扩展性问题嘛。。。目前没遇到。</p>
+
+<h2 id="redis-基础梳理以及其在渗透测试中的利用-https-www-k0rz3n-com-2018-11-08-redis-20-e5-9f-ba-e7-a1-80-e6-a2-b3-e7-90-86-e4-bb-a5-e5-8f-8a-e5-85-b6-e5-9c-a8-e6-b8-97-e9-80-8f-e6-b5-8b-e8-af-95-e4-b8-ad-e7-9a-84-e5-88-a9-e7-94-a8"><a href="https://www.k0rz3n.com/2018/11/08/Redis%20%E5%9F%BA%E7%A1%80%E6%A2%B3%E7%90%86%E4%BB%A5%E5%8F%8A%E5%85%B6%E5%9C%A8%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E4%B8%AD%E7%9A%84%E5%88%A9%E7%94%A8/">Redis 基础梳理以及其在渗透测试中的利用</a></h2>
+
+<p>文章后半部分讲述的针对 Redis 的攻击与防护值得一读。</p>
+    </div>
+
+    <footer class="post-footer">
+      <div class="post-tags">
+          <a href="/zh/tags/redis-weekly/">Redis Weekly</a>
+          </div>
+      <nav class="post-nav">
+        
+        <a class="next" href="/zh/post/redis-sentinel-automatic-failover/">
+            <span class="next-text nav-default">Redis 哨兵：自动故障转移</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        <div id="disqus_thread"></div>
+    <script type="text/javascript">
+    (function() {
+      
+      
+      if (window.location.hostname === 'localhost') return;
+
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      var disqus_shortname = 'guoqing';
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:hellokangning@hotmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://www.linkedin.com/in/guoqing-geng-9032b820/" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="https://github.com/hellokangning" class="iconfont icon-github" title="github"></a>
+      <a href="https://www.douban.com/people/hellokangning/" class="iconfont icon-douban" title="douban"></a>
+      <a href="https://www.instagram.com/hellokangning/" class="iconfont icon-instagram" title="instagram"></a>
+  <a href="https://hellokangning.github.io/zh/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2016 - 
+    2019
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Guoqing Geng</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  <script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-105833321-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>
