@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Redis 启动流程：命令注册和执行 - Qing&#39;s Landing</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Guoqing Geng" /><meta name="description" content="这篇博客想讲一下 Redis 命令的注册、解析和执行。
+ 本文采用的源码是 Redis 5.0.0
+" /><meta name="keywords" content="elasticsearch, python, hbase, redis" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.54.0 with even 4.0.0" />
+
+
+<link rel="canonical" href="https://hellokangning.github.io/zh/post/redis-cmd-population-execution/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+
+<meta property="og:title" content="Redis 启动流程：命令注册和执行" />
+<meta property="og:description" content="这篇博客想讲一下 Redis 命令的注册、解析和执行。
+
+
+本文采用的源码是 Redis 5.0.0
+" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hellokangning.github.io/zh/post/redis-cmd-population-execution/" />
+<meta property="article:published_time" content="2019-04-03T20:11:53&#43;08:00"/>
+<meta property="article:modified_time" content="2019-04-03T20:11:53&#43;08:00"/>
+
+<meta itemprop="name" content="Redis 启动流程：命令注册和执行">
+<meta itemprop="description" content="这篇博客想讲一下 Redis 命令的注册、解析和执行。
+
+
+本文采用的源码是 Redis 5.0.0
+">
+
+
+<meta itemprop="datePublished" content="2019-04-03T20:11:53&#43;08:00" />
+<meta itemprop="dateModified" content="2019-04-03T20:11:53&#43;08:00" />
+<meta itemprop="wordCount" content="1495">
+
+
+
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Redis 启动流程：命令注册和执行"/>
+<meta name="twitter:description" content="这篇博客想讲一下 Redis 命令的注册、解析和执行。
+
+
+本文采用的源码是 Redis 5.0.0
+"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/zh/" class="logo">Qing&#39;s Landing</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/zh/">
+        <li class="mobile-menu-item">首页</li>
+      </a><a href="/zh/post/">
+        <li class="mobile-menu-item">归档</li>
+      </a><a href="/zh/categories/">
+        <li class="mobile-menu-item">分类</li>
+      </a><a href="/zh/tags/">
+        <li class="mobile-menu-item">标签</li>
+      </a><a href="/en/">
+        <li class="mobile-menu-item">EN</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/zh/" class="logo">Qing&#39;s Landing</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/zh/">首页</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/zh/post/">归档</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/zh/categories/">分类</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/zh/tags/">标签</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/en/">EN</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Redis 启动流程：命令注册和执行</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> Apr 03, 2019 </span>
+        <div class="post-category">
+            <a href="/zh/categories/redis/"> Redis </a>
+            </div>
+          <span class="more-meta"> 约 1495 字 </span>
+          <span class="more-meta"> 预计阅读 3 分钟 </span>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    
+  </div>
+</div>
+    <div class="post-content">
+      <p>这篇博客想讲一下 Redis 命令的注册、解析和执行。</p>
+
+<blockquote>
+<p>本文采用的源码是 Redis 5.0.0</p>
+</blockquote>
+
+<p>首先来看下 Redis 命令的结构：<code>redisCommand</code>。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="k">typedef</span> <span class="kt">void</span> <span class="nf">redisCommandProc</span><span class="p">(</span><span class="n">client</span> <span class="o">*</span><span class="n">c</span><span class="p">);</span>
+<span class="k">typedef</span> <span class="kt">int</span> <span class="o">*</span><span class="nf">redisGetKeysProc</span><span class="p">(</span><span class="k">struct</span> <span class="n">redisCommand</span> <span class="o">*</span><span class="n">cmd</span><span class="p">,</span> <span class="n">robj</span> <span class="o">**</span><span class="n">argv</span><span class="p">,</span> <span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span><span class="n">numkeys</span><span class="p">);</span>
+<span class="k">struct</span> <span class="n">redisCommand</span> <span class="p">{</span>
+    <span class="kt">char</span> <span class="o">*</span><span class="n">name</span><span class="p">;</span>
+    <span class="n">redisCommandProc</span> <span class="o">*</span><span class="n">proc</span><span class="p">;</span> <span class="c1">// 执行函数
+</span><span class="c1"></span>    <span class="kt">int</span> <span class="n">arity</span><span class="p">;</span> <span class="c1">// 参数数量
+</span><span class="c1"></span>    <span class="kt">char</span> <span class="o">*</span><span class="n">sflags</span><span class="p">;</span> <span class="c1">// 标记，一个 char 代表一个标志 
+</span><span class="c1"></span>    <span class="kt">int</span> <span class="n">flags</span><span class="p">;</span>    <span class="c1">// 实际的标记，从 sflags 中获得
+</span><span class="c1"></span>
+    <span class="n">redisGetKeysProc</span> <span class="o">*</span><span class="n">getkeys_proc</span><span class="p">;</span> <span class="c1">// 获得 key 参数
+</span><span class="c1"></span>
+    <span class="kt">int</span> <span class="n">firstkey</span><span class="p">;</span> <span class="c1">// 第一个是 key 的参数 
+</span><span class="c1"></span>    <span class="kt">int</span> <span class="n">lastkey</span><span class="p">;</span>  <span class="c1">// 最后一个是 key 的参数
+</span><span class="c1"></span>    <span class="kt">int</span> <span class="n">keystep</span><span class="p">;</span>  <span class="c1">// 第一个和最后一个 key 之间的步数 
+</span><span class="c1"></span>    <span class="kt">long</span> <span class="kt">long</span> <span class="n">microseconds</span><span class="p">,</span> <span class="n">calls</span><span class="p">;</span> <span class="c1">// 命令的总执行时间、调用次数
+</span><span class="c1"></span><span class="p">}</span></code></pre></td></tr></table>
+</div>
+</div>
+<p>Redis 所有的命令，都保存在数组 <code>redisCommandTable</code>。这里以 GET 命令为例：</p>
+
+<ul>
+<li>名称：get</li>
+<li>执行函数：getCommand</li>
+<li>参数个数：2</li>
+<li>标记：rF</li>
+<li>实际标记：0</li>
+<li>不用于集群重定向</li>
+<li>第一个为 key 的参数，是第 1 个参数</li>
+<li>最后一个为 key 的参数，也是第 1 个参数</li>
+<li>上述两个参数的间隔为 1</li>
+<li>总执行时间为 0</li>
+<li>调用次数为 0</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="k">struct</span> <span class="n">redisCommand</span> <span class="n">redisCommandTable</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="p">{</span><span class="s">&#34;module&#34;</span><span class="p">,</span><span class="n">moduleCommand</span><span class="p">,</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="s">&#34;as&#34;</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="nb">NULL</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">},</span>
+    <span class="p">{</span><span class="s">&#34;get&#34;</span><span class="p">,</span><span class="n">getCommand</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="s">&#34;rF&#34;</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="nb">NULL</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">},</span>
+    <span class="c1">// ...
+</span><span class="c1"></span><span class="p">}</span></code></pre></td></tr></table>
+</div>
+</div>
+<p>Redis 的 <code>main</code> 函数（server.c）中，调用 <code>pupulateCommandTable</code> 填充了命令表：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">void</span> <span class="nf">populateCommandTable</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">int</span> <span class="n">j</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">numcommands</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">redisCommandTable</span><span class="p">)</span><span class="o">/</span><span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span> <span class="n">redisCommand</span><span class="p">);</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">numcommands</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">struct</span> <span class="n">redisCommand</span> <span class="o">*</span><span class="n">c</span> <span class="o">=</span> <span class="n">redisCommandTable</span><span class="o">+</span><span class="n">j</span><span class="p">;</span>
+        <span class="kt">char</span> <span class="o">*</span><span class="n">f</span> <span class="o">=</span> <span class="n">c</span><span class="o">-&gt;</span><span class="n">sflags</span><span class="p">;</span>
+        <span class="kt">int</span> <span class="n">retval1</span><span class="p">,</span> <span class="n">retval2</span><span class="p">;</span>
+
+        <span class="k">while</span><span class="p">(</span><span class="o">*</span><span class="n">f</span> <span class="o">!=</span> <span class="sc">&#39;\0&#39;</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">switch</span><span class="p">(</span><span class="o">*</span><span class="n">f</span><span class="p">)</span> <span class="p">{</span>
+
+            <span class="c1">// 计算实际的 flag
+</span><span class="c1"></span>            <span class="k">case</span> <span class="sc">&#39;w&#39;</span><span class="o">:</span> <span class="n">c</span><span class="o">-&gt;</span><span class="n">flags</span> <span class="o">|=</span> <span class="n">CMD_WRITE</span><span class="p">;</span> <span class="k">break</span><span class="p">;</span>
+            <span class="k">case</span> <span class="sc">&#39;r&#39;</span><span class="o">:</span> <span class="n">c</span><span class="o">-&gt;</span><span class="n">flags</span> <span class="o">|=</span> <span class="n">CMD_READONLY</span><span class="p">;</span> <span class="k">break</span><span class="p">;</span>
+            <span class="k">case</span> <span class="sc">&#39;m&#39;</span><span class="o">:</span> <span class="n">c</span><span class="o">-&gt;</span><span class="n">flags</span> <span class="o">|=</span> <span class="n">CMD_DENYOOM</span><span class="p">;</span> <span class="k">break</span><span class="p">;</span>
+            <span class="k">case</span> <span class="sc">&#39;a&#39;</span><span class="o">:</span> <span class="n">c</span><span class="o">-&gt;</span><span class="n">flags</span> <span class="o">|=</span> <span class="n">CMD_ADMIN</span><span class="p">;</span> <span class="k">break</span><span class="p">;</span>
+            <span class="k">case</span> <span class="sc">&#39;p&#39;</span><span class="o">:</span> <span class="n">c</span><span class="o">-&gt;</span><span class="n">flags</span> <span class="o">|=</span> <span class="n">CMD_PUBSUB</span><span class="p">;</span> <span class="k">break</span><span class="p">;</span>
+            <span class="k">case</span> <span class="sc">&#39;s&#39;</span><span class="o">:</span> <span class="n">c</span><span class="o">-&gt;</span><span class="n">flags</span> <span class="o">|=</span> <span class="n">CMD_NOSCRIPT</span><span class="p">;</span> <span class="k">break</span><span class="p">;</span>
+            <span class="k">case</span> <span class="sc">&#39;R&#39;</span><span class="o">:</span> <span class="n">c</span><span class="o">-&gt;</span><span class="n">flags</span> <span class="o">|=</span> <span class="n">CMD_RANDOM</span><span class="p">;</span> <span class="k">break</span><span class="p">;</span>
+            <span class="k">case</span> <span class="sc">&#39;S&#39;</span><span class="o">:</span> <span class="n">c</span><span class="o">-&gt;</span><span class="n">flags</span> <span class="o">|=</span> <span class="n">CMD_SORT_FOR_SCRIPT</span><span class="p">;</span> <span class="k">break</span><span class="p">;</span>
+            <span class="k">case</span> <span class="sc">&#39;l&#39;</span><span class="o">:</span> <span class="n">c</span><span class="o">-&gt;</span><span class="n">flags</span> <span class="o">|=</span> <span class="n">CMD_LOADING</span><span class="p">;</span> <span class="k">break</span><span class="p">;</span>
+            <span class="k">case</span> <span class="sc">&#39;t&#39;</span><span class="o">:</span> <span class="n">c</span><span class="o">-&gt;</span><span class="n">flags</span> <span class="o">|=</span> <span class="n">CMD_STALE</span><span class="p">;</span> <span class="k">break</span><span class="p">;</span>
+            <span class="k">case</span> <span class="sc">&#39;M&#39;</span><span class="o">:</span> <span class="n">c</span><span class="o">-&gt;</span><span class="n">flags</span> <span class="o">|=</span> <span class="n">CMD_SKIP_MONITOR</span><span class="p">;</span> <span class="k">break</span><span class="p">;</span>
+            <span class="k">case</span> <span class="sc">&#39;k&#39;</span><span class="o">:</span> <span class="n">c</span><span class="o">-&gt;</span><span class="n">flags</span> <span class="o">|=</span> <span class="n">CMD_ASKING</span><span class="p">;</span> <span class="k">break</span><span class="p">;</span>
+            <span class="k">case</span> <span class="sc">&#39;F&#39;</span><span class="o">:</span> <span class="n">c</span><span class="o">-&gt;</span><span class="n">flags</span> <span class="o">|=</span> <span class="n">CMD_FAST</span><span class="p">;</span> <span class="k">break</span><span class="p">;</span>
+            <span class="k">default</span><span class="o">:</span> <span class="n">serverPanic</span><span class="p">(</span><span class="s">&#34;Unsupported command flag&#34;</span><span class="p">);</span> <span class="k">break</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="n">f</span><span class="o">++</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="c1">// 将命令加入 server.commands 哈希表
+</span><span class="c1"></span>        <span class="n">retval1</span> <span class="o">=</span> <span class="n">dictAdd</span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">commands</span><span class="p">,</span> <span class="n">sdsnew</span><span class="p">(</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">),</span> <span class="n">c</span><span class="p">);</span>
+        <span class="c1">// 将命令加入 server.orig_commands 哈希表，这张表不会受到命令重命名的影响
+</span><span class="c1"></span>        <span class="n">retval2</span> <span class="o">=</span> <span class="n">dictAdd</span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">orig_commands</span><span class="p">,</span> <span class="n">sdsnew</span><span class="p">(</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">),</span> <span class="n">c</span><span class="p">);</span>
+        <span class="n">serverAssert</span><span class="p">(</span><span class="n">retval1</span> <span class="o">==</span> <span class="n">DICT_OK</span> <span class="o">&amp;&amp;</span> <span class="n">retval2</span> <span class="o">==</span> <span class="n">DICT_OK</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre></td></tr></table>
+</div>
+</div>
+<p>命令表保存在 <code>server</code> 变量中，它是一个全局变量：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="k">struct</span> <span class="n">redisServer</span> <span class="n">server</span><span class="p">;</span> <span class="cm">/* Server global state */</span>
+
+<span class="k">struct</span> <span class="n">redisServer</span> <span class="p">{</span>
+    <span class="c1">// ...
+</span><span class="c1"></span>    <span class="n">dict</span> <span class="o">*</span><span class="n">commands</span><span class="p">;</span>             <span class="cm">/* Command table */</span>
+    <span class="n">dict</span> <span class="o">*</span><span class="n">orig_commands</span><span class="p">;</span>        <span class="cm">/* Command table before command renaming. */</span>
+    <span class="c1">// ...
+</span><span class="c1"></span><span class="p">}</span></code></pre></td></tr></table>
+</div>
+</div>
+<p>Redis 命令执行的函数是 <code>processCommands</code>，它会调用 <code>call</code> 执行具体的操作：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">void</span> <span class="nf">call</span><span class="p">(</span><span class="n">client</span> <span class="o">*</span><span class="n">c</span><span class="p">,</span> <span class="kt">int</span> <span class="n">flags</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">long</span> <span class="kt">long</span> <span class="n">dirty</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">duration</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">client_old_flags</span> <span class="o">=</span> <span class="n">c</span><span class="o">-&gt;</span><span class="n">flags</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="n">redisCommand</span> <span class="o">*</span><span class="n">real_cmd</span> <span class="o">=</span> <span class="n">c</span><span class="o">-&gt;</span><span class="n">cmd</span><span class="p">;</span>
+
+    <span class="c1">// ...
+</span><span class="c1"></span>
+    <span class="c1">// 重新初始化标志位，并为命令传播创建数组
+</span><span class="c1"></span>    <span class="n">c</span><span class="o">-&gt;</span><span class="n">flags</span> <span class="o">&amp;=</span> <span class="o">~</span><span class="p">(</span><span class="n">CLIENT_FORCE_AOF</span><span class="o">|</span><span class="n">CLIENT_FORCE_REPL</span><span class="o">|</span><span class="n">CLIENT_PREVENT_PROP</span><span class="p">);</span>
+    <span class="n">redisOpArray</span> <span class="n">prev_also_propagate</span> <span class="o">=</span> <span class="n">server</span><span class="p">.</span><span class="n">also_propagate</span><span class="p">;</span>
+    <span class="n">redisOpArrayInit</span><span class="p">(</span><span class="o">&amp;</span><span class="n">server</span><span class="p">.</span><span class="n">also_propagate</span><span class="p">);</span>
+
+
+    <span class="c1">// 执行命令，记录执行时间
+</span><span class="c1"></span>    <span class="n">dirty</span> <span class="o">=</span> <span class="n">server</span><span class="p">.</span><span class="n">dirty</span><span class="p">;</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">ustime</span><span class="p">();</span>
+    <span class="n">c</span><span class="o">-&gt;</span><span class="n">cmd</span><span class="o">-&gt;</span><span class="n">proc</span><span class="p">(</span><span class="n">c</span><span class="p">);</span>
+    <span class="n">duration</span> <span class="o">=</span> <span class="n">ustime</span><span class="p">()</span><span class="o">-</span><span class="n">start</span><span class="p">;</span>
+    <span class="n">dirty</span> <span class="o">=</span> <span class="n">server</span><span class="p">.</span><span class="n">dirty</span><span class="o">-</span><span class="n">dirty</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">dirty</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="n">dirty</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+    <span class="c1">// ...
+</span><span class="c1"></span>
+    <span class="c1">// 如有需要，记录慢日志。填充统计数据
+</span><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="n">flags</span> <span class="o">&amp;</span> <span class="n">CMD_CALL_SLOWLOG</span> <span class="o">&amp;&amp;</span> <span class="n">c</span><span class="o">-&gt;</span><span class="n">cmd</span><span class="o">-&gt;</span><span class="n">proc</span> <span class="o">!=</span> <span class="n">execCommand</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kt">char</span> <span class="o">*</span><span class="n">latency_event</span> <span class="o">=</span> <span class="p">(</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">cmd</span><span class="o">-&gt;</span><span class="n">flags</span> <span class="o">&amp;</span> <span class="n">CMD_FAST</span><span class="p">)</span> <span class="o">?</span>
+                              <span class="s">&#34;fast-command&#34;</span> <span class="o">:</span> <span class="s">&#34;command&#34;</span><span class="p">;</span>
+        <span class="n">latencyAddSampleIfNeeded</span><span class="p">(</span><span class="n">latency_event</span><span class="p">,</span><span class="n">duration</span><span class="o">/</span><span class="mi">1000</span><span class="p">);</span>
+        <span class="n">slowlogPushEntryIfNeeded</span><span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">argv</span><span class="p">,</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">argc</span><span class="p">,</span><span class="n">duration</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">flags</span> <span class="o">&amp;</span> <span class="n">CMD_CALL_STATS</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// 记录真正被执行的命令，防止 MULTI-EXEC/EXPIRE/GEOADD 等
+</span><span class="c1"></span>        <span class="n">real_cmd</span><span class="o">-&gt;</span><span class="n">microseconds</span> <span class="o">+=</span> <span class="n">duration</span><span class="p">;</span>
+        <span class="n">real_cmd</span><span class="o">-&gt;</span><span class="n">calls</span><span class="o">++</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="c1">// 将命令传播给 AOF 和副本
+</span><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="n">flags</span> <span class="o">&amp;</span> <span class="n">CMD_CALL_PROPAGATE</span> <span class="o">&amp;&amp;</span>
+        <span class="p">(</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">flags</span> <span class="o">&amp;</span> <span class="n">CLIENT_PREVENT_PROP</span><span class="p">)</span> <span class="o">!=</span> <span class="n">CLIENT_PREVENT_PROP</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// ...
+</span><span class="c1"></span>    <span class="p">}</span>
+
+   <span class="c1">// ...
+</span><span class="c1"></span>
+   <span class="n">server</span><span class="p">.</span><span class="n">also_propagate</span> <span class="o">=</span> <span class="n">prev_also_propagate</span><span class="p">;</span>
+   <span class="n">server</span><span class="p">.</span><span class="n">stat_numcommands</span><span class="o">++</span><span class="p">;</span>
+<span class="p">}</span></code></pre></td></tr></table>
+</div>
+</div>
+<p>那么 <code>processCommand</code> 在哪里触发呢？答案是 <code>networking.c</code> 里。</p>
+
+<p>整个函数的调用关系是：</p>
+
+<p><code>readQueryFromClient</code> -&gt; <code>processInputBufferAndReplicate</code> -&gt; <code>processInputBuffer</code> -&gt; <code>processCommand</code>。</p>
+
+<p><code>processInputBuffer</code> 函数根据请求类型进行数据读取处理，<code>processMultibulkBuffer</code> 是针对多个命令请求的数据读取解析，并且放到命令字段argv中。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">void</span> <span class="nf">processInputBuffer</span><span class="p">(</span><span class="n">client</span> <span class="o">*</span><span class="n">c</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">server</span><span class="p">.</span><span class="n">current_client</span> <span class="o">=</span> <span class="n">c</span><span class="p">;</span>
+
+    <span class="c1">// 处理，直到 buffer 为空
+</span><span class="c1"></span>    <span class="k">while</span><span class="p">(</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">qb_pos</span> <span class="o">&lt;</span> <span class="n">sdslen</span><span class="p">(</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">querybuf</span><span class="p">))</span> <span class="p">{</span>
+        <span class="c1">// client 暂停
+</span><span class="c1"></span>        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">flags</span> <span class="o">&amp;</span> <span class="n">CLIENT_SLAVE</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">clientsArePaused</span><span class="p">())</span> <span class="k">break</span><span class="p">;</span>
+
+        <span class="c1">// client 正在处理其他事情
+</span><span class="c1"></span>        <span class="k">if</span> <span class="p">(</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">flags</span> <span class="o">&amp;</span> <span class="n">CLIENT_BLOCKED</span><span class="p">)</span> <span class="k">break</span><span class="p">;</span>
+
+        <span class="c1">// 有 lua 脚本正在执行
+</span><span class="c1"></span>        <span class="k">if</span> <span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">lua_timedout</span> <span class="o">&amp;&amp;</span> <span class="n">c</span><span class="o">-&gt;</span><span class="n">flags</span> <span class="o">&amp;</span> <span class="n">CLIENT_MASTER</span><span class="p">)</span> <span class="k">break</span><span class="p">;</span>
+
+        <span class="c1">// 结果返回给 client 之后，就关闭连接，设置 CLIENT_CLOSE_AFTER_REPLY 状态
+</span><span class="c1"></span>        <span class="k">if</span> <span class="p">(</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">flags</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">CLIENT_CLOSE_AFTER_REPLY</span><span class="o">|</span><span class="n">CLIENT_CLOSE_ASAP</span><span class="p">))</span> <span class="k">break</span><span class="p">;</span>
+
+        <span class="c1">// 判断请求类型
+</span><span class="c1"></span>        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">reqtype</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">querybuf</span><span class="p">[</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">qb_pos</span><span class="p">]</span> <span class="o">==</span> <span class="sc">&#39;*&#39;</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">c</span><span class="o">-&gt;</span><span class="n">reqtype</span> <span class="o">=</span> <span class="n">PROTO_REQ_MULTIBULK</span><span class="p">;</span>
+            <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                <span class="n">c</span><span class="o">-&gt;</span><span class="n">reqtype</span> <span class="o">=</span> <span class="n">PROTO_REQ_INLINE</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">reqtype</span> <span class="o">==</span> <span class="n">PROTO_REQ_INLINE</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">processInlineBuffer</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">!=</span> <span class="n">C_OK</span><span class="p">)</span> <span class="k">break</span><span class="p">;</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">reqtype</span> <span class="o">==</span> <span class="n">PROTO_REQ_MULTIBULK</span><span class="p">)</span> <span class="p">{</span>
+            <span class="c1">// 这里读取buff中的数据，并且根据argc来填写argv数据
+</span><span class="c1"></span>            <span class="k">if</span> <span class="p">(</span><span class="n">processMultibulkBuffer</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">!=</span> <span class="n">C_OK</span><span class="p">)</span> <span class="k">break</span><span class="p">;</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="n">serverPanic</span><span class="p">(</span><span class="s">&#34;Unknown request type&#34;</span><span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="c1">// 批量处理，这时长度可能小于 0
+</span><span class="c1"></span>        <span class="k">if</span> <span class="p">(</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">argc</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">resetClient</span><span class="p">(</span><span class="n">c</span><span class="p">);</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="c1">// 命令执行之后，重置 client
+</span><span class="c1"></span>            <span class="k">if</span> <span class="p">(</span><span class="n">processCommand</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">==</span> <span class="n">C_OK</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">flags</span> <span class="o">&amp;</span> <span class="n">CLIENT_MASTER</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="p">(</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">flags</span> <span class="o">&amp;</span> <span class="n">CLIENT_MULTI</span><span class="p">))</span> <span class="p">{</span>
+                    <span class="c1">// 更新 master 的 replica 偏移量
+</span><span class="c1"></span>                    <span class="n">c</span><span class="o">-&gt;</span><span class="n">reploff</span> <span class="o">=</span> <span class="n">c</span><span class="o">-&gt;</span><span class="n">read_reploff</span> <span class="o">-</span> <span class="n">sdslen</span><span class="p">(</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">querybuf</span><span class="p">)</span> <span class="o">+</span> <span class="n">c</span><span class="o">-&gt;</span><span class="n">qb_pos</span><span class="p">;</span>
+                <span class="p">}</span>
+
+                <span class="cm">/* Don&#39;t reset the client structure for clients blocked in a
+</span><span class="cm">                 * module blocking command, so that the reply callback will
+</span><span class="cm">                 * still be able to access the client argv and argc field.
+</span><span class="cm">                 * The client will be reset in unblockClientFromModule(). */</span>
+                <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">flags</span> <span class="o">&amp;</span> <span class="n">CLIENT_BLOCKED</span><span class="p">)</span> <span class="o">||</span> <span class="n">c</span><span class="o">-&gt;</span><span class="n">btype</span> <span class="o">!=</span> <span class="n">BLOCKED_MODULE</span><span class="p">)</span>
+                    <span class="n">resetClient</span><span class="p">(</span><span class="n">c</span><span class="p">);</span>
+            <span class="p">}</span>
+            <span class="cm">/* freeMemoryIfNeeded may flush slave output buffers. This may
+</span><span class="cm">             * result into a slave, that may be the active client, to be
+</span><span class="cm">             * freed. */</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">current_client</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="k">break</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="cm">/* Trim to pos */</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">current_client</span> <span class="o">!=</span> <span class="nb">NULL</span> <span class="o">&amp;&amp;</span> <span class="n">c</span><span class="o">-&gt;</span><span class="n">qb_pos</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">sdsrange</span><span class="p">(</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">querybuf</span><span class="p">,</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">qb_pos</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+        <span class="n">c</span><span class="o">-&gt;</span><span class="n">qb_pos</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">server</span><span class="p">.</span><span class="n">current_client</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="p">}</span></code></pre></td></tr></table>
+</div>
+</div>
+<p>那么 <code>processInputBuffer</code> 什么时候触发呢，这时候事件模型就登场了。To be continued&hellip;</p>
+    </div>
+
+    <footer class="post-footer">
+      
+      <nav class="post-nav">
+        
+        <a class="next" href="/zh/post/redis-weekly-8/">
+            <span class="next-text nav-default">Redis Weekly #8</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        <div id="disqus_thread"></div>
+    <script type="text/javascript">
+    (function() {
+      
+      
+      if (window.location.hostname === 'localhost') return;
+
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      var disqus_shortname = 'guoqing';
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:hellokangning@hotmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://www.linkedin.com/in/guoqing-geng-9032b820/" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="https://github.com/hellokangning" class="iconfont icon-github" title="github"></a>
+      <a href="https://www.douban.com/people/hellokangning/" class="iconfont icon-douban" title="douban"></a>
+      <a href="https://www.instagram.com/hellokangning/" class="iconfont icon-instagram" title="instagram"></a>
+  <a href="https://hellokangning.github.io/zh/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2016 - 
+    2019
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Guoqing Geng</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  <script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-105833321-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>
