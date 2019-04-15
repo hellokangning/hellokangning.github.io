@@ -61,7 +61,7 @@
 
 <meta itemprop="datePublished" content="2019-04-03T20:11:53&#43;08:00" />
 <meta itemprop="dateModified" content="2019-04-03T20:11:53&#43;08:00" />
-<meta itemprop="wordCount" content="1495">
+<meta itemprop="wordCount" content="1598">
 
 
 
@@ -146,8 +146,8 @@
         <div class="post-category">
             <a href="/zh/categories/redis/"> Redis </a>
             </div>
-          <span class="more-meta"> 约 1495 字 </span>
-          <span class="more-meta"> 预计阅读 3 分钟 </span>
+          <span class="more-meta"> 约 1598 字 </span>
+          <span class="more-meta"> 预计阅读 4 分钟 </span>
         
       </div>
     </header>
@@ -341,7 +341,40 @@
 </span><span class="c1"></span><span class="p">}</span></code></pre></td></tr></table>
 </div>
 </div>
-<p>Redis 命令执行的函数是 <code>processCommands</code>，它会调用 <code>call</code> 执行具体的操作：</p>
+<p>Redis 命令执行的函数是 <code>processCommands</code>，它会先调用<code>lookupCommand</code> 查找命令，然后 <code>call</code> 执行具体的操作。</p>
+
+<p><code>lookupCommand</code>就是一个字典查找操作，具体实现可以看<a href="https://hellokangning.github.io/en/post/redis-internals-dict/#get-a-key">这里</a>：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="c1">// server.c
+</span><span class="c1"></span><span class="k">struct</span> <span class="n">redisCommand</span> <span class="o">*</span><span class="nf">lookupCommand</span><span class="p">(</span><span class="n">sds</span> <span class="n">name</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">dictFetchValue</span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">commands</span><span class="p">,</span> <span class="n">name</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// dict.c
+</span><span class="c1"></span><span class="kt">void</span> <span class="o">*</span><span class="nf">dictFetchValue</span><span class="p">(</span><span class="n">dict</span> <span class="o">*</span><span class="n">d</span><span class="p">,</span> <span class="k">const</span> <span class="kt">void</span> <span class="o">*</span><span class="n">key</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">dictEntry</span> <span class="o">*</span><span class="n">he</span><span class="p">;</span>
+
+    <span class="n">he</span> <span class="o">=</span> <span class="n">dictFind</span><span class="p">(</span><span class="n">d</span><span class="p">,</span><span class="n">key</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">he</span> <span class="o">?</span> <span class="n">dictGetVal</span><span class="p">(</span><span class="n">he</span><span class="p">)</span> <span class="o">:</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="p">}</span></code></pre></td></tr></table>
+</div>
+</div>
+<p><code>call</code> 函数：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
@@ -601,7 +634,7 @@
       <nav class="post-nav">
         <a class="prev" href="/zh/post/redis-weekly-9/">
             <i class="iconfont icon-left"></i>
-            <span class="prev-text nav-default">Redis Weekly 9</span>
+            <span class="prev-text nav-default">Redis Weekly #9</span>
             <span class="prev-text nav-mobile">上一篇</span>
           </a>
         <a class="next" href="/zh/post/redis-weekly-8/">
