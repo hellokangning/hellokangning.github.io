@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.54.0 with even 4.0.0" />
+<meta name="generator" content="Hugo 0.55.6 with even 4.0.0" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/zh/" />
@@ -45,7 +45,7 @@
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://hellokangning.github.io/zh/" />
 
-<meta property="og:updated_time" content="2019-04-03T20:11:53&#43;08:00"/>
+<meta property="og:updated_time" content="2019-07-24T14:24:00&#43;08:00"/>
 
 <meta itemprop="name" content="Qing&#39;s Landing">
 <meta itemprop="description" content="Guoqing Geng&#39;s blog">
@@ -117,6 +117,44 @@
       <div class="content-wrapper">
         <div id="content" class="content">
           <section id="posts" class="posts">
+    <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/zh/post/are-you-ok/">Are you ok - 分布式系统的租约和心跳</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> Jul 24, 2019 </span>
+      <div class="post-category">
+          <a href="/zh/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/"> 分布式系统 </a>
+          </div>
+        <span class="more-meta"> 约 921 字 </span>
+        <span class="more-meta"> 预计阅读 2 分钟 </span>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      <p>故障检测主要有两种机制：心跳和租约。</p>
+
+<ul>
+<li>心跳：假设总控机 A 需要确认工作机 B 是否发生故障，那么总控机 A 每隔一段时间，比如 1 秒，向工作机 B 发送一个心跳包。</li>
+<li>租约：租约在一定期限内给予持有者特定权力的协议。</li>
+</ul>
+
+<p>租约的协议决定了其用途，它能做的事情远不止故障检测。</p>
+
+<ol>
+<li>如果协议内容是服务器确认客户端还存活，那么这个租约的功能就相当于*心跳*；</li>
+<li>如果协议内容是服务器保证内容不会被修改，那么这个 租约就相当于*读锁*；</li>
+<li>如果协议内容是服务器保证内容只能被这个客户端修改，那么这个租约就相当于*写锁*。</li>
+</ol>
+
+<p>那么在判断客户端是否存活的问题上，心跳和租约有什么区别呢？</p>
+    </div>
+    <div class="read-more">
+      <a href="/zh/post/are-you-ok/" class="read-more-link">阅读更多</a>
+    </div>
+  </div>
+</article>
+
     <article class="post">
   <header class="post-header">
     <h1 class="post-title"><a class="post-link" href="/zh/post/redis-cmd-population-execution/">Redis 启动流程：命令注册和执行</a></h1>
@@ -287,7 +325,7 @@
       <div class="post-category">
           <a href="/zh/categories/redis/"> Redis </a>
           </div>
-        <span class="more-meta"> 约 2356 字 </span>
+        <span class="more-meta"> 约 2362 字 </span>
         <span class="more-meta"> 预计阅读 5 分钟 </span>
     </div>
   </header>

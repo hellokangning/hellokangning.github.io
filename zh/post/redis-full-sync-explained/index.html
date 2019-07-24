@@ -26,7 +26,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.54.0 with even 4.0.0" />
+<meta name="generator" content="Hugo 0.55.6 with even 4.0.0" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/zh/post/redis-full-sync-explained/" />
@@ -66,7 +66,7 @@
 
 <meta itemprop="datePublished" content="2019-01-20T21:38:27-08:00" />
 <meta itemprop="dateModified" content="2019-01-21T09:38:27-08:00" />
-<meta itemprop="wordCount" content="2356">
+<meta itemprop="wordCount" content="2362">
 
 
 
@@ -153,7 +153,7 @@
         <div class="post-category">
             <a href="/zh/categories/redis/"> Redis </a>
             </div>
-          <span class="more-meta"> 约 2356 字 </span>
+          <span class="more-meta"> 约 2362 字 </span>
           <span class="more-meta"> 预计阅读 5 分钟 </span>
         
       </div>
@@ -291,27 +291,56 @@ master_link_status: down</pre></td></tr></table>
 <ol>
 <li>发送 <em>psync</em> 命令进行数据同步，如果是第一次进行复制，slave 没有复制偏移量和主节点的运行 ID，只能发送 <em>psync -1</em> 。</li>
 <li>master 根据 slave 的 <em>psync</em> 命令解析出全量同步的请求，并回复 <em>+FULLRESYNC</em> 。</li>
-<li>slave 接到 master 的响应数据，保存运行 ID 和偏移量，并打印日志：
-<code>
-Partial resynchronization not possible (no cached master)
-Full resync from master: xxxxx
-</code></li>
-<li>master 执行 <em>bgsave</em> 保存 RDB 文件到本地。</li>
-<li>master 发送 RDB 文件给 slave，slave 把接收到的 RDB 保存在本地，接受完 RDB 后，slave 的日志中可以看到:
-<code>
-16:24:01.057 * MASTER &lt;-&gt; SLAVE sync: receiving 2778899 bytes from master
-</code></li>
-<li>slave 开始接收 RDB 文件到接收完成这u但时间，master 仍然相应读写命令，并将它们保存在客户端缓冲区。slave 加载 RDB 完成后，master 把缓冲区中的数据再发给 slave。</li>
-<li>slave 接收完 master 发来的全部数据后，会清空自身旧数据，对应日志如下：
-<code>
-16:24:02:034 * MASTER &lt;-&gt; SLAVE sync: Flushing old data
-</code></li>
-<li>slave 清空数据后，开始加载 RDB 快照，对应日志如下：
-<code>
-16:24:03:034 * MASTER &lt;-&gt; SLAVE sync: Loading DB in memory
-16:24:04:034 * MASTER &lt;-&gt; SLAVE sync: Finished with sucess
-</code></li>
-<li>slave 加载 RDB 完成后，如果当前节点开启了 AOF，会立刻做 <em>bgrewriteaof</em> 操作，为了保证全量同步后 AOF 文件立即可用。</li>
+
+<li><p>slave 接到 master 的响应数据，保存运行 ID 和偏移量，并打印日志：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">Partial resynchronization not possible (no cached master)
+Full resync from master: xxxxx</pre></td></tr></table>
+</div>
+</div></li>
+
+<li><p>master 执行 <em>bgsave</em> 保存 RDB 文件到本地。</p></li>
+
+<li><p>master 发送 RDB 文件给 slave，slave 把接收到的 RDB 保存在本地，接受完 RDB 后，slave 的日志中可以看到:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">16:24:01.057 * MASTER &lt;-&gt; SLAVE sync: receiving 2778899 bytes from master</pre></td></tr></table>
+</div>
+</div></li>
+
+<li><p>slave 开始接收 RDB 文件到接收完成这u但时间，master 仍然相应读写命令，并将它们保存在客户端缓冲区。slave 加载 RDB 完成后，master 把缓冲区中的数据再发给 slave。</p></li>
+
+<li><p>slave 接收完 master 发来的全部数据后，会清空自身旧数据，对应日志如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">16:24:02:034 * MASTER &lt;-&gt; SLAVE sync: Flushing old data</pre></td></tr></table>
+</div>
+</div></li>
+
+<li><p>slave 清空数据后，开始加载 RDB 快照，对应日志如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">16:24:03:034 * MASTER &lt;-&gt; SLAVE sync: Loading DB in memory
+16:24:04:034 * MASTER &lt;-&gt; SLAVE sync: Finished with sucess</pre></td></tr></table>
+</div>
+</div></li>
+
+<li><p>slave 加载 RDB 完成后，如果当前节点开启了 AOF，会立刻做 <em>bgrewriteaof</em> 操作，为了保证全量同步后 AOF 文件立即可用。</p></li>
 </ol>
 
 <h1 id="全量同步的可能问题">全量同步的可能问题</h1>
@@ -384,7 +413,8 @@ Full resync from master: xxxxx
 <p>复制缓冲区不足：主从失联之后，slave 再次连上 master，会请求部分同步。但是，如果请求的偏移量不在 master 的缓冲区里，那么部分同步将退化为全量同步。为避免这种情况，要根据写的数据量，合理规划缓冲区的大小。之前的这篇 <a href="https://hellokangning.github.io/zh/post/100-server-load-because-of-redis-sync/">Redis 同步引发的系统过载</a> 讲述的就是由此而引发的系统过载问题。</p>
     </div>
 
-    <footer class="post-footer">
+    
+<footer class="post-footer">
       
       <nav class="post-nav">
         <a class="prev" href="/zh/post/redis-sentinel-client-connection/">
@@ -415,6 +445,10 @@ Full resync from master: xxxxx
     })();
     </script>
     <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  
+  
+
+  
 
       </div>
     </main>
