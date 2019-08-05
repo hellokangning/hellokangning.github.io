@@ -24,7 +24,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.55.6 with even 4.0.0" />
+<meta name="generator" content="Hugo 0.56.1 with even 4.0.0" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/en/post/hbase-code-analysis-memstore/" />
@@ -43,9 +43,8 @@
 <meta property="og:description" content="The MemStore holds in-memory modifications to the Store. This post deeps into the source code for sake of understanding what it really do underneath." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hellokangning.github.io/en/post/hbase-code-analysis-memstore/" />
-<meta property="article:published_time" content="2017-11-23T11:39:43&#43;08:00"/>
-<meta property="article:modified_time" content="2017-11-23T11:39:43&#43;08:00"/>
-
+<meta property="article:published_time" content="2017-11-23T11:39:43+08:00" />
+<meta property="article:modified_time" content="2017-11-23T11:39:43+08:00" />
 <meta itemprop="name" content="HBase Code Analysis: MemStore">
 <meta itemprop="description" content="The MemStore holds in-memory modifications to the Store. This post deeps into the source code for sake of understanding what it really do underneath.">
 
@@ -179,16 +178,16 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// Creates a snapshot of the current memstore
-</span><span class="c1"></span><span class="n">MemStoreSnapshot</span> <span class="nf">snapshot</span><span class="o">();</span>
+</span><span class="c1"></span><span class="n">MemStoreSnapshot</span> <span class="nf">snapshot</span><span class="p">();</span>
 
 <span class="c1">// Write an update
-</span><span class="c1"></span><span class="kt">void</span> <span class="nf">add</span><span class="o">(</span><span class="kd">final</span> <span class="n">Cell</span> <span class="n">cell</span><span class="o">,</span> <span class="n">MemstoreSize</span> <span class="n">memstoreSize</span><span class="o">);</span>
+</span><span class="c1"></span><span class="kt">void</span> <span class="nf">add</span><span class="p">(</span><span class="kd">final</span> <span class="nf">Cell</span> <span class="n">cell</span><span class="p">,</span> <span class="n">MemstoreSize</span> <span class="nf">memstoreSize</span><span class="p">);</span>
 
 <span class="c1">// Update or insert the specified cells
-</span><span class="c1"></span><span class="kt">void</span> <span class="nf">upsert</span><span class="o">(</span><span class="n">Iterable</span><span class="o">&lt;</span><span class="n">Cell</span><span class="o">&gt;</span> <span class="n">cells</span><span class="o">,</span> <span class="kt">long</span> <span class="n">readpoint</span><span class="o">,</span> <span class="n">MemstoreSize</span> <span class="n">memstoreSize</span><span class="o">);</span>
+</span><span class="c1"></span><span class="kt">void</span> <span class="nf">upsert</span><span class="p">(</span><span class="n">Iterable</span><span class="o">&lt;</span><span class="n">Cell</span><span class="o">&gt;</span> <span class="nf">cells</span><span class="p">,</span> <span class="kt">long</span> <span class="nf">readpoint</span><span class="p">,</span> <span class="n">MemstoreSize</span> <span class="nf">memstoreSize</span><span class="p">);</span>
 
 <span class="c1">// return scanner over the memstore, inluding scanner over snapshot
-</span><span class="c1"></span><span class="n">List</span><span class="o">&lt;</span><span class="n">KeyValueScanner</span><span class="o">&gt;</span> <span class="nf">getScanners</span><span class="o">(</span><span class="kt">long</span> <span class="n">readPt</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span></code></pre></td></tr></table>
+</span><span class="c1"></span><span class="n">List</span><span class="o">&lt;</span><span class="n">KeyValueScanner</span><span class="o">&gt;</span> <span class="nf">getScanners</span><span class="p">(</span><span class="kt">long</span> <span class="nf">readPt</span><span class="p">)</span> <span class="kd">throws</span> <span class="nf">IOException</span><span class="p">;</span></code></pre></td></tr></table>
 </div>
 </div>
 <h2 id="abstractmemstore-abstract-class"><code>AbstractMemStore</code> abstract class</h2>
@@ -239,17 +238,17 @@
 </span><span class="lnt">41
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">abstract</span> <span class="kd">class</span> <span class="nc">AbstractMemStore</span> <span class="kd">implements</span> <span class="n">MemStore</span> <span class="o">{</span>
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="nf">abstract</span> <span class="kd">class</span> <span class="nf">AbstractMemStore</span> <span class="kd">implements</span> <span class="nf">MemStore</span> <span class="p">{</span>
   <span class="c1">// active segment absorbs write operations
-</span><span class="c1"></span>  <span class="kd">protected</span> <span class="kd">volatile</span> <span class="n">MutableSegment</span> <span class="n">active</span><span class="o">;</span>
+</span><span class="c1"></span>  <span class="kd">protected</span> <span class="nf">volatile</span> <span class="n">MutableSegment</span> <span class="nf">active</span><span class="p">;</span>
 
   <span class="c1">// Snapshot of memstore.  Made for flusher.
-</span><span class="c1"></span>  <span class="kd">protected</span> <span class="kd">volatile</span> <span class="n">ImmutableSegment</span> <span class="n">snapshot</span><span class="o">;</span>
+</span><span class="c1"></span>  <span class="kd">protected</span> <span class="nf">volatile</span> <span class="n">ImmutableSegment</span> <span class="nf">snapshot</span><span class="p">;</span>
 
   <span class="nd">@Override</span>
-  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">add</span><span class="o">(</span><span class="n">Cell</span> <span class="n">cell</span><span class="o">,</span> <span class="n">MemstoreSize</span> <span class="n">memstoreSize</span><span class="o">)</span> <span class="o">{</span>
-    <span class="n">Cell</span> <span class="n">toAdd</span> <span class="o">=</span> <span class="n">maybeCloneWithAllocator</span><span class="o">(</span><span class="n">cell</span><span class="o">);</span>
-    <span class="kt">boolean</span> <span class="n">mslabUsed</span> <span class="o">=</span> <span class="o">(</span><span class="n">toAdd</span> <span class="o">!=</span> <span class="n">cell</span><span class="o">);</span>
+  <span class="kd">public</span> <span class="nf">void</span> <span class="n">add</span><span class="p">(</span><span class="n">Cell</span> <span class="nf">cell</span><span class="p">,</span> <span class="n">MemstoreSize</span> <span class="nf">memstoreSize</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">Cell</span> <span class="nf">toAdd</span> <span class="o">=</span> <span class="n">maybeCloneWithAllocator</span><span class="p">(</span><span class="n">cell</span><span class="p">);</span>
+    <span class="kt">boolean</span> <span class="nf">mslabUsed</span> <span class="o">=</span> <span class="p">(</span><span class="n">toAdd</span> <span class="o">!=</span> <span class="n">cell</span><span class="p">);</span>
     <span class="c1">// This cell data is backed by the same byte[] where we read request in RPC(See HBASE-15180). By
 </span><span class="c1"></span>    <span class="c1">// default MSLAB is ON and we might have copied cell to MSLAB area. If not we must do below deep
 </span><span class="c1"></span>    <span class="c1">// copy. Or else we will keep referring to the bigger chunk of memory and prevent it from
@@ -259,11 +258,11 @@
 </span><span class="c1"></span>    <span class="c1">// 2. When the size of the cell is bigger than the max size supported by MSLAB. See
 </span><span class="c1"></span>    <span class="c1">// &#34;hbase.hregion.memstore.mslab.max.allocation&#34;. This defaults to 256 KB
 </span><span class="c1"></span>    <span class="c1">// 3. When cells are from Append/Increment operation.
-</span><span class="c1"></span>    <span class="k">if</span> <span class="o">(!</span><span class="n">mslabUsed</span><span class="o">)</span> <span class="o">{</span>
-      <span class="n">toAdd</span> <span class="o">=</span> <span class="n">deepCopyIfNeeded</span><span class="o">(</span><span class="n">toAdd</span><span class="o">);</span>
-    <span class="o">}</span>
-    <span class="n">internalAdd</span><span class="o">(</span><span class="n">toAdd</span><span class="o">,</span> <span class="n">mslabUsed</span><span class="o">,</span> <span class="n">memstoreSize</span><span class="o">);</span>
-  <span class="o">}</span>
+</span><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">mslabUsed</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">toAdd</span> <span class="o">=</span> <span class="n">deepCopyIfNeeded</span><span class="p">(</span><span class="n">toAdd</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="n">internalAdd</span><span class="p">(</span><span class="n">toAdd</span><span class="p">,</span> <span class="n">mslabUsed</span><span class="p">,</span> <span class="n">memstoreSize</span><span class="p">);</span>
+  <span class="p">}</span>
 
    <span class="cm">/*
 </span><span class="cm">   * Internal version of add() that doesn&#39;t clone Cells with the
@@ -274,12 +273,12 @@
 </span><span class="cm">   * @param mslabUsed whether using MSLAB
 </span><span class="cm">   * @param memstoreSize
 </span><span class="cm">   */</span>
-  <span class="kd">private</span> <span class="kt">void</span> <span class="nf">internalAdd</span><span class="o">(</span><span class="kd">final</span> <span class="n">Cell</span> <span class="n">toAdd</span><span class="o">,</span> <span class="kd">final</span> <span class="kt">boolean</span> <span class="n">mslabUsed</span><span class="o">,</span> <span class="n">MemstoreSize</span> <span class="n">memstoreSize</span><span class="o">)</span> <span class="o">{</span>
-    <span class="n">active</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">toAdd</span><span class="o">,</span> <span class="n">mslabUsed</span><span class="o">,</span> <span class="n">memstoreSize</span><span class="o">);</span>
-    <span class="n">setOldestEditTimeToNow</span><span class="o">();</span>
-    <span class="n">checkActiveSize</span><span class="o">();</span>
-  <span class="o">}</span>
-<span class="o">}</span></code></pre></td></tr></table>
+  <span class="kd">private</span> <span class="nf">void</span> <span class="n">internalAdd</span><span class="p">(</span><span class="kd">final</span> <span class="nf">Cell</span> <span class="n">toAdd</span><span class="p">,</span> <span class="kd">final</span> <span class="nf">boolean</span> <span class="n">mslabUsed</span><span class="p">,</span> <span class="n">MemstoreSize</span> <span class="nf">memstoreSize</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">active</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="n">toAdd</span><span class="p">,</span> <span class="n">mslabUsed</span><span class="p">,</span> <span class="n">memstoreSize</span><span class="p">);</span>
+    <span class="n">setOldestEditTimeToNow</span><span class="p">();</span>
+    <span class="n">checkActiveSize</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre></td></tr></table>
 </div>
 </div>
 <p>The <code>add</code> function follows these steps:</p>
@@ -333,11 +332,11 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java">  <span class="nd">@Override</span>
-  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">upsert</span><span class="o">(</span><span class="n">Iterable</span><span class="o">&lt;</span><span class="n">Cell</span><span class="o">&gt;</span> <span class="n">cells</span><span class="o">,</span> <span class="kt">long</span> <span class="n">readpoint</span><span class="o">,</span> <span class="n">MemstoreSize</span> <span class="n">memstoreSize</span><span class="o">)</span> <span class="o">{</span>
-    <span class="k">for</span> <span class="o">(</span><span class="n">Cell</span> <span class="n">cell</span> <span class="o">:</span> <span class="n">cells</span><span class="o">)</span> <span class="o">{</span>
-      <span class="n">upsert</span><span class="o">(</span><span class="n">cell</span><span class="o">,</span> <span class="n">readpoint</span><span class="o">,</span> <span class="n">memstoreSize</span><span class="o">);</span>
-    <span class="o">}</span>
-  <span class="o">}</span>
+  <span class="kd">public</span> <span class="nf">void</span> <span class="n">upsert</span><span class="p">(</span><span class="n">Iterable</span><span class="o">&lt;</span><span class="n">Cell</span><span class="o">&gt;</span> <span class="nf">cells</span><span class="p">,</span> <span class="kt">long</span> <span class="nf">readpoint</span><span class="p">,</span> <span class="n">MemstoreSize</span> <span class="nf">memstoreSize</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">Cell</span> <span class="nf">cell</span> <span class="o">:</span> <span class="n">cells</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">upsert</span><span class="p">(</span><span class="n">cell</span><span class="p">,</span> <span class="n">readpoint</span><span class="p">,</span> <span class="n">memstoreSize</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
 
     <span class="cm">/*
 </span><span class="cm">   * Inserts the specified Cell into MemStore and deletes any existing
@@ -354,7 +353,7 @@
 </span><span class="cm">   * @param readpoint readpoint below which we can safely remove duplicate KVs
 </span><span class="cm">   * @param memstoreSize
 </span><span class="cm">   */</span>
-  <span class="kd">private</span> <span class="kt">void</span> <span class="nf">upsert</span><span class="o">(</span><span class="n">Cell</span> <span class="n">cell</span><span class="o">,</span> <span class="kt">long</span> <span class="n">readpoint</span><span class="o">,</span> <span class="n">MemstoreSize</span> <span class="n">memstoreSize</span><span class="o">)</span> <span class="o">{</span>
+  <span class="kd">private</span> <span class="nf">void</span> <span class="n">upsert</span><span class="p">(</span><span class="n">Cell</span> <span class="nf">cell</span><span class="p">,</span> <span class="kt">long</span> <span class="nf">readpoint</span><span class="p">,</span> <span class="n">MemstoreSize</span> <span class="nf">memstoreSize</span><span class="p">)</span> <span class="p">{</span>
     <span class="c1">// Add the Cell to the MemStore
 </span><span class="c1"></span>    <span class="c1">// Use the internalAdd method here since we (a) already have a lock
 </span><span class="c1"></span>    <span class="c1">// and (b) cannot safely use the MSLAB here without potentially
@@ -364,11 +363,11 @@
 </span><span class="c1"></span>    <span class="c1">// This cell data is backed by the same byte[] where we read request in RPC(See HBASE-15180). We
 </span><span class="c1"></span>    <span class="c1">// must do below deep copy. Or else we will keep referring to the bigger chunk of memory and
 </span><span class="c1"></span>    <span class="c1">// prevent it from getting GCed.
-</span><span class="c1"></span>    <span class="n">cell</span> <span class="o">=</span> <span class="n">deepCopyIfNeeded</span><span class="o">(</span><span class="n">cell</span><span class="o">);</span>
-    <span class="k">this</span><span class="o">.</span><span class="na">active</span><span class="o">.</span><span class="na">upsert</span><span class="o">(</span><span class="n">cell</span><span class="o">,</span> <span class="n">readpoint</span><span class="o">,</span> <span class="n">memstoreSize</span><span class="o">);</span>
-    <span class="n">setOldestEditTimeToNow</span><span class="o">();</span>
-    <span class="n">checkActiveSize</span><span class="o">();</span>
-  <span class="o">}</span></code></pre></td></tr></table>
+</span><span class="c1"></span>    <span class="n">cell</span> <span class="o">=</span> <span class="n">deepCopyIfNeeded</span><span class="p">(</span><span class="n">cell</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="na">active</span><span class="p">.</span><span class="na">upsert</span><span class="p">(</span><span class="n">cell</span><span class="p">,</span> <span class="n">readpoint</span><span class="p">,</span> <span class="n">memstoreSize</span><span class="p">);</span>
+    <span class="n">setOldestEditTimeToNow</span><span class="p">();</span>
+    <span class="n">checkActiveSize</span><span class="p">();</span>
+  <span class="p">}</span></code></pre></td></tr></table>
 </div>
 </div>
 <ol>
@@ -428,28 +427,28 @@
 </span><span class="lnt">47
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java">  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">upsert</span><span class="o">(</span><span class="n">Cell</span> <span class="n">cell</span><span class="o">,</span> <span class="kt">long</span> <span class="n">readpoint</span><span class="o">,</span> <span class="n">MemstoreSize</span> <span class="n">memstoreSize</span><span class="o">)</span> <span class="o">{</span>
-    <span class="n">internalAdd</span><span class="o">(</span><span class="n">cell</span><span class="o">,</span> <span class="kc">false</span><span class="o">,</span> <span class="n">memstoreSize</span><span class="o">);</span>
+<pre class="chroma"><code class="language-java" data-lang="java">  <span class="kd">public</span> <span class="nf">void</span> <span class="n">upsert</span><span class="p">(</span><span class="n">Cell</span> <span class="nf">cell</span><span class="p">,</span> <span class="kt">long</span> <span class="nf">readpoint</span><span class="p">,</span> <span class="n">MemstoreSize</span> <span class="nf">memstoreSize</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">internalAdd</span><span class="p">(</span><span class="n">cell</span><span class="p">,</span> <span class="kc">false</span><span class="p">,</span> <span class="n">memstoreSize</span><span class="p">);</span>
 
     <span class="c1">// Get the Cells for the row/family/qualifier regardless of timestamp.
 </span><span class="c1"></span>    <span class="c1">// For this case we want to clean up any other puts
-</span><span class="c1"></span>    <span class="n">Cell</span> <span class="n">firstCell</span> <span class="o">=</span> <span class="n">CellUtil</span><span class="o">.</span><span class="na">createFirstOnRowColTS</span><span class="o">(</span><span class="n">cell</span><span class="o">,</span> <span class="n">HConstants</span><span class="o">.</span><span class="na">LATEST_TIMESTAMP</span><span class="o">);</span>
-    <span class="n">SortedSet</span><span class="o">&lt;</span><span class="n">Cell</span><span class="o">&gt;</span> <span class="n">ss</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">tailSet</span><span class="o">(</span><span class="n">firstCell</span><span class="o">);</span>
-    <span class="n">Iterator</span><span class="o">&lt;</span><span class="n">Cell</span><span class="o">&gt;</span> <span class="n">it</span> <span class="o">=</span> <span class="n">ss</span><span class="o">.</span><span class="na">iterator</span><span class="o">();</span>
+</span><span class="c1"></span>    <span class="n">Cell</span> <span class="nf">firstCell</span> <span class="o">=</span> <span class="n">CellUtil</span><span class="p">.</span><span class="na">createFirstOnRowColTS</span><span class="p">(</span><span class="n">cell</span><span class="p">,</span> <span class="n">HConstants</span><span class="p">.</span><span class="na">LATEST_TIMESTAMP</span><span class="p">);</span>
+    <span class="n">SortedSet</span><span class="o">&lt;</span><span class="n">Cell</span><span class="o">&gt;</span> <span class="nf">ss</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="na">tailSet</span><span class="p">(</span><span class="n">firstCell</span><span class="p">);</span>
+    <span class="n">Iterator</span><span class="o">&lt;</span><span class="n">Cell</span><span class="o">&gt;</span> <span class="nf">it</span> <span class="o">=</span> <span class="n">ss</span><span class="p">.</span><span class="na">iterator</span><span class="p">();</span>
     <span class="c1">// versions visible to oldest scanner
-</span><span class="c1"></span>    <span class="kt">int</span> <span class="n">versionsVisible</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span>
-    <span class="k">while</span> <span class="o">(</span><span class="n">it</span><span class="o">.</span><span class="na">hasNext</span><span class="o">())</span> <span class="o">{</span>
-      <span class="n">Cell</span> <span class="n">cur</span> <span class="o">=</span> <span class="n">it</span><span class="o">.</span><span class="na">next</span><span class="o">();</span>
+</span><span class="c1"></span>    <span class="kt">int</span> <span class="nf">versionsVisible</span> <span class="o">=</span> <span class="n">0</span><span class="p">;</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">it</span><span class="p">.</span><span class="na">hasNext</span><span class="p">())</span> <span class="p">{</span>
+      <span class="n">Cell</span> <span class="nf">cur</span> <span class="o">=</span> <span class="n">it</span><span class="p">.</span><span class="na">next</span><span class="p">();</span>
 
-      <span class="k">if</span> <span class="o">(</span><span class="n">cell</span> <span class="o">==</span> <span class="n">cur</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">cell</span> <span class="o">==</span> <span class="n">cur</span><span class="p">)</span> <span class="p">{</span>
         <span class="c1">// ignore the one just put in
-</span><span class="c1"></span>        <span class="k">continue</span><span class="o">;</span>
-      <span class="o">}</span>
+</span><span class="c1"></span>        <span class="k">continue</span><span class="p">;</span>
+      <span class="p">}</span>
       <span class="c1">// check that this is the row and column we are interested in, otherwise bail
-</span><span class="c1"></span>      <span class="k">if</span> <span class="o">(</span><span class="n">CellUtil</span><span class="o">.</span><span class="na">matchingRows</span><span class="o">(</span><span class="n">cell</span><span class="o">,</span> <span class="n">cur</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="n">CellUtil</span><span class="o">.</span><span class="na">matchingQualifier</span><span class="o">(</span><span class="n">cell</span><span class="o">,</span> <span class="n">cur</span><span class="o">))</span> <span class="o">{</span>
+</span><span class="c1"></span>      <span class="k">if</span> <span class="p">(</span><span class="n">CellUtil</span><span class="p">.</span><span class="na">matchingRows</span><span class="p">(</span><span class="n">cell</span><span class="p">,</span> <span class="n">cur</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">CellUtil</span><span class="p">.</span><span class="na">matchingQualifier</span><span class="p">(</span><span class="n">cell</span><span class="p">,</span> <span class="n">cur</span><span class="p">))</span> <span class="p">{</span>
         <span class="c1">// only remove Puts that concurrent scanners cannot possibly see
-</span><span class="c1"></span>        <span class="k">if</span> <span class="o">(</span><span class="n">cur</span><span class="o">.</span><span class="na">getTypeByte</span><span class="o">()</span> <span class="o">==</span> <span class="n">KeyValue</span><span class="o">.</span><span class="na">Type</span><span class="o">.</span><span class="na">Put</span><span class="o">.</span><span class="na">getCode</span><span class="o">()</span> <span class="o">&amp;&amp;</span> <span class="n">cur</span><span class="o">.</span><span class="na">getSequenceId</span><span class="o">()</span> <span class="o">&lt;=</span> <span class="n">readpoint</span><span class="o">)</span> <span class="o">{</span>
-          <span class="k">if</span> <span class="o">(</span><span class="n">versionsVisible</span> <span class="o">&gt;=</span> <span class="n">1</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="c1"></span>        <span class="k">if</span> <span class="p">(</span><span class="n">cur</span><span class="p">.</span><span class="na">getTypeByte</span><span class="p">()</span> <span class="o">==</span> <span class="n">KeyValue</span><span class="p">.</span><span class="na">Type</span><span class="p">.</span><span class="na">Put</span><span class="p">.</span><span class="na">getCode</span><span class="p">()</span> <span class="o">&amp;&amp;</span> <span class="n">cur</span><span class="p">.</span><span class="na">getSequenceId</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="n">readpoint</span><span class="p">)</span> <span class="p">{</span>
+          <span class="k">if</span> <span class="p">(</span><span class="n">versionsVisible</span> <span class="o">&gt;=</span> <span class="n">1</span><span class="p">)</span> <span class="p">{</span>
             <span class="c1">// if we get here we have seen at least one version visible to the oldest scanner,
 </span><span class="c1"></span>            <span class="c1">// which means we can prove that no scanner will see this version
 </span><span class="c1"></span>
@@ -458,23 +457,23 @@
 </span><span class="c1"></span>            <span class="c1">// area. Only the Cell object as such going way. We need to consider cellLen to be
 </span><span class="c1"></span>            <span class="c1">// decreased there as 0 only. Just keeping it as existing code now. We need to know the
 </span><span class="c1"></span>            <span class="c1">// removed cell is from MSLAB or not. Will do once HBASE-16438 is in
-</span><span class="c1"></span>            <span class="kt">int</span> <span class="n">cellLen</span> <span class="o">=</span> <span class="n">getCellLength</span><span class="o">(</span><span class="n">cur</span><span class="o">);</span>
-            <span class="kt">long</span> <span class="n">heapSize</span> <span class="o">=</span> <span class="n">heapSizeChange</span><span class="o">(</span><span class="n">cur</span><span class="o">,</span> <span class="kc">true</span><span class="o">);</span>
-            <span class="k">this</span><span class="o">.</span><span class="na">incSize</span><span class="o">(-</span><span class="n">cellLen</span><span class="o">,</span> <span class="o">-</span><span class="n">heapSize</span><span class="o">);</span>
-            <span class="k">if</span> <span class="o">(</span><span class="n">memstoreSize</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-              <span class="n">memstoreSize</span><span class="o">.</span><span class="na">decMemstoreSize</span><span class="o">(</span><span class="n">cellLen</span><span class="o">,</span> <span class="n">heapSize</span><span class="o">);</span>
-            <span class="o">}</span>
-            <span class="n">it</span><span class="o">.</span><span class="na">remove</span><span class="o">();</span>
-          <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
-            <span class="n">versionsVisible</span><span class="o">++;</span>
-          <span class="o">}</span>
-        <span class="o">}</span>
-      <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+</span><span class="c1"></span>            <span class="kt">int</span> <span class="nf">cellLen</span> <span class="o">=</span> <span class="n">getCellLength</span><span class="p">(</span><span class="n">cur</span><span class="p">);</span>
+            <span class="kt">long</span> <span class="nf">heapSize</span> <span class="o">=</span> <span class="n">heapSizeChange</span><span class="p">(</span><span class="n">cur</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
+            <span class="k">this</span><span class="p">.</span><span class="na">incSize</span><span class="p">(</span><span class="o">-</span><span class="n">cellLen</span><span class="p">,</span> <span class="o">-</span><span class="n">heapSize</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">memstoreSize</span> <span class="o">!=</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+              <span class="n">memstoreSize</span><span class="p">.</span><span class="na">decMemstoreSize</span><span class="p">(</span><span class="n">cellLen</span><span class="p">,</span> <span class="n">heapSize</span><span class="p">);</span>
+            <span class="p">}</span>
+            <span class="n">it</span><span class="p">.</span><span class="na">remove</span><span class="p">();</span>
+          <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="n">versionsVisible</span><span class="o">++</span><span class="p">;</span>
+          <span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
         <span class="c1">// past the row or column, done
-</span><span class="c1"></span>        <span class="k">break</span><span class="o">;</span>
-      <span class="o">}</span>
-    <span class="o">}</span>
-  <span class="o">}</span></code></pre></td></tr></table>
+</span><span class="c1"></span>        <span class="k">break</span><span class="p">;</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span></code></pre></td></tr></table>
 </div>
 </div>
 <ol>
@@ -524,42 +523,42 @@
 </span><span class="lnt">36
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">DefaultMemStore</span> <span class="kd">extends</span> <span class="n">AbstractMemStore</span> <span class="o">{</span>
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="nf">class</span> <span class="n">DefaultMemStore</span> <span class="nf">extends</span> <span class="n">AbstractMemStore</span> <span class="p">{</span>
 
   <span class="cm">/**
 </span><span class="cm">   * Creates a snapshot of the current memstore.
 </span><span class="cm">   * Snapshot must be cleared by call to {@link #clearSnapshot(long)}
 </span><span class="cm">   */</span>
   <span class="nd">@Override</span>
-  <span class="kd">public</span> <span class="n">MemStoreSnapshot</span> <span class="nf">snapshot</span><span class="o">()</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="nf">MemStoreSnapshot</span> <span class="n">snapshot</span><span class="p">()</span> <span class="p">{</span>
     <span class="c1">// If snapshot currently has entries, then flusher failed or didn&#39;t call
 </span><span class="c1"></span>    <span class="c1">// cleanup.  Log a warning.
-</span><span class="c1"></span>    <span class="k">if</span> <span class="o">(!</span><span class="k">this</span><span class="o">.</span><span class="na">snapshot</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">())</span> <span class="o">{</span>
-      <span class="n">LOG</span><span class="o">.</span><span class="na">warn</span><span class="o">(</span><span class="s">&#34;Snapshot called again without clearing previous. &#34;</span> <span class="o">+</span>
-          <span class="s">&#34;Doing nothing. Another ongoing flush or did we fail last attempt?&#34;</span><span class="o">);</span>
-    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
-      <span class="k">this</span><span class="o">.</span><span class="na">snapshotId</span> <span class="o">=</span> <span class="n">EnvironmentEdgeManager</span><span class="o">.</span><span class="na">currentTime</span><span class="o">();</span>
-      <span class="k">if</span> <span class="o">(!</span><span class="k">this</span><span class="o">.</span><span class="na">active</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">())</span> <span class="o">{</span>
-        <span class="n">ImmutableSegment</span> <span class="n">immutableSegment</span> <span class="o">=</span> <span class="n">SegmentFactory</span><span class="o">.</span><span class="na">instance</span><span class="o">().</span>
-            <span class="n">createImmutableSegment</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">active</span><span class="o">);</span>
-        <span class="k">this</span><span class="o">.</span><span class="na">snapshot</span> <span class="o">=</span> <span class="n">immutableSegment</span><span class="o">;</span>
-        <span class="n">resetActive</span><span class="o">();</span>
-      <span class="o">}</span>
-    <span class="o">}</span>
-    <span class="k">return</span> <span class="k">new</span> <span class="n">MemStoreSnapshot</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">snapshotId</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="na">snapshot</span><span class="o">);</span>
-  <span class="o">}</span>
+</span><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="na">snapshot</span><span class="p">.</span><span class="na">isEmpty</span><span class="p">())</span> <span class="p">{</span>
+      <span class="n">LOG</span><span class="p">.</span><span class="na">warn</span><span class="p">(</span><span class="s">&#34;Snapshot called again without clearing previous. &#34;</span> <span class="o">+</span>
+          <span class="s">&#34;Doing nothing. Another ongoing flush or did we fail last attempt?&#34;</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="na">snapshotId</span> <span class="o">=</span> <span class="n">EnvironmentEdgeManager</span><span class="p">.</span><span class="na">currentTime</span><span class="p">();</span>
+      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="na">active</span><span class="p">.</span><span class="na">isEmpty</span><span class="p">())</span> <span class="p">{</span>
+        <span class="n">ImmutableSegment</span> <span class="nf">immutableSegment</span> <span class="o">=</span> <span class="n">SegmentFactory</span><span class="p">.</span><span class="na">instance</span><span class="p">().</span>
+            <span class="n">createImmutableSegment</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="na">active</span><span class="p">);</span>
+        <span class="k">this</span><span class="p">.</span><span class="na">snapshot</span> <span class="o">=</span> <span class="n">immutableSegment</span><span class="p">;</span>
+        <span class="n">resetActive</span><span class="p">();</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="n">MemStoreSnapshot</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="na">snapshotId</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="na">snapshot</span><span class="p">);</span>
+  <span class="p">}</span>
 
   <span class="nd">@Override</span>
   <span class="cm">/*
 </span><span class="cm">   * Scanners are ordered from 0 (oldest) to newest in increasing order.
 </span><span class="cm">   */</span>
-  <span class="kd">public</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">KeyValueScanner</span><span class="o">&gt;</span> <span class="nf">getScanners</span><span class="o">(</span><span class="kt">long</span> <span class="n">readPt</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
-    <span class="n">List</span><span class="o">&lt;</span><span class="n">KeyValueScanner</span><span class="o">&gt;</span> <span class="n">list</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;();</span>
-    <span class="kt">long</span> <span class="n">order</span> <span class="o">=</span> <span class="n">snapshot</span><span class="o">.</span><span class="na">getNumOfSegments</span><span class="o">();</span>
-    <span class="n">order</span> <span class="o">=</span> <span class="n">addToScanners</span><span class="o">(</span><span class="n">active</span><span class="o">,</span> <span class="n">readPt</span><span class="o">,</span> <span class="n">order</span><span class="o">,</span> <span class="n">list</span><span class="o">);</span>
-    <span class="n">addToScanners</span><span class="o">(</span><span class="n">snapshot</span><span class="o">.</span><span class="na">getAllSegments</span><span class="o">(),</span> <span class="n">readPt</span><span class="o">,</span> <span class="n">order</span><span class="o">,</span> <span class="n">list</span><span class="o">);</span>
-    <span class="k">return</span> <span class="n">list</span><span class="o">;</span>
-  <span class="o">}</span></code></pre></td></tr></table>
+  <span class="kd">public</span> <span class="nf">List</span><span class="o">&lt;</span><span class="n">KeyValueScanner</span><span class="o">&gt;</span> <span class="nf">getScanners</span><span class="p">(</span><span class="kt">long</span> <span class="nf">readPt</span><span class="p">)</span> <span class="kd">throws</span> <span class="nf">IOException</span> <span class="p">{</span>
+    <span class="n">List</span><span class="o">&lt;</span><span class="n">KeyValueScanner</span><span class="o">&gt;</span> <span class="nf">list</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+    <span class="kt">long</span> <span class="nf">order</span> <span class="o">=</span> <span class="n">snapshot</span><span class="p">.</span><span class="na">getNumOfSegments</span><span class="p">();</span>
+    <span class="n">order</span> <span class="o">=</span> <span class="n">addToScanners</span><span class="p">(</span><span class="n">active</span><span class="p">,</span> <span class="n">readPt</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">list</span><span class="p">);</span>
+    <span class="n">addToScanners</span><span class="p">(</span><span class="n">snapshot</span><span class="p">.</span><span class="na">getAllSegments</span><span class="p">(),</span> <span class="n">readPt</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">list</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">list</span><span class="p">;</span>
+  <span class="p">}</span></code></pre></td></tr></table>
 </div>
 </div>
 <h2 id="compactingmemstore-class"><code>CompactingMemStore</code> class</h2>
@@ -608,7 +607,7 @@ Periodically, a compaction is applied in the background to all pipeline componen
 </span><span class="lnt">34
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">CompactingMemStore</span> <span class="kd">extends</span> <span class="n">AbstractMemStore</span> <span class="o">{</span>
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="nf">class</span> <span class="n">CompactingMemStore</span> <span class="nf">extends</span> <span class="n">AbstractMemStore</span> <span class="p">{</span>
  <span class="cm">/**
 </span><span class="cm">   * Push the current active memstore segment into the pipeline
 </span><span class="cm">   * and create a snapshot of the tail of current compaction pipeline
@@ -617,31 +616,31 @@ Periodically, a compaction is applied in the background to all pipeline componen
 </span><span class="cm">   * @return {@link MemStoreSnapshot}
 </span><span class="cm">   */</span>
   <span class="nd">@Override</span>
-  <span class="kd">public</span> <span class="n">MemStoreSnapshot</span> <span class="nf">snapshot</span><span class="o">()</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="nf">MemStoreSnapshot</span> <span class="n">snapshot</span><span class="p">()</span> <span class="p">{</span>
     <span class="c1">// If snapshot currently has entries, then flusher failed or didn&#39;t call
 </span><span class="c1"></span>    <span class="c1">// cleanup.  Log a warning.
-</span><span class="c1"></span>    <span class="k">if</span> <span class="o">(!</span><span class="k">this</span><span class="o">.</span><span class="na">snapshot</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">())</span> <span class="o">{</span>
-      <span class="n">LOG</span><span class="o">.</span><span class="na">warn</span><span class="o">(</span><span class="s">&#34;Snapshot called again without clearing previous. &#34;</span> <span class="o">+</span>
-          <span class="s">&#34;Doing nothing. Another ongoing flush or did we fail last attempt?&#34;</span><span class="o">);</span>
-    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
-      <span class="k">if</span> <span class="o">(</span><span class="n">LOG</span><span class="o">.</span><span class="na">isDebugEnabled</span><span class="o">())</span> <span class="o">{</span>
-        <span class="n">LOG</span><span class="o">.</span><span class="na">debug</span><span class="o">(</span><span class="s">&#34;FLUSHING TO DISK: region &#34;</span>
-            <span class="o">+</span> <span class="n">getRegionServices</span><span class="o">().</span><span class="na">getRegionInfo</span><span class="o">().</span><span class="na">getRegionNameAsString</span><span class="o">()</span> <span class="o">+</span> <span class="s">&#34;store: &#34;</span>
-            <span class="o">+</span> <span class="n">getFamilyName</span><span class="o">());</span>
-      <span class="o">}</span>
-      <span class="n">stopCompaction</span><span class="o">();</span>
-      <span class="n">pushActiveToPipeline</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">active</span><span class="o">);</span>
-      <span class="n">snapshotId</span> <span class="o">=</span> <span class="n">EnvironmentEdgeManager</span><span class="o">.</span><span class="na">currentTime</span><span class="o">();</span>
+</span><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="na">snapshot</span><span class="p">.</span><span class="na">isEmpty</span><span class="p">())</span> <span class="p">{</span>
+      <span class="n">LOG</span><span class="p">.</span><span class="na">warn</span><span class="p">(</span><span class="s">&#34;Snapshot called again without clearing previous. &#34;</span> <span class="o">+</span>
+          <span class="s">&#34;Doing nothing. Another ongoing flush or did we fail last attempt?&#34;</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">LOG</span><span class="p">.</span><span class="na">isDebugEnabled</span><span class="p">())</span> <span class="p">{</span>
+        <span class="n">LOG</span><span class="p">.</span><span class="na">debug</span><span class="p">(</span><span class="s">&#34;FLUSHING TO DISK: region &#34;</span>
+            <span class="o">+</span> <span class="n">getRegionServices</span><span class="p">().</span><span class="na">getRegionInfo</span><span class="p">().</span><span class="na">getRegionNameAsString</span><span class="p">()</span> <span class="o">+</span> <span class="s">&#34;store: &#34;</span>
+            <span class="o">+</span> <span class="n">getFamilyName</span><span class="p">());</span>
+      <span class="p">}</span>
+      <span class="n">stopCompaction</span><span class="p">();</span>
+      <span class="n">pushActiveToPipeline</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="na">active</span><span class="p">);</span>
+      <span class="n">snapshotId</span> <span class="o">=</span> <span class="n">EnvironmentEdgeManager</span><span class="p">.</span><span class="na">currentTime</span><span class="p">();</span>
       <span class="c1">// in both cases whatever is pushed to snapshot is cleared from the pipeline
-</span><span class="c1"></span>      <span class="k">if</span> <span class="o">(</span><span class="n">compositeSnapshot</span><span class="o">)</span> <span class="o">{</span>
-        <span class="n">pushPipelineToSnapshot</span><span class="o">();</span>
-      <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
-        <span class="n">pushTailToSnapshot</span><span class="o">();</span>
-      <span class="o">}</span>
-    <span class="o">}</span>
-    <span class="k">return</span> <span class="k">new</span> <span class="n">MemStoreSnapshot</span><span class="o">(</span><span class="n">snapshotId</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="na">snapshot</span><span class="o">);</span>
-  <span class="o">}</span>
-<span class="o">}</span></code></pre></td></tr></table>
+</span><span class="c1"></span>      <span class="k">if</span> <span class="p">(</span><span class="n">compositeSnapshot</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">pushPipelineToSnapshot</span><span class="p">();</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="n">pushTailToSnapshot</span><span class="p">();</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="n">MemStoreSnapshot</span><span class="p">(</span><span class="n">snapshotId</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="na">snapshot</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre></td></tr></table>
 </div>
 </div>
     </div>

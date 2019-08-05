@@ -26,7 +26,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.55.6 with even 4.0.0" />
+<meta name="generator" content="Hugo 0.56.1 with even 4.0.0" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/en/post/java-nio-channel/" />
@@ -62,9 +62,8 @@ ServerSocketChannel: An implementation similar to a web server listening to requ
 This post will take FileChannel for further exploration, from example to implementation." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hellokangning.github.io/en/post/java-nio-channel/" />
-<meta property="article:published_time" content="2018-07-19T11:00:38&#43;08:00"/>
-<meta property="article:modified_time" content="2018-07-19T11:00:38&#43;08:00"/>
-
+<meta property="article:published_time" content="2018-07-19T11:00:38+08:00" />
+<meta property="article:modified_time" content="2018-07-19T11:00:38+08:00" />
 <meta itemprop="name" content="Java NIO: Channel">
 <meta itemprop="description" content="Channels are similar to streams available for blocking IO with a few differences:
 
@@ -253,26 +252,26 @@ This post will take FileChannel for further exploration, from example to impleme
 </span><span class="lnt">20
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="n">RandomAccessFile</span> <span class="n">aFile</span> <span class="o">=</span> <span class="k">new</span> <span class="n">RandomAccessFile</span><span class="o">(</span><span class="s">&#34;data/nio-data.txt&#34;</span><span class="o">,</span> <span class="s">&#34;rw&#34;</span><span class="o">);</span>
-<span class="n">FileChannel</span> <span class="n">inChannel</span> <span class="o">=</span> <span class="n">aFile</span><span class="o">.</span><span class="na">getChannel</span><span class="o">();</span>
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="n">RandomAccessFile</span> <span class="nf">aFile</span> <span class="o">=</span> <span class="k">new</span> <span class="n">RandomAccessFile</span><span class="p">(</span><span class="s">&#34;data/nio-data.txt&#34;</span><span class="p">,</span> <span class="s">&#34;rw&#34;</span><span class="p">);</span>
+<span class="n">FileChannel</span> <span class="nf">inChannel</span> <span class="o">=</span> <span class="n">aFile</span><span class="p">.</span><span class="na">getChannel</span><span class="p">();</span>
 
-<span class="n">ByteBuffer</span> <span class="n">buf</span> <span class="o">=</span> <span class="n">ByteBuffer</span><span class="o">.</span><span class="na">allocate</span><span class="o">(</span><span class="n">48</span><span class="o">);</span>
+<span class="n">ByteBuffer</span> <span class="nf">buf</span> <span class="o">=</span> <span class="n">ByteBuffer</span><span class="p">.</span><span class="na">allocate</span><span class="p">(</span><span class="n">48</span><span class="p">);</span>
 
-<span class="kt">int</span> <span class="n">bytesRead</span> <span class="o">=</span> <span class="n">inChannel</span><span class="o">.</span><span class="na">read</span><span class="o">(</span><span class="n">buf</span><span class="o">);</span>
-<span class="k">while</span> <span class="o">(</span><span class="n">bytesRead</span> <span class="o">!=</span> <span class="o">-</span><span class="n">1</span><span class="o">)</span> <span class="o">{</span>
+<span class="kt">int</span> <span class="nf">bytesRead</span> <span class="o">=</span> <span class="n">inChannel</span><span class="p">.</span><span class="na">read</span><span class="p">(</span><span class="n">buf</span><span class="p">);</span>
+<span class="k">while</span> <span class="p">(</span><span class="n">bytesRead</span> <span class="o">!=</span> <span class="o">-</span><span class="n">1</span><span class="p">)</span> <span class="p">{</span>
 
-  <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&#34;Read &#34;</span> <span class="o">+</span> <span class="n">bytesRead</span><span class="o">);</span>
-  <span class="n">buf</span><span class="o">.</span><span class="na">flip</span><span class="o">();</span>
+  <span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&#34;Read &#34;</span> <span class="o">+</span> <span class="n">bytesRead</span><span class="p">);</span>
+  <span class="n">buf</span><span class="p">.</span><span class="na">flip</span><span class="p">();</span>
 
-  <span class="k">while</span><span class="o">(</span><span class="n">buf</span><span class="o">.</span><span class="na">hasRemaining</span><span class="o">()){</span>
-      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">print</span><span class="o">((</span><span class="kt">char</span><span class="o">)</span> 
-      <span class="n">buf</span><span class="o">.</span><span class="na">get</span><span class="o">());</span>
-  <span class="o">}</span>
+  <span class="k">while</span><span class="p">(</span><span class="n">buf</span><span class="p">.</span><span class="na">hasRemaining</span><span class="p">()){</span>
+      <span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">print</span><span class="p">((</span><span class="kt">char</span><span class="p">)</span> 
+      <span class="n">buf</span><span class="p">.</span><span class="na">get</span><span class="p">());</span>
+  <span class="p">}</span>
 
-  <span class="n">buf</span><span class="o">.</span><span class="na">clear</span><span class="o">();</span>
-  <span class="n">bytesRead</span> <span class="o">=</span> <span class="n">inChannel</span><span class="o">.</span><span class="na">read</span><span class="o">(</span><span class="n">buf</span><span class="o">);</span>
-<span class="o">}</span>
-<span class="n">aFile</span><span class="o">.</span><span class="na">close</span><span class="o">();</span></code></pre></td></tr></table>
+  <span class="n">buf</span><span class="p">.</span><span class="na">clear</span><span class="p">();</span>
+  <span class="n">bytesRead</span> <span class="o">=</span> <span class="n">inChannel</span><span class="p">.</span><span class="na">read</span><span class="p">(</span><span class="n">buf</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="n">aFile</span><span class="p">.</span><span class="na">close</span><span class="p">();</span></code></pre></td></tr></table>
 </div>
 </div>
 <p>Java NIO supports built-in scatter and gather.</p>
@@ -298,8 +297,8 @@ This post will take FileChannel for further exploration, from example to impleme
 </span><span class="lnt">2
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="n">RandomAccessFile</span> <span class="n">aFile</span> <span class="o">=</span> <span class="k">new</span> <span class="n">RandomAccessFile</span><span class="o">(</span><span class="s">&#34;data/nio-data.txt&#34;</span><span class="o">,</span> <span class="s">&#34;rw&#34;</span><span class="o">);</span>
-<span class="n">FileChannel</span> <span class="n">inChannel</span> <span class="o">=</span> <span class="n">aFile</span><span class="o">.</span><span class="na">getChannel</span><span class="o">();</span></code></pre></td></tr></table>
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="n">RandomAccessFile</span> <span class="nf">aFile</span> <span class="o">=</span> <span class="k">new</span> <span class="n">RandomAccessFile</span><span class="p">(</span><span class="s">&#34;data/nio-data.txt&#34;</span><span class="p">,</span> <span class="s">&#34;rw&#34;</span><span class="p">);</span>
+<span class="n">FileChannel</span> <span class="nf">inChannel</span> <span class="o">=</span> <span class="n">aFile</span><span class="p">.</span><span class="na">getChannel</span><span class="p">();</span></code></pre></td></tr></table>
 </div>
 </div>
 <p>What actually RandomAccessFile does lists as follows,</p>
@@ -319,14 +318,14 @@ This post will take FileChannel for further exploration, from example to impleme
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// RandomAccessFile.java
 </span><span class="c1"></span>
-<span class="kd">public</span> <span class="kd">final</span> <span class="n">FileChannel</span> <span class="nf">getChannel</span><span class="o">()</span> <span class="o">{</span>
-    <span class="kd">synchronized</span> <span class="o">(</span><span class="k">this</span><span class="o">)</span> <span class="o">{</span>
-        <span class="k">if</span> <span class="o">(</span><span class="n">channel</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-            <span class="n">channel</span> <span class="o">=</span> <span class="n">FileChannelImpl</span><span class="o">.</span><span class="na">open</span><span class="o">(</span><span class="n">fd</span><span class="o">,</span> <span class="n">path</span><span class="o">,</span> <span class="kc">true</span><span class="o">,</span> <span class="n">rw</span><span class="o">,</span> <span class="k">this</span><span class="o">);</span>
-        <span class="o">}</span>
-        <span class="k">return</span> <span class="n">channel</span><span class="o">;</span>
-    <span class="o">}</span>
-<span class="o">}</span></code></pre></td></tr></table>
+<span class="kd">public</span> <span class="nf">final</span> <span class="n">FileChannel</span> <span class="nf">getChannel</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">synchronized</span> <span class="p">(</span><span class="k">this</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">channel</span> <span class="o">==</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">channel</span> <span class="o">=</span> <span class="n">FileChannelImpl</span><span class="p">.</span><span class="na">open</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="kc">true</span><span class="p">,</span> <span class="n">rw</span><span class="p">,</span> <span class="k">this</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">channel</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre></td></tr></table>
 </div>
 </div>
 <p>After jumping to FileChannelImpl, <code>open()</code> method justs construct an instance of FileChannelImpl.</p>
@@ -365,37 +364,37 @@ This post will take FileChannel for further exploration, from example to impleme
 </span><span class="lnt">31
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">static</span> <span class="n">FileChannel</span> <span class="nf">open</span><span class="o">(</span><span class="n">FileDescriptor</span> <span class="n">fd</span><span class="o">,</span> <span class="n">String</span> <span class="n">path</span><span class="o">,</span>
-                               <span class="kt">boolean</span> <span class="n">readable</span><span class="o">,</span> <span class="kt">boolean</span> <span class="n">writable</span><span class="o">,</span>
-                               <span class="n">Object</span> <span class="n">parent</span><span class="o">)</span>
-<span class="o">{</span>
-    <span class="k">return</span> <span class="k">new</span> <span class="n">FileChannelImpl</span><span class="o">(</span><span class="n">fd</span><span class="o">,</span> <span class="n">path</span><span class="o">,</span> <span class="n">readable</span><span class="o">,</span> <span class="n">writable</span><span class="o">,</span> <span class="kc">false</span><span class="o">,</span> <span class="n">parent</span><span class="o">);</span>
-<span class="o">}</span>
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="nf">static</span> <span class="n">FileChannel</span> <span class="nf">open</span><span class="p">(</span><span class="n">FileDescriptor</span> <span class="nf">fd</span><span class="p">,</span> <span class="n">String</span> <span class="nf">path</span><span class="p">,</span>
+                               <span class="kt">boolean</span> <span class="nf">readable</span><span class="p">,</span> <span class="kt">boolean</span> <span class="nf">writable</span><span class="p">,</span>
+                               <span class="n">Object</span> <span class="nf">parent</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="n">FileChannelImpl</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">readable</span><span class="p">,</span> <span class="n">writable</span><span class="p">,</span> <span class="kc">false</span><span class="p">,</span> <span class="n">parent</span><span class="p">);</span>
+<span class="p">}</span>
 
-<span class="kd">private</span> <span class="nf">FileChannelImpl</span><span class="o">(</span><span class="n">FileDescriptor</span> <span class="n">fd</span><span class="o">,</span> <span class="n">String</span> <span class="n">path</span><span class="o">,</span> <span class="kt">boolean</span> <span class="n">readable</span><span class="o">,</span>
-                        <span class="kt">boolean</span> <span class="n">writable</span><span class="o">,</span> <span class="kt">boolean</span> <span class="n">direct</span><span class="o">,</span> <span class="n">Object</span> <span class="n">parent</span><span class="o">)</span>
-<span class="o">{</span>
-    <span class="k">this</span><span class="o">.</span><span class="na">fd</span> <span class="o">=</span> <span class="n">fd</span><span class="o">;</span>
-    <span class="k">this</span><span class="o">.</span><span class="na">readable</span> <span class="o">=</span> <span class="n">readable</span><span class="o">;</span>
-    <span class="k">this</span><span class="o">.</span><span class="na">writable</span> <span class="o">=</span> <span class="n">writable</span><span class="o">;</span>
-    <span class="k">this</span><span class="o">.</span><span class="na">parent</span> <span class="o">=</span> <span class="n">parent</span><span class="o">;</span>
-    <span class="k">this</span><span class="o">.</span><span class="na">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">;</span>
-    <span class="k">this</span><span class="o">.</span><span class="na">direct</span> <span class="o">=</span> <span class="n">direct</span><span class="o">;</span>
-    <span class="k">this</span><span class="o">.</span><span class="na">nd</span> <span class="o">=</span> <span class="k">new</span> <span class="n">FileDispatcherImpl</span><span class="o">();</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">direct</span><span class="o">)</span> <span class="o">{</span>
-        <span class="k">assert</span> <span class="n">path</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">;</span>
-        <span class="k">this</span><span class="o">.</span><span class="na">alignment</span> <span class="o">=</span> <span class="n">nd</span><span class="o">.</span><span class="na">setDirectIO</span><span class="o">(</span><span class="n">fd</span><span class="o">,</span> <span class="n">path</span><span class="o">);</span>
-    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
-        <span class="k">this</span><span class="o">.</span><span class="na">alignment</span> <span class="o">=</span> <span class="o">-</span><span class="n">1</span><span class="o">;</span>
-    <span class="o">}</span>
+<span class="kd">private</span> <span class="nf">FileChannelImpl</span><span class="p">(</span><span class="n">FileDescriptor</span> <span class="nf">fd</span><span class="p">,</span> <span class="n">String</span> <span class="nf">path</span><span class="p">,</span> <span class="kt">boolean</span> <span class="nf">readable</span><span class="p">,</span>
+                        <span class="kt">boolean</span> <span class="nf">writable</span><span class="p">,</span> <span class="kt">boolean</span> <span class="nf">direct</span><span class="p">,</span> <span class="n">Object</span> <span class="nf">parent</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="na">fd</span> <span class="o">=</span> <span class="n">fd</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="na">readable</span> <span class="o">=</span> <span class="n">readable</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="na">writable</span> <span class="o">=</span> <span class="n">writable</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="na">parent</span> <span class="o">=</span> <span class="n">parent</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="na">path</span> <span class="o">=</span> <span class="n">path</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="na">direct</span> <span class="o">=</span> <span class="n">direct</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="na">nd</span> <span class="o">=</span> <span class="k">new</span> <span class="n">FileDispatcherImpl</span><span class="p">();</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">direct</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">assert</span> <span class="n">path</span> <span class="o">!=</span> <span class="kc">null</span><span class="p">;</span>
+        <span class="k">this</span><span class="p">.</span><span class="na">alignment</span> <span class="o">=</span> <span class="n">nd</span><span class="p">.</span><span class="na">setDirectIO</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">path</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="na">alignment</span> <span class="o">=</span> <span class="o">-</span><span class="n">1</span><span class="p">;</span>
+    <span class="p">}</span>
 
     <span class="c1">// Register a cleaning action if and only if there is no parent
 </span><span class="c1"></span>    <span class="c1">// as the parent will take care of closing the file descriptor.
 </span><span class="c1"></span>    <span class="c1">// FileChannel is used by the LambdaMetaFactory so a lambda cannot
 </span><span class="c1"></span>    <span class="c1">// be used here hence we use a nested class instead.
-</span><span class="c1"></span>    <span class="k">this</span><span class="o">.</span><span class="na">closer</span> <span class="o">=</span> <span class="n">parent</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">?</span> <span class="kc">null</span> <span class="o">:</span>
-        <span class="n">CleanerFactory</span><span class="o">.</span><span class="na">cleaner</span><span class="o">().</span><span class="na">register</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="k">new</span> <span class="n">Closer</span><span class="o">(</span><span class="n">fd</span><span class="o">));</span>
-<span class="o">}</span></code></pre></td></tr></table>
+</span><span class="c1"></span>    <span class="k">this</span><span class="p">.</span><span class="na">closer</span> <span class="o">=</span> <span class="n">parent</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">?</span> <span class="kc">null</span> <span class="o">:</span>
+        <span class="n">CleanerFactory</span><span class="p">.</span><span class="na">cleaner</span><span class="p">().</span><span class="na">register</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="k">new</span> <span class="n">Closer</span><span class="p">(</span><span class="n">fd</span><span class="p">));</span>
+<span class="p">}</span></code></pre></td></tr></table>
 </div>
 </div>
 <p>As to Constructor, let&rsquo;s the fields involved in FileChannelImpl.</p>
@@ -452,51 +451,51 @@ This post will take FileChannel for further exploration, from example to impleme
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// FileChannelImpl.java
 </span><span class="c1"></span>
-<span class="kd">public</span> <span class="kd">class</span> <span class="nc">FileChannelImpl</span>
-    <span class="kd">extends</span> <span class="n">FileChannel</span>
-<span class="o">{</span>
+<span class="kd">public</span> <span class="nf">class</span> <span class="n">FileChannelImpl</span>
+    <span class="nf">extends</span> <span class="n">FileChannel</span>
+<span class="p">{</span>
     <span class="c1">// Memory allocation size for mapping buffers
-</span><span class="c1"></span>    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">long</span> <span class="n">allocationGranularity</span><span class="o">;</span>
+</span><span class="c1"></span>    <span class="kd">private</span> <span class="nf">static</span> <span class="kd">final</span> <span class="nf">long</span> <span class="n">allocationGranularity</span><span class="p">;</span>
 
     <span class="c1">// Access to FileDescriptor internals
-</span><span class="c1"></span>    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">JavaIOFileDescriptorAccess</span> <span class="n">fdAccess</span> <span class="o">=</span>
-        <span class="n">SharedSecrets</span><span class="o">.</span><span class="na">getJavaIOFileDescriptorAccess</span><span class="o">();</span>
+</span><span class="c1"></span>    <span class="kd">private</span> <span class="nf">static</span> <span class="kd">final</span> <span class="nf">JavaIOFileDescriptorAccess</span> <span class="n">fdAccess</span> <span class="o">=</span>
+        <span class="n">SharedSecrets</span><span class="p">.</span><span class="na">getJavaIOFileDescriptorAccess</span><span class="p">();</span>
 
     <span class="c1">// Used to make native read and write calls
-</span><span class="c1"></span>    <span class="kd">private</span> <span class="kd">final</span> <span class="n">FileDispatcher</span> <span class="n">nd</span><span class="o">;</span>
+</span><span class="c1"></span>    <span class="kd">private</span> <span class="nf">final</span> <span class="n">FileDispatcher</span> <span class="nf">nd</span><span class="p">;</span>
 
     <span class="c1">// File descriptor
-</span><span class="c1"></span>    <span class="kd">private</span> <span class="kd">final</span> <span class="n">FileDescriptor</span> <span class="n">fd</span><span class="o">;</span>
+</span><span class="c1"></span>    <span class="kd">private</span> <span class="nf">final</span> <span class="n">FileDescriptor</span> <span class="nf">fd</span><span class="p">;</span>
 
     <span class="c1">// File access mode (immutable)
-</span><span class="c1"></span>    <span class="kd">private</span> <span class="kd">final</span> <span class="kt">boolean</span> <span class="n">writable</span><span class="o">;</span>
-    <span class="kd">private</span> <span class="kd">final</span> <span class="kt">boolean</span> <span class="n">readable</span><span class="o">;</span>
+</span><span class="c1"></span>    <span class="kd">private</span> <span class="nf">final</span> <span class="kt">boolean</span> <span class="nf">writable</span><span class="p">;</span>
+    <span class="kd">private</span> <span class="nf">final</span> <span class="kt">boolean</span> <span class="nf">readable</span><span class="p">;</span>
 
     <span class="c1">// Required to prevent finalization of creating stream (immutable)
-</span><span class="c1"></span>    <span class="kd">private</span> <span class="kd">final</span> <span class="n">Object</span> <span class="n">parent</span><span class="o">;</span>
+</span><span class="c1"></span>    <span class="kd">private</span> <span class="nf">final</span> <span class="n">Object</span> <span class="nf">parent</span><span class="p">;</span>
 
     <span class="c1">// The path of the referenced file
 </span><span class="c1"></span>    <span class="c1">// (null if the parent stream is created with a file descriptor)
-</span><span class="c1"></span>    <span class="kd">private</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">path</span><span class="o">;</span>
+</span><span class="c1"></span>    <span class="kd">private</span> <span class="nf">final</span> <span class="n">String</span> <span class="nf">path</span><span class="p">;</span>
 
     <span class="c1">// Thread-safe set of IDs of native threads, for signalling
-</span><span class="c1"></span>    <span class="kd">private</span> <span class="kd">final</span> <span class="n">NativeThreadSet</span> <span class="n">threads</span> <span class="o">=</span> <span class="k">new</span> <span class="n">NativeThreadSet</span><span class="o">(</span><span class="n">2</span><span class="o">);</span>
+</span><span class="c1"></span>    <span class="kd">private</span> <span class="nf">final</span> <span class="n">NativeThreadSet</span> <span class="nf">threads</span> <span class="o">=</span> <span class="k">new</span> <span class="n">NativeThreadSet</span><span class="p">(</span><span class="n">2</span><span class="p">);</span>
 
     <span class="c1">// Lock for operations involving position and size
-</span><span class="c1"></span>    <span class="kd">private</span> <span class="kd">final</span> <span class="n">Object</span> <span class="n">positionLock</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Object</span><span class="o">();</span>
+</span><span class="c1"></span>    <span class="kd">private</span> <span class="nf">final</span> <span class="n">Object</span> <span class="nf">positionLock</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Object</span><span class="p">();</span>
 
     <span class="c1">// Positional-read is not interruptible
-</span><span class="c1"></span>    <span class="kd">private</span> <span class="kd">volatile</span> <span class="kt">boolean</span> <span class="n">uninterruptible</span><span class="o">;</span>
+</span><span class="c1"></span>    <span class="kd">private</span> <span class="nf">volatile</span> <span class="kt">boolean</span> <span class="nf">uninterruptible</span><span class="p">;</span>
 
     <span class="c1">// DirectIO flag
-</span><span class="c1"></span>    <span class="kd">private</span> <span class="kd">final</span> <span class="kt">boolean</span> <span class="n">direct</span><span class="o">;</span>
+</span><span class="c1"></span>    <span class="kd">private</span> <span class="nf">final</span> <span class="kt">boolean</span> <span class="nf">direct</span><span class="p">;</span>
 
     <span class="c1">// IO alignment value for DirectIO
-</span><span class="c1"></span>    <span class="kd">private</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">alignment</span><span class="o">;</span>
+</span><span class="c1"></span>    <span class="kd">private</span> <span class="nf">final</span> <span class="kt">int</span> <span class="nf">alignment</span><span class="p">;</span>
 
     <span class="c1">// Cleanable with an action which closes this channel&#39;s file descriptor
-</span><span class="c1"></span>    <span class="kd">private</span> <span class="kd">final</span> <span class="n">Cleanable</span> <span class="n">closer</span><span class="o">;</span>
-<span class="o">}</span></code></pre></td></tr></table>
+</span><span class="c1"></span>    <span class="kd">private</span> <span class="nf">final</span> <span class="n">Cleanable</span> <span class="nf">closer</span><span class="p">;</span>
+<span class="p">}</span></code></pre></td></tr></table>
 </div>
 </div>
 <h1 id="reading-data-from-a-filechannel">Reading Data from a FileChannel</h1>
@@ -508,8 +507,8 @@ This post will take FileChannel for further exploration, from example to impleme
 </span><span class="lnt">2
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="n">ByteBuffer</span> <span class="n">buf</span> <span class="o">=</span> <span class="n">ByteBuffer</span><span class="o">.</span><span class="na">allocate</span><span class="o">(</span><span class="n">48</span><span class="o">);</span>
-<span class="kt">int</span> <span class="n">bytesRead</span> <span class="o">=</span> <span class="n">inChannel</span><span class="o">.</span><span class="na">read</span><span class="o">(</span><span class="n">buf</span><span class="o">);</span></code></pre></td></tr></table>
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="n">ByteBuffer</span> <span class="nf">buf</span> <span class="o">=</span> <span class="n">ByteBuffer</span><span class="p">.</span><span class="na">allocate</span><span class="p">(</span><span class="n">48</span><span class="p">);</span>
+<span class="kt">int</span> <span class="nf">bytesRead</span> <span class="o">=</span> <span class="n">inChannel</span><span class="p">.</span><span class="na">read</span><span class="p">(</span><span class="n">buf</span><span class="p">);</span></code></pre></td></tr></table>
 </div>
 </div>
 <p>The <code>read()</code> underneath tackles read operation with the following steps:</p>
@@ -522,8 +521,8 @@ This post will take FileChannel for further exploration, from example to impleme
 <li>check the buffer is readable</li>
 <li>allocate a temporary buffer and write data into it</li>
 <li>assign newborn buffer to destination buffer</li>
-<li>normalize the status of this I/O operation</li>
-</ul>
+
+<li><p>normalize the status of this I/O operation</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
@@ -588,66 +587,68 @@ This post will take FileChannel for further exploration, from example to impleme
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// FileChannelImpl.java
-</span><span class="c1"></span><span class="kd">public</span> <span class="kt">int</span> <span class="nf">read</span><span class="o">(</span><span class="n">ByteBuffer</span> <span class="n">dst</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
-    <span class="n">ensureOpen</span><span class="o">();</span>
-    <span class="k">if</span> <span class="o">(!</span><span class="n">readable</span><span class="o">)</span>
-        <span class="k">throw</span> <span class="k">new</span> <span class="n">NonReadableChannelException</span><span class="o">();</span>
-    <span class="kd">synchronized</span> <span class="o">(</span><span class="n">positionLock</span><span class="o">)</span> <span class="o">{</span>
-        <span class="k">if</span> <span class="o">(</span><span class="n">direct</span><span class="o">)</span>
-            <span class="n">Util</span><span class="o">.</span><span class="na">checkChannelPositionAligned</span><span class="o">(</span><span class="n">position</span><span class="o">(),</span> <span class="n">alignment</span><span class="o">);</span>
-        <span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span>
-        <span class="kt">int</span> <span class="n">ti</span> <span class="o">=</span> <span class="o">-</span><span class="n">1</span><span class="o">;</span>
-        <span class="k">try</span> <span class="o">{</span>
-            <span class="n">begin</span><span class="o">();</span>
-            <span class="n">ti</span> <span class="o">=</span> <span class="n">threads</span><span class="o">.</span><span class="na">add</span><span class="o">();</span>
-            <span class="k">if</span> <span class="o">(!</span><span class="n">isOpen</span><span class="o">())</span>
-                <span class="k">return</span> <span class="n">0</span><span class="o">;</span>
-            <span class="k">do</span> <span class="o">{</span>
-                <span class="n">n</span> <span class="o">=</span> <span class="n">IOUtil</span><span class="o">.</span><span class="na">read</span><span class="o">(</span><span class="n">fd</span><span class="o">,</span> <span class="n">dst</span><span class="o">,</span> <span class="o">-</span><span class="n">1</span><span class="o">,</span> <span class="n">direct</span><span class="o">,</span> <span class="n">alignment</span><span class="o">,</span> <span class="n">nd</span><span class="o">);</span>
-            <span class="o">}</span> <span class="k">while</span> <span class="o">((</span><span class="n">n</span> <span class="o">==</span> <span class="n">IOStatus</span><span class="o">.</span><span class="na">INTERRUPTED</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="n">isOpen</span><span class="o">());</span>
-            <span class="k">return</span> <span class="n">IOStatus</span><span class="o">.</span><span class="na">normalize</span><span class="o">(</span><span class="n">n</span><span class="o">);</span>
-        <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
-            <span class="n">threads</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="n">ti</span><span class="o">);</span>
-            <span class="n">end</span><span class="o">(</span><span class="n">n</span> <span class="o">&gt;</span> <span class="n">0</span><span class="o">);</span>
-            <span class="k">assert</span> <span class="n">IOStatus</span><span class="o">.</span><span class="na">check</span><span class="o">(</span><span class="n">n</span><span class="o">);</span>
-        <span class="o">}</span>
-    <span class="o">}</span>
-<span class="o">}</span>
+</span><span class="c1"></span><span class="kd">public</span> <span class="nf">int</span> <span class="n">read</span><span class="p">(</span><span class="n">ByteBuffer</span> <span class="nf">dst</span><span class="p">)</span> <span class="kd">throws</span> <span class="nf">IOException</span> <span class="p">{</span>
+<span class="n">ensureOpen</span><span class="p">();</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">readable</span><span class="p">)</span>
+    <span class="k">throw</span> <span class="k">new</span> <span class="n">NonReadableChannelException</span><span class="p">();</span>
+<span class="kd">synchronized</span> <span class="p">(</span><span class="n">positionLock</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">direct</span><span class="p">)</span>
+        <span class="n">Util</span><span class="p">.</span><span class="na">checkChannelPositionAligned</span><span class="p">(</span><span class="n">position</span><span class="p">(),</span> <span class="n">alignment</span><span class="p">);</span>
+    <span class="kt">int</span> <span class="nf">n</span> <span class="o">=</span> <span class="n">0</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="nf">ti</span> <span class="o">=</span> <span class="o">-</span><span class="n">1</span><span class="p">;</span>
+    <span class="k">try</span> <span class="p">{</span>
+        <span class="n">begin</span><span class="p">();</span>
+        <span class="n">ti</span> <span class="o">=</span> <span class="n">threads</span><span class="p">.</span><span class="na">add</span><span class="p">();</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">isOpen</span><span class="p">())</span>
+            <span class="k">return</span> <span class="n">0</span><span class="p">;</span>
+        <span class="k">do</span> <span class="p">{</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="n">IOUtil</span><span class="p">.</span><span class="na">read</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="o">-</span><span class="n">1</span><span class="p">,</span> <span class="n">direct</span><span class="p">,</span> <span class="n">alignment</span><span class="p">,</span> <span class="n">nd</span><span class="p">);</span>
+        <span class="p">}</span> <span class="k">while</span> <span class="p">((</span><span class="n">n</span> <span class="o">==</span> <span class="n">IOStatus</span><span class="p">.</span><span class="na">INTERRUPTED</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">isOpen</span><span class="p">());</span>
+        <span class="k">return</span> <span class="n">IOStatus</span><span class="p">.</span><span class="na">normalize</span><span class="p">(</span><span class="n">n</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">finally</span> <span class="p">{</span>
+        <span class="n">threads</span><span class="p">.</span><span class="na">remove</span><span class="p">(</span><span class="n">ti</span><span class="p">);</span>
+        <span class="n">end</span><span class="p">(</span><span class="n">n</span> <span class="o">&gt;</span> <span class="n">0</span><span class="p">);</span>
+        <span class="k">assert</span> <span class="n">IOStatus</span><span class="p">.</span><span class="na">check</span><span class="p">(</span><span class="n">n</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="p">}</span>
 
 <span class="c1">// IOUtil.java
-</span><span class="c1"></span><span class="kd">static</span> <span class="kt">int</span> <span class="nf">read</span><span class="o">(</span><span class="n">FileDescriptor</span> <span class="n">fd</span><span class="o">,</span> <span class="n">ByteBuffer</span> <span class="n">dst</span><span class="o">,</span> <span class="kt">long</span> <span class="n">position</span><span class="o">,</span>
-                <span class="kt">boolean</span> <span class="n">directIO</span><span class="o">,</span> <span class="kt">int</span> <span class="n">alignment</span><span class="o">,</span> <span class="n">NativeDispatcher</span> <span class="n">nd</span><span class="o">)</span>
-    <span class="kd">throws</span> <span class="n">IOException</span>
-<span class="o">{</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">dst</span><span class="o">.</span><span class="na">isReadOnly</span><span class="o">())</span>
-        <span class="k">throw</span> <span class="k">new</span> <span class="n">IllegalArgumentException</span><span class="o">(</span><span class="s">&#34;Read-only buffer&#34;</span><span class="o">);</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">dst</span> <span class="k">instanceof</span> <span class="n">DirectBuffer</span><span class="o">)</span>
-        <span class="k">return</span> <span class="n">readIntoNativeBuffer</span><span class="o">(</span><span class="n">fd</span><span class="o">,</span> <span class="n">dst</span><span class="o">,</span> <span class="n">position</span><span class="o">,</span>
-                <span class="n">directIO</span><span class="o">,</span> <span class="n">alignment</span><span class="o">,</span> <span class="n">nd</span><span class="o">);</span>
+</span><span class="c1"></span><span class="kd">static</span> <span class="nf">int</span> <span class="n">read</span><span class="p">(</span><span class="n">FileDescriptor</span> <span class="nf">fd</span><span class="p">,</span> <span class="n">ByteBuffer</span> <span class="nf">dst</span><span class="p">,</span> <span class="kt">long</span> <span class="nf">position</span><span class="p">,</span>
+            <span class="kt">boolean</span> <span class="nf">directIO</span><span class="p">,</span> <span class="kt">int</span> <span class="nf">alignment</span><span class="p">,</span> <span class="n">NativeDispatcher</span> <span class="nf">nd</span><span class="p">)</span>
+<span class="kd">throws</span> <span class="nf">IOException</span>
+<span class="p">{</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">dst</span><span class="p">.</span><span class="na">isReadOnly</span><span class="p">())</span>
+    <span class="k">throw</span> <span class="k">new</span> <span class="n">IllegalArgumentException</span><span class="p">(</span><span class="s">&#34;Read-only buffer&#34;</span><span class="p">);</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">dst</span> <span class="nf">instanceof</span> <span class="n">DirectBuffer</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">readIntoNativeBuffer</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span>
+            <span class="n">directIO</span><span class="p">,</span> <span class="n">alignment</span><span class="p">,</span> <span class="n">nd</span><span class="p">);</span>
 
-    <span class="c1">// Substitute a native buffer
-</span><span class="c1"></span>    <span class="n">ByteBuffer</span> <span class="n">bb</span><span class="o">;</span>
-    <span class="kt">int</span> <span class="n">rem</span> <span class="o">=</span> <span class="n">dst</span><span class="o">.</span><span class="na">remaining</span><span class="o">();</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">directIO</span><span class="o">)</span> <span class="o">{</span>
-        <span class="n">Util</span><span class="o">.</span><span class="na">checkRemainingBufferSizeAligned</span><span class="o">(</span><span class="n">rem</span><span class="o">,</span> <span class="n">alignment</span><span class="o">);</span>
-        <span class="n">bb</span> <span class="o">=</span> <span class="n">Util</span><span class="o">.</span><span class="na">getTemporaryAlignedDirectBuffer</span><span class="o">(</span><span class="n">rem</span><span class="o">,</span>
-                                                  <span class="n">alignment</span><span class="o">);</span>
-    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
-        <span class="n">bb</span> <span class="o">=</span> <span class="n">Util</span><span class="o">.</span><span class="na">getTemporaryDirectBuffer</span><span class="o">(</span><span class="n">rem</span><span class="o">);</span>
-    <span class="o">}</span>
-    <span class="k">try</span> <span class="o">{</span>
-        <span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="n">readIntoNativeBuffer</span><span class="o">(</span><span class="n">fd</span><span class="o">,</span> <span class="n">bb</span><span class="o">,</span> <span class="n">position</span><span class="o">,</span>
-                <span class="n">directIO</span><span class="o">,</span> <span class="n">alignment</span><span class="o">,</span><span class="n">nd</span><span class="o">);</span>
-        <span class="n">bb</span><span class="o">.</span><span class="na">flip</span><span class="o">();</span>
-        <span class="k">if</span> <span class="o">(</span><span class="n">n</span> <span class="o">&gt;</span> <span class="n">0</span><span class="o">)</span>
-            <span class="n">dst</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">bb</span><span class="o">);</span>
-        <span class="k">return</span> <span class="n">n</span><span class="o">;</span>
-    <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
-        <span class="n">Util</span><span class="o">.</span><span class="na">offerFirstTemporaryDirectBuffer</span><span class="o">(</span><span class="n">bb</span><span class="o">);</span>
-    <span class="o">}</span>
-<span class="o">}</span></code></pre></td></tr></table>
+<span class="c1">// Substitute a native buffer
+</span><span class="c1"></span><span class="n">ByteBuffer</span> <span class="nf">bb</span><span class="p">;</span>
+<span class="kt">int</span> <span class="nf">rem</span> <span class="o">=</span> <span class="n">dst</span><span class="p">.</span><span class="na">remaining</span><span class="p">();</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">directIO</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">Util</span><span class="p">.</span><span class="na">checkRemainingBufferSizeAligned</span><span class="p">(</span><span class="n">rem</span><span class="p">,</span> <span class="n">alignment</span><span class="p">);</span>
+    <span class="n">bb</span> <span class="o">=</span> <span class="n">Util</span><span class="p">.</span><span class="na">getTemporaryAlignedDirectBuffer</span><span class="p">(</span><span class="n">rem</span><span class="p">,</span>
+                                              <span class="n">alignment</span><span class="p">);</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="n">bb</span> <span class="o">=</span> <span class="n">Util</span><span class="p">.</span><span class="na">getTemporaryDirectBuffer</span><span class="p">(</span><span class="n">rem</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="k">try</span> <span class="p">{</span>
+    <span class="kt">int</span> <span class="nf">n</span> <span class="o">=</span> <span class="n">readIntoNativeBuffer</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">bb</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span>
+            <span class="n">directIO</span><span class="p">,</span> <span class="n">alignment</span><span class="p">,</span><span class="n">nd</span><span class="p">);</span>
+    <span class="n">bb</span><span class="p">.</span><span class="na">flip</span><span class="p">();</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">&gt;</span> <span class="n">0</span><span class="p">)</span>
+        <span class="n">dst</span><span class="p">.</span><span class="na">put</span><span class="p">(</span><span class="n">bb</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">n</span><span class="p">;</span>
+<span class="p">}</span> <span class="k">finally</span> <span class="p">{</span>
+    <span class="n">Util</span><span class="p">.</span><span class="na">offerFirstTemporaryDirectBuffer</span><span class="p">(</span><span class="n">bb</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="p">}</span></code></pre></td></tr></table>
 </div>
-</div>
+</div></li>
+</ul>
+
 <p>Eventually, the <code>read</code> operation is achieved by <code>readIntoNativeBuffer</code> with the help of NativeDispatcher, which, as its name implies, will call native method of <code>read0</code> and <code>write0</code>.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -685,34 +686,34 @@ This post will take FileChannel for further exploration, from example to impleme
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// IOUtil.java
 </span><span class="c1"></span>
-<span class="kd">private</span> <span class="kd">static</span> <span class="kt">int</span> <span class="nf">readIntoNativeBuffer</span><span class="o">(</span><span class="n">FileDescriptor</span> <span class="n">fd</span><span class="o">,</span> <span class="n">ByteBuffer</span> <span class="n">bb</span><span class="o">,</span>
-                                        <span class="kt">long</span> <span class="n">position</span><span class="o">,</span> <span class="kt">boolean</span> <span class="n">directIO</span><span class="o">,</span>
-                                        <span class="kt">int</span> <span class="n">alignment</span><span class="o">,</span> <span class="n">NativeDispatcher</span> <span class="n">nd</span><span class="o">)</span>
-    <span class="kd">throws</span> <span class="n">IOException</span>
-<span class="o">{</span>
-    <span class="kt">int</span> <span class="n">pos</span> <span class="o">=</span> <span class="n">bb</span><span class="o">.</span><span class="na">position</span><span class="o">();</span>
-    <span class="kt">int</span> <span class="n">lim</span> <span class="o">=</span> <span class="n">bb</span><span class="o">.</span><span class="na">limit</span><span class="o">();</span>
-    <span class="k">assert</span> <span class="o">(</span><span class="n">pos</span> <span class="o">&lt;=</span> <span class="n">lim</span><span class="o">);</span>
-    <span class="kt">int</span> <span class="n">rem</span> <span class="o">=</span> <span class="o">(</span><span class="n">pos</span> <span class="o">&lt;=</span> <span class="n">lim</span> <span class="o">?</span> <span class="n">lim</span> <span class="o">-</span> <span class="n">pos</span> <span class="o">:</span> <span class="n">0</span><span class="o">);</span>
+<span class="kd">private</span> <span class="nf">static</span> <span class="kt">int</span> <span class="nf">readIntoNativeBuffer</span><span class="p">(</span><span class="n">FileDescriptor</span> <span class="nf">fd</span><span class="p">,</span> <span class="n">ByteBuffer</span> <span class="nf">bb</span><span class="p">,</span>
+                                        <span class="kt">long</span> <span class="nf">position</span><span class="p">,</span> <span class="kt">boolean</span> <span class="nf">directIO</span><span class="p">,</span>
+                                        <span class="kt">int</span> <span class="nf">alignment</span><span class="p">,</span> <span class="n">NativeDispatcher</span> <span class="nf">nd</span><span class="p">)</span>
+    <span class="kd">throws</span> <span class="nf">IOException</span>
+<span class="p">{</span>
+    <span class="kt">int</span> <span class="nf">pos</span> <span class="o">=</span> <span class="n">bb</span><span class="p">.</span><span class="na">position</span><span class="p">();</span>
+    <span class="kt">int</span> <span class="nf">lim</span> <span class="o">=</span> <span class="n">bb</span><span class="p">.</span><span class="na">limit</span><span class="p">();</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">pos</span> <span class="o">&lt;=</span> <span class="n">lim</span><span class="p">);</span>
+    <span class="kt">int</span> <span class="nf">rem</span> <span class="o">=</span> <span class="p">(</span><span class="n">pos</span> <span class="o">&lt;=</span> <span class="n">lim</span> <span class="o">?</span> <span class="n">lim</span> <span class="o">-</span> <span class="n">pos</span> <span class="o">:</span> <span class="n">0</span><span class="p">);</span>
 
-    <span class="k">if</span> <span class="o">(</span><span class="n">directIO</span><span class="o">)</span> <span class="o">{</span>
-        <span class="n">Util</span><span class="o">.</span><span class="na">checkBufferPositionAligned</span><span class="o">(</span><span class="n">bb</span><span class="o">,</span> <span class="n">pos</span><span class="o">,</span> <span class="n">alignment</span><span class="o">);</span>
-        <span class="n">Util</span><span class="o">.</span><span class="na">checkRemainingBufferSizeAligned</span><span class="o">(</span><span class="n">rem</span><span class="o">,</span> <span class="n">alignment</span><span class="o">);</span>
-    <span class="o">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">directIO</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">Util</span><span class="p">.</span><span class="na">checkBufferPositionAligned</span><span class="p">(</span><span class="n">bb</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">alignment</span><span class="p">);</span>
+        <span class="n">Util</span><span class="p">.</span><span class="na">checkRemainingBufferSizeAligned</span><span class="p">(</span><span class="n">rem</span><span class="p">,</span> <span class="n">alignment</span><span class="p">);</span>
+    <span class="p">}</span>
 
-    <span class="k">if</span> <span class="o">(</span><span class="n">rem</span> <span class="o">==</span> <span class="n">0</span><span class="o">)</span>
-        <span class="k">return</span> <span class="n">0</span><span class="o">;</span>
-    <span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">position</span> <span class="o">!=</span> <span class="o">-</span><span class="n">1</span><span class="o">)</span> <span class="o">{</span>
-        <span class="n">n</span> <span class="o">=</span> <span class="n">nd</span><span class="o">.</span><span class="na">pread</span><span class="o">(</span><span class="n">fd</span><span class="o">,</span> <span class="o">((</span><span class="n">DirectBuffer</span><span class="o">)</span><span class="n">bb</span><span class="o">).</span><span class="na">address</span><span class="o">()</span> <span class="o">+</span> <span class="n">pos</span><span class="o">,</span>
-                     <span class="n">rem</span><span class="o">,</span> <span class="n">position</span><span class="o">);</span>
-    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
-        <span class="n">n</span> <span class="o">=</span> <span class="n">nd</span><span class="o">.</span><span class="na">read</span><span class="o">(</span><span class="n">fd</span><span class="o">,</span> <span class="o">((</span><span class="n">DirectBuffer</span><span class="o">)</span><span class="n">bb</span><span class="o">).</span><span class="na">address</span><span class="o">()</span> <span class="o">+</span> <span class="n">pos</span><span class="o">,</span> <span class="n">rem</span><span class="o">);</span>
-    <span class="o">}</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">n</span> <span class="o">&gt;</span> <span class="n">0</span><span class="o">)</span>
-        <span class="n">bb</span><span class="o">.</span><span class="na">position</span><span class="o">(</span><span class="n">pos</span> <span class="o">+</span> <span class="n">n</span><span class="o">);</span>
-    <span class="k">return</span> <span class="n">n</span><span class="o">;</span>
-<span class="o">}</span></code></pre></td></tr></table>
+    <span class="k">if</span> <span class="p">(</span><span class="n">rem</span> <span class="o">==</span> <span class="n">0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">0</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="nf">n</span> <span class="o">=</span> <span class="n">0</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">position</span> <span class="o">!=</span> <span class="o">-</span><span class="n">1</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">nd</span><span class="p">.</span><span class="na">pread</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="p">((</span><span class="n">DirectBuffer</span><span class="p">)</span><span class="n">bb</span><span class="p">).</span><span class="na">address</span><span class="p">()</span> <span class="o">+</span> <span class="n">pos</span><span class="p">,</span>
+                     <span class="n">rem</span><span class="p">,</span> <span class="n">position</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">nd</span><span class="p">.</span><span class="na">read</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="p">((</span><span class="n">DirectBuffer</span><span class="p">)</span><span class="n">bb</span><span class="p">).</span><span class="na">address</span><span class="p">()</span> <span class="o">+</span> <span class="n">pos</span><span class="p">,</span> <span class="n">rem</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">&gt;</span> <span class="n">0</span><span class="p">)</span>
+        <span class="n">bb</span><span class="p">.</span><span class="na">position</span><span class="p">(</span><span class="n">pos</span> <span class="o">+</span> <span class="n">n</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">n</span><span class="p">;</span>
+<span class="p">}</span></code></pre></td></tr></table>
 </div>
 </div>
 <h1 id="writing-data-to-a-filechannel">Writing Data to a FileChannel</h1>
@@ -733,17 +734,17 @@ This post will take FileChannel for further exploration, from example to impleme
 </span><span class="lnt">11
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="n">String</span> <span class="n">newData</span> <span class="o">=</span> <span class="s">&#34;New String to write to file...&#34;</span> <span class="o">+</span> <span class="n">System</span><span class="o">.</span><span class="na">currentTimeMillis</span><span class="o">();</span>
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="n">String</span> <span class="nf">newData</span> <span class="o">=</span> <span class="s">&#34;New String to write to file...&#34;</span> <span class="o">+</span> <span class="n">System</span><span class="p">.</span><span class="na">currentTimeMillis</span><span class="p">();</span>
 
-<span class="n">ByteBuffer</span> <span class="n">buf</span> <span class="o">=</span> <span class="n">ByteBuffer</span><span class="o">.</span><span class="na">allocate</span><span class="o">(</span><span class="n">48</span><span class="o">);</span>
-<span class="n">buf</span><span class="o">.</span><span class="na">clear</span><span class="o">();</span>
-<span class="n">buf</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">newData</span><span class="o">.</span><span class="na">getBytes</span><span class="o">());</span>
+<span class="n">ByteBuffer</span> <span class="nf">buf</span> <span class="o">=</span> <span class="n">ByteBuffer</span><span class="p">.</span><span class="na">allocate</span><span class="p">(</span><span class="n">48</span><span class="p">);</span>
+<span class="n">buf</span><span class="p">.</span><span class="na">clear</span><span class="p">();</span>
+<span class="n">buf</span><span class="p">.</span><span class="na">put</span><span class="p">(</span><span class="n">newData</span><span class="p">.</span><span class="na">getBytes</span><span class="p">());</span>
 
-<span class="n">buf</span><span class="o">.</span><span class="na">flip</span><span class="o">();</span>
+<span class="n">buf</span><span class="p">.</span><span class="na">flip</span><span class="p">();</span>
 
-<span class="k">while</span><span class="o">(</span><span class="n">buf</span><span class="o">.</span><span class="na">hasRemaining</span><span class="o">())</span> <span class="o">{</span>
-    <span class="n">channel</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="n">buf</span><span class="o">);</span>
-<span class="o">}</span></code></pre></td></tr></table>
+<span class="k">while</span><span class="p">(</span><span class="n">buf</span><span class="p">.</span><span class="na">hasRemaining</span><span class="p">())</span> <span class="p">{</span>
+    <span class="n">channel</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="n">buf</span><span class="p">);</span>
+<span class="p">}</span></code></pre></td></tr></table>
 </div>
 </div>
 <p>Because of no guarantee of how many bytes the <code>write()</code> method writes to the FileChannel, <code>write()</code> is called repeatedly until the buffer has no further bytes to write.</p>
@@ -782,31 +783,31 @@ This post will take FileChannel for further exploration, from example to impleme
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// FileChannelImpl.java
 </span><span class="c1"></span>
-<span class="kd">public</span> <span class="kt">int</span> <span class="nf">write</span><span class="o">(</span><span class="n">ByteBuffer</span> <span class="n">src</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
-    <span class="n">ensureOpen</span><span class="o">();</span>
-    <span class="k">if</span> <span class="o">(!</span><span class="n">writable</span><span class="o">)</span>
-        <span class="k">throw</span> <span class="k">new</span> <span class="n">NonWritableChannelException</span><span class="o">();</span>
-    <span class="kd">synchronized</span> <span class="o">(</span><span class="n">positionLock</span><span class="o">)</span> <span class="o">{</span>
-        <span class="k">if</span> <span class="o">(</span><span class="n">direct</span><span class="o">)</span>
-            <span class="n">Util</span><span class="o">.</span><span class="na">checkChannelPositionAligned</span><span class="o">(</span><span class="n">position</span><span class="o">(),</span> <span class="n">alignment</span><span class="o">);</span>
-        <span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span>
-        <span class="kt">int</span> <span class="n">ti</span> <span class="o">=</span> <span class="o">-</span><span class="n">1</span><span class="o">;</span>
-        <span class="k">try</span> <span class="o">{</span>
-            <span class="n">begin</span><span class="o">();</span>
-            <span class="n">ti</span> <span class="o">=</span> <span class="n">threads</span><span class="o">.</span><span class="na">add</span><span class="o">();</span>
-            <span class="k">if</span> <span class="o">(!</span><span class="n">isOpen</span><span class="o">())</span>
-                <span class="k">return</span> <span class="n">0</span><span class="o">;</span>
-            <span class="k">do</span> <span class="o">{</span>
-                <span class="n">n</span> <span class="o">=</span> <span class="n">IOUtil</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="n">fd</span><span class="o">,</span> <span class="n">src</span><span class="o">,</span> <span class="o">-</span><span class="n">1</span><span class="o">,</span> <span class="n">direct</span><span class="o">,</span> <span class="n">alignment</span><span class="o">,</span> <span class="n">nd</span><span class="o">);</span>
-            <span class="o">}</span> <span class="k">while</span> <span class="o">((</span><span class="n">n</span> <span class="o">==</span> <span class="n">IOStatus</span><span class="o">.</span><span class="na">INTERRUPTED</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="n">isOpen</span><span class="o">());</span>
-            <span class="k">return</span> <span class="n">IOStatus</span><span class="o">.</span><span class="na">normalize</span><span class="o">(</span><span class="n">n</span><span class="o">);</span>
-        <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
-            <span class="n">threads</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="n">ti</span><span class="o">);</span>
-            <span class="n">end</span><span class="o">(</span><span class="n">n</span> <span class="o">&gt;</span> <span class="n">0</span><span class="o">);</span>
-            <span class="k">assert</span> <span class="n">IOStatus</span><span class="o">.</span><span class="na">check</span><span class="o">(</span><span class="n">n</span><span class="o">);</span>
-        <span class="o">}</span>
-    <span class="o">}</span>
-<span class="o">}</span></code></pre></td></tr></table>
+<span class="kd">public</span> <span class="nf">int</span> <span class="n">write</span><span class="p">(</span><span class="n">ByteBuffer</span> <span class="nf">src</span><span class="p">)</span> <span class="kd">throws</span> <span class="nf">IOException</span> <span class="p">{</span>
+    <span class="n">ensureOpen</span><span class="p">();</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">writable</span><span class="p">)</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="n">NonWritableChannelException</span><span class="p">();</span>
+    <span class="kd">synchronized</span> <span class="p">(</span><span class="n">positionLock</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">direct</span><span class="p">)</span>
+            <span class="n">Util</span><span class="p">.</span><span class="na">checkChannelPositionAligned</span><span class="p">(</span><span class="n">position</span><span class="p">(),</span> <span class="n">alignment</span><span class="p">);</span>
+        <span class="kt">int</span> <span class="nf">n</span> <span class="o">=</span> <span class="n">0</span><span class="p">;</span>
+        <span class="kt">int</span> <span class="nf">ti</span> <span class="o">=</span> <span class="o">-</span><span class="n">1</span><span class="p">;</span>
+        <span class="k">try</span> <span class="p">{</span>
+            <span class="n">begin</span><span class="p">();</span>
+            <span class="n">ti</span> <span class="o">=</span> <span class="n">threads</span><span class="p">.</span><span class="na">add</span><span class="p">();</span>
+            <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">isOpen</span><span class="p">())</span>
+                <span class="k">return</span> <span class="n">0</span><span class="p">;</span>
+            <span class="k">do</span> <span class="p">{</span>
+                <span class="n">n</span> <span class="o">=</span> <span class="n">IOUtil</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="o">-</span><span class="n">1</span><span class="p">,</span> <span class="n">direct</span><span class="p">,</span> <span class="n">alignment</span><span class="p">,</span> <span class="n">nd</span><span class="p">);</span>
+            <span class="p">}</span> <span class="k">while</span> <span class="p">((</span><span class="n">n</span> <span class="o">==</span> <span class="n">IOStatus</span><span class="p">.</span><span class="na">INTERRUPTED</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">isOpen</span><span class="p">());</span>
+            <span class="k">return</span> <span class="n">IOStatus</span><span class="p">.</span><span class="na">normalize</span><span class="p">(</span><span class="n">n</span><span class="p">);</span>
+        <span class="p">}</span> <span class="k">finally</span> <span class="p">{</span>
+            <span class="n">threads</span><span class="p">.</span><span class="na">remove</span><span class="p">(</span><span class="n">ti</span><span class="p">);</span>
+            <span class="n">end</span><span class="p">(</span><span class="n">n</span> <span class="o">&gt;</span> <span class="n">0</span><span class="p">);</span>
+            <span class="k">assert</span> <span class="n">IOStatus</span><span class="p">.</span><span class="na">check</span><span class="p">(</span><span class="n">n</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre></td></tr></table>
 </div>
 </div>
 <h1 id="closing-a-filechannel">Closing a FileChannel</h1>
@@ -819,8 +820,8 @@ What <code>implCloseChannel</code> does includes:</p>
 <li>release and invalidate any locks that we still hold</li>
 <li>signal any threads blocked on this channel</li>
 <li>close FileDescriptor</li>
-<li>perform the cleaning action</li>
-</ul>
+
+<li><p>perform the cleaning action</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
@@ -862,41 +863,43 @@ What <code>implCloseChannel</code> does includes:</p>
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// FileChannelImpl.java
 </span><span class="c1"></span>
-<span class="kd">protected</span> <span class="kt">void</span> <span class="nf">implCloseChannel</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
-    <span class="k">if</span> <span class="o">(!</span><span class="n">fd</span><span class="o">.</span><span class="na">valid</span><span class="o">())</span>
-        <span class="k">return</span><span class="o">;</span> <span class="c1">// nothing to do
+<span class="kd">protected</span> <span class="nf">void</span> <span class="n">implCloseChannel</span><span class="p">()</span> <span class="kd">throws</span> <span class="nf">IOException</span> <span class="p">{</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">fd</span><span class="p">.</span><span class="na">valid</span><span class="p">())</span>
+    <span class="k">return</span><span class="p">;</span> <span class="c1">// nothing to do
 </span><span class="c1"></span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">fileLockTable</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-        <span class="k">for</span> <span class="o">(</span><span class="n">FileLock</span> <span class="nl">fl:</span> <span class="n">fileLockTable</span><span class="o">.</span><span class="na">removeAll</span><span class="o">())</span> <span class="o">{</span>
-            <span class="kd">synchronized</span> <span class="o">(</span><span class="n">fl</span><span class="o">)</span> <span class="o">{</span>
-                <span class="k">if</span> <span class="o">(</span><span class="n">fl</span><span class="o">.</span><span class="na">isValid</span><span class="o">())</span> <span class="o">{</span>
-                    <span class="n">nd</span><span class="o">.</span><span class="na">release</span><span class="o">(</span><span class="n">fd</span><span class="o">,</span> <span class="n">fl</span><span class="o">.</span><span class="na">position</span><span class="o">(),</span> <span class="n">fl</span><span class="o">.</span><span class="na">size</span><span class="o">());</span>
-                    <span class="o">((</span><span class="n">FileLockImpl</span><span class="o">)</span><span class="n">fl</span><span class="o">).</span><span class="na">invalidate</span><span class="o">();</span>
-                <span class="o">}</span>
-            <span class="o">}</span>
-        <span class="o">}</span>
-    <span class="o">}</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">fileLockTable</span> <span class="o">!=</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">FileLock</span> <span class="nf">fl</span><span class="o">:</span> <span class="n">fileLockTable</span><span class="p">.</span><span class="na">removeAll</span><span class="p">())</span> <span class="p">{</span>
+        <span class="kd">synchronized</span> <span class="p">(</span><span class="n">fl</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">fl</span><span class="p">.</span><span class="na">isValid</span><span class="p">())</span> <span class="p">{</span>
+                <span class="n">nd</span><span class="p">.</span><span class="na">release</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">fl</span><span class="p">.</span><span class="na">position</span><span class="p">(),</span> <span class="n">fl</span><span class="p">.</span><span class="na">size</span><span class="p">());</span>
+                <span class="p">((</span><span class="n">FileLockImpl</span><span class="p">)</span><span class="n">fl</span><span class="p">).</span><span class="na">invalidate</span><span class="p">();</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
 
-    <span class="n">threads</span><span class="o">.</span><span class="na">signalAndWait</span><span class="o">();</span>
+<span class="n">threads</span><span class="p">.</span><span class="na">signalAndWait</span><span class="p">();</span>
 
-    <span class="k">if</span> <span class="o">(</span><span class="n">parent</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">parent</span> <span class="o">!=</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
 
-        <span class="c1">// Close the fd via the parent stream&#39;s close method.  The parent
-</span><span class="c1"></span>        <span class="c1">// will reinvoke our close method, which is defined in the
-</span><span class="c1"></span>        <span class="c1">// superclass AbstractInterruptibleChannel, but the isOpen logic in
-</span><span class="c1"></span>        <span class="c1">// that method will prevent this method from being reinvoked.
-</span><span class="c1"></span>        <span class="c1">//
-</span><span class="c1"></span>        <span class="o">((</span><span class="n">java</span><span class="o">.</span><span class="na">io</span><span class="o">.</span><span class="na">Closeable</span><span class="o">)</span><span class="n">parent</span><span class="o">).</span><span class="na">close</span><span class="o">();</span>
-    <span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">closer</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-        <span class="c1">// Perform the cleaning action so it is not redone when
-</span><span class="c1"></span>        <span class="c1">// this channel becomes phantom reachable.
-</span><span class="c1"></span>        <span class="n">closer</span><span class="o">.</span><span class="na">clean</span><span class="o">();</span>
-    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
-        <span class="n">fdAccess</span><span class="o">.</span><span class="na">close</span><span class="o">(</span><span class="n">fd</span><span class="o">);</span>
-    <span class="o">}</span>
-<span class="o">}</span></code></pre></td></tr></table>
+    <span class="c1">// Close the fd via the parent stream&#39;s close method.  The parent
+</span><span class="c1"></span>    <span class="c1">// will reinvoke our close method, which is defined in the
+</span><span class="c1"></span>    <span class="c1">// superclass AbstractInterruptibleChannel, but the isOpen logic in
+</span><span class="c1"></span>    <span class="c1">// that method will prevent this method from being reinvoked.
+</span><span class="c1"></span>    <span class="c1">//
+</span><span class="c1"></span>    <span class="p">((</span><span class="n">java</span><span class="p">.</span><span class="na">io</span><span class="p">.</span><span class="na">Closeable</span><span class="p">)</span><span class="n">parent</span><span class="p">).</span><span class="na">close</span><span class="p">();</span>
+<span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">closer</span> <span class="o">!=</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// Perform the cleaning action so it is not redone when
+</span><span class="c1"></span>    <span class="c1">// this channel becomes phantom reachable.
+</span><span class="c1"></span>    <span class="n">closer</span><span class="p">.</span><span class="na">clean</span><span class="p">();</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="n">fdAccess</span><span class="p">.</span><span class="na">close</span><span class="p">(</span><span class="n">fd</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="p">}</span></code></pre></td></tr></table>
 </div>
-</div>
+</div></li>
+</ul>
+
 <p><code>position()</code> and <code>truncate()</code> are skipped in this post, because they share analogous steps with <code>read()</code> and <code>write()</code>.</p>
 
 <p><strong>Reference</strong></p>

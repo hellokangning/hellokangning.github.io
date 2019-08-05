@@ -24,7 +24,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.55.6 with even 4.0.0" />
+<meta name="generator" content="Hugo 0.56.1 with even 4.0.0" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/en/post/hbase-batch-puts-with-bufferedmutator/" />
@@ -43,9 +43,8 @@
 <meta property="og:description" content="BufferedMutator is meant for batched, potentially asynchronous puts into a single table. This class relies heavily on AsyncProcess, which I has explained here. Then, we can focus on what BufferedMutator does in this post." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hellokangning.github.io/en/post/hbase-batch-puts-with-bufferedmutator/" />
-<meta property="article:published_time" content="2018-01-15T16:56:23&#43;08:00"/>
-<meta property="article:modified_time" content="2018-01-15T16:56:23&#43;08:00"/>
-
+<meta property="article:published_time" content="2018-01-15T16:56:23+08:00" />
+<meta property="article:modified_time" content="2018-01-15T16:56:23+08:00" />
 <meta itemprop="name" content="HBase Batch Puts with BufferedMutator">
 <meta itemprop="description" content="BufferedMutator is meant for batched, potentially asynchronous puts into a single table. This class relies heavily on AsyncProcess, which I has explained here. Then, we can focus on what BufferedMutator does in this post.">
 
@@ -215,43 +214,43 @@
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// BufferedMutatorImpl.java
 </span><span class="c1"></span>
   <span class="nd">@Override</span>
-  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">mutate</span><span class="o">(</span><span class="n">List</span><span class="o">&lt;?</span> <span class="kd">extends</span> <span class="n">Mutation</span><span class="o">&gt;</span> <span class="n">ms</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">InterruptedIOException</span><span class="o">,</span>
-      <span class="n">RetriesExhaustedWithDetailsException</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="nf">void</span> <span class="n">mutate</span><span class="p">(</span><span class="n">List</span><span class="o">&lt;?</span> <span class="kd">extends</span> <span class="nf">Mutation</span><span class="o">&gt;</span> <span class="n">ms</span><span class="p">)</span> <span class="kd">throws</span> <span class="nf">InterruptedIOException</span><span class="p">,</span>
+      <span class="n">RetriesExhaustedWithDetailsException</span> <span class="p">{</span>
 
-    <span class="k">if</span> <span class="o">(</span><span class="n">closed</span><span class="o">)</span> <span class="o">{</span>
-      <span class="k">throw</span> <span class="k">new</span> <span class="n">IllegalStateException</span><span class="o">(</span><span class="s">&#34;Cannot put when the BufferedMutator is closed.&#34;</span><span class="o">);</span>
-    <span class="o">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">closed</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">throw</span> <span class="k">new</span> <span class="n">IllegalStateException</span><span class="p">(</span><span class="s">&#34;Cannot put when the BufferedMutator is closed.&#34;</span><span class="p">);</span>
+    <span class="p">}</span>
 
-    <span class="kt">long</span> <span class="n">toAddSize</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span>
-    <span class="kt">int</span> <span class="n">toAddCount</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span>
-    <span class="k">for</span> <span class="o">(</span><span class="n">Mutation</span> <span class="n">m</span> <span class="o">:</span> <span class="n">ms</span><span class="o">)</span> <span class="o">{</span>
-      <span class="k">if</span> <span class="o">(</span><span class="n">m</span> <span class="k">instanceof</span> <span class="n">Put</span><span class="o">)</span> <span class="o">{</span>
-        <span class="n">validatePut</span><span class="o">((</span><span class="n">Put</span><span class="o">)</span> <span class="n">m</span><span class="o">);</span>
-      <span class="o">}</span>
-      <span class="n">toAddSize</span> <span class="o">+=</span> <span class="n">m</span><span class="o">.</span><span class="na">heapSize</span><span class="o">();</span>
-      <span class="o">++</span><span class="n">toAddCount</span><span class="o">;</span>
-    <span class="o">}</span>
+    <span class="kt">long</span> <span class="nf">toAddSize</span> <span class="o">=</span> <span class="n">0</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="nf">toAddCount</span> <span class="o">=</span> <span class="n">0</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">Mutation</span> <span class="nf">m</span> <span class="o">:</span> <span class="n">ms</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">m</span> <span class="nf">instanceof</span> <span class="n">Put</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">validatePut</span><span class="p">((</span><span class="n">Put</span><span class="p">)</span> <span class="n">m</span><span class="p">);</span>
+      <span class="p">}</span>
+      <span class="n">toAddSize</span> <span class="o">+=</span> <span class="n">m</span><span class="p">.</span><span class="na">heapSize</span><span class="p">();</span>
+      <span class="o">++</span><span class="n">toAddCount</span><span class="p">;</span>
+    <span class="p">}</span>
 
     <span class="c1">// This behavior is highly non-intuitive... it does not protect us against
 </span><span class="c1"></span>    <span class="c1">// 94-incompatible behavior, which is a timing issue because hasError, the below code
 </span><span class="c1"></span>    <span class="c1">// and setter of hasError are not synchronized. Perhaps it should be removed.
-</span><span class="c1"></span>    <span class="k">if</span> <span class="o">(</span><span class="n">ap</span><span class="o">.</span><span class="na">hasError</span><span class="o">())</span> <span class="o">{</span>
-      <span class="n">currentWriteBufferSize</span><span class="o">.</span><span class="na">addAndGet</span><span class="o">(</span><span class="n">toAddSize</span><span class="o">);</span>
-      <span class="n">writeAsyncBuffer</span><span class="o">.</span><span class="na">addAll</span><span class="o">(</span><span class="n">ms</span><span class="o">);</span>
-      <span class="n">undealtMutationCount</span><span class="o">.</span><span class="na">addAndGet</span><span class="o">(</span><span class="n">toAddCount</span><span class="o">);</span>
-      <span class="n">backgroundFlushCommits</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
-    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
-      <span class="n">currentWriteBufferSize</span><span class="o">.</span><span class="na">addAndGet</span><span class="o">(</span><span class="n">toAddSize</span><span class="o">);</span>
-      <span class="n">writeAsyncBuffer</span><span class="o">.</span><span class="na">addAll</span><span class="o">(</span><span class="n">ms</span><span class="o">);</span>
-      <span class="n">undealtMutationCount</span><span class="o">.</span><span class="na">addAndGet</span><span class="o">(</span><span class="n">toAddCount</span><span class="o">);</span>
-    <span class="o">}</span>
+</span><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="n">ap</span><span class="p">.</span><span class="na">hasError</span><span class="p">())</span> <span class="p">{</span>
+      <span class="n">currentWriteBufferSize</span><span class="p">.</span><span class="na">addAndGet</span><span class="p">(</span><span class="n">toAddSize</span><span class="p">);</span>
+      <span class="n">writeAsyncBuffer</span><span class="p">.</span><span class="na">addAll</span><span class="p">(</span><span class="n">ms</span><span class="p">);</span>
+      <span class="n">undealtMutationCount</span><span class="p">.</span><span class="na">addAndGet</span><span class="p">(</span><span class="n">toAddCount</span><span class="p">);</span>
+      <span class="n">backgroundFlushCommits</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="n">currentWriteBufferSize</span><span class="p">.</span><span class="na">addAndGet</span><span class="p">(</span><span class="n">toAddSize</span><span class="p">);</span>
+      <span class="n">writeAsyncBuffer</span><span class="p">.</span><span class="na">addAll</span><span class="p">(</span><span class="n">ms</span><span class="p">);</span>
+      <span class="n">undealtMutationCount</span><span class="p">.</span><span class="na">addAndGet</span><span class="p">(</span><span class="n">toAddCount</span><span class="p">);</span>
+    <span class="p">}</span>
 
     <span class="c1">// Now try and queue what needs to be queued.
-</span><span class="c1"></span>    <span class="k">while</span> <span class="o">(</span><span class="n">undealtMutationCount</span><span class="o">.</span><span class="na">get</span><span class="o">()</span> <span class="o">!=</span> <span class="n">0</span>
-        <span class="o">&amp;&amp;</span> <span class="n">currentWriteBufferSize</span><span class="o">.</span><span class="na">get</span><span class="o">()</span> <span class="o">&gt;</span> <span class="n">writeBufferSize</span><span class="o">)</span> <span class="o">{</span>
-      <span class="n">backgroundFlushCommits</span><span class="o">(</span><span class="kc">false</span><span class="o">);</span>
-    <span class="o">}</span>
-  <span class="o">}</span></code></pre></td></tr></table>
+</span><span class="c1"></span>    <span class="k">while</span> <span class="p">(</span><span class="n">undealtMutationCount</span><span class="p">.</span><span class="na">get</span><span class="p">()</span> <span class="o">!=</span> <span class="n">0</span>
+        <span class="o">&amp;&amp;</span> <span class="n">currentWriteBufferSize</span><span class="p">.</span><span class="na">get</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">writeBufferSize</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">backgroundFlushCommits</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span></code></pre></td></tr></table>
 </div>
 </div>
 <p>The code is fussy, here is a quick list,</p>
@@ -313,48 +312,48 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// BufferedMutatorImpl.java
 </span><span class="c1"></span>
- <span class="kd">private</span> <span class="kt">void</span> <span class="nf">backgroundFlushCommits</span><span class="o">(</span><span class="kt">boolean</span> <span class="n">synchronous</span><span class="o">)</span> <span class="kd">throws</span>
-      <span class="n">InterruptedIOException</span><span class="o">,</span>
-      <span class="n">RetriesExhaustedWithDetailsException</span> <span class="o">{</span>
-    <span class="k">if</span> <span class="o">(!</span><span class="n">synchronous</span> <span class="o">&amp;&amp;</span> <span class="n">writeAsyncBuffer</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">())</span> <span class="o">{</span>
-      <span class="k">return</span><span class="o">;</span>
-    <span class="o">}</span>
+ <span class="kd">private</span> <span class="nf">void</span> <span class="n">backgroundFlushCommits</span><span class="p">(</span><span class="kt">boolean</span> <span class="nf">synchronous</span><span class="p">)</span> <span class="kd">throws</span>
+      <span class="nf">InterruptedIOException</span><span class="p">,</span>
+      <span class="n">RetriesExhaustedWithDetailsException</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">synchronous</span> <span class="o">&amp;&amp;</span> <span class="n">writeAsyncBuffer</span><span class="p">.</span><span class="na">isEmpty</span><span class="p">())</span> <span class="p">{</span>
+      <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
 
-    <span class="k">if</span> <span class="o">(!</span><span class="n">synchronous</span><span class="o">)</span> <span class="o">{</span>
-      <span class="n">QueueRowAccess</span> <span class="n">taker</span> <span class="o">=</span> <span class="k">new</span> <span class="n">QueueRowAccess</span><span class="o">();</span>
-      <span class="n">AsyncProcessTask</span> <span class="n">task</span> <span class="o">=</span> <span class="n">wrapAsyncProcessTask</span><span class="o">(</span><span class="n">taker</span><span class="o">);</span>
-      <span class="k">try</span> <span class="o">{</span>
-        <span class="n">ap</span><span class="o">.</span><span class="na">submit</span><span class="o">(</span><span class="n">task</span><span class="o">);</span>
-        <span class="k">if</span> <span class="o">(</span><span class="n">ap</span><span class="o">.</span><span class="na">hasError</span><span class="o">())</span> <span class="o">{</span>
-          <span class="n">LOG</span><span class="o">.</span><span class="na">debug</span><span class="o">(</span><span class="n">tableName</span> <span class="o">+</span> <span class="s">&#34;: One or more of the operations have failed -&#34;</span>
-              <span class="o">+</span> <span class="s">&#34; waiting for all operation in progress to finish (successfully or not)&#34;</span><span class="o">);</span>
-        <span class="o">}</span>
-      <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
-        <span class="n">taker</span><span class="o">.</span><span class="na">restoreRemainder</span><span class="o">();</span>
-      <span class="o">}</span>
-    <span class="o">}</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">synchronous</span> <span class="o">||</span> <span class="n">ap</span><span class="o">.</span><span class="na">hasError</span><span class="o">())</span> <span class="o">{</span>
-      <span class="n">QueueRowAccess</span> <span class="n">taker</span> <span class="o">=</span> <span class="k">new</span> <span class="n">QueueRowAccess</span><span class="o">();</span>
-      <span class="n">AsyncProcessTask</span> <span class="n">task</span> <span class="o">=</span> <span class="n">wrapAsyncProcessTask</span><span class="o">(</span><span class="n">taker</span><span class="o">);</span>
-      <span class="k">try</span> <span class="o">{</span>
-        <span class="k">while</span> <span class="o">(!</span><span class="n">taker</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">())</span> <span class="o">{</span>
-          <span class="n">ap</span><span class="o">.</span><span class="na">submit</span><span class="o">(</span><span class="n">task</span><span class="o">);</span>
-          <span class="n">taker</span><span class="o">.</span><span class="na">reset</span><span class="o">();</span>
-        <span class="o">}</span>
-      <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
-        <span class="n">taker</span><span class="o">.</span><span class="na">restoreRemainder</span><span class="o">();</span>
-      <span class="o">}</span>
-      <span class="n">RetriesExhaustedWithDetailsException</span> <span class="n">error</span> <span class="o">=</span>
-          <span class="n">ap</span><span class="o">.</span><span class="na">waitForAllPreviousOpsAndReset</span><span class="o">(</span><span class="kc">null</span><span class="o">,</span> <span class="n">tableName</span><span class="o">);</span>
-      <span class="k">if</span> <span class="o">(</span><span class="n">error</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-        <span class="k">if</span> <span class="o">(</span><span class="n">listener</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-          <span class="k">throw</span> <span class="n">error</span><span class="o">;</span>
-        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
-          <span class="k">this</span><span class="o">.</span><span class="na">listener</span><span class="o">.</span><span class="na">onException</span><span class="o">(</span><span class="n">error</span><span class="o">,</span> <span class="k">this</span><span class="o">);</span>
-        <span class="o">}</span>
-      <span class="o">}</span>
-    <span class="o">}</span>
-  <span class="o">}</span></code></pre></td></tr></table>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">synchronous</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">QueueRowAccess</span> <span class="nf">taker</span> <span class="o">=</span> <span class="k">new</span> <span class="n">QueueRowAccess</span><span class="p">();</span>
+      <span class="n">AsyncProcessTask</span> <span class="nf">task</span> <span class="o">=</span> <span class="n">wrapAsyncProcessTask</span><span class="p">(</span><span class="n">taker</span><span class="p">);</span>
+      <span class="k">try</span> <span class="p">{</span>
+        <span class="n">ap</span><span class="p">.</span><span class="na">submit</span><span class="p">(</span><span class="n">task</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">ap</span><span class="p">.</span><span class="na">hasError</span><span class="p">())</span> <span class="p">{</span>
+          <span class="n">LOG</span><span class="p">.</span><span class="na">debug</span><span class="p">(</span><span class="n">tableName</span> <span class="o">+</span> <span class="s">&#34;: One or more of the operations have failed -&#34;</span>
+              <span class="o">+</span> <span class="s">&#34; waiting for all operation in progress to finish (successfully or not)&#34;</span><span class="p">);</span>
+        <span class="p">}</span>
+      <span class="p">}</span> <span class="k">finally</span> <span class="p">{</span>
+        <span class="n">taker</span><span class="p">.</span><span class="na">restoreRemainder</span><span class="p">();</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">synchronous</span> <span class="o">||</span> <span class="n">ap</span><span class="p">.</span><span class="na">hasError</span><span class="p">())</span> <span class="p">{</span>
+      <span class="n">QueueRowAccess</span> <span class="nf">taker</span> <span class="o">=</span> <span class="k">new</span> <span class="n">QueueRowAccess</span><span class="p">();</span>
+      <span class="n">AsyncProcessTask</span> <span class="nf">task</span> <span class="o">=</span> <span class="n">wrapAsyncProcessTask</span><span class="p">(</span><span class="n">taker</span><span class="p">);</span>
+      <span class="k">try</span> <span class="p">{</span>
+        <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">taker</span><span class="p">.</span><span class="na">isEmpty</span><span class="p">())</span> <span class="p">{</span>
+          <span class="n">ap</span><span class="p">.</span><span class="na">submit</span><span class="p">(</span><span class="n">task</span><span class="p">);</span>
+          <span class="n">taker</span><span class="p">.</span><span class="na">reset</span><span class="p">();</span>
+        <span class="p">}</span>
+      <span class="p">}</span> <span class="k">finally</span> <span class="p">{</span>
+        <span class="n">taker</span><span class="p">.</span><span class="na">restoreRemainder</span><span class="p">();</span>
+      <span class="p">}</span>
+      <span class="n">RetriesExhaustedWithDetailsException</span> <span class="nf">error</span> <span class="o">=</span>
+          <span class="n">ap</span><span class="p">.</span><span class="na">waitForAllPreviousOpsAndReset</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="n">tableName</span><span class="p">);</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">error</span> <span class="o">!=</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">listener</span> <span class="o">==</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+          <span class="k">throw</span> <span class="n">error</span><span class="p">;</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+          <span class="k">this</span><span class="p">.</span><span class="na">listener</span><span class="p">.</span><span class="na">onException</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="k">this</span><span class="p">);</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span></code></pre></td></tr></table>
 </div>
 </div>
 <p>Thereafter, the following steps can be found in <a href="https://hellokangning.github.io/en/post/hbase-batch-puts-without-bufferedmutator/">HBase Batch Puts without BufferedMutator

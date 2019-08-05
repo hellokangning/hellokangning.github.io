@@ -25,7 +25,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.55.6 with even 4.0.0" />
+<meta name="generator" content="Hugo 0.56.1 with even 4.0.0" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/zh/post/redis-cmd-population-execution/" />
@@ -48,9 +48,8 @@
 " />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hellokangning.github.io/zh/post/redis-cmd-population-execution/" />
-<meta property="article:published_time" content="2019-04-03T20:11:53&#43;08:00"/>
-<meta property="article:modified_time" content="2019-04-03T20:11:53&#43;08:00"/>
-
+<meta property="article:published_time" content="2019-04-03T20:11:53+08:00" />
+<meta property="article:modified_time" content="2019-04-03T20:11:53+08:00" />
 <meta itemprop="name" content="Redis 启动流程：命令注册和执行">
 <meta itemprop="description" content="这篇博客想讲一下 Redis 命令的注册、解析和执行。
 
@@ -217,8 +216,8 @@
 <li>最后一个为 key 的参数，也是第 1 个参数</li>
 <li>上述两个参数的间隔为 1</li>
 <li>总执行时间为 0</li>
-<li>调用次数为 0</li>
-</ul>
+
+<li><p>调用次数为 0</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt">1
@@ -229,12 +228,14 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-c" data-lang="c"><span class="k">struct</span> <span class="n">redisCommand</span> <span class="n">redisCommandTable</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="p">{</span><span class="s">&#34;module&#34;</span><span class="p">,</span><span class="n">moduleCommand</span><span class="p">,</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="s">&#34;as&#34;</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="nb">NULL</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">},</span>
-    <span class="p">{</span><span class="s">&#34;get&#34;</span><span class="p">,</span><span class="n">getCommand</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="s">&#34;rF&#34;</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="nb">NULL</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">},</span>
-    <span class="c1">// ...
+<span class="p">{</span><span class="s">&#34;module&#34;</span><span class="p">,</span><span class="n">moduleCommand</span><span class="p">,</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="s">&#34;as&#34;</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="nb">NULL</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">},</span>
+<span class="p">{</span><span class="s">&#34;get&#34;</span><span class="p">,</span><span class="n">getCommand</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="s">&#34;rF&#34;</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="nb">NULL</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">},</span>
+<span class="c1">// ...
 </span><span class="c1"></span><span class="p">}</span></code></pre></td></tr></table>
 </div>
-</div>
+</div></li>
+</ul>
+
 <p>Redis 的 <code>main</code> 函数（server.c）中，调用 <code>pupulateCommandTable</code> 填充了命令表：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">

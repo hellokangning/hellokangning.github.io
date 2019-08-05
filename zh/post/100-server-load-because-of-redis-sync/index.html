@@ -24,7 +24,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.55.6 with even 4.0.0" />
+<meta name="generator" content="Hugo 0.56.1 with even 4.0.0" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/zh/post/100-server-load-because-of-redis-sync/" />
@@ -45,9 +45,8 @@
 " />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hellokangning.github.io/zh/post/100-server-load-because-of-redis-sync/" />
-<meta property="article:published_time" content="2018-11-28T14:25:25&#43;08:00"/>
-<meta property="article:modified_time" content="2018-11-28T14:25:25&#43;08:00"/>
-
+<meta property="article:published_time" content="2018-11-28T14:25:25+08:00" />
+<meta property="article:modified_time" content="2018-11-28T14:25:25+08:00" />
 <meta itemprop="name" content="Redis 同步引发的系统过载">
 <meta itemprop="description" content="今天一早，就有客户来报说机器负载 100%。从日志中看到的现象是，Slave 向 Master 请求部分同步，Master 却要求 Slave 做个全套：全量同步，因为 Slave 发过来的 replication ID 太老了。Slave 说好吧，整个全的，然后消费成功。接着，Slave 还想来个部分同步，上述的过程连续发生 3 次。Master 有点强买强卖的意思了，这样一来两边的 CPU 不干了，这不是加班嘛！二者之间的网络带宽也是突增，从下图可以看出：
 
