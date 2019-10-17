@@ -55,7 +55,7 @@
 
 <meta itemprop="datePublished" content="2018-11-28T14:25:25&#43;08:00" />
 <meta itemprop="dateModified" content="2018-11-28T14:25:25&#43;08:00" />
-<meta itemprop="wordCount" content="3104">
+<meta itemprop="wordCount" content="3105">
 
 
 
@@ -138,7 +138,7 @@
         <div class="post-category">
             <a href="/zh/categories/redis/"> Redis </a>
             </div>
-          <span class="more-meta"> 约 3104 字 </span>
+          <span class="more-meta"> 约 3105 字 </span>
           <span class="more-meta"> 预计阅读 7 分钟 </span>
         
       </div>
@@ -174,9 +174,11 @@
 
 <p>为啥 Master 这么不讲理呢, 简单来说：</p>
 
-<blockquote>
-<p>我们发现客户端的请求包含很多超过 4MB 的对象。这些对象挤占了 Master 的 buffer。Master 会将 Slave 发来的 replication ID 都存在 buffer 里，现在却被挤出去了。这样，Slave 再发来 SYNC 请求，Master 在 buffer 里找不到对应的 replication ID，就毫不吝啬地开启全量同步。</p>
-</blockquote>
+<div class="admonition quote"><p class="admonition-title">Quote</p>
+  
+我们发现客户端的请求包含很多超过 4MB 的对象。这些对象挤占了 Master 的 buffer。Master 会将 Slave 发来的 replication ID 都存在 buffer 里，现在却被挤出去了。这样，Slave 再发来 SYNC 请求，Master 在 buffer 里找不到对应的 replication ID，就毫不吝啬地开启全量同步。
+
+</div>
 
 <h1 id="redis-的副本同步">Redis 的副本同步</h1>
 
