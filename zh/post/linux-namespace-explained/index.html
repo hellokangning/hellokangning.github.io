@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Linux Namespace Explained - Qing&#39;s Landing</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Guoqing Geng" /><meta name="description" content="最近在做 Kubernetes Security 相关的工作。作为一个 Kubernetes 新手，刚看到 yaml 文件中的 namespace 时，很容易和 Linux 的 Namespace 搞混。加上在读 Kubernetes 文档的时候，总时不时看到 Linux Namespace 的字样就更加困惑起来。以此为契机，正好把 Linux Namespace 再好好梳理一下，解开心中的谜团：
+ Linux 的 Namespace 是如何实现资源的隔离 Linux 下哪些资源可以按照 Namespace 组织，如何组织 Container 哪些地方用到了 Linux Namespace " /><meta name="keywords" content="elasticsearch, python, hbase, redis" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.59.1 with theme even" />
+
+
+<link rel="canonical" href="https://hellokangning.github.io/zh/post/linux-namespace-explained/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+
+<meta property="og:title" content="Linux Namespace Explained" />
+<meta property="og:description" content="最近在做 Kubernetes Security 相关的工作。作为一个 Kubernetes 新手，刚看到 yaml 文件中的 namespace 时，很容易和 Linux 的 Namespace 搞混。加上在读 Kubernetes 文档的时候，总时不时看到 Linux Namespace 的字样就更加困惑起来。以此为契机，正好把 Linux Namespace 再好好梳理一下，解开心中的谜团：
+
+
+Linux 的 Namespace 是如何实现资源的隔离
+Linux 下哪些资源可以按照 Namespace 组织，如何组织
+Container 哪些地方用到了 Linux Namespace
+" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hellokangning.github.io/zh/post/linux-namespace-explained/" />
+<meta property="article:published_time" content="2019-11-27T20:12:20+08:00" />
+<meta property="article:modified_time" content="2019-11-27T20:12:20+08:00" />
+<meta itemprop="name" content="Linux Namespace Explained">
+<meta itemprop="description" content="最近在做 Kubernetes Security 相关的工作。作为一个 Kubernetes 新手，刚看到 yaml 文件中的 namespace 时，很容易和 Linux 的 Namespace 搞混。加上在读 Kubernetes 文档的时候，总时不时看到 Linux Namespace 的字样就更加困惑起来。以此为契机，正好把 Linux Namespace 再好好梳理一下，解开心中的谜团：
+
+
+Linux 的 Namespace 是如何实现资源的隔离
+Linux 下哪些资源可以按照 Namespace 组织，如何组织
+Container 哪些地方用到了 Linux Namespace
+">
+
+
+<meta itemprop="datePublished" content="2019-11-27T20:12:20&#43;08:00" />
+<meta itemprop="dateModified" content="2019-11-27T20:12:20&#43;08:00" />
+<meta itemprop="wordCount" content="3003">
+
+
+
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Linux Namespace Explained"/>
+<meta name="twitter:description" content="最近在做 Kubernetes Security 相关的工作。作为一个 Kubernetes 新手，刚看到 yaml 文件中的 namespace 时，很容易和 Linux 的 Namespace 搞混。加上在读 Kubernetes 文档的时候，总时不时看到 Linux Namespace 的字样就更加困惑起来。以此为契机，正好把 Linux Namespace 再好好梳理一下，解开心中的谜团：
+
+
+Linux 的 Namespace 是如何实现资源的隔离
+Linux 下哪些资源可以按照 Namespace 组织，如何组织
+Container 哪些地方用到了 Linux Namespace
+"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/zh/" class="logo">Qing&#39;s Landing</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/zh/">
+        <li class="mobile-menu-item">首页</li>
+      </a><a href="/zh/post/">
+        <li class="mobile-menu-item">归档</li>
+      </a><a href="/zh/categories/">
+        <li class="mobile-menu-item">分类</li>
+      </a><a href="/zh/tags/">
+        <li class="mobile-menu-item">标签</li>
+      </a><a href="/en/">
+        <li class="mobile-menu-item">EN</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/zh/" class="logo">Qing&#39;s Landing</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/zh/">首页</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/zh/post/">归档</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/zh/categories/">分类</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/zh/tags/">标签</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/en/">EN</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Linux Namespace Explained</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> Nov 27, 2019 </span>
+        <div class="post-category">
+            <a href="/zh/categories/%E5%AE%B9%E5%99%A8/"> 容器 </a>
+            </div>
+          <span class="more-meta"> 约 3003 字 </span>
+          <span class="more-meta"> 预计阅读 6 分钟 </span>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+<ul>
+<li><a href="#英雄诞生">英雄诞生</a></li>
+<li><a href="#实现">实现</a></li>
+<li><a href="#namespace-的-api">Namespace 的 API</a>
+<ul>
+<li><a href="#clone-创建新-namespace"><code>clone()</code> 创建新 namespace</a></li>
+<li><a href="#setns-加入已有-namespace"><code>setns()</code> 加入已有 namespace</a></li>
+<li><a href="#unshare-离开-namespace"><code>unshare()</code> 离开 namespace</a></li>
+</ul></li>
+<li><a href="#proc-pid-ns-目录">/proc/[pid]/ns/ 目录</a></li>
+<li><a href="#pid-namespace">PID Namespace</a></li>
+<li><a href="#mount-namespace">Mount Namespace</a></li>
+<li><a href="#user-namespace">User Namespace</a></li>
+<li><a href="#network-namespace">Network Namespace</a></li>
+<li><a href="#uts-namespace">UTS Namespace</a>
+<ul>
+<li><a href="#所属的-user-namespace">- 所属的 user namespace</a></li>
+</ul></li>
+<li><a href="#ipc-namespace">IPC Namespace</a></li>
+</ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <p>最近在做 Kubernetes Security 相关的工作。作为一个 Kubernetes 新手，刚看到 yaml 文件中的 namespace 时，很容易和 Linux 的 Namespace 搞混。加上在读 Kubernetes 文档的时候，总时不时看到 Linux Namespace 的字样就更加困惑起来。以此为契机，正好把 Linux Namespace 再好好梳理一下，解开心中的谜团：</p>
+
+<ul>
+<li>Linux 的 Namespace 是如何实现资源的隔离</li>
+<li>Linux 下哪些资源可以按照 Namespace 组织，如何组织</li>
+<li>Container 哪些地方用到了 Linux Namespace</li>
+</ul>
+
+<h1 id="英雄诞生">英雄诞生</h1>
+
+<p>传统的 Linux 及其衍生的 UNIX 变体中，许多资源是全局管理的。例如，系统中的所有进程按照惯例是通过 PID 标识的，这意味着内核必须管理一个全局的 PID 列表。而且，所有调用者通过 <code>uname</code> 系统调用返回的系统相关信息（包括系统名称和有关内核的一些信息）都是相同的。用户 ID 的管理方式类似，即各个用户是通过一个全局唯一的 UID 号标识。</p>
+
+<p>全局 ID 给内核极大的选择权，可以通过 ID 来允许或拒绝某些权限。UID 为 0 的 root 用户可以做人和事，但其他 UID 会受限。例如 UID 为 n 的用户，不允许杀死属于用户 m 的进程（m ≠ n ）。但这不能防止用户看到彼此，即用户 n 可以看到另一个用户 m 也在计算机上活动。这种效果在某些情况下是不可取的。</p>
+
+<p>Namespace 提供了虚拟化的一种轻量级形式，它只使用一个内核在一台物理机上运行，就可以将上述的全局资源组织起来。这使得可以将一组进程放置到容器中，各个容器彼此隔离。隔离可以使容器的成员与其他容器毫无关系。但也可以通过允许容器进行一定的共享，来降低容器之间的分隔。例如，容器可以设置为使用自身的 PID 集合，但仍然与其他容器共享部分文件系统。</p>
+
+<h1 id="实现">实现</h1>
+
+<p>Namespace 的实现需要两个部分：
+1. 每个子系统的 namespace 结构，将此前所有的全局组件包装到 namespace 中
+2. 将给定进程关联到所属各个 namespace 的机制</p>
+
+<div class="admonition info"><p class="admonition-title">Info</p>
+  
+本文采用的源码是内核 5.4
+
+</div>
+
+<p>Linux内核中进程用 <code>task_struct</code> 结构体表示，我们称为进程描述符。该结构体定义在 <code>sched.h</code> 中，记录了进程相关的所有信息，比如进程地址空间，进程状态，打开的文件等。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="c1">// sched.h
+</span><span class="c1"></span>
+<span class="k">struct</span> <span class="n">task_struct</span> <span class="p">{</span>
+	<span class="cm">/* Filesystem information: */</span>
+	<span class="k">struct</span> <span class="n">fs_struct</span>		<span class="o">*</span><span class="n">fs</span><span class="p">;</span>
+
+	<span class="cm">/* Open file information: */</span>
+	<span class="k">struct</span> <span class="n">files_struct</span>		<span class="o">*</span><span class="n">files</span><span class="p">;</span>
+
+	<span class="cm">/* Namespaces: */</span>
+	<span class="k">struct</span> <span class="n">nsproxy</span>			<span class="o">*</span><span class="n">nsproxy</span><span class="p">;</span>
+
+    <span class="c1">// ...
+</span><span class="c1"></span><span class="p">}</span></code></pre></td></tr></table>
+</div>
+</div>
+<p>这里我们重点关注 <code>nsproxy</code> 变量。<code>nsproxy</code> 结构体包含指向进程所属 Namespace 的所有指针，分别是：</p>
+
+<table>
+<thead>
+<tr>
+<th>Namespace</th>
+<th>系统调用参数</th>
+<th>隔离内容</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>UTS</td>
+<td>CLONE_NEWUTS</td>
+<td>主机名与域名</td>
+</tr>
+
+<tr>
+<td>IPC</td>
+<td>CLONE_NEWIPC</td>
+<td>信号量、消息队列和共享内存</td>
+</tr>
+
+<tr>
+<td>PID</td>
+<td>CLONE_NEWPID</td>
+<td>进程编号</td>
+</tr>
+
+<tr>
+<td>Network</td>
+<td>CLONE_NEWNET</td>
+<td>网络设备、网络栈、端口等等</td>
+</tr>
+
+<tr>
+<td>Mount</td>
+<td>CLONE_NEWNS</td>
+<td>挂载点（文件系统）</td>
+</tr>
+
+<tr>
+<td>User</td>
+<td>CLONE_NEWUSER</td>
+<td>用户和用户组</td>
+</tr>
+</tbody>
+</table>
+
+<p><code>nsproxy</code> 由 namespace 下的所有进程共享，namespace 再封装了各种资源，进程只能查看和操作绑定在 namespace 的资源。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="c1">// nsproxy.h
+</span><span class="c1"></span>
+<span class="k">struct</span> <span class="n">nsproxy</span> <span class="p">{</span>
+	<span class="n">atomic_t</span> <span class="n">count</span><span class="p">;</span> 
+	<span class="k">struct</span> <span class="n">uts_namespace</span> <span class="o">*</span><span class="n">uts_ns</span><span class="p">;</span>
+	<span class="k">struct</span> <span class="n">ipc_namespace</span> <span class="o">*</span><span class="n">ipc_ns</span><span class="p">;</span>
+	<span class="k">struct</span> <span class="n">mnt_namespace</span> <span class="o">*</span><span class="n">mnt_ns</span><span class="p">;</span>
+	<span class="k">struct</span> <span class="n">pid_namespace</span> <span class="o">*</span><span class="n">pid_ns_for_children</span><span class="p">;</span>
+	<span class="k">struct</span> <span class="n">net</span> 	     <span class="o">*</span><span class="n">net_ns</span><span class="p">;</span>
+	<span class="k">struct</span> <span class="n">cgroup_namespace</span> <span class="o">*</span><span class="n">cgroup_ns</span><span class="p">;</span>
+<span class="p">};</span></code></pre></td></tr></table>
+</div>
+</div>
+<p>这里特别说明下:
+-  进程的 pid namespace 通过 <code>task_active_pid_ns</code> 获取。<code>nsproxy</code> 结构中的 <code>pid_namespae</code> 是给子进程使用的。
+-  User namespace 没有直接出现在 <code>nsproxy</code> 中，但 <code>**_namespace</code> 都有包含 user namespace 的指针。
+-  实际上，内核从 4.6 开始引入了 cgroup namespace，本文就先掠过不表，留待以后探索。</p>
+
+<h1 id="namespace-的-api">Namespace 的 API</h1>
+
+<p>有两种方法创建 namespace:
+1. 在用 <code>fork</code> 或 <code>clone</code> 系统调用创建新进程时，有特定的选项可以控制是与父进程共享 namespace，还是建立新的 namespace。
+2. <code>unshare</code> 系统调用将进程的某些部分从父进程分离，其中也包括 namespace。</p>
+
+<p>这底下用到三个函数 <code>clone()</code>、<code>setns()</code> 以及 <code>unshare()</code>，让我们逐个解析。</p>
+
+<h2 id="clone-创建新-namespace"><code>clone()</code> 创建新 namespace</h2>
+
+<p><code>clone()</code> 函数的 manual 在 <a href="http://man7.org/linux/man-pages/man2/clone.2.html">CLONE(2)</a></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">int</span> <span class="nf">clone</span><span class="p">(</span><span class="kt">int</span> <span class="p">(</span><span class="o">*</span><span class="n">fn</span><span class="p">)(</span><span class="kt">void</span> <span class="o">*</span><span class="p">),</span> <span class="kt">void</span> <span class="o">*</span><span class="n">child_stack</span><span class="p">,</span>
+                 <span class="kt">int</span> <span class="n">flags</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">arg</span><span class="p">,</span> <span class="p">...</span>
+                 <span class="cm">/* pid_t *ptid, void *newtls, pid_t *ctid */</span> <span class="p">);</span></code></pre></td></tr></table>
+</div>
+</div>
+<p><code>clone()</code> 可以看作是传统 UNIX <code>fork</code> 的通用版本，两者都创建一个新的进程，也创建了一个新的 namespace。不同之处在于，<code>clone()</code> 允许子进程共享父进程的部分执行上下文，比如虚拟地址空间、文件描述符等。通过 <code>flags</code> 参数，我们可以控制父子进程之间共享的内容。</p>
+
+<p><code>clone()</code> 的几个参数：</p>
+
+<ul>
+<li><code>fn</code> 传入子进程运行的主函数</li>
+<li><code>child_stack</code> 传入子进程使用的栈空间，因为子进程可能和父进程共享内存</li>
+<li><code>flags</code> 表示使用哪些 <code>CLONE_*</code> 标志位</li>
+<li><code>arg</code> 即传入 <code>fn</code> 函数的参数</li>
+</ul>
+
+<h2 id="setns-加入已有-namespace"><code>setns()</code> 加入已有 namespace</h2>
+
+<p>通过 <a href="http://man7.org/linux/man-pages/man2/setns.2.html"><code>setns()</code></a> 可以加入一个已经存在的 namespace。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">int</span> <span class="nf">setns</span><span class="p">(</span><span class="kt">int</span> <span class="n">fd</span><span class="p">,</span> <span class="kt">int</span> <span class="n">nstype</span><span class="p">);</span></code></pre></td></tr></table>
+</div>
+</div>
+<p>其中，</p>
+
+<ul>
+<li><code>fd</code> 是指向 <code>/proc/[pid]/ns/</code> 目录的文件描述符</li>
+<li><code>nstype</code> 使用 CLONE_* 标志位约束了 namespace 的类型</li>
+</ul>
+
+<h2 id="unshare-离开-namespace"><code>unshare()</code> 离开 namespace</h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">int</span> <span class="nf">unshare</span><span class="p">(</span><span class="kt">int</span> <span class="n">flags</span><span class="p">);</span></code></pre></td></tr></table>
+</div>
+</div>
+<p><code>unshare()</code> 将进程（线程）从它被其他进程（线程）共享的执行上下文中分离出来。<code>flags</code> 参数是 <code>CLONE_*</code> 的位掩码。</p>
+
+<h1 id="proc-pid-ns-目录">/proc/[pid]/ns/ 目录</h1>
+
+<p>前文说到了 /proc/[pid]/ns/ 目录，每个进程在该目录下都有一个子目录，标识着所属的 namespace。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ ls -l /proc/$$/ns
+total 0
+lrwxrwxrwx. 1 mtk mtk 0 Apr 28 12:46 cgroup -&gt; cgroup:[4026531835]
+lrwxrwxrwx. 1 mtk mtk 0 Apr 28 12:46 ipc -&gt; ipc:[4026531839]
+lrwxrwxrwx. 1 mtk mtk 0 Apr 28 12:46 mnt -&gt; mnt:[4026531840]
+lrwxrwxrwx. 1 mtk mtk 0 Apr 28 12:46 net -&gt; net:[4026531969]
+lrwxrwxrwx. 1 mtk mtk 0 Apr 28 12:46 pid -&gt; pid:[4026531836]
+lrwxrwxrwx. 1 mtk mtk 0 Apr 28 12:46 pid_for_children -&gt; pid:[4026531834]
+lrwxrwxrwx. 1 mtk mtk 0 Apr 28 12:46 user -&gt; user:[4026531837]
+rwxrwxrwx. 1 mtk mtk 0 Apr 28 12:46 uts -&gt; uts:[4026531838]</pre></td></tr></table>
+</div>
+</div>
+<p>下面，我们对 6 种 namespace 一一拆解。</p>
+
+<h1 id="pid-namespace">PID Namespace</h1>
+
+<p>每个进程都有一个 PID，PID namespace 将 PID 隔离开来。这意味着在不同 PID namespace 下的进程可以有相同的 PID。Container 可以依靠 PID namespace 来 suspend 或 resume 一个 namespace 下的进程集合，而不影响其他 namespace 的进程。</p>
+
+<p><code>fork</code> 和 <code>clone</code> 创建的进程，带有两个 PID，其中一个是 namespace 中唯一 PID，另一个是 host 系统上的 PID。PID namespace 的 PID 从 2 开始分配，1 这个位置留给 init 进程，它是所有孤儿进程的父进程。如果 init 进程终止了，那么内核会通过 <strong>SIGKILL</strong> 来终止该 namespace 下的所有进程。</p>
+
+<p>PID namespace 可以组织为层次，也可以为非层次。内核为所有的 PID namespace 维护了一个树状结构，最顶层的是系统初始时创建的 root namespace。在层次组织的 namespace 中，父 namespace 能够看到子 namespace 的所有进程，因为后者进程的 PID 会映射到父 namespace 中。</p>
+
+<p>我们来看下 <code>pid_namespace</code> 结构体：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="k">struct</span> <span class="n">pid_namespace</span> <span class="p">{</span>
+	<span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">pid_allocated</span><span class="p">;</span>
+	<span class="k">struct</span> <span class="n">task_struct</span> <span class="o">*</span><span class="n">child_reaper</span><span class="p">;</span>
+	<span class="k">struct</span> <span class="n">pid_namespace</span> <span class="o">*</span><span class="n">parent</span><span class="p">;</span>
+	<span class="k">struct</span> <span class="n">user_namespace</span> <span class="o">*</span><span class="n">user_ns</span><span class="p">;</span>
+
+	<span class="c1">// ...
+</span><span class="c1"></span><span class="p">}</span> <span class="n">__randomize_layout</span><span class="p">;</span></code></pre></td></tr></table>
+</div>
+</div>
+<p>它包括：</p>
+
+<ul>
+<li>PID</li>
+<li>子进程的指针</li>
+<li>父 PID namespace 的指针</li>
+<li>所属 User namespace 的指针</li>
+</ul>
+
+<h1 id="mount-namespace">Mount Namespace</h1>
+
+<p>Mount namespace 隔离的是挂载点，也就是说不同 namesapce 下的进程看到不同的文件系统视图。因此，Mount namespace 用来实现容器中文件系统的隔离。引入 Mount namespace 之后，mount 和 umount 这两个系统调用就不会在 global 的 挂载点上执行了。</p>
+
+<p>Mount namespace 是内核 2.4.19 时引进的，代表常量是 CLONE_NEWNS，是没有考虑到之后的扩展性。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="k">struct</span> <span class="n">mnt_namespace</span> <span class="p">{</span>
+	<span class="n">atomic_t</span>		<span class="n">count</span><span class="p">;</span>
+	<span class="k">struct</span> <span class="n">ns_common</span>	<span class="n">ns</span><span class="p">;</span>
+	<span class="k">struct</span> <span class="n">mount</span> <span class="o">*</span>	<span class="n">root</span><span class="p">;</span>
+	<span class="k">struct</span> <span class="n">list_head</span>	<span class="n">list</span><span class="p">;</span>
+	<span class="k">struct</span> <span class="n">user_namespace</span>	<span class="o">*</span><span class="n">user_ns</span><span class="p">;</span>
+	<span class="k">struct</span> <span class="n">ucounts</span>		<span class="o">*</span><span class="n">ucounts</span><span class="p">;</span>
+	<span class="n">u64</span>			<span class="n">seq</span><span class="p">;</span>	<span class="cm">/* Sequence number to prevent loops */</span>
+	<span class="n">wait_queue_head_t</span> <span class="n">poll</span><span class="p">;</span>
+	<span class="n">u64</span> <span class="n">event</span><span class="p">;</span>
+	<span class="kt">unsigned</span> <span class="kt">int</span>		<span class="n">mounts</span><span class="p">;</span> <span class="cm">/* # of mounts in the namespace */</span>
+	<span class="kt">unsigned</span> <span class="kt">int</span>		<span class="n">pending_mounts</span><span class="p">;</span>
+<span class="p">}</span> <span class="n">__randomize_layout</span><span class="p">;</span></code></pre></td></tr></table>
+</div>
+</div>
+<p><code>mnt_namespace</code> 结构体中有：
+- User namespace 的指针
+- 所有 mount 的文件树的 root 指针</p>
+
+<h1 id="user-namespace">User Namespace</h1>
+
+<p>User namespace 隔离了 UID 和 GID。换句话说，进程的 UID 和 GID 在 namespace 内外可以不同。这意味着，一个进程可以在 user namespace 之外有一个 unprivileged UID，同时在一个 user namespace 内有为 0 的 privileged UID。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="k">struct</span> <span class="n">user_namespace</span> <span class="p">{</span>
+	<span class="k">struct</span> <span class="n">uid_gid_map</span>	<span class="n">uid_map</span><span class="p">;</span>
+	<span class="k">struct</span> <span class="n">uid_gid_map</span>	<span class="n">gid_map</span><span class="p">;</span>
+	<span class="k">struct</span> <span class="n">uid_gid_map</span>	<span class="n">projid_map</span><span class="p">;</span>
+	<span class="n">atomic_t</span>		<span class="n">count</span><span class="p">;</span>
+	<span class="k">struct</span> <span class="n">user_namespace</span>	<span class="o">*</span><span class="n">parent</span><span class="p">;</span>
+	<span class="kt">int</span>			<span class="n">level</span><span class="p">;</span>
+	<span class="n">kuid_t</span>			<span class="n">owner</span><span class="p">;</span>
+	<span class="n">kgid_t</span>			<span class="n">group</span><span class="p">;</span>
+	<span class="k">struct</span> <span class="n">ns_common</span>	<span class="n">ns</span><span class="p">;</span>
+	<span class="kt">unsigned</span> <span class="kt">long</span>		<span class="n">flags</span><span class="p">;</span>
+
+	<span class="k">struct</span> <span class="n">ucounts</span>		<span class="o">*</span><span class="n">ucounts</span><span class="p">;</span>
+	<span class="kt">int</span> <span class="n">ucount_max</span><span class="p">[</span><span class="n">UCOUNT_COUNTS</span><span class="p">];</span>
+<span class="p">}</span> <span class="n">__randomize_layout</span><span class="p">;</span></code></pre></td></tr></table>
+</div>
+</div>
+<p><code>user_namespace</code> 中有：
+- 父 user namespace 的指针
+- UID 和 GID 的 map</p>
+
+<h1 id="network-namespace">Network Namespace</h1>
+
+<p>Network namespace 隔离了网络资源，包括网络设备、IP 地址、IP 路由表、／proc／net 目录、端口号等等。</p>
+
+<p>对容器来说，每个容器就可以有自己的网络设备，containerized app 也可以绑定到自己的端口空间。Host 机器上的路由规则也可以把数据包传送给指定的容器（关联到某个网络设备）。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="k">struct</span> <span class="n">net</span> <span class="p">{</span>
+	<span class="k">struct</span> <span class="n">list_head</span>	<span class="n">list</span><span class="p">;</span>		<span class="cm">/* list of network namespaces */</span>
+	<span class="k">struct</span> <span class="n">user_namespace</span>   <span class="o">*</span><span class="n">user_ns</span><span class="p">;</span>	<span class="cm">/* Owning user namespace */</span>
+
+	<span class="k">struct</span> <span class="n">netns_core</span>	<span class="n">core</span><span class="p">;</span>
+	<span class="k">struct</span> <span class="n">netns_mib</span>	<span class="n">mib</span><span class="p">;</span>
+	<span class="k">struct</span> <span class="n">netns_packet</span>	<span class="n">packet</span><span class="p">;</span>
+	<span class="k">struct</span> <span class="n">netns_unix</span>	<span class="n">unx</span><span class="p">;</span>
+	<span class="k">struct</span> <span class="n">netns_nexthop</span>	<span class="n">nexthop</span><span class="p">;</span>
+	<span class="k">struct</span> <span class="n">netns_ipv4</span>	<span class="n">ipv4</span><span class="p">;</span>
+<span class="p">}</span></code></pre></td></tr></table>
+</div>
+</div>
+<p><code>net</code> 结构中包括：
+- 各种 net_xxx 的网络设备
+- 所属的 user namespace
+- Network namespace 的列表</p>
+
+<h1 id="uts-namespace">UTS Namespace</h1>
+
+<p>UTS 隔离 <code>nodename</code> 和 <code>domainname</code> 系统标识符。通过 uname 调用可以看到这两个标识符的值。借助 UTS namespace，容器可以有自己的 hostname 和 NIS domain name。UTS 是 &ldquo;UNIX Time-sharing System&rdquo; 的缩写。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="k">struct</span> <span class="n">uts_namespace</span> <span class="p">{</span>
+	<span class="k">struct</span> <span class="n">kref</span> <span class="n">kref</span><span class="p">;</span>
+	<span class="k">struct</span> <span class="n">new_utsname</span> <span class="n">name</span><span class="p">;</span>
+	<span class="k">struct</span> <span class="n">user_namespace</span> <span class="o">*</span><span class="n">user_ns</span><span class="p">;</span>
+	<span class="k">struct</span> <span class="n">ucounts</span> <span class="o">*</span><span class="n">ucounts</span><span class="p">;</span>
+	<span class="k">struct</span> <span class="n">ns_common</span> <span class="n">ns</span><span class="p">;</span>
+<span class="p">}</span> <span class="n">__randomize_layout</span><span class="p">;</span></code></pre></td></tr></table>
+</div>
+</div>
+<p><code>uts_namespace</code> 结构体也是最简单的：</p>
+
+<h2 id="所属的-user-namespace">- 所属的 user namespace</h2>
+
+<h1 id="ipc-namespace">IPC Namespace</h1>
+
+<p>IPC namespace 隔离了 System V IPC 和 POSIX 消息队列。这两个都是进程通信的资源。只有在一个 IPC namespace 下的进程才能够通信。所以在同一个 IPC namespace 下的进程彼此可见，而与其他的 IPC namespace 下的进程则互相不可见。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="k">struct</span> <span class="n">ipc_namespace</span> <span class="p">{</span>
+	<span class="kt">unsigned</span> <span class="kt">int</span>	<span class="n">msg_ctlmax</span><span class="p">;</span>
+	<span class="kt">unsigned</span> <span class="kt">int</span>	<span class="n">msg_ctlmnb</span><span class="p">;</span>
+	<span class="kt">unsigned</span> <span class="kt">int</span>	<span class="n">msg_ctlmni</span><span class="p">;</span>
+	<span class="n">atomic_t</span>	<span class="n">msg_bytes</span><span class="p">;</span>
+	<span class="n">atomic_t</span>	<span class="n">msg_hdrs</span><span class="p">;</span>
+
+	<span class="n">size_t</span>		<span class="n">shm_ctlmax</span><span class="p">;</span>
+	<span class="n">size_t</span>		<span class="n">shm_ctlall</span><span class="p">;</span>
+
+	<span class="kt">unsigned</span> <span class="kt">int</span>    <span class="n">mq_queues_count</span><span class="p">;</span>
+
+	<span class="cm">/* next fields are set through sysctl */</span>
+	<span class="kt">unsigned</span> <span class="kt">int</span>    <span class="n">mq_queues_max</span><span class="p">;</span>   <span class="cm">/* initialized to DFLT_QUEUESMAX */</span>
+	<span class="kt">unsigned</span> <span class="kt">int</span>    <span class="n">mq_msg_max</span><span class="p">;</span>      <span class="cm">/* initialized to DFLT_MSGMAX */</span>
+	<span class="kt">unsigned</span> <span class="kt">int</span>    <span class="n">mq_msgsize_max</span><span class="p">;</span>  <span class="cm">/* initialized to DFLT_MSGSIZEMAX */</span>
+	<span class="kt">unsigned</span> <span class="kt">int</span>    <span class="n">mq_msg_default</span><span class="p">;</span>
+	<span class="kt">unsigned</span> <span class="kt">int</span>    <span class="n">mq_msgsize_default</span><span class="p">;</span>
+
+	<span class="cm">/* user_ns which owns the ipc ns */</span>
+	<span class="k">struct</span> <span class="n">user_namespace</span> <span class="o">*</span><span class="n">user_ns</span><span class="p">;</span>
+<span class="p">}</span></code></pre></td></tr></table>
+</div>
+</div>
+<p><strong>Reference</strong></p>
+
+<ul>
+<li><a href="https://cizixs.com/2017/08/29/linux-namespace/">docker 容器基础技术：linux namespace 简介</a></li>
+<li><a href="https://www.infoq.cn/article/docker-kernel-knowledge-namespace-resource-isolation">Docker 背后的内核知识——Namespace 资源隔离</a></li>
+<li><a href="https://lwn.net/Articles/531114/">Namespaces in operation</a></li>
+</ul>
+    </div>
+
+    
+<footer class="post-footer">
+      
+      <nav class="post-nav">
+        
+        <a class="next" href="/zh/post/this-is-professionalism/">
+            <span class="next-text nav-default">这个就叫专业 🚬</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        <div id="disqus_thread"></div>
+    <script type="text/javascript">
+    (function() {
+      
+      
+      if (window.location.hostname === 'localhost') return;
+
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      var disqus_shortname = 'guoqing';
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:hellokangning@hotmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://www.linkedin.com/in/guoqing-geng-9032b820/" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="https://github.com/hellokangning" class="iconfont icon-github" title="github"></a>
+      <a href="https://www.douban.com/people/hellokangning/" class="iconfont icon-douban" title="douban"></a>
+      <a href="https://www.instagram.com/hellokangning/" class="iconfont icon-instagram" title="instagram"></a>
+  <a href="https://hellokangning.github.io/zh/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2016 - 
+    2019
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Guoqing Geng</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  <script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-105833321-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>
