@@ -25,7 +25,7 @@ In this post, BufferedMutator is excluded. It will be discussed in the near futu
 
 
 
-<meta name="generator" content="Hugo 0.58.1 with theme even" />
+<meta name="generator" content="Hugo 0.59.1 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/en/post/hbase-batch-puts-without-bufferedmutator/" />
@@ -185,14 +185,14 @@ In this post, BufferedMutator is excluded. It will be discussed in the near futu
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// HTable.java
 </span><span class="c1"></span>
-  <span class="kd">public</span> <span class="nf">void</span> <span class="n">put</span><span class="p">(</span><span class="kd">final</span> <span class="nf">List</span><span class="o">&lt;</span><span class="n">Put</span><span class="o">&gt;</span> <span class="nf">puts</span><span class="p">)</span> <span class="kd">throws</span> <span class="nf">IOException</span> <span class="p">{</span>
-    <span class="k">for</span> <span class="p">(</span><span class="n">Put</span> <span class="nf">put</span> <span class="o">:</span> <span class="n">puts</span><span class="p">)</span> <span class="p">{</span>
+  <span class="err">public void </span><span class="n">put</span><span class="p">(</span><span class="err">final List</span><span class="o">&lt;</span><span class="err">Put&gt; puts</span><span class="p">)</span> <span class="err">throws IOException </span><span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="err">Put put </span><span class="o">:</span> <span class="n">puts</span><span class="p">)</span> <span class="p">{</span>
       <span class="n">validatePut</span><span class="p">(</span><span class="n">put</span><span class="p">);</span>
     <span class="p">}</span>
-    <span class="n">Object</span><span class="p">[]</span> <span class="nf">results</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Object</span><span class="p">[</span><span class="n">puts</span><span class="p">.</span><span class="na">size</span><span class="p">()];</span>
+    <span class="err">Object[] results </span><span class="o">=</span> <span class="k">new</span> <span class="n">Object</span><span class="p">[</span><span class="n">puts</span><span class="p">.</span><span class="na">size</span><span class="p">()];</span>
     <span class="k">try</span> <span class="p">{</span>
       <span class="n">batch</span><span class="p">(</span><span class="n">puts</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">writeRpcTimeoutMs</span><span class="p">);</span>
-    <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="n">InterruptedException</span> <span class="nf">e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="err">InterruptedException e</span><span class="p">)</span> <span class="p">{</span>
       <span class="k">throw</span> <span class="p">(</span><span class="n">InterruptedIOException</span><span class="p">)</span> <span class="k">new</span> <span class="n">InterruptedIOException</span><span class="p">().</span><span class="na">initCause</span><span class="p">(</span><span class="n">e</span><span class="p">);</span>
     <span class="p">}</span>
   <span class="p">}</span></code></pre></td></tr></table>
@@ -243,9 +243,9 @@ In this post, BufferedMutator is excluded. It will be discussed in the near futu
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// HTable.java
 </span><span class="c1"></span>
-  <span class="kd">public</span> <span class="nf">void</span> <span class="n">batch</span><span class="p">(</span><span class="kd">final</span> <span class="nf">List</span><span class="o">&lt;?</span> <span class="kd">extends</span> <span class="nf">Row</span><span class="o">&gt;</span> <span class="n">actions</span><span class="p">,</span> <span class="kd">final</span> <span class="nf">Object</span><span class="p">[]</span> <span class="n">results</span><span class="p">,</span> <span class="kt">int</span> <span class="nf">rpcTimeout</span><span class="p">)</span>
-      <span class="kd">throws</span> <span class="nf">InterruptedException</span><span class="p">,</span> <span class="n">IOException</span> <span class="p">{</span>
-    <span class="n">AsyncProcessTask</span> <span class="nf">task</span> <span class="o">=</span> <span class="n">AsyncProcessTask</span><span class="p">.</span><span class="na">newBuilder</span><span class="p">()</span>
+  <span class="err">public void </span><span class="n">batch</span><span class="p">(</span><span class="err">final List</span><span class="o">&lt;?</span> <span class="err">extends Row</span><span class="o">&gt;</span> <span class="n">actions</span><span class="p">,</span> <span class="err">final Object</span><span class="p">[]</span> <span class="n">results</span><span class="p">,</span> <span class="err">int rpcTimeout</span><span class="p">)</span>
+      <span class="err">throws InterruptedException</span><span class="p">,</span> <span class="n">IOException</span> <span class="p">{</span>
+    <span class="err">AsyncProcessTask task </span><span class="o">=</span> <span class="n">AsyncProcessTask</span><span class="p">.</span><span class="na">newBuilder</span><span class="p">()</span>
             <span class="p">.</span><span class="na">setPool</span><span class="p">(</span><span class="n">pool</span><span class="p">)</span>
             <span class="p">.</span><span class="na">setTableName</span><span class="p">(</span><span class="n">tableName</span><span class="p">)</span>
             <span class="p">.</span><span class="na">setRowAccess</span><span class="p">(</span><span class="n">actions</span><span class="p">)</span>
@@ -254,7 +254,7 @@ In this post, BufferedMutator is excluded. It will be discussed in the near futu
             <span class="p">.</span><span class="na">setOperationTimeout</span><span class="p">(</span><span class="n">operationTimeoutMs</span><span class="p">)</span>
             <span class="p">.</span><span class="na">setSubmittedRows</span><span class="p">(</span><span class="n">AsyncProcessTask</span><span class="p">.</span><span class="na">SubmittedRows</span><span class="p">.</span><span class="na">ALL</span><span class="p">)</span>
             <span class="p">.</span><span class="na">build</span><span class="p">();</span>
-    <span class="n">AsyncRequestFuture</span> <span class="nf">ars</span> <span class="o">=</span> <span class="n">multiAp</span><span class="p">.</span><span class="na">submit</span><span class="p">(</span><span class="n">task</span><span class="p">);</span>
+    <span class="err">AsyncRequestFuture ars </span><span class="o">=</span> <span class="n">multiAp</span><span class="p">.</span><span class="na">submit</span><span class="p">(</span><span class="n">task</span><span class="p">);</span>
     <span class="n">ars</span><span class="p">.</span><span class="na">waitUntilDone</span><span class="p">();</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">ars</span><span class="p">.</span><span class="na">hasError</span><span class="p">())</span> <span class="p">{</span>
       <span class="k">throw</span> <span class="n">ars</span><span class="p">.</span><span class="na">getErrors</span><span class="p">();</span>
@@ -309,23 +309,23 @@ In this post, BufferedMutator is excluded. It will be discussed in the near futu
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// AsyncProcessTask.java
 </span><span class="c1"></span>
-<span class="kd">public</span> <span class="nf">class</span> <span class="n">AsyncProcessTask</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="p">{</span>
-<span class="kd">public</span> <span class="nf">static</span> <span class="n">Builder</span> <span class="nf">newBuilder</span><span class="p">()</span> <span class="p">{</span>
+<span class="err">public class </span><span class="n">AsyncProcessTask</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="p">{</span>
+<span class="err">public static Builder newBuilder</span><span class="p">()</span> <span class="p">{</span>
 <span class="k">return</span> <span class="k">new</span> <span class="n">Builder</span><span class="p">();</span>
 <span class="p">}</span>
 
-<span class="kd">public</span> <span class="nf">static</span> <span class="kd">class</span> <span class="nf">Builder</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="p">{</span>
+<span class="err">public static class Builder</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="p">{</span>
 
-<span class="kd">private</span> <span class="nf">ExecutorService</span> <span class="n">pool</span><span class="p">;</span>
-<span class="kd">private</span> <span class="nf">TableName</span> <span class="n">tableName</span><span class="p">;</span>
-<span class="kd">private</span> <span class="nf">RowAccess</span><span class="o">&lt;?</span> <span class="kd">extends</span> <span class="nf">Row</span><span class="o">&gt;</span> <span class="n">rows</span><span class="p">;</span>
-<span class="kd">private</span> <span class="nf">SubmittedRows</span> <span class="n">submittedRows</span> <span class="o">=</span> <span class="n">SubmittedRows</span><span class="p">.</span><span class="na">ALL</span><span class="p">;</span>
-<span class="kd">private</span> <span class="nf">Batch</span><span class="p">.</span><span class="na">Callback</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="nf">callback</span><span class="p">;</span>
-<span class="kd">private</span> <span class="nf">boolean</span> <span class="n">needResults</span><span class="p">;</span>
-<span class="kd">private</span> <span class="nf">int</span> <span class="n">rpcTimeout</span><span class="p">;</span>
-<span class="kd">private</span> <span class="nf">int</span> <span class="n">operationTimeout</span><span class="p">;</span>
-<span class="kd">private</span> <span class="nf">CancellableRegionServerCallable</span> <span class="n">callable</span><span class="p">;</span>
-<span class="kd">private</span> <span class="nf">Object</span><span class="p">[]</span> <span class="n">results</span><span class="p">;</span>
+<span class="err">private ExecutorService </span><span class="n">pool</span><span class="p">;</span>
+<span class="err">private TableName </span><span class="n">tableName</span><span class="p">;</span>
+<span class="err">private RowAccess</span><span class="o">&lt;?</span> <span class="err">extends Row</span><span class="o">&gt;</span> <span class="n">rows</span><span class="p">;</span>
+<span class="err">private SubmittedRows </span><span class="n">submittedRows</span> <span class="o">=</span> <span class="n">SubmittedRows</span><span class="p">.</span><span class="na">ALL</span><span class="p">;</span>
+<span class="err">private Batch</span><span class="p">.</span><span class="na">Callback</span><span class="o">&lt;</span><span class="err">T&gt; callback</span><span class="p">;</span>
+<span class="err">private boolean </span><span class="n">needResults</span><span class="p">;</span>
+<span class="err">private int </span><span class="n">rpcTimeout</span><span class="p">;</span>
+<span class="err">private int </span><span class="n">operationTimeout</span><span class="p">;</span>
+<span class="err">private CancellableRegionServerCallable </span><span class="n">callable</span><span class="p">;</span>
+<span class="err">private Object</span><span class="p">[]</span> <span class="n">results</span><span class="p">;</span>
 
 <span class="c1">// getters and setters
 </span><span class="c1"></span><span class="p">}</span>
@@ -356,10 +356,10 @@ In this post, BufferedMutator is excluded. It will be discussed in the near futu
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// AsyncProcess.java
 </span><span class="c1"></span>
-<span class="kd">class</span> <span class="nf">AsyncProcess</span> <span class="p">{</span>
+<span class="err">class AsyncProcess </span><span class="p">{</span>
 
-  <span class="kd">private</span> <span class="o">&lt;</span><span class="n">CResult</span><span class="o">&gt;</span> <span class="nf">AsyncRequestFuture</span> <span class="n">submit</span><span class="p">(</span><span class="n">AsyncProcessTask</span><span class="o">&lt;</span><span class="n">CResult</span><span class="o">&gt;</span> <span class="nf">task</span><span class="p">,</span>
-    <span class="kt">boolean</span> <span class="nf">atLeastOne</span><span class="p">)</span> <span class="kd">throws</span> <span class="nf">InterruptedIOException</span> <span class="p">{</span>
+  <span class="kd">private</span> <span class="o">&lt;</span><span class="err">CResult&gt; AsyncRequestFuture </span><span class="n">submit</span><span class="p">(</span><span class="err">AsyncProcessTask&lt;CResult&gt; task</span><span class="p">,</span>
+    <span class="err">boolean atLeastOne</span><span class="p">)</span> <span class="err">throws InterruptedIOException </span><span class="p">{</span>
       <span class="c1">// ...
 </span><span class="c1"></span>    <span class="p">}</span>
 <span class="p">}</span></code></pre></td></tr></table>
@@ -427,29 +427,29 @@ In this post, BufferedMutator is excluded. It will be discussed in the near futu
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// AsyncRequestFutureImpl.java
 </span><span class="c1"></span>
-<span class="kd">class</span> <span class="nf">AsyncRequestFutureImpl</span><span class="o">&lt;</span><span class="n">CResult</span><span class="o">&gt;</span> <span class="nf">implements</span> <span class="n">AsyncRequestFuture</span> <span class="p">{</span>
-  <span class="kt">void</span> <span class="nf">sendMultiAction</span><span class="p">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="n">ServerName</span><span class="p">,</span> <span class="n">MultiAction</span><span class="o">&gt;</span> <span class="nf">actionsByServer</span><span class="p">,</span>
-                               <span class="kt">int</span> <span class="nf">numAttempt</span><span class="p">,</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">Action</span><span class="o">&gt;</span> <span class="nf">actionsForReplicaThread</span><span class="p">,</span> <span class="kt">boolean</span> <span class="nf">reuseThread</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">Collection</span><span class="o">&lt;?</span> <span class="kd">extends</span> <span class="nf">Runnable</span><span class="o">&gt;</span> <span class="n">runnables</span> <span class="o">=</span> <span class="n">getNewMultiActionRunnable</span><span class="p">(</span><span class="n">server</span><span class="p">,</span> <span class="n">multiAction</span><span class="p">,</span>
+<span class="err">class AsyncRequestFutureImpl</span><span class="o">&lt;</span><span class="err">CResult&gt; implements </span><span class="n">AsyncRequestFuture</span> <span class="p">{</span>
+  <span class="err">void sendMultiAction</span><span class="p">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="n">ServerName</span><span class="p">,</span> <span class="err">MultiAction&gt; actionsByServer</span><span class="p">,</span>
+                               <span class="err">int numAttempt</span><span class="p">,</span> <span class="err">List&lt;Action&gt; actionsForReplicaThread</span><span class="p">,</span> <span class="err">boolean reuseThread</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">Collection</span><span class="o">&lt;?</span> <span class="err">extends Runnable</span><span class="o">&gt;</span> <span class="n">runnables</span> <span class="o">=</span> <span class="n">getNewMultiActionRunnable</span><span class="p">(</span><span class="n">server</span><span class="p">,</span> <span class="n">multiAction</span><span class="p">,</span>
           <span class="n">numAttempt</span><span class="p">);</span>
 
       <span class="c1">// run  all the runnables
-</span><span class="c1"></span>      <span class="k">for</span> <span class="p">(</span><span class="n">Runnable</span> <span class="nf">runnable</span> <span class="o">:</span> <span class="n">runnables</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="c1"></span>      <span class="k">for</span> <span class="p">(</span><span class="err">Runnable runnable </span><span class="o">:</span> <span class="n">runnables</span><span class="p">)</span> <span class="p">{</span>
         <span class="n">runnable</span><span class="p">.</span><span class="na">run</span><span class="p">()</span>
       <span class="p">}</span>     
     <span class="p">}</span>
   <span class="p">}</span>
 
-  <span class="kd">private</span> <span class="nf">Collection</span><span class="o">&lt;?</span> <span class="kd">extends</span> <span class="nf">Runnable</span><span class="o">&gt;</span> <span class="n">getNewMultiActionRunnable</span><span class="p">(</span><span class="n">ServerName</span> <span class="nf">server</span><span class="p">,</span>
-                                                                   <span class="n">MultiAction</span> <span class="nf">multiAction</span><span class="p">,</span>
-                                                                   <span class="kt">int</span> <span class="nf">numAttempt</span><span class="p">)</span> <span class="p">{</span>
+  <span class="err">private Collection</span><span class="o">&lt;?</span> <span class="err">extends Runnable</span><span class="o">&gt;</span> <span class="n">getNewMultiActionRunnable</span><span class="p">(</span><span class="err">ServerName server</span><span class="p">,</span>
+                                                                   <span class="err">MultiAction multiAction</span><span class="p">,</span>
+                                                                   <span class="err">int numAttempt</span><span class="p">)</span> <span class="p">{</span>
 
     <span class="c1">// ...
 </span><span class="c1"></span>
-    <span class="n">Map</span><span class="o">&lt;</span><span class="n">Long</span><span class="p">,</span> <span class="n">DelayingRunner</span><span class="o">&gt;</span> <span class="nf">actions</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="n">multiAction</span><span class="p">.</span><span class="na">size</span><span class="p">());</span>
-    <span class="n">List</span><span class="o">&lt;</span><span class="n">Runnable</span><span class="o">&gt;</span> <span class="nf">toReturn</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="n">actions</span><span class="p">.</span><span class="na">size</span><span class="p">());</span>
-    <span class="k">for</span> <span class="p">(</span><span class="n">DelayingRunner</span> <span class="nf">runner</span> <span class="o">:</span> <span class="n">actions</span><span class="p">.</span><span class="na">values</span><span class="p">())</span> <span class="p">{</span>
-      <span class="n">Runnable</span> <span class="nf">runnable</span> <span class="o">=</span> <span class="n">createSingleServerRequest</span><span class="p">(</span><span class="n">runner</span><span class="p">.</span><span class="na">getActions</span><span class="p">(),</span> <span class="n">numAttempt</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="n">callsInProgress</span><span class="p">);</span>
+    <span class="n">Map</span><span class="o">&lt;</span><span class="n">Long</span><span class="p">,</span> <span class="err">DelayingRunner&gt; actions </span><span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="n">multiAction</span><span class="p">.</span><span class="na">size</span><span class="p">());</span>
+    <span class="err">List&lt;Runnable&gt; toReturn </span><span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="n">actions</span><span class="p">.</span><span class="na">size</span><span class="p">());</span>
+    <span class="k">for</span> <span class="p">(</span><span class="err">DelayingRunner runner </span><span class="o">:</span> <span class="n">actions</span><span class="p">.</span><span class="na">values</span><span class="p">())</span> <span class="p">{</span>
+      <span class="err">Runnable runnable </span><span class="o">=</span> <span class="n">createSingleServerRequest</span><span class="p">(</span><span class="n">runner</span><span class="p">.</span><span class="na">getActions</span><span class="p">(),</span> <span class="n">numAttempt</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="n">callsInProgress</span><span class="p">);</span>
       <span class="c1">// use a delay runner only if we need to sleep for some time
 </span><span class="c1"></span>      <span class="k">if</span> <span class="p">(</span><span class="n">runner</span><span class="p">.</span><span class="na">getSleepTime</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">0</span><span class="p">)</span> <span class="p">{</span>
         <span class="n">runner</span><span class="p">.</span><span class="na">setRunner</span><span class="p">(</span><span class="n">runnable</span><span class="p">);</span>
@@ -490,17 +490,17 @@ In this post, BufferedMutator is excluded. It will be discussed in the near futu
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// AsyncRequestFutureImpl.java
-</span><span class="c1"></span><span class="kd">final</span> <span class="nf">class</span> <span class="n">SingleServerRequestRunnable</span> <span class="nf">implements</span> <span class="n">Runnable</span> <span class="p">{</span>
-  <span class="kd">private</span> <span class="nf">final</span> <span class="n">MultiAction</span> <span class="nf">multiAction</span><span class="p">;</span>
-  <span class="kd">private</span> <span class="nf">final</span> <span class="kt">int</span> <span class="nf">numAttempt</span><span class="p">;</span>
-  <span class="kd">private</span> <span class="nf">final</span> <span class="n">ServerName</span> <span class="nf">server</span><span class="p">;</span>
-  <span class="kd">private</span> <span class="nf">final</span> <span class="n">Set</span><span class="o">&lt;</span><span class="n">CancellableRegionServerCallable</span><span class="o">&gt;</span> <span class="nf">callsInProgress</span><span class="p">;</span>
+</span><span class="c1"></span><span class="err">final class SingleServerRequestRunnable implements </span><span class="n">Runnable</span> <span class="p">{</span>
+  <span class="err">private final MultiAction multiAction</span><span class="p">;</span>
+  <span class="err">private final int numAttempt</span><span class="p">;</span>
+  <span class="err">private final ServerName server</span><span class="p">;</span>
+  <span class="err">private final Set&lt;CancellableRegionServerCallable&gt; callsInProgress</span><span class="p">;</span>
 
   <span class="nd">@Override</span>
-  <span class="kd">public</span> <span class="nf">void</span> <span class="n">run</span><span class="p">()</span> <span class="p">{</span>
+  <span class="err">public void </span><span class="n">run</span><span class="p">()</span> <span class="p">{</span>
     <span class="c1">// for short
 </span><span class="c1"></span>    <span class="n">callable</span> <span class="o">=</span> <span class="n">createCallable</span><span class="p">(</span><span class="n">server</span><span class="p">,</span> <span class="n">tableName</span><span class="p">,</span> <span class="n">multiAction</span><span class="p">);</span>
-    <span class="n">RpcRetryingCaller</span><span class="o">&lt;</span><span class="n">AbstractResponse</span><span class="o">&gt;</span> <span class="nf">caller</span> <span class="o">=</span> <span class="n">asyncProcess</span><span class="p">.</span><span class="na">createCaller</span><span class="p">(</span><span class="n">callable</span><span class="p">,</span><span class="n">rpcTimeout</span><span class="p">);</span>
+    <span class="err">RpcRetryingCaller&lt;AbstractResponse&gt; caller </span><span class="o">=</span> <span class="n">asyncProcess</span><span class="p">.</span><span class="na">createCaller</span><span class="p">(</span><span class="n">callable</span><span class="p">,</span><span class="n">rpcTimeout</span><span class="p">);</span>
     <span class="n">caller</span><span class="p">.</span><span class="na">callWithoutRetries</span><span class="p">(</span><span class="n">callable</span><span class="p">,</span> <span class="n">operationTimeout</span><span class="p">);</span>
   <span class="p">}</span>
 <span class="p">}</span></code></pre></td></tr></table>

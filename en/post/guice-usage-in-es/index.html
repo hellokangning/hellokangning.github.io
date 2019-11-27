@@ -25,7 +25,7 @@ Elasticsearch has a ModulesBuilder which is responsible for assembling modules."
 
 
 
-<meta name="generator" content="Hugo 0.58.1 with theme even" />
+<meta name="generator" content="Hugo 0.59.1 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/en/post/guice-usage-in-es/" />
@@ -186,24 +186,24 @@ Elasticsearch has a ModulesBuilder which is responsible for assembling modules."
 </span><span class="lnt">25
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="nf">class</span> <span class="n">ModulesBuilder</span> <span class="nf">implements</span> <span class="n">Iterable</span><span class="o">&lt;</span><span class="n">Module</span><span class="o">&gt;</span> <span class="p">{</span>
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="err">public class ModulesBuilder implements </span><span class="n">Iterable</span><span class="o">&lt;</span><span class="n">Module</span><span class="o">&gt;</span> <span class="p">{</span>
 
     <span class="c1">// container for all Module
-</span><span class="c1"></span>    <span class="kd">private</span> <span class="nf">final</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">Module</span><span class="o">&gt;</span> <span class="nf">modules</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+</span><span class="c1"></span>    <span class="err">private final List&lt;Module&gt; modules </span><span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
 
     <span class="c1">// add new Modules into container
-</span><span class="c1"></span>    <span class="kd">public</span> <span class="nf">ModulesBuilder</span> <span class="n">add</span><span class="p">(</span><span class="n">Module</span><span class="p">...</span> <span class="nf">newModules</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="c1"></span>    <span class="err">public ModulesBuilder </span><span class="n">add</span><span class="p">(</span><span class="err">Module... newModules</span><span class="p">)</span> <span class="p">{</span>
         <span class="n">Collections</span><span class="p">.</span><span class="na">addAll</span><span class="p">(</span><span class="n">modules</span><span class="p">,</span> <span class="n">newModules</span><span class="p">);</span>
         <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
     <span class="p">}</span>
 
     <span class="nd">@Override</span>
-    <span class="kd">public</span> <span class="nf">Iterator</span><span class="o">&lt;</span><span class="n">Module</span><span class="o">&gt;</span> <span class="nf">iterator</span><span class="p">()</span> <span class="p">{</span>
+    <span class="err">public Iterator</span><span class="o">&lt;</span><span class="err">Module&gt; iterator</span><span class="p">()</span> <span class="p">{</span>
         <span class="k">return</span> <span class="n">modules</span><span class="p">.</span><span class="na">iterator</span><span class="p">();</span>
     <span class="p">}</span>
 
-    <span class="kd">public</span> <span class="nf">Injector</span> <span class="n">createInjector</span><span class="p">()</span> <span class="p">{</span>
-        <span class="n">Injector</span> <span class="nf">injector</span> <span class="o">=</span> <span class="n">Guice</span><span class="p">.</span><span class="na">createInjector</span><span class="p">(</span><span class="n">modules</span><span class="p">);</span>
+    <span class="err">public Injector </span><span class="n">createInjector</span><span class="p">()</span> <span class="p">{</span>
+        <span class="err">Injector injector </span><span class="o">=</span> <span class="n">Guice</span><span class="p">.</span><span class="na">createInjector</span><span class="p">(</span><span class="n">modules</span><span class="p">);</span>
         <span class="p">((</span><span class="n">InjectorImpl</span><span class="p">)</span> <span class="n">injector</span><span class="p">).</span><span class="na">clearCache</span><span class="p">();</span>
         <span class="c1">// in ES, we always create all instances as if they are eager singletons
 </span><span class="c1"></span>        <span class="c1">// this allows for considerable memory savings (no need to store construction info) as well as cycles
@@ -298,11 +298,11 @@ Elasticsearch has a ModulesBuilder which is responsible for assembling modules."
 </span><span class="lnt">80
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="nf">class</span> <span class="n">Node</span> <span class="nf">implements</span> <span class="n">Closeable</span> <span class="p">{</span>
-    <span class="kd">private</span> <span class="nf">final</span> <span class="n">Injector</span> <span class="nf">injector</span><span class="p">;</span>
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="err">public class Node implements </span><span class="n">Closeable</span> <span class="p">{</span>
+    <span class="err">private final Injector injector</span><span class="p">;</span>
     
-    <span class="kd">protected</span> <span class="nf">Node</span><span class="p">(</span><span class="kd">final</span> <span class="nf">Environment</span> <span class="n">environment</span><span class="p">,</span> <span class="n">Collection</span><span class="o">&lt;</span><span class="n">Class</span><span class="o">&lt;?</span> <span class="kd">extends</span> <span class="nf">Plugin</span><span class="o">&gt;&gt;</span> <span class="n">classpathPlugins</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">ModulesBuilder</span> <span class="nf">modules</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ModulesBuilder</span><span class="p">();</span>
+    <span class="err">protected Node</span><span class="p">(</span><span class="err">final Environment </span><span class="n">environment</span><span class="p">,</span> <span class="n">Collection</span><span class="o">&lt;</span><span class="n">Class</span><span class="o">&lt;?</span> <span class="err">extends Plugin</span><span class="o">&gt;&gt;</span> <span class="n">classpathPlugins</span><span class="p">)</span> <span class="p">{</span>
+        <span class="err">ModulesBuilder modules </span><span class="o">=</span> <span class="k">new</span> <span class="n">ModulesBuilder</span><span class="p">();</span>
         <span class="n">modules</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="n">pluginModule</span><span class="p">)</span>        
         <span class="n">modules</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="n">clusterModule</span><span class="p">);</span>
         <span class="n">modules</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="n">indicesModule</span><span class="p">);</span>
@@ -347,7 +347,7 @@ Elasticsearch has a ModulesBuilder which is responsible for assembling modules."
                     <span class="n">b</span><span class="p">.</span><span class="na">bind</span><span class="p">(</span><span class="n">ClusterInfoService</span><span class="p">.</span><span class="na">class</span><span class="p">).</span><span class="na">toInstance</span><span class="p">(</span><span class="n">clusterInfoService</span><span class="p">);</span>
                     <span class="n">b</span><span class="p">.</span><span class="na">bind</span><span class="p">(</span><span class="n">Discovery</span><span class="p">.</span><span class="na">class</span><span class="p">).</span><span class="na">toInstance</span><span class="p">(</span><span class="n">discoveryModule</span><span class="p">.</span><span class="na">getDiscovery</span><span class="p">());</span>
                     <span class="p">{</span>
-                        <span class="n">RecoverySettings</span> <span class="nf">recoverySettings</span> <span class="o">=</span> <span class="k">new</span> <span class="n">RecoverySettings</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="n">settingsModule</span><span class="p">.</span><span class="na">getClusterSettings</span><span class="p">());</span>
+                        <span class="err">RecoverySettings recoverySettings </span><span class="o">=</span> <span class="k">new</span> <span class="n">RecoverySettings</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="n">settingsModule</span><span class="p">.</span><span class="na">getClusterSettings</span><span class="p">());</span>
                         <span class="n">processRecoverySettings</span><span class="p">(</span><span class="n">settingsModule</span><span class="p">.</span><span class="na">getClusterSettings</span><span class="p">(),</span> <span class="n">recoverySettings</span><span class="p">);</span>
                         <span class="n">b</span><span class="p">.</span><span class="na">bind</span><span class="p">(</span><span class="n">PeerRecoverySourceService</span><span class="p">.</span><span class="na">class</span><span class="p">).</span><span class="na">toInstance</span><span class="p">(</span><span class="k">new</span> <span class="n">PeerRecoverySourceService</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="n">transportService</span><span class="p">,</span>
                                 <span class="n">indicesService</span><span class="p">,</span> <span class="n">recoverySettings</span><span class="p">));</span>
@@ -365,14 +365,14 @@ Elasticsearch has a ModulesBuilder which is responsible for assembling modules."
 </span><span class="c1"></span>        <span class="n">injector</span> <span class="o">=</span> <span class="n">modules</span><span class="p">.</span><span class="na">createInjector</span><span class="p">();</span>
     <span class="p">}</span>
 
-    <span class="kd">public</span> <span class="nf">Node</span> <span class="n">start</span><span class="p">()</span> <span class="kd">throws</span> <span class="nf">NodeValidationException</span> <span class="p">{</span>
+    <span class="err">public Node </span><span class="n">start</span><span class="p">()</span> <span class="err">throws NodeValidationException </span><span class="p">{</span>
         <span class="c1">// get any instance from injector, and call its method if you want
 </span><span class="c1"></span>        <span class="n">injector</span><span class="p">.</span><span class="na">getInstance</span><span class="p">(</span><span class="n">IndicesServer</span><span class="p">.</span><span class="na">class</span><span class="p">).</span><span class="na">start</span><span class="p">();</span>
         <span class="n">injector</span><span class="p">.</span><span class="na">getInstance</span><span class="p">(</span><span class="n">SearchService</span><span class="p">.</span><span class="na">class</span><span class="p">).</span><span class="na">start</span><span class="p">();</span>
         <span class="c1">// ...
 </span><span class="c1"></span>    <span class="p">}</span>
 
-    <span class="kd">private</span> <span class="nf">Node</span> <span class="n">stop</span><span class="p">()</span> <span class="p">{</span>
+    <span class="err">private Node </span><span class="n">stop</span><span class="p">()</span> <span class="p">{</span>
         <span class="n">injector</span><span class="p">.</span><span class="na">getInstance</span><span class="p">(</span><span class="n">TribeService</span><span class="p">.</span><span class="na">class</span><span class="p">).</span><span class="na">stop</span><span class="p">();</span>
         <span class="n">injector</span><span class="p">.</span><span class="na">getInstance</span><span class="p">(</span><span class="n">SnapshotsService</span><span class="p">.</span><span class="na">class</span><span class="p">).</span><span class="na">stop</span><span class="p">();</span>
         <span class="c1">// ...
@@ -407,13 +407,13 @@ Elasticsearch has a ModulesBuilder which is responsible for assembling modules."
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="cm">/**
 </span><span class="cm"> * Configures classes and services that are shared by indices on each node.
 </span><span class="cm"> */</span>
-<span class="kd">public</span> <span class="nf">class</span> <span class="n">IndicesModule</span> <span class="nf">extends</span> <span class="n">AbstractModule</span> <span class="p">{</span>
+<span class="err">public class IndicesModule extends </span><span class="n">AbstractModule</span> <span class="p">{</span>
 
     <span class="cm">/**
 </span><span class="cm">     * Guice needs to be configured to build the dependency graph exactly.
 </span><span class="cm">     */</span>
     <span class="nd">@Override</span>
-    <span class="kd">protected</span> <span class="nf">void</span> <span class="n">configure</span><span class="p">()</span> <span class="p">{</span>
+    <span class="err">protected void </span><span class="n">configure</span><span class="p">()</span> <span class="p">{</span>
         <span class="n">bind</span><span class="p">(</span><span class="n">IndicesStore</span><span class="p">.</span><span class="na">class</span><span class="p">).</span><span class="na">asEagerSingleton</span><span class="p">();</span>
         <span class="n">bind</span><span class="p">(</span><span class="n">IndicesClusterStateService</span><span class="p">.</span><span class="na">class</span><span class="p">).</span><span class="na">asEagerSingleton</span><span class="p">();</span>
         <span class="n">bind</span><span class="p">(</span><span class="n">SyncedFlushService</span><span class="p">.</span><span class="na">class</span><span class="p">).</span><span class="na">asEagerSingleton</span><span class="p">();</span>

@@ -26,7 +26,7 @@ With the help of HashMap, HashSet offers constant time performance for the basic
 
 
 
-<meta name="generator" content="Hugo 0.58.1 with theme even" />
+<meta name="generator" content="Hugo 0.59.1 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/en/post/java-hashset/" />
@@ -199,16 +199,16 @@ With the help of HashMap, HashSet offers constant time performance for the basic
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// HashSet.java
 </span><span class="c1"></span>
-<span class="kd">public</span> <span class="nf">class</span> <span class="n">HashSet</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span>
-    <span class="nf">extends</span> <span class="n">AbstractSet</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span>
-    <span class="nf">implements</span> <span class="n">Set</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">Cloneable</span><span class="p">,</span> <span class="n">java</span><span class="p">.</span><span class="na">io</span><span class="p">.</span><span class="na">Serializable</span>
+<span class="err">public class HashSet&lt;E&gt;
+</span><span class="err">    extends AbstractSet&lt;E&gt;
+</span><span class="err">    implements </span><span class="n">Set</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">Cloneable</span><span class="p">,</span> <span class="n">java</span><span class="p">.</span><span class="na">io</span><span class="p">.</span><span class="na">Serializable</span>
 <span class="p">{</span>
-    <span class="kd">private</span> <span class="nf">transient</span> <span class="n">HashMap</span><span class="o">&lt;</span><span class="n">E</span><span class="p">,</span><span class="n">Object</span><span class="o">&gt;</span> <span class="nf">map</span><span class="p">;</span>
-    <span class="kd">public</span> <span class="nf">HashSet</span><span class="p">()</span> <span class="p">{</span>
+    <span class="err">private transient </span><span class="n">HashMap</span><span class="o">&lt;</span><span class="n">E</span><span class="p">,</span><span class="err">Object&gt; map</span><span class="p">;</span>
+    <span class="err">public HashSet</span><span class="p">()</span> <span class="p">{</span>
         <span class="n">map</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&lt;&gt;</span><span class="p">();</span>
     <span class="p">}</span>
 
-     <span class="kd">public</span> <span class="nf">HashSet</span><span class="p">(</span><span class="kt">int</span> <span class="nf">initialCapacity</span><span class="p">,</span> <span class="kt">float</span> <span class="nf">loadFactor</span><span class="p">)</span> <span class="p">{</span>
+     <span class="err">public HashSet</span><span class="p">(</span><span class="err">int initialCapacity</span><span class="p">,</span> <span class="err">float loadFactor</span><span class="p">)</span> <span class="p">{</span>
         <span class="n">map</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="n">initialCapacity</span><span class="p">,</span> <span class="n">loadFactor</span><span class="p">);</span>
     <span class="p">}</span>
 <span class="p">}</span></code></pre></td></tr></table>
@@ -228,7 +228,7 @@ With the help of HashMap, HashSet offers constant time performance for the basic
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// HashSet.java
 </span><span class="c1"></span>
-<span class="kd">public</span> <span class="nf">boolean</span> <span class="n">add</span><span class="p">(</span><span class="n">E</span> <span class="nf">e</span><span class="p">)</span> <span class="p">{</span>
+<span class="err">public boolean </span><span class="n">add</span><span class="p">(</span><span class="err">E e</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="n">map</span><span class="p">.</span><span class="na">put</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">PRESENT</span><span class="p">)</span><span class="o">==</span><span class="kc">null</span><span class="p">;</span>
 <span class="p">}</span></code></pre></td></tr></table>
 </div>
@@ -251,7 +251,7 @@ With the help of HashMap, HashSet offers constant time performance for the basic
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// HashSet.java
 </span><span class="c1"></span>
-<span class="kd">public</span> <span class="nf">boolean</span> <span class="n">remove</span><span class="p">(</span><span class="n">Object</span> <span class="nf">o</span><span class="p">)</span> <span class="p">{</span>
+<span class="err">public boolean </span><span class="n">remove</span><span class="p">(</span><span class="err">Object o</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="n">map</span><span class="p">.</span><span class="na">remove</span><span class="p">(</span><span class="n">o</span><span class="p">)</span><span class="o">==</span><span class="n">PRESENT</span><span class="p">;</span>
 <span class="p">}</span></code></pre></td></tr></table>
 </div>
@@ -270,7 +270,7 @@ With the help of HashMap, HashSet offers constant time performance for the basic
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// HashSet.java
 </span><span class="c1"></span>
-<span class="kd">public</span> <span class="nf">boolean</span> <span class="n">contains</span><span class="p">(</span><span class="n">Object</span> <span class="nf">o</span><span class="p">)</span> <span class="p">{</span>
+<span class="err">public boolean </span><span class="n">contains</span><span class="p">(</span><span class="err">Object o</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="n">map</span><span class="p">.</span><span class="na">containsKey</span><span class="p">(</span><span class="n">o</span><span class="p">);</span>
 <span class="p">}</span></code></pre></td></tr></table>
 </div>
@@ -291,7 +291,7 @@ With the help of HashMap, HashSet offers constant time performance for the basic
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// HashSet.java
 </span><span class="c1"></span>
-<span class="kd">public</span> <span class="nf">int</span> <span class="n">size</span><span class="p">()</span> <span class="p">{</span>
+<span class="err">public int </span><span class="n">size</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="n">map</span><span class="p">.</span><span class="na">size</span><span class="p">();</span>
 <span class="p">}</span></code></pre></td></tr></table>
 </div>

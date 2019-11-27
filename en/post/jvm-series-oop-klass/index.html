@@ -24,7 +24,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.1 with theme even" />
+<meta name="generator" content="Hugo 0.59.1 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/en/post/jvm-series-oop-klass/" />
@@ -51,7 +51,7 @@
 
 <meta itemprop="datePublished" content="2018-04-10T14:46:26&#43;08:00" />
 <meta itemprop="dateModified" content="2018-04-10T14:46:26&#43;08:00" />
-<meta itemprop="wordCount" content="1027">
+<meta itemprop="wordCount" content="1033">
 
 
 
@@ -132,7 +132,7 @@
         <div class="post-category">
             <a href="/en/categories/java/"> Java </a>
             </div>
-          <span class="more-meta"> 1027 words </span>
+          <span class="more-meta"> 1033 words </span>
           <span class="more-meta"> 3 mins read </span>
         
       </div>
@@ -304,7 +304,7 @@
   <span class="k">if</span> <span class="p">(</span><span class="n">m</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">THROW_MSG_0</span><span class="p">(</span><span class="n">vmSymbols</span><span class="o">::</span><span class="n">java_lang_InternalError</span><span class="p">(),</span> <span class="s">&#34;invoke&#34;</span><span class="p">);</span>
   <span class="p">}</span>
-  <span class="n">methodHandle</span> <span class="n">method</span><span class="p">(</span><span class="n">THREAD</span><span class="p">,</span> <span class="n">m</span><span class="p">);</span>
+  <span class="n">methodHandle</span> <span class="nf">method</span><span class="p">(</span><span class="n">THREAD</span><span class="p">,</span> <span class="n">m</span><span class="p">);</span>
   <span class="n">assert</span><span class="p">(</span><span class="n">method</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">()</span> <span class="o">==</span> <span class="n">vmSymbols</span><span class="o">::</span><span class="n">object_initializer_name</span><span class="p">(),</span> <span class="s">&#34;invalid constructor&#34;</span><span class="p">);</span>
 
   <span class="c1">// Make sure klass gets initialize
@@ -339,11 +339,11 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="c1">// oopsHierarchy.hpp
 </span><span class="c1"></span>
-<span class="k">typedef</span> <span class="k">class</span><span class="err"> </span><span class="nc">oopDesc</span><span class="o">*</span>                            <span class="n">oop</span><span class="p">;</span>
-<span class="k">typedef</span> <span class="k">class</span><span class="err">   </span><span class="nc">instanceOopDesc</span><span class="o">*</span>            <span class="n">instanceOop</span><span class="p">;</span>
-<span class="k">typedef</span> <span class="k">class</span><span class="err">   </span><span class="nc">arrayOopDesc</span><span class="o">*</span>                    <span class="n">arrayOop</span><span class="p">;</span>
-<span class="k">typedef</span> <span class="k">class</span><span class="err">     </span><span class="nc">objArrayOopDesc</span><span class="o">*</span>            <span class="n">objArrayOop</span><span class="p">;</span>
-<span class="k">typedef</span> <span class="k">class</span><span class="err">     </span><span class="nc">typeArrayOopDesc</span><span class="o">*</span>            <span class="n">typeArrayOop</span><span class="p">;</span>
+<span class="k">typedef</span> <span class="k">class</span> <span class="nc">oopDesc</span><span class="o">*</span>                            <span class="n">oop</span><span class="p">;</span>
+<span class="k">typedef</span> <span class="k">class</span>   <span class="nc">instanceOopDesc</span><span class="o">*</span>            <span class="n">instanceOop</span><span class="p">;</span>
+<span class="k">typedef</span> <span class="k">class</span>   <span class="nc">arrayOopDesc</span><span class="o">*</span>                    <span class="n">arrayOop</span><span class="p">;</span>
+<span class="k">typedef</span> <span class="k">class</span>     <span class="nc">objArrayOopDesc</span><span class="o">*</span>            <span class="n">objArrayOop</span><span class="p">;</span>
+<span class="k">typedef</span> <span class="k">class</span>     <span class="nc">typeArrayOopDesc</span><span class="o">*</span>            <span class="n">typeArrayOop</span><span class="p">;</span>
 </code></pre></td></tr></table>
 </div>
 </div>
@@ -360,10 +360,10 @@
 </span><span class="lnt">8
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="k">class</span><span class="err"> </span><span class="nc">oopDesc</span> <span class="p">{</span>
+<pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="k">class</span> <span class="nc">oopDesc</span> <span class="p">{</span>
  <span class="k">private</span><span class="o">:</span>
   <span class="k">volatile</span> <span class="n">markOop</span> <span class="n">_mark</span><span class="p">;</span>
-  <span class="k">union</span> <span class="n">_metadata</span> <span class="p">{</span>
+  <span class="k">union</span> <span class="nc">_metadata</span> <span class="p">{</span>
     <span class="n">Klass</span><span class="o">*</span>      <span class="n">_klass</span><span class="p">;</span>
     <span class="n">narrowKlass</span> <span class="n">_compressed_klass</span><span class="p">;</span>
   <span class="p">}</span>

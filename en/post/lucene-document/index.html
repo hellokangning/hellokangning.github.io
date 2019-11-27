@@ -24,7 +24,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.1 with theme even" />
+<meta name="generator" content="Hugo 0.59.1 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/en/post/lucene-document/" />
@@ -290,11 +290,11 @@
 </span><span class="lnt">107
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="nf">class</span> <span class="n">Field</span> <span class="nf">implements</span> <span class="n">IndexableField</span> <span class="p">{</span>
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="err">public class Field implements </span><span class="n">IndexableField</span> <span class="p">{</span>
 
-  <span class="kd">protected</span> <span class="nf">final</span> <span class="n">FieldType</span> <span class="nf">type</span><span class="p">;</span>
-  <span class="kd">protected</span> <span class="nf">final</span> <span class="n">String</span> <span class="nf">name</span><span class="p">;</span>
-  <span class="kd">protected</span> <span class="nf">float</span> <span class="n">boost</span> <span class="o">=</span> <span class="n">1</span><span class="p">.</span><span class="na">0f</span><span class="p">;</span>
+  <span class="err">protected final FieldType type</span><span class="p">;</span>
+  <span class="err">protected final String name</span><span class="p">;</span>
+  <span class="err">protected float </span><span class="n">boost</span> <span class="o">=</span> <span class="n">1</span><span class="p">.</span><span class="na">0f</span><span class="p">;</span>
   
   <span class="cm">/**
 </span><span class="cm">   * data can be converted to 
@@ -303,13 +303,13 @@
 </span><span class="cm">   * 3. String Value
 </span><span class="cm">   * 4. Reader Value
 </span><span class="cm">   */</span>
-  <span class="kd">protected</span> <span class="nf">Object</span> <span class="n">fieldsData</span><span class="p">;</span>
+  <span class="err">protected Object </span><span class="n">fieldsData</span><span class="p">;</span>
 
   <span class="cm">/** Pre-analyzed tokenStream for indexed fields; this is
 </span><span class="cm">   * separate from fieldsData because you are allowed to
 </span><span class="cm">   * have both; eg maybe field has a String value but you
 </span><span class="cm">   * customize how it&#39;s tokenized */</span>
-  <span class="kd">protected</span> <span class="nf">TokenStream</span> <span class="n">tokenStream</span><span class="p">;</span>
+  <span class="err">protected TokenStream </span><span class="n">tokenStream</span><span class="p">;</span>
 
   <span class="cm">/**
 </span><span class="cm">   *...
@@ -329,22 +329,22 @@
 </span><span class="cm">   * @return TokenStream value for indexing the document.  Should always return
 </span><span class="cm">  */</span>
   <span class="nd">@Override</span>
-  <span class="kd">public</span> <span class="nf">TokenStream</span> <span class="n">tokenStream</span><span class="p">(</span><span class="n">Analyzer</span> <span class="nf">analyzer</span><span class="p">,</span> <span class="n">TokenStream</span> <span class="nf">reuse</span><span class="p">)</span> <span class="p">{</span>
+  <span class="err">public TokenStream </span><span class="n">tokenStream</span><span class="p">(</span><span class="err">Analyzer analyzer</span><span class="p">,</span> <span class="err">TokenStream reuse</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">fieldType</span><span class="p">().</span><span class="na">indexOptions</span><span class="p">()</span> <span class="o">==</span> <span class="n">IndexOptions</span><span class="p">.</span><span class="na">NONE</span><span class="p">)</span> <span class="p">{</span>
       <span class="c1">// Not indexed
 </span><span class="c1"></span>      <span class="k">return</span> <span class="kc">null</span><span class="p">;</span>
     <span class="p">}</span>
 
-    <span class="kd">final</span> <span class="nf">FieldType</span><span class="p">.</span><span class="na">LegacyNumericType</span> <span class="n">numericType</span> <span class="o">=</span> <span class="n">fieldType</span><span class="p">().</span><span class="na">numericType</span><span class="p">();</span>
+    <span class="err">final FieldType</span><span class="p">.</span><span class="na">LegacyNumericType</span> <span class="n">numericType</span> <span class="o">=</span> <span class="n">fieldType</span><span class="p">().</span><span class="na">numericType</span><span class="p">();</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">numericType</span> <span class="o">!=</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">reuse</span> <span class="nf">instanceof</span> <span class="n">LegacyNumericTokenStream</span> <span class="o">&amp;&amp;</span> <span class="p">((</span><span class="n">LegacyNumericTokenStream</span><span class="p">)</span><span class="n">reuse</span><span class="p">).</span><span class="na">getPrecisionStep</span><span class="p">()</span> <span class="o">==</span> <span class="n">type</span><span class="p">.</span><span class="na">numericPrecisionStep</span><span class="p">()))</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="err">reuse instanceof </span><span class="n">LegacyNumericTokenStream</span> <span class="o">&amp;&amp;</span> <span class="p">((</span><span class="n">LegacyNumericTokenStream</span><span class="p">)</span><span class="n">reuse</span><span class="p">).</span><span class="na">getPrecisionStep</span><span class="p">()</span> <span class="o">==</span> <span class="n">type</span><span class="p">.</span><span class="na">numericPrecisionStep</span><span class="p">()))</span> <span class="p">{</span>
         <span class="c1">// lazy init the TokenStream as it is heavy to instantiate
 </span><span class="c1"></span>        <span class="c1">// (attributes,...) if not needed (stored field loading)
 </span><span class="c1"></span>        <span class="n">reuse</span> <span class="o">=</span> <span class="k">new</span> <span class="n">LegacyNumericTokenStream</span><span class="p">(</span><span class="n">type</span><span class="p">.</span><span class="na">numericPrecisionStep</span><span class="p">());</span>
       <span class="p">}</span>
-      <span class="kd">final</span> <span class="nf">LegacyNumericTokenStream</span> <span class="n">nts</span> <span class="o">=</span> <span class="p">(</span><span class="n">LegacyNumericTokenStream</span><span class="p">)</span> <span class="n">reuse</span><span class="p">;</span>
+      <span class="err">final LegacyNumericTokenStream </span><span class="n">nts</span> <span class="o">=</span> <span class="p">(</span><span class="n">LegacyNumericTokenStream</span><span class="p">)</span> <span class="n">reuse</span><span class="p">;</span>
       <span class="c1">// initialize value in TokenStream
-</span><span class="c1"></span>      <span class="kd">final</span> <span class="nf">Number</span> <span class="n">val</span> <span class="o">=</span> <span class="p">(</span><span class="n">Number</span><span class="p">)</span> <span class="n">fieldsData</span><span class="p">;</span>
+</span><span class="c1"></span>      <span class="err">final Number </span><span class="n">val</span> <span class="o">=</span> <span class="p">(</span><span class="n">Number</span><span class="p">)</span> <span class="n">fieldsData</span><span class="p">;</span>
       <span class="k">switch</span> <span class="p">(</span><span class="n">numericType</span><span class="p">)</span> <span class="p">{</span>
       <span class="k">case</span> <span class="n">INT</span><span class="o">:</span>
         <span class="n">nts</span><span class="p">.</span><span class="na">setIntValue</span><span class="p">(</span><span class="n">val</span><span class="p">.</span><span class="na">intValue</span><span class="p">());</span>
@@ -366,7 +366,7 @@
 
     <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">fieldType</span><span class="p">().</span><span class="na">tokenized</span><span class="p">())</span> <span class="p">{</span>
       <span class="k">if</span> <span class="p">(</span><span class="n">stringValue</span><span class="p">()</span> <span class="o">!=</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">reuse</span> <span class="nf">instanceof</span> <span class="n">StringTokenStream</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="err">reuse instanceof </span><span class="n">StringTokenStream</span><span class="p">))</span> <span class="p">{</span>
           <span class="c1">// lazy init the TokenStream as it is heavy to instantiate
 </span><span class="c1"></span>          <span class="c1">// (attributes,...) if not needed
 </span><span class="c1"></span>          <span class="n">reuse</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StringTokenStream</span><span class="p">();</span>
@@ -374,7 +374,7 @@
         <span class="p">((</span><span class="n">StringTokenStream</span><span class="p">)</span> <span class="n">reuse</span><span class="p">).</span><span class="na">setValue</span><span class="p">(</span><span class="n">stringValue</span><span class="p">());</span>
         <span class="k">return</span> <span class="n">reuse</span><span class="p">;</span>
       <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">binaryValue</span><span class="p">()</span> <span class="o">!=</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">reuse</span> <span class="nf">instanceof</span> <span class="n">BinaryTokenStream</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="err">reuse instanceof </span><span class="n">BinaryTokenStream</span><span class="p">))</span> <span class="p">{</span>
           <span class="c1">// lazy init the TokenStream as it is heavy to instantiate
 </span><span class="c1"></span>          <span class="c1">// (attributes,...) if not needed
 </span><span class="c1"></span>          <span class="n">reuse</span> <span class="o">=</span> <span class="k">new</span> <span class="n">BinaryTokenStream</span><span class="p">();</span>
@@ -459,12 +459,12 @@
 </span><span class="lnt">53
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="nf">final</span> <span class="kd">class</span> <span class="nf">Document</span> <span class="kd">implements</span> <span class="nf">Iterable</span><span class="o">&lt;</span><span class="n">IndexableField</span><span class="o">&gt;</span> <span class="p">{</span>
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="err">public final class Document implements Iterable</span><span class="o">&lt;</span><span class="n">IndexableField</span><span class="o">&gt;</span> <span class="p">{</span>
 
-  <span class="kd">private</span> <span class="nf">final</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">IndexableField</span><span class="o">&gt;</span> <span class="nf">fields</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+  <span class="err">private final List&lt;IndexableField&gt; fields </span><span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
 
   <span class="nd">@Override</span>
-  <span class="kd">public</span> <span class="nf">Iterator</span><span class="o">&lt;</span><span class="n">IndexableField</span><span class="o">&gt;</span> <span class="nf">iterator</span><span class="p">()</span> <span class="p">{</span>
+  <span class="err">public Iterator</span><span class="o">&lt;</span><span class="err">IndexableField&gt; iterator</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="n">fields</span><span class="p">.</span><span class="na">iterator</span><span class="p">();</span>
   <span class="p">}</span>
 
@@ -472,14 +472,14 @@
 </span><span class="cm">  Adds a field to a document.
 </span><span class="cm">  Several fields may be added with the same name. 
 </span><span class="cm">  */</span>
-  <span class="kd">public</span> <span class="nf">final</span> <span class="kt">void</span> <span class="nf">add</span><span class="p">(</span><span class="n">IndexableField</span> <span class="nf">field</span><span class="p">)</span> <span class="p">{</span>
+  <span class="err">public final void add</span><span class="p">(</span><span class="err">IndexableField field</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">fields</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="n">field</span><span class="p">);</span>
   <span class="p">}</span>
 
-  <span class="kd">public</span> <span class="nf">final</span> <span class="kt">void</span> <span class="nf">removeField</span><span class="p">(</span><span class="n">String</span> <span class="nf">name</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">Iterator</span><span class="o">&lt;</span><span class="n">IndexableField</span><span class="o">&gt;</span> <span class="nf">it</span> <span class="o">=</span> <span class="n">fields</span><span class="p">.</span><span class="na">iterator</span><span class="p">();</span>
+  <span class="err">public final void removeField</span><span class="p">(</span><span class="err">String name</span><span class="p">)</span> <span class="p">{</span>
+    <span class="err">Iterator&lt;IndexableField&gt; it </span><span class="o">=</span> <span class="n">fields</span><span class="p">.</span><span class="na">iterator</span><span class="p">();</span>
     <span class="k">while</span> <span class="p">(</span><span class="n">it</span><span class="p">.</span><span class="na">hasNext</span><span class="p">())</span> <span class="p">{</span>
-      <span class="n">IndexableField</span> <span class="nf">field</span> <span class="o">=</span> <span class="n">it</span><span class="p">.</span><span class="na">next</span><span class="p">();</span>
+      <span class="err">IndexableField field </span><span class="o">=</span> <span class="n">it</span><span class="p">.</span><span class="na">next</span><span class="p">();</span>
       <span class="k">if</span> <span class="p">(</span><span class="n">field</span><span class="p">.</span><span class="na">name</span><span class="p">().</span><span class="na">equals</span><span class="p">(</span><span class="n">name</span><span class="p">))</span> <span class="p">{</span>
         <span class="n">it</span><span class="p">.</span><span class="na">remove</span><span class="p">();</span>
         <span class="k">return</span><span class="p">;</span>
@@ -491,10 +491,10 @@
 </span><span class="cm">  * Returns an array of bytes for the first (or only) field that has the name
 </span><span class="cm">  * specified as the method parameter. 
 </span><span class="cm">  */</span>
-  <span class="kd">public</span> <span class="nf">final</span> <span class="n">BytesRef</span> <span class="nf">getBinaryValue</span><span class="p">(</span><span class="n">String</span> <span class="nf">name</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">for</span> <span class="p">(</span><span class="n">IndexableField</span> <span class="nf">field</span> <span class="o">:</span> <span class="n">fields</span><span class="p">)</span> <span class="p">{</span>
+  <span class="err">public final BytesRef getBinaryValue</span><span class="p">(</span><span class="err">String name</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="err">IndexableField field </span><span class="o">:</span> <span class="n">fields</span><span class="p">)</span> <span class="p">{</span>
       <span class="k">if</span> <span class="p">(</span><span class="n">field</span><span class="p">.</span><span class="na">name</span><span class="p">().</span><span class="na">equals</span><span class="p">(</span><span class="n">name</span><span class="p">))</span> <span class="p">{</span>
-        <span class="kd">final</span> <span class="nf">BytesRef</span> <span class="n">bytes</span> <span class="o">=</span> <span class="n">field</span><span class="p">.</span><span class="na">binaryValue</span><span class="p">();</span>
+        <span class="err">final BytesRef </span><span class="n">bytes</span> <span class="o">=</span> <span class="n">field</span><span class="p">.</span><span class="na">binaryValue</span><span class="p">();</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">bytes</span> <span class="o">!=</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
           <span class="k">return</span> <span class="n">bytes</span><span class="p">;</span>
         <span class="p">}</span>
@@ -503,8 +503,8 @@
     <span class="k">return</span> <span class="kc">null</span><span class="p">;</span>
   <span class="p">}</span>
 
-  <span class="kd">public</span> <span class="nf">final</span> <span class="n">IndexableField</span> <span class="nf">getField</span><span class="p">(</span><span class="n">String</span> <span class="nf">name</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">for</span> <span class="p">(</span><span class="n">IndexableField</span> <span class="nf">field</span> <span class="o">:</span> <span class="n">fields</span><span class="p">)</span> <span class="p">{</span>
+  <span class="err">public final IndexableField getField</span><span class="p">(</span><span class="err">String name</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="err">IndexableField field </span><span class="o">:</span> <span class="n">fields</span><span class="p">)</span> <span class="p">{</span>
       <span class="k">if</span> <span class="p">(</span><span class="n">field</span><span class="p">.</span><span class="na">name</span><span class="p">().</span><span class="na">equals</span><span class="p">(</span><span class="n">name</span><span class="p">))</span> <span class="p">{</span>
         <span class="k">return</span> <span class="n">field</span><span class="p">;</span>
       <span class="p">}</span>
