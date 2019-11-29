@@ -18,21 +18,7 @@
       
       <guid>https://hellokangning.github.io/zh/post/redis-anomalous-latency-because-of-page-fault/</guid>
       <description>&lt;p&gt;继续每天的知心姐姐时间，这次客户邮件说，CPU 使用率飙升，同时 GET/LLEN 等命令，都要执行几十毫秒。看了一下慢日志，我去：&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;Id:900909 When:(1/1/2019 6:16:15 PM) Duration:41564us Command:(Llen PRIVATE ARG)
+&lt;pre&gt;&lt;code&gt;Id:900909 When:(1/1/2019 6:16:15 PM) Duration:41564us Command:(Llen PRIVATE ARG)
 Id:900908 When:(1/1/2019 6:16:14 PM) Duration:17041us Command:(get PRIVATE ARG)
 Id:900907 When:(1/1/2019 6:16:14 PM) Duration:51032us Command:(get PRIVATE ARG)
 Id:900906 When:(1/1/2019 6:16:12 PM) Duration:49292us Command:(get PRIVATE ARG)
@@ -41,9 +27,8 @@ Id:900904 When:(1/1/2019 6:16:10 PM) Duration:10562us Command:(get PRIVATE ARG)
 Id:900903 When:(1/1/2019 6:16:10 PM) Duration:35680us Command:(get PRIVATE ARG)
 Id:900902 When:(1/1/2019 6:16:10 PM) Duration:16367us Command:(get PRIVATE ARG)
 Id:900901 When:(1/1/2019 6:16:10 PM) Duration:29851us Command:(Llen PRIVATE ARG)
-Id:900900 When:(1/1/2019 6:16:08 PM) Duration:29050us Command:(get PRIVATE ARG)&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;</description>
+Id:900900 When:(1/1/2019 6:16:08 PM) Duration:29050us Command:(get PRIVATE ARG)
+&lt;/code&gt;&lt;/pre&gt;</description>
     </item>
     
     <item>
@@ -53,8 +38,7 @@ Id:900900 When:(1/1/2019 6:16:08 PM) Duration:29050us Command:(get PRIVATE ARG)&
       
       <guid>https://hellokangning.github.io/zh/post/100-server-load-because-of-redis-sync/</guid>
       <description>&lt;p&gt;今天一早，就有客户来报说机器负载 100%。从日志中看到的现象是，Slave 向 Master 请求部分同步，Master 却要求 Slave 做个全套：全量同步，因为 Slave 发过来的 replication ID 太老了。Slave 说好吧，整个全的，然后消费成功。接着，Slave 还想来个部分同步，上述的过程连续发生 3 次。Master 有点强买强卖的意思了，这样一来两边的 CPU 不干了，这不是加班嘛！二者之间的网络带宽也是突增，从下图可以看出：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://hellokangning.github.io/images/redis-network-bandwidth-spiking.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;</description>
+&lt;p&gt;&lt;img src=&#34;https://hellokangning.github.io/images/redis-network-bandwidth-spiking.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;</description>
     </item>
     
   </channel>

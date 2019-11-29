@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.59.1 with theme even" />
+<meta name="generator" content="Hugo 0.60.0 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/en/post/when-python-executes-decorators/" />
@@ -46,16 +46,13 @@
 <meta property="article:modified_time" content="2018-10-29T14:55:25+08:00" />
 <meta itemprop="name" content="When Python Executes Decorators">
 <meta itemprop="description" content="A key feature of decorators is that they run right after the decorated function is defined. This is usually at import time.">
-
-
 <meta itemprop="datePublished" content="2018-10-29T14:55:25&#43;08:00" />
 <meta itemprop="dateModified" content="2018-10-29T14:55:25&#43;08:00" />
-<meta itemprop="wordCount" content="449">
+<meta itemprop="wordCount" content="433">
 
 
 
-<meta itemprop="keywords" content="" />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="When Python Executes Decorators"/>
 <meta name="twitter:description" content="A key feature of decorators is that they run right after the decorated function is defined. This is usually at import time."/>
 
@@ -131,7 +128,7 @@
         <div class="post-category">
             <a href="/en/categories/python/"> Python </a>
             </div>
-          <span class="more-meta"> 449 words </span>
+          <span class="more-meta"> 433 words </span>
           <span class="more-meta"> 3 mins read </span>
         
       </div>
@@ -140,11 +137,10 @@
     
     <div class="post-content">
       <p>A key feature of decorators is that they run right after the decorated function is defined. This is usually at import time.</p>
-
 <p>What is the output of the following code?</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -172,87 +168,55 @@
 </span><span class="lnt">26
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="n">registry</span> <span class="o">=</span> <span class="p">[]</span>
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="n">registry</span> <span class="o">=</span> <span class="p">[</span><span class="p">]</span>
 
-<span class="k">def</span> <span class="nf">register</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;running register(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">func</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">register</span><span class="p">(</span><span class="n">func</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">running register(</span><span class="si">%s</span><span class="s1">)</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">func</span><span class="p">)</span>
     <span class="n">registry</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">func</span>
 
 <span class="nd">@register</span>
-<span class="k">def</span> <span class="nf">f1</span><span class="p">():</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;running f1()&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">f1</span><span class="p">(</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">running f1()</span><span class="s1">&#39;</span><span class="p">)</span>
 
 <span class="nd">@register</span>
-<span class="k">def</span> <span class="nf">f2</span><span class="p">():</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;running f2()&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">f2</span><span class="p">(</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">running f2()</span><span class="s1">&#39;</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">f3</span><span class="p">():</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;running f3()&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">f3</span><span class="p">(</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">running f3()</span><span class="s1">&#39;</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;registry -&gt;&#39;</span><span class="p">,</span> <span class="n">registry</span><span class="p">)</span>
-    <span class="n">f1</span><span class="p">()</span>
-    <span class="n">f2</span><span class="p">()</span>
-    <span class="n">f3</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">registry -&gt;</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">registry</span><span class="p">)</span>
+    <span class="n">f1</span><span class="p">(</span><span class="p">)</span>
+    <span class="n">f2</span><span class="p">(</span><span class="p">)</span>
+    <span class="n">f3</span><span class="p">(</span><span class="p">)</span>
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="n">main</span><span class="p">()</span></code></pre></td></tr></table>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="sa"></span><span class="s1">&#39;</span><span class="s1">__main__</span><span class="s1">&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">(</span><span class="p">)</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>The result may surprise you.</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span></pre></td>
-<td class="lntd">
-<pre class="chroma">running register(&lt;function f1 at 0x1055ae378&gt;)
+</div><p>The result may surprise you.</p>
+<pre><code>running register(&lt;function f1 at 0x1055ae378&gt;)
 running register(&lt;function f2 at 0x1055ae400&gt;)
 registry -&gt; [&lt;function f1 at 0x1055ae378&gt;, &lt;function f2 at 0x1055ae400&gt;]
 running f1()
-running f2()</pre></td></tr></table>
-</div>
-</div>
-<p>Note that <code>register</code> runs twice before any other function in the module. It infers that decorators run right after the decorated function is defined. This is usually at import time, when a module is loaded by Python.</p>
-
+running f2()
+</code></pre><p>Note that <code>register</code> runs twice before any other function in the module. It infers that decorators run right after the decorated function is defined. This is usually at import time, when a module is loaded by Python.</p>
 <p>Save the above code in <code>registration.py</code> file and import it as a script:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></pre></td>
-<td class="lntd">
-<pre class="chroma">&gt;&gt;&gt; import registration
+<pre><code>&gt;&gt;&gt; import registration
 running register(&lt;function f1 at 0x104679840&gt;)
-running register(&lt;function f2 at 0x1046798c8&gt;)</pre></td></tr></table>
-</div>
-</div>
-<p>At this time, if you look at the variable <code>registry</code>, here is that you get:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span><span class="lnt">2
-</span></pre></td>
-<td class="lntd">
-<pre class="chroma">&gt;&gt;&gt; registration.registry
-[&lt;function f1 at 0x104679840&gt;, &lt;function f2 at 0x1046798c8&gt;]</pre></td></tr></table>
-</div>
-</div>
-<p>The function decorators are executed as soon as the module is imported, but the decorated functions only run when they are explicitly invoked.</p>
-
+running register(&lt;function f2 at 0x1046798c8&gt;)
+</code></pre><p>At this time, if you look at the variable <code>registry</code>, here is that you get:</p>
+<pre><code>&gt;&gt;&gt; registration.registry
+[&lt;function f1 at 0x104679840&gt;, &lt;function f2 at 0x1046798c8&gt;]
+</code></pre><p>The function decorators are executed as soon as the module is imported, but the decorated functions only run when they are explicitly invoked.</p>
 <p>Similar decorators are used in many Python Web frameworks to add functions to some central registry, for example, a registry mapping URL patterns to functions that generate HTTP responses.</p>
-
-<p>Back to <a href="https://hellokangning.github.io/en/post/design-patterns-with-first-class-functions/">Refactoring Strategy</a>, it&rsquo;s difficult to compute the highest discount applicable. You must append all strategy functions to one list manually.</p>
-
+<p>Back to <a href="https://hellokangning.github.io/en/post/design-patterns-with-first-class-functions/">Refactoring Strategy</a>, it's difficult to compute the highest discount applicable. You must append all strategy functions to one list manually.</p>
 <p>We can solve this problem with a registration decorator.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -292,44 +256,45 @@ running register(&lt;function f2 at 0x1046798c8&gt;)</pre></td></tr></table>
 </span><span class="lnt">38
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="n">promos</span> <span class="o">=</span> <span class="p">[]</span>
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="n">promos</span> <span class="o">=</span> <span class="p">[</span><span class="p">]</span>
 
-<span class="k">def</span> <span class="nf">promotion</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">promotion</span><span class="p">(</span><span class="n">func</span><span class="p">)</span><span class="p">:</span>
     <span class="n">promos</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">func</span>
 
 <span class="nd">@promotion</span>
-<span class="k">def</span> <span class="nf">fidelityPromo</span><span class="p">(</span><span class="n">order</span><span class="p">):</span>
-    <span class="s2">&#34;&#34;&#34;
-</span><span class="s2">    5</span><span class="si">% d</span><span class="s2">iscount for customers with 1000 or more fidelity points
-</span><span class="s2">    &#34;&#34;&#34;</span>
-    <span class="k">return</span> <span class="n">order</span><span class="o">.</span><span class="n">total</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.05</span> <span class="k">if</span> <span class="n">order</span><span class="o">.</span><span class="n">customer</span><span class="o">.</span><span class="n">fidelity</span> <span class="o">&gt;=</span> <span class="mi">1000</span> <span class="k">else</span> <span class="mi">0</span>
+<span class="k">def</span> <span class="nf">fidelityPromo</span><span class="p">(</span><span class="n">order</span><span class="p">)</span><span class="p">:</span>
+    <span class="sa"></span><span class="s2">&#34;&#34;&#34;</span><span class="s2">
+</span><span class="s2"></span><span class="s2">    5</span><span class="si">% d</span><span class="s2">iscount for customers with 1000 or more fidelity points</span><span class="s2">
+</span><span class="s2"></span><span class="s2">    </span><span class="s2">&#34;&#34;&#34;</span>
+    <span class="k">return</span> <span class="n">order</span><span class="o">.</span><span class="n">total</span><span class="p">(</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.05</span> <span class="k">if</span> <span class="n">order</span><span class="o">.</span><span class="n">customer</span><span class="o">.</span><span class="n">fidelity</span> <span class="o">&gt;</span><span class="o">=</span> <span class="mi">1000</span> <span class="k">else</span> <span class="mi">0</span>
 
 <span class="nd">@promotion</span>
-<span class="k">def</span> <span class="nf">bulkItemPromo</span><span class="p">(</span><span class="n">order</span><span class="p">):</span>
-    <span class="s2">&#34;&#34;&#34;
-</span><span class="s2">    10</span><span class="si">% d</span><span class="s2">iscount for each LineItem with 20 or more units
-</span><span class="s2">    &#34;&#34;&#34;</span>
+<span class="k">def</span> <span class="nf">bulkItemPromo</span><span class="p">(</span><span class="n">order</span><span class="p">)</span><span class="p">:</span>
+    <span class="sa"></span><span class="s2">&#34;&#34;&#34;</span><span class="s2">
+</span><span class="s2"></span><span class="s2">    10</span><span class="si">% d</span><span class="s2">iscount for each LineItem with 20 or more units</span><span class="s2">
+</span><span class="s2"></span><span class="s2">    </span><span class="s2">&#34;&#34;&#34;</span>
     <span class="n">discount</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">order</span><span class="o">.</span><span class="n">cart</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">quantity</span> <span class="o">&gt;=</span> <span class="mi">20</span><span class="p">:</span>
-            <span class="n">discount</span> <span class="o">+=</span> <span class="n">item</span><span class="o">.</span><span class="n">total</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.1</span>
+        <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">quantity</span> <span class="o">&gt;</span><span class="o">=</span> <span class="mi">20</span><span class="p">:</span>
+            <span class="n">discount</span> <span class="o">+</span><span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">total</span><span class="p">(</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.1</span>
 
     <span class="k">return</span> <span class="n">discount</span>
 
 <span class="nd">@promotion</span>
-<span class="k">def</span> <span class="nf">largeOrderPromo</span><span class="p">(</span><span class="n">order</span><span class="p">):</span>
-    <span class="s2">&#34;&#34;&#34;
-</span><span class="s2">    7</span><span class="si">% d</span><span class="s2">iscount for orders with 10 or more distinct items
-</span><span class="s2">    &#34;&#34;&#34;</span>
+<span class="k">def</span> <span class="nf">largeOrderPromo</span><span class="p">(</span><span class="n">order</span><span class="p">)</span><span class="p">:</span>
+    <span class="sa"></span><span class="s2">&#34;&#34;&#34;</span><span class="s2">
+</span><span class="s2"></span><span class="s2">    7</span><span class="si">% d</span><span class="s2">iscount for orders with 10 or more distinct items</span><span class="s2">
+</span><span class="s2"></span><span class="s2">    </span><span class="s2">&#34;&#34;&#34;</span>
     <span class="n">distinctItems</span> <span class="o">=</span> <span class="p">{</span><span class="n">item</span><span class="o">.</span><span class="n">product</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">order</span><span class="o">.</span><span class="n">cart</span><span class="p">}</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">distinctItems</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">10</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">order</span><span class="o">.</span><span class="n">total</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.07</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">distinctItems</span><span class="p">)</span> <span class="o">&gt;</span><span class="o">=</span> <span class="mi">10</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">order</span><span class="o">.</span><span class="n">total</span><span class="p">(</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.07</span>
 
     <span class="k">return</span> <span class="mi">0</span>
 
-<span class="k">def</span> <span class="nf">bestPromo</span><span class="p">(</span><span class="n">order</span><span class="p">):</span>
-    <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">promo</span><span class="p">(</span><span class="n">order</span><span class="p">)</span> <span class="k">for</span> <span class="n">promo</span> <span class="ow">in</span> <span class="n">promos</span><span class="p">)</span></code></pre></td></tr></table>
+<span class="k">def</span> <span class="nf">bestPromo</span><span class="p">(</span><span class="n">order</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">promo</span><span class="p">(</span><span class="n">order</span><span class="p">)</span> <span class="k">for</span> <span class="n">promo</span> <span class="ow">in</span> <span class="n">promos</span><span class="p">)</span>
+</code></pre></td></tr></table>
 </div>
 </div>
     </div>

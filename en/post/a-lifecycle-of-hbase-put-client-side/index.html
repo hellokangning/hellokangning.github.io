@@ -16,7 +16,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
 
-<meta name="author" content="Guoqing Geng" /><meta name="description" content="Put is used to perform insert or update a single row of HBase table. It&amp;rsquo;s essential to understand its lifecycle, which can be broke into two pieces,
+<meta name="author" content="Guoqing Geng" /><meta name="description" content="Put is used to perform insert or update a single row of HBase table. It&#39;s essential to understand its lifecycle, which can be broke into two pieces,
  Client-side, How the put request is built up and sent to the right RegionServer. Server-side, How the RegionServer handle the Put request and update one row.  In view of the limitation of one single post, the client-side is discussed only.
 " /><meta name="keywords" content="HBase" />
 
@@ -25,7 +25,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.59.1 with theme even" />
+<meta name="generator" content="Hugo 0.60.0 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/en/post/a-lifecycle-of-hbase-put-client-side/" />
@@ -41,12 +41,10 @@
 
 
 <meta property="og:title" content="A Lifecycle of HBase&#39;s Put: Client-side" />
-<meta property="og:description" content="Put is used to perform insert or update a single row of HBase table. It&rsquo;s essential to understand its lifecycle, which can be broke into two pieces,
-
+<meta property="og:description" content="Put is used to perform insert or update a single row of HBase table. It&#39;s essential to understand its lifecycle, which can be broke into two pieces,
 
 Client-side, How the put request is built up and sent to the right RegionServer.
 Server-side, How the RegionServer handle the Put request and update one row.
-
 
 In view of the limitation of one single post, the client-side is discussed only." />
 <meta property="og:type" content="article" />
@@ -54,31 +52,24 @@ In view of the limitation of one single post, the client-side is discussed only.
 <meta property="article:published_time" content="2017-11-24T11:38:14+08:00" />
 <meta property="article:modified_time" content="2017-12-07T10:38:14+08:00" />
 <meta itemprop="name" content="A Lifecycle of HBase&#39;s Put: Client-side">
-<meta itemprop="description" content="Put is used to perform insert or update a single row of HBase table. It&rsquo;s essential to understand its lifecycle, which can be broke into two pieces,
-
+<meta itemprop="description" content="Put is used to perform insert or update a single row of HBase table. It&#39;s essential to understand its lifecycle, which can be broke into two pieces,
 
 Client-side, How the put request is built up and sent to the right RegionServer.
 Server-side, How the RegionServer handle the Put request and update one row.
 
-
 In view of the limitation of one single post, the client-side is discussed only.">
-
-
 <meta itemprop="datePublished" content="2017-11-24T11:38:14&#43;08:00" />
 <meta itemprop="dateModified" content="2017-12-07T10:38:14&#43;08:00" />
 <meta itemprop="wordCount" content="2223">
 
 
 
-<meta itemprop="keywords" content="" />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="A Lifecycle of HBase&#39;s Put: Client-side"/>
-<meta name="twitter:description" content="Put is used to perform insert or update a single row of HBase table. It&rsquo;s essential to understand its lifecycle, which can be broke into two pieces,
-
+<meta name="twitter:description" content="Put is used to perform insert or update a single row of HBase table. It&#39;s essential to understand its lifecycle, which can be broke into two pieces,
 
 Client-side, How the put request is built up and sent to the right RegionServer.
 Server-side, How the RegionServer handle the Put request and update one row.
-
 
 In view of the limitation of one single post, the client-side is discussed only."/>
 
@@ -163,33 +154,19 @@ In view of the limitation of one single post, the client-side is discussed only.
     <div class="post-toc" id="post-toc">
   <h2 class="post-toc-title">Contents</h2>
   <div class="post-toc-content always-active">
-    <nav id="TableOfContents">
-<ul>
-<li><a href="#table"><code>Table</code></a></li>
-<li><a href="#rpcretryingcaller"><code>RpcRetryingCaller</code></a></li>
-<li><a href="#servercallable"><code>ServerCallable</code></a></li>
-<li><a href="#rpccontroller"><code>RpcController</code></a></li>
-<li><a href="#connection"><code>Connection</code></a></li>
-</ul>
-</nav>
+    <nav id="TableOfContents"></nav>
   </div>
 </div>
     <div class="post-content">
-      <p><code>Put</code> is used to perform insert or update a single row of HBase table. It&rsquo;s essential to understand its lifecycle, which can be broke into two pieces,</p>
-
+      <p><code>Put</code> is used to perform insert or update a single row of HBase table. It's essential to understand its lifecycle, which can be broke into two pieces,</p>
 <ol>
 <li>Client-side, How the <code>put</code> request is built up and sent to the right <code>RegionServer</code>.</li>
 <li>Server-side, How the <code>RegionServer</code> handle the <code>Put</code> request and update one row.</li>
 </ol>
-
 <p>In view of the limitation of one single post, the client-side is discussed only.</p>
-
 <p>A sequence diagram elucidates the interaction between class, so it emerges firstly.</p>
-
-<p><img src="/images/hbase-client-put-sequence.png" alt="" /></p>
-
+<p><img src="/images/hbase-client-put-sequence.png" alt=""></p>
 <p>The roles involves this interaction, we can see from above diagram, are,</p>
-
 <ul>
 <li><code>HTable</code>, launch a <code>Put</code> operation.</li>
 <li><code>ServerCallable</code>, is constructed in <code>HTable</code>, then it builds up mutation request.</li>
@@ -197,19 +174,14 @@ In view of the limitation of one single post, the client-side is discussed only.
 <li><code>Connection</code>, finds the destination <code>RegionServer</code> and return it to <code>RpcRetryingCaller</code>.</li>
 <li><code>RpcController</code>, set the RPC properties before it is sent.</li>
 </ul>
-
 <p>So far, A more complicated class diagram is needed,</p>
-
-<p><img src="/images/hbase-client-put-class.png" alt="" /></p>
-
+<p><img src="/images/hbase-client-put-class.png" alt=""></p>
 <p>Then, please allow me to show the source code, since it never lies.</p>
-
 <h1 id="table"><code>Table</code></h1>
-
 <p><code>Table</code> is used to communicate with a single HBase table, and obtained an instance from a <code>Connection</code>. <code>Table</code> interface has two methods about <code>Put</code>, one for single operation, the other for batch puts.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -228,25 +200,24 @@ In view of the limitation of one single post, the client-side is discussed only.
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// Table.java
 </span><span class="c1"></span>
 <span class="nd">@InterfaceAudience.Public</span>
-<span class="err">public interface Table extends </span><span class="n">Closeable</span> <span class="p">{</span>
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">Table</span> <span class="kd">extends</span> <span class="n">Closeable</span> <span class="o">{</span>
   <span class="cm">/**
 </span><span class="cm">   * Puts some data in the table.
 </span><span class="cm">   */</span>
-  <span class="err">void put</span><span class="p">(</span><span class="err">Put put</span><span class="p">)</span> <span class="err">throws IOException</span><span class="p">;</span>
+  <span class="kt">void</span> <span class="nf">put</span><span class="o">(</span><span class="n">Put</span> <span class="n">put</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
 
   <span class="cm">/**
 </span><span class="cm">   * Batch puts the specified data into the table.
 </span><span class="cm">   */</span>
-  <span class="err">void put</span><span class="p">(</span><span class="err">List&lt;Put&gt; puts</span><span class="p">)</span> <span class="err">throws IOException</span><span class="p">;</span>
-<span class="p">}</span></code></pre></td></tr></table>
+  <span class="kt">void</span> <span class="nf">put</span><span class="o">(</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Put</span><span class="o">&gt;</span> <span class="n">puts</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><code>HTable</code> is an implementation of <code>Table</code> and overrides these two methods. It&rsquo;s very lightweight(Many thanks to <code>ThreadPoolExecutor</code>). Get as needed and just close when done.</p>
-
-<p>In this post, it excludes batch puts which is a totally different story in contrast with single row&rsquo;s put.</p>
+</div><p><code>HTable</code> is an implementation of <code>Table</code> and overrides these two methods. It's very lightweight(Many thanks to <code>ThreadPoolExecutor</code>). Get as needed and just close when done.</p>
+<p>In this post, it excludes batch puts which is a totally different story in contrast with single row's put.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -294,64 +265,59 @@ In view of the limitation of one single post, the client-side is discussed only.
 </span><span class="c1"></span>
 <span class="nd">@InterfaceAudience.Private</span>
 <span class="nd">@InterfaceStability.Stable</span>
-<span class="err">public class HTable implements </span><span class="n">Table</span> <span class="p">{</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">HTable</span> <span class="kd">implements</span> <span class="n">Table</span> <span class="o">{</span>
 
-  <span class="err">private final ClusterConnection connection</span><span class="p">;</span>
+  <span class="kd">private</span> <span class="kd">final</span> <span class="n">ClusterConnection</span> <span class="n">connection</span><span class="o">;</span>
 
   <span class="nd">@Override</span>
-  <span class="err">public void </span><span class="n">put</span><span class="p">(</span><span class="err">final Put </span><span class="n">put</span><span class="p">)</span> <span class="err">throws IOException </span><span class="p">{</span>
-    <span class="n">validatePut</span><span class="p">(</span><span class="n">put</span><span class="p">);</span>
-    <span class="err">ClientServiceCallable&lt;Void&gt; callable </span><span class="o">=</span>
-        <span class="k">new</span> <span class="n">ClientServiceCallable</span><span class="o">&lt;</span><span class="n">Void</span><span class="o">&gt;</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="na">connection</span><span class="p">,</span> <span class="n">getName</span><span class="p">(),</span> <span class="n">put</span><span class="p">.</span><span class="na">getRow</span><span class="p">(),</span>
-            <span class="k">this</span><span class="p">.</span><span class="na">rpcControllerFactory</span><span class="p">.</span><span class="na">newController</span><span class="p">(),</span> <span class="n">put</span><span class="p">.</span><span class="na">getPriority</span><span class="p">())</span> <span class="p">{</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">put</span><span class="o">(</span><span class="kd">final</span> <span class="n">Put</span> <span class="n">put</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+    <span class="n">validatePut</span><span class="o">(</span><span class="n">put</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">ClientServiceCallable</span><span class="o">&lt;</span><span class="n">Void</span><span class="o">&gt;</span> <span class="n">callable</span> <span class="o">=</span>
+        <span class="k">new</span> <span class="n">ClientServiceCallable</span><span class="o">&lt;</span><span class="n">Void</span><span class="o">&gt;</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">connection</span><span class="o">,</span> <span class="n">getName</span><span class="o">(</span><span class="o">)</span><span class="o">,</span> <span class="n">put</span><span class="o">.</span><span class="na">getRow</span><span class="o">(</span><span class="o">)</span><span class="o">,</span>
+            <span class="k">this</span><span class="o">.</span><span class="na">rpcControllerFactory</span><span class="o">.</span><span class="na">newController</span><span class="o">(</span><span class="o">)</span><span class="o">,</span> <span class="n">put</span><span class="o">.</span><span class="na">getPriority</span><span class="o">(</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
           <span class="nd">@Override</span>
-          <span class="err">protected Void </span><span class="n">rpcCall</span><span class="p">()</span> <span class="err">throws Exception </span><span class="p">{</span>
-            <span class="err">MutateRequest request </span><span class="o">=</span>
-                <span class="n">RequestConverter</span><span class="p">.</span><span class="na">buildMutateRequest</span><span class="p">(</span><span class="n">getLocation</span><span class="p">().</span><span class="na">getRegionInfo</span><span class="p">().</span><span class="na">getRegionName</span><span class="p">(),</span>
-                  <span class="n">put</span><span class="p">);</span>
-            <span class="n">doMutate</span><span class="p">(</span><span class="n">request</span><span class="p">);</span>
-            <span class="k">return</span> <span class="kc">null</span><span class="p">;</span>
-          <span class="p">}</span>
-        <span class="p">};</span>
-    <span class="err">rpcCallerFactory.&lt;Void&gt; newCaller</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="na">writeRpcTimeoutMs</span><span class="p">).</span><span class="na">callWithRetries</span><span class="p">(</span><span class="n">callable</span><span class="p">,</span>
-      <span class="k">this</span><span class="p">.</span><span class="na">operationTimeoutMs</span><span class="p">);</span>
-  <span class="p">}</span>
+          <span class="kd">protected</span> <span class="n">Void</span> <span class="nf">rpcCall</span><span class="o">(</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+            <span class="n">MutateRequest</span> <span class="n">request</span> <span class="o">=</span>
+                <span class="n">RequestConverter</span><span class="o">.</span><span class="na">buildMutateRequest</span><span class="o">(</span><span class="n">getLocation</span><span class="o">(</span><span class="o">)</span><span class="o">.</span><span class="na">getRegionInfo</span><span class="o">(</span><span class="o">)</span><span class="o">.</span><span class="na">getRegionName</span><span class="o">(</span><span class="o">)</span><span class="o">,</span>
+                  <span class="n">put</span><span class="o">)</span><span class="o">;</span>
+            <span class="n">doMutate</span><span class="o">(</span><span class="n">request</span><span class="o">)</span><span class="o">;</span>
+            <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+          <span class="o">}</span>
+        <span class="o">}</span><span class="o">;</span>
+    <span class="n">rpcCallerFactory</span><span class="o">.</span><span class="o">&lt;</span><span class="n">Void</span><span class="o">&gt;</span> <span class="nf">newCaller</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">writeRpcTimeoutMs</span><span class="o">)</span><span class="o">.</span><span class="na">callWithRetries</span><span class="o">(</span><span class="n">callable</span><span class="o">,</span>
+      <span class="k">this</span><span class="o">.</span><span class="na">operationTimeoutMs</span><span class="o">)</span><span class="o">;</span>
+  <span class="o">}</span>
 
-  <span class="err">public static void validatePut</span><span class="p">(</span><span class="err">Put put</span><span class="p">,</span> <span class="err">int maxKeyValueSize</span><span class="p">)</span> <span class="err">throws IllegalArgumentException </span><span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">put</span><span class="p">.</span><span class="na">isEmpty</span><span class="p">())</span> <span class="p">{</span>
-      <span class="k">throw</span> <span class="k">new</span> <span class="n">IllegalArgumentException</span><span class="p">(</span><span class="s">&#34;No columns to insert&#34;</span><span class="p">);</span>
-    <span class="p">}</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">maxKeyValueSize</span> <span class="o">&gt;</span> <span class="n">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">for</span> <span class="p">(</span><span class="err">List&lt;Cell&gt; list </span><span class="o">:</span> <span class="n">put</span><span class="p">.</span><span class="na">getFamilyCellMap</span><span class="p">().</span><span class="na">values</span><span class="p">())</span> <span class="p">{</span>
-        <span class="k">for</span> <span class="p">(</span><span class="err">Cell cell </span><span class="o">:</span> <span class="n">list</span><span class="p">)</span> <span class="p">{</span>
-          <span class="k">if</span> <span class="p">(</span><span class="n">KeyValueUtil</span><span class="p">.</span><span class="na">length</span><span class="p">(</span><span class="n">cell</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">maxKeyValueSize</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="n">IllegalArgumentException</span><span class="p">(</span><span class="s">&#34;KeyValue size too large&#34;</span><span class="p">);</span>
-          <span class="p">}</span>
-        <span class="p">}</span>
-      <span class="p">}</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-<span class="p">}</span></code></pre></td></tr></table>
+  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">validatePut</span><span class="o">(</span><span class="n">Put</span> <span class="n">put</span><span class="o">,</span> <span class="kt">int</span> <span class="n">maxKeyValueSize</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IllegalArgumentException</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">put</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">(</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">throw</span> <span class="k">new</span> <span class="n">IllegalArgumentException</span><span class="o">(</span><span class="s">&#34;No columns to insert&#34;</span><span class="o">)</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">maxKeyValueSize</span> <span class="o">&gt;</span> <span class="n">0</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">for</span> <span class="o">(</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Cell</span><span class="o">&gt;</span> <span class="n">list</span> <span class="o">:</span> <span class="n">put</span><span class="o">.</span><span class="na">getFamilyCellMap</span><span class="o">(</span><span class="o">)</span><span class="o">.</span><span class="na">values</span><span class="o">(</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">for</span> <span class="o">(</span><span class="n">Cell</span> <span class="n">cell</span> <span class="o">:</span> <span class="n">list</span><span class="o">)</span> <span class="o">{</span>
+          <span class="k">if</span> <span class="o">(</span><span class="n">KeyValueUtil</span><span class="o">.</span><span class="na">length</span><span class="o">(</span><span class="n">cell</span><span class="o">)</span> <span class="o">&gt;</span> <span class="n">maxKeyValueSize</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="n">IllegalArgumentException</span><span class="o">(</span><span class="s">&#34;KeyValue size too large&#34;</span><span class="o">)</span><span class="o">;</span>
+          <span class="o">}</span>
+        <span class="o">}</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>We can lightly list the steps of what <code>put</code> method does,</p>
-
+</div><p>We can lightly list the steps of what <code>put</code> method does,</p>
 <ol>
 <li>validate this put.</li>
 <li>new a <code>ClientServiceCallable</code> with parameter <code>Connection</code>, <code>RpcControlelr</code>. and override its <code>rpcCall</code> method.</li>
-<li>new a <code>RpcRetryingCaller</code> from <code>RpcCallerFactory</code> and call the caller&rsquo;s <code>callWithRetries</code>, passing callable, initialized from step 2, to it.</li>
+<li>new a <code>RpcRetryingCaller</code> from <code>RpcCallerFactory</code> and call the caller's <code>callWithRetries</code>, passing callable, initialized from step 2, to it.</li>
 </ol>
-
 <p>Take a glimpse on <code>validatePut</code>. It checks if this put is empty, then iterates all the values, if non-empty, to make sure the they are all smaller than maximum Key-Value size, which is configured before.</p>
-
-<p>Let&rsquo;s skip <code>ServerCallable</code>, which we will take a close look later, and deep into <code>RpcRetryingCaller</code> first, considering <code>callWithRetries</code> method in <code>RpcRetryingCaller</code> takes <code>ServerCallable</code> as an input parameter.</p>
-
+<p>Let's skip <code>ServerCallable</code>, which we will take a close look later, and deep into <code>RpcRetryingCaller</code> first, considering <code>callWithRetries</code> method in <code>RpcRetryingCaller</code> takes <code>ServerCallable</code> as an input parameter.</p>
 <h1 id="rpcretryingcaller"><code>RpcRetryingCaller</code></h1>
-
 <p><code>RpcRetryingCaller</code> is also an interface without any member field. it leaves unimplemented <code>callWithRetries</code> to its implementation, <code>RpcRetryingCallerImpl</code>.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -367,20 +333,20 @@ In view of the limitation of one single post, the client-side is discussed only.
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// RpcRetryingCaller.java
 </span><span class="c1"></span>
 <span class="nd">@InterfaceAudience.Public</span>
-<span class="err">public interface </span><span class="n">RpcRetryingCaller</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="p">{</span>
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">RpcRetryingCaller</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="o">{</span>
 
   <span class="cm">/**
 </span><span class="cm">   * Retries if invocation fails.
 </span><span class="cm">   */</span>
-  <span class="err">T callWithRetries</span><span class="p">(</span><span class="err">RetryingCallable&lt;T&gt; callable</span><span class="p">,</span> <span class="err">int callTimeout</span><span class="p">)</span>
-  <span class="err">throws IOException</span><span class="p">,</span> <span class="n">RuntimeException</span><span class="p">;</span>
-<span class="p">}</span></code></pre></td></tr></table>
+  <span class="n">T</span> <span class="nf">callWithRetries</span><span class="o">(</span><span class="n">RetryingCallable</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">callable</span><span class="o">,</span> <span class="kt">int</span> <span class="n">callTimeout</span><span class="o">)</span>
+  <span class="kd">throws</span> <span class="n">IOException</span><span class="o">,</span> <span class="n">RuntimeException</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>We can slide over other code snippets and look through <code>callWithRetries</code> method.</p>
+</div><p>We can slide over other code snippets and look through <code>callWithRetries</code> method.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -457,87 +423,87 @@ In view of the limitation of one single post, the client-side is discussed only.
 </span><span class="lnt">75
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="err">public class RpcRetryingCallerImpl&lt;T&gt; implements </span><span class="n">RpcRetryingCaller</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="p">{</span>
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">RpcRetryingCallerImpl</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="kd">implements</span> <span class="n">RpcRetryingCaller</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="o">{</span>
   <span class="nd">@Override</span>
-  <span class="err">public T </span><span class="n">callWithRetries</span><span class="p">(</span><span class="err">RetryingCallable&lt;T&gt; callable</span><span class="p">,</span> <span class="err">int callTimeout</span><span class="p">)</span>
-  <span class="err">throws IOException</span><span class="p">,</span> <span class="n">RuntimeException</span> <span class="p">{</span>
-    <span class="err">List&lt;RetriesExhaustedException.ThrowableWithExtraContext&gt; exceptions </span><span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
-    <span class="n">tracker</span><span class="p">.</span><span class="na">start</span><span class="p">();</span>
-    <span class="n">context</span><span class="p">.</span><span class="na">clear</span><span class="p">();</span>
-    <span class="k">for</span> <span class="p">(</span><span class="err">int tries </span><span class="o">=</span> <span class="n">0</span><span class="p">;;</span> <span class="n">tries</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-      <span class="err">long expectedSleep</span><span class="p">;</span>
-      <span class="k">try</span> <span class="p">{</span>
+  <span class="kd">public</span> <span class="n">T</span> <span class="nf">callWithRetries</span><span class="o">(</span><span class="n">RetryingCallable</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">callable</span><span class="o">,</span> <span class="kt">int</span> <span class="n">callTimeout</span><span class="o">)</span>
+  <span class="kd">throws</span> <span class="n">IOException</span><span class="o">,</span> <span class="n">RuntimeException</span> <span class="o">{</span>
+    <span class="n">List</span><span class="o">&lt;</span><span class="n">RetriesExhaustedException</span><span class="o">.</span><span class="na">ThrowableWithExtraContext</span><span class="o">&gt;</span> <span class="n">exceptions</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="o">&gt;</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">tracker</span><span class="o">.</span><span class="na">start</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">context</span><span class="o">.</span><span class="na">clear</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">tries</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span><span class="o">;</span> <span class="n">tries</span><span class="o">+</span><span class="o">+</span><span class="o">)</span> <span class="o">{</span>
+      <span class="kt">long</span> <span class="n">expectedSleep</span><span class="o">;</span>
+      <span class="k">try</span> <span class="o">{</span>
         <span class="c1">// bad cache entries are cleared in the call to RetryingCallable#throwable() in catch block
-</span><span class="c1"></span>        <span class="n">callable</span><span class="p">.</span><span class="na">prepare</span><span class="p">(</span><span class="n">tries</span> <span class="o">!=</span> <span class="n">0</span><span class="p">);</span>
-        <span class="n">interceptor</span><span class="p">.</span><span class="na">intercept</span><span class="p">(</span><span class="n">context</span><span class="p">.</span><span class="na">prepare</span><span class="p">(</span><span class="n">callable</span><span class="p">,</span> <span class="n">tries</span><span class="p">));</span>
-        <span class="k">return</span> <span class="n">callable</span><span class="p">.</span><span class="na">call</span><span class="p">(</span><span class="n">getTimeout</span><span class="p">(</span><span class="n">callTimeout</span><span class="p">));</span>
-      <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="err">PreemptiveFastFailException e</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">throw</span> <span class="n">e</span><span class="p">;</span>
-      <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="err">Throwable t</span><span class="p">)</span> <span class="p">{</span>
-        <span class="err">Throwable e </span><span class="o">=</span> <span class="n">t</span><span class="p">.</span><span class="na">getCause</span><span class="p">();</span>
-        <span class="n">ExceptionUtil</span><span class="p">.</span><span class="na">rethrowIfInterrupt</span><span class="p">(</span><span class="n">t</span><span class="p">);</span>
-        <span class="err">Throwable cause </span><span class="o">=</span> <span class="n">t</span><span class="p">.</span><span class="na">getCause</span><span class="p">();</span>
-        <span class="k">if</span> <span class="p">(</span><span class="err">cause instanceof </span><span class="n">DoNotRetryIOException</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="c1"></span>        <span class="n">callable</span><span class="o">.</span><span class="na">prepare</span><span class="o">(</span><span class="n">tries</span> <span class="o">!</span><span class="o">=</span> <span class="n">0</span><span class="o">)</span><span class="o">;</span>
+        <span class="n">interceptor</span><span class="o">.</span><span class="na">intercept</span><span class="o">(</span><span class="n">context</span><span class="o">.</span><span class="na">prepare</span><span class="o">(</span><span class="n">callable</span><span class="o">,</span> <span class="n">tries</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
+        <span class="k">return</span> <span class="n">callable</span><span class="o">.</span><span class="na">call</span><span class="o">(</span><span class="n">getTimeout</span><span class="o">(</span><span class="n">callTimeout</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
+      <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">PreemptiveFastFailException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">throw</span> <span class="n">e</span><span class="o">;</span>
+      <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Throwable</span> <span class="n">t</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">Throwable</span> <span class="n">e</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="na">getCause</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+        <span class="n">ExceptionUtil</span><span class="o">.</span><span class="na">rethrowIfInterrupt</span><span class="o">(</span><span class="n">t</span><span class="o">)</span><span class="o">;</span>
+        <span class="n">Throwable</span> <span class="n">cause</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="na">getCause</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">cause</span> <span class="k">instanceof</span> <span class="n">DoNotRetryIOException</span><span class="o">)</span> <span class="o">{</span>
           <span class="c1">// Fail fast
-</span><span class="c1"></span>          <span class="k">throw</span> <span class="p">(</span><span class="n">DoNotRetryIOException</span><span class="p">)</span> <span class="n">cause</span><span class="p">;</span>
-        <span class="p">}</span>
+</span><span class="c1"></span>          <span class="k">throw</span> <span class="o">(</span><span class="n">DoNotRetryIOException</span><span class="o">)</span> <span class="n">cause</span><span class="o">;</span>
+        <span class="o">}</span>
         <span class="c1">// translateException throws exception when should not retry: i.e. when request is bad.
-</span><span class="c1"></span>        <span class="n">interceptor</span><span class="p">.</span><span class="na">handleFailure</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">t</span><span class="p">);</span>
-        <span class="n">t</span> <span class="o">=</span> <span class="n">translateException</span><span class="p">(</span><span class="n">t</span><span class="p">);</span>
+</span><span class="c1"></span>        <span class="n">interceptor</span><span class="o">.</span><span class="na">handleFailure</span><span class="o">(</span><span class="n">context</span><span class="o">,</span> <span class="n">t</span><span class="o">)</span><span class="o">;</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">translateException</span><span class="o">(</span><span class="n">t</span><span class="o">)</span><span class="o">;</span>
 
-        <span class="k">if</span> <span class="p">(</span><span class="n">tries</span> <span class="o">&gt;</span> <span class="n">startLogErrorsCnt</span><span class="p">)</span> <span class="p">{</span>
-          <span class="n">LOG</span><span class="p">.</span><span class="na">info</span><span class="p">(</span><span class="s">&#34;Call exception, tries=&#34;</span> <span class="o">+</span> <span class="n">tries</span> <span class="o">+</span> <span class="s">&#34;, maxAttempts=&#34;</span> <span class="o">+</span> <span class="n">maxAttempts</span> <span class="o">+</span> <span class="s">&#34;, started=&#34;</span>
-              <span class="o">+</span> <span class="p">(</span><span class="n">EnvironmentEdgeManager</span><span class="p">.</span><span class="na">currentTime</span><span class="p">()</span> <span class="o">-</span> <span class="n">tracker</span><span class="p">.</span><span class="na">getStartTime</span><span class="p">())</span> <span class="o">+</span> <span class="s">&#34; ms ago, &#34;</span>
-              <span class="o">+</span> <span class="s">&#34;cancelled=&#34;</span> <span class="o">+</span> <span class="n">cancelled</span><span class="p">.</span><span class="na">get</span><span class="p">()</span> <span class="o">+</span> <span class="s">&#34;, msg=&#34;</span>
-              <span class="o">+</span> <span class="n">t</span><span class="p">.</span><span class="na">getMessage</span><span class="p">()</span> <span class="o">+</span> <span class="s">&#34; &#34;</span> <span class="o">+</span> <span class="n">callable</span><span class="p">.</span><span class="na">getExceptionMessageAdditionalDetail</span><span class="p">());</span>
-        <span class="p">}</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">tries</span> <span class="o">&gt;</span> <span class="n">startLogErrorsCnt</span><span class="o">)</span> <span class="o">{</span>
+          <span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&#34;Call exception, tries=&#34;</span> <span class="o">+</span> <span class="n">tries</span> <span class="o">+</span> <span class="s">&#34;, maxAttempts=&#34;</span> <span class="o">+</span> <span class="n">maxAttempts</span> <span class="o">+</span> <span class="s">&#34;, started=&#34;</span>
+              <span class="o">+</span> <span class="o">(</span><span class="n">EnvironmentEdgeManager</span><span class="o">.</span><span class="na">currentTime</span><span class="o">(</span><span class="o">)</span> <span class="o">-</span> <span class="n">tracker</span><span class="o">.</span><span class="na">getStartTime</span><span class="o">(</span><span class="o">)</span><span class="o">)</span> <span class="o">+</span> <span class="s">&#34; ms ago, &#34;</span>
+              <span class="o">+</span> <span class="s">&#34;cancelled=&#34;</span> <span class="o">+</span> <span class="n">cancelled</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="o">)</span> <span class="o">+</span> <span class="s">&#34;, msg=&#34;</span>
+              <span class="o">+</span> <span class="n">t</span><span class="o">.</span><span class="na">getMessage</span><span class="o">(</span><span class="o">)</span> <span class="o">+</span> <span class="s">&#34; &#34;</span> <span class="o">+</span> <span class="n">callable</span><span class="o">.</span><span class="na">getExceptionMessageAdditionalDetail</span><span class="o">(</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
+        <span class="o">}</span>
 
-        <span class="n">callable</span><span class="p">.</span><span class="na">throwable</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">maxAttempts</span> <span class="o">!=</span> <span class="n">1</span><span class="p">);</span>
-        <span class="err">RetriesExhaustedException.ThrowableWithExtraContext qt </span><span class="o">=</span>
-            <span class="k">new</span> <span class="n">RetriesExhaustedException</span><span class="p">.</span><span class="na">ThrowableWithExtraContext</span><span class="p">(</span><span class="n">t</span><span class="p">,</span>
-                <span class="n">EnvironmentEdgeManager</span><span class="p">.</span><span class="na">currentTime</span><span class="p">(),</span> <span class="n">toString</span><span class="p">());</span>
-        <span class="n">exceptions</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="n">qt</span><span class="p">);</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">tries</span> <span class="o">&gt;=</span> <span class="n">maxAttempts</span> <span class="o">-</span> <span class="n">1</span><span class="p">)</span> <span class="p">{</span>
-          <span class="k">throw</span> <span class="k">new</span> <span class="n">RetriesExhaustedException</span><span class="p">(</span><span class="n">tries</span><span class="p">,</span> <span class="n">exceptions</span><span class="p">);</span>
-        <span class="p">}</span>
+        <span class="n">callable</span><span class="o">.</span><span class="na">throwable</span><span class="o">(</span><span class="n">t</span><span class="o">,</span> <span class="n">maxAttempts</span> <span class="o">!</span><span class="o">=</span> <span class="n">1</span><span class="o">)</span><span class="o">;</span>
+        <span class="n">RetriesExhaustedException</span><span class="o">.</span><span class="na">ThrowableWithExtraContext</span> <span class="n">qt</span> <span class="o">=</span>
+            <span class="k">new</span> <span class="n">RetriesExhaustedException</span><span class="o">.</span><span class="na">ThrowableWithExtraContext</span><span class="o">(</span><span class="n">t</span><span class="o">,</span>
+                <span class="n">EnvironmentEdgeManager</span><span class="o">.</span><span class="na">currentTime</span><span class="o">(</span><span class="o">)</span><span class="o">,</span> <span class="n">toString</span><span class="o">(</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
+        <span class="n">exceptions</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">qt</span><span class="o">)</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">tries</span> <span class="o">&gt;</span><span class="o">=</span> <span class="n">maxAttempts</span> <span class="o">-</span> <span class="n">1</span><span class="o">)</span> <span class="o">{</span>
+          <span class="k">throw</span> <span class="k">new</span> <span class="n">RetriesExhaustedException</span><span class="o">(</span><span class="n">tries</span><span class="o">,</span> <span class="n">exceptions</span><span class="o">)</span><span class="o">;</span>
+        <span class="o">}</span>
         <span class="c1">// If the server is dead, we need to wait a little before retrying, to give
 </span><span class="c1"></span>        <span class="c1">// a chance to the regions to be moved
 </span><span class="c1"></span>        <span class="c1">// get right pause time, start by RETRY_BACKOFF[0] * pauseBase, where pauseBase might be
 </span><span class="c1"></span>        <span class="c1">// special when encountering CallQueueTooBigException, see #HBASE-17114
-</span><span class="c1"></span>        <span class="err">long pauseBase </span><span class="o">=</span> <span class="p">(</span><span class="err">t instanceof </span><span class="n">CallQueueTooBigException</span><span class="p">)</span> <span class="o">?</span> <span class="n">pauseForCQTBE</span> <span class="o">:</span> <span class="n">pause</span><span class="p">;</span>
-        <span class="n">expectedSleep</span> <span class="o">=</span> <span class="n">callable</span><span class="p">.</span><span class="na">sleep</span><span class="p">(</span><span class="n">pauseBase</span><span class="p">,</span> <span class="n">tries</span><span class="p">);</span>
+</span><span class="c1"></span>        <span class="kt">long</span> <span class="n">pauseBase</span> <span class="o">=</span> <span class="o">(</span><span class="n">t</span> <span class="k">instanceof</span> <span class="n">CallQueueTooBigException</span><span class="o">)</span> <span class="o">?</span> <span class="n">pauseForCQTBE</span> <span class="o">:</span> <span class="n">pause</span><span class="o">;</span>
+        <span class="n">expectedSleep</span> <span class="o">=</span> <span class="n">callable</span><span class="o">.</span><span class="na">sleep</span><span class="o">(</span><span class="n">pauseBase</span><span class="o">,</span> <span class="n">tries</span><span class="o">)</span><span class="o">;</span>
 
         <span class="c1">// If, after the planned sleep, there won&#39;t be enough time left, we stop now.
-</span><span class="c1"></span>        <span class="err">long duration </span><span class="o">=</span> <span class="n">singleCallDuration</span><span class="p">(</span><span class="n">expectedSleep</span><span class="p">);</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">duration</span> <span class="o">&gt;</span> <span class="n">callTimeout</span><span class="p">)</span> <span class="p">{</span>
-          <span class="err">String msg </span><span class="o">=</span> <span class="s">&#34;callTimeout=&#34;</span> <span class="o">+</span> <span class="n">callTimeout</span> <span class="o">+</span> <span class="s">&#34;, callDuration=&#34;</span> <span class="o">+</span> <span class="n">duration</span> <span class="o">+</span>
-              <span class="s">&#34;: &#34;</span> <span class="o">+</span>  <span class="n">t</span><span class="p">.</span><span class="na">getMessage</span><span class="p">()</span> <span class="o">+</span> <span class="s">&#34; &#34;</span> <span class="o">+</span> <span class="n">callable</span><span class="p">.</span><span class="na">getExceptionMessageAdditionalDetail</span><span class="p">();</span>
-          <span class="k">throw</span> <span class="p">(</span><span class="n">SocketTimeoutException</span><span class="p">)(</span><span class="k">new</span> <span class="n">SocketTimeoutException</span><span class="p">(</span><span class="n">msg</span><span class="p">).</span><span class="na">initCause</span><span class="p">(</span><span class="n">t</span><span class="p">));</span>
-        <span class="p">}</span>
-      <span class="p">}</span> <span class="k">finally</span> <span class="p">{</span>
-        <span class="n">interceptor</span><span class="p">.</span><span class="na">updateFailureInfo</span><span class="p">(</span><span class="n">context</span><span class="p">);</span>
-      <span class="p">}</span>
-      <span class="k">try</span> <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">expectedSleep</span> <span class="o">&gt;</span> <span class="n">0</span><span class="p">)</span> <span class="p">{</span>
-          <span class="kd">synchronized</span> <span class="p">(</span><span class="n">cancelled</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">cancelled</span><span class="p">.</span><span class="na">get</span><span class="p">())</span> <span class="k">return</span> <span class="kc">null</span><span class="p">;</span>
-            <span class="n">cancelled</span><span class="p">.</span><span class="na">wait</span><span class="p">(</span><span class="n">expectedSleep</span><span class="p">);</span>
-          <span class="p">}</span>
-        <span class="p">}</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">cancelled</span><span class="p">.</span><span class="na">get</span><span class="p">())</span> <span class="k">return</span> <span class="kc">null</span><span class="p">;</span>
-      <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="err">InterruptedException e</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">throw</span> <span class="k">new</span> <span class="n">InterruptedIOException</span><span class="p">(</span><span class="s">&#34;Interrupted after &#34;</span> <span class="o">+</span> <span class="n">tries</span>
-            <span class="o">+</span> <span class="s">&#34; tries while maxAttempts=&#34;</span> <span class="o">+</span> <span class="n">maxAttempts</span><span class="p">);</span>
-      <span class="p">}</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-<span class="p">}</span></code></pre></td></tr></table>
+</span><span class="c1"></span>        <span class="kt">long</span> <span class="n">duration</span> <span class="o">=</span> <span class="n">singleCallDuration</span><span class="o">(</span><span class="n">expectedSleep</span><span class="o">)</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">duration</span> <span class="o">&gt;</span> <span class="n">callTimeout</span><span class="o">)</span> <span class="o">{</span>
+          <span class="n">String</span> <span class="n">msg</span> <span class="o">=</span> <span class="s">&#34;callTimeout=&#34;</span> <span class="o">+</span> <span class="n">callTimeout</span> <span class="o">+</span> <span class="s">&#34;, callDuration=&#34;</span> <span class="o">+</span> <span class="n">duration</span> <span class="o">+</span>
+              <span class="s">&#34;: &#34;</span> <span class="o">+</span>  <span class="n">t</span><span class="o">.</span><span class="na">getMessage</span><span class="o">(</span><span class="o">)</span> <span class="o">+</span> <span class="s">&#34; &#34;</span> <span class="o">+</span> <span class="n">callable</span><span class="o">.</span><span class="na">getExceptionMessageAdditionalDetail</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+          <span class="k">throw</span> <span class="o">(</span><span class="n">SocketTimeoutException</span><span class="o">)</span><span class="o">(</span><span class="k">new</span> <span class="n">SocketTimeoutException</span><span class="o">(</span><span class="n">msg</span><span class="o">)</span><span class="o">.</span><span class="na">initCause</span><span class="o">(</span><span class="n">t</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
+        <span class="o">}</span>
+      <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+        <span class="n">interceptor</span><span class="o">.</span><span class="na">updateFailureInfo</span><span class="o">(</span><span class="n">context</span><span class="o">)</span><span class="o">;</span>
+      <span class="o">}</span>
+      <span class="k">try</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">expectedSleep</span> <span class="o">&gt;</span> <span class="n">0</span><span class="o">)</span> <span class="o">{</span>
+          <span class="kd">synchronized</span> <span class="o">(</span><span class="n">cancelled</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">cancelled</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="o">)</span><span class="o">)</span> <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+            <span class="n">cancelled</span><span class="o">.</span><span class="na">wait</span><span class="o">(</span><span class="n">expectedSleep</span><span class="o">)</span><span class="o">;</span>
+          <span class="o">}</span>
+        <span class="o">}</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">cancelled</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="o">)</span><span class="o">)</span> <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+      <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">InterruptedException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="n">InterruptedIOException</span><span class="o">(</span><span class="s">&#34;Interrupted after &#34;</span> <span class="o">+</span> <span class="n">tries</span>
+            <span class="o">+</span> <span class="s">&#34; tries while maxAttempts=&#34;</span> <span class="o">+</span> <span class="n">maxAttempts</span><span class="o">)</span><span class="o">;</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>Well, it&rsquo;s still a long snippet. Let&rsquo;s simplify it as short as possible.</p>
+</div><p>Well, it's still a long snippet. Let's simplify it as short as possible.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -549,34 +515,30 @@ In view of the limitation of one single post, the client-side is discussed only.
 </span><span class="lnt">10
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="err">public T </span><span class="n">callWithRetries</span><span class="p">(</span><span class="err">RetryingCallable&lt;T&gt; callable</span><span class="p">,</span> <span class="err">int callTimeout</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">for</span> <span class="p">(</span><span class="err">int tries </span><span class="o">=</span> <span class="n">0</span><span class="p">;;</span> <span class="n">tries</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">try</span> <span class="p">{</span>
-      <span class="n">callable</span><span class="p">.</span><span class="na">prepare</span><span class="p">(</span><span class="n">tries</span> <span class="o">!=</span> <span class="n">0</span><span class="p">);</span>
-      <span class="k">return</span> <span class="n">callable</span><span class="p">.</span><span class="na">call</span><span class="p">(</span><span class="n">getTimeout</span><span class="p">(</span><span class="n">callTimeout</span><span class="p">));</span>
-    <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="err">Throwable t</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">callable</span><span class="p">.</span><span class="na">throwable</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">maxAttempts</span> <span class="o">!=</span> <span class="n">1</span><span class="p">)</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-<span class="p">}</span></code></pre></td></tr></table>
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="n">T</span> <span class="nf">callWithRetries</span><span class="o">(</span><span class="n">RetryingCallable</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">callable</span><span class="o">,</span> <span class="kt">int</span> <span class="n">callTimeout</span><span class="o">)</span> <span class="o">{</span>
+  <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">tries</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span><span class="o">;</span> <span class="n">tries</span><span class="o">+</span><span class="o">+</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">try</span> <span class="o">{</span>
+      <span class="n">callable</span><span class="o">.</span><span class="na">prepare</span><span class="o">(</span><span class="n">tries</span> <span class="o">!</span><span class="o">=</span> <span class="n">0</span><span class="o">)</span><span class="o">;</span>
+      <span class="k">return</span> <span class="n">callable</span><span class="o">.</span><span class="na">call</span><span class="o">(</span><span class="n">getTimeout</span><span class="o">(</span><span class="n">callTimeout</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
+    <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Throwable</span> <span class="n">t</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">callable</span><span class="o">.</span><span class="na">throwable</span><span class="o">(</span><span class="n">t</span><span class="o">,</span> <span class="n">maxAttempts</span> <span class="o">!</span><span class="o">=</span> <span class="n">1</span><span class="o">)</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>At present, it becomes clear. <code>RpcRetryingCaller</code> invokes <code>ServerCallable</code>&rsquo;s</p>
-
+</div><p>At present, it becomes clear. <code>RpcRetryingCaller</code> invokes <code>ServerCallable</code>'s</p>
 <ol>
 <li><code>prepare()</code></li>
 <li><code>call()</code></li>
 <li><code>throwable()</code>, if <code>call()</code> throws any <code>Throwable</code> exception.</li>
 </ol>
-
-<p>Next, It&rsquo;s time for <code>ServerCallable</code>&rsquo;s appearance on the stage.</p>
-
+<p>Next, It's time for <code>ServerCallable</code>'s appearance on the stage.</p>
 <h1 id="servercallable"><code>ServerCallable</code></h1>
-
 <p>The root class of <code>ServerCallable</code> is <code>RetryingCallable</code>, a callable that will be retried. It declares two important methods, <code>prepare()</code> and <code>call()</code>, which will be used in the remaining <code>Put</code> process.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -595,23 +557,23 @@ In view of the limitation of one single post, the client-side is discussed only.
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// RetryingCallable.java
 </span><span class="c1"></span>
 <span class="nd">@InterfaceAudience.Private</span>
-<span class="err">public interface </span><span class="n">RetryingCallable</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="p">{</span>
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">RetryingCallable</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="o">{</span>
   <span class="cm">/**
 </span><span class="cm">   * Prepare by setting up any connections to servers, etc., ahead of call invocation.
 </span><span class="cm">   */</span>
-  <span class="err">void prepare</span><span class="p">(</span><span class="err">final boolean </span><span class="n">reload</span><span class="p">)</span> <span class="err">throws IOException</span><span class="p">;</span>
+  <span class="kt">void</span> <span class="nf">prepare</span><span class="o">(</span><span class="kd">final</span> <span class="kt">boolean</span> <span class="n">reload</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
 
   <span class="cm">/**
 </span><span class="cm">   * Computes a result, or throws an exception if unable to do so.
 </span><span class="cm">   */</span>
-  <span class="err">T call</span><span class="p">(</span><span class="err">int callTimeout</span><span class="p">)</span> <span class="err">throws Exception</span><span class="p">;</span>
-<span class="p">}</span></code></pre></td></tr></table>
+  <span class="n">T</span> <span class="nf">call</span><span class="o">(</span><span class="kt">int</span> <span class="n">callTimeout</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><code>RegionServerCallable</code> implements <code>RetryingCallable</code>, overrides <code>prepare()</code> and <code>call()</code> methods. What&rsquo;s important, it introduces a field named <code>stub</code>, a RPC client stub, which sends request underneath.</p>
+</div><p><code>RegionServerCallable</code> implements <code>RetryingCallable</code>, overrides <code>prepare()</code> and <code>call()</code> methods. What's important, it introduces a field named <code>stub</code>, a RPC client stub, which sends request underneath.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -685,38 +647,38 @@ In view of the limitation of one single post, the client-side is discussed only.
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// RegionServerCallable.java
 </span><span class="c1"></span>
 <span class="nd">@InterfaceAudience.Private</span>
-<span class="err">public abstract class RegionServerCallable</span><span class="o">&lt;</span><span class="n">T</span><span class="p">,</span> <span class="err">S&gt; implements </span><span class="n">RetryingCallable</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="p">{</span>
-  <span class="err">private final Connection connection</span><span class="p">;</span>
-  <span class="err">protected HRegionLocation </span><span class="n">location</span><span class="p">;</span>
-  <span class="err">protected S </span><span class="n">stub</span><span class="p">;</span>
-  <span class="err">protected final RpcController rpcController</span><span class="p">;</span>
+<span class="kd">public</span> <span class="kd">abstract</span> <span class="kd">class</span> <span class="nc">RegionServerCallable</span><span class="o">&lt;</span><span class="n">T</span><span class="o">,</span> <span class="n">S</span><span class="o">&gt;</span> <span class="kd">implements</span> <span class="n">RetryingCallable</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="o">{</span>
+  <span class="kd">private</span> <span class="kd">final</span> <span class="n">Connection</span> <span class="n">connection</span><span class="o">;</span>
+  <span class="kd">protected</span> <span class="n">HRegionLocation</span> <span class="n">location</span><span class="o">;</span>
+  <span class="kd">protected</span> <span class="n">S</span> <span class="n">stub</span><span class="o">;</span>
+  <span class="kd">protected</span> <span class="kd">final</span> <span class="n">RpcController</span> <span class="n">rpcController</span><span class="o">;</span>
 
   <span class="cm">/**
 </span><span class="cm">   * Override that changes call Exception from {@link Exception} to {@link IOException}.
 </span><span class="cm">   * Also does set up of the rpcController.
 </span><span class="cm">   */</span>
-  <span class="err">public T </span><span class="n">call</span><span class="p">(</span><span class="err">int callTimeout</span><span class="p">)</span> <span class="err">throws IOException </span><span class="p">{</span>
-    <span class="k">try</span> <span class="p">{</span>
+  <span class="kd">public</span> <span class="n">T</span> <span class="nf">call</span><span class="o">(</span><span class="kt">int</span> <span class="n">callTimeout</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+    <span class="k">try</span> <span class="o">{</span>
       <span class="c1">// Iff non-null and an instance of a SHADED rpcController, do config! Unshaded -- i.e.
 </span><span class="c1"></span>      <span class="c1">// com.google.protobuf.RpcController or null -- will just skip over this config.
-</span><span class="c1"></span>      <span class="k">if</span> <span class="p">(</span><span class="n">getRpcController</span><span class="p">()</span> <span class="o">!=</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
-        <span class="err">RpcController shadedRpcController </span><span class="o">=</span> <span class="p">(</span><span class="n">RpcController</span><span class="p">)</span><span class="n">getRpcController</span><span class="p">();</span>
+</span><span class="c1"></span>      <span class="k">if</span> <span class="o">(</span><span class="n">getRpcController</span><span class="o">(</span><span class="o">)</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">RpcController</span> <span class="n">shadedRpcController</span> <span class="o">=</span> <span class="o">(</span><span class="n">RpcController</span><span class="o">)</span><span class="n">getRpcController</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
         <span class="c1">// Do a reset to clear previous states, such as CellScanner.
-</span><span class="c1"></span>        <span class="n">shadedRpcController</span><span class="p">.</span><span class="na">reset</span><span class="p">();</span>
-        <span class="k">if</span> <span class="p">(</span><span class="err">shadedRpcController instanceof </span><span class="n">HBaseRpcController</span><span class="p">)</span> <span class="p">{</span>
-          <span class="err">HBaseRpcController hrc </span><span class="o">=</span> <span class="p">(</span><span class="n">HBaseRpcController</span><span class="p">)</span><span class="n">getRpcController</span><span class="p">();</span>
+</span><span class="c1"></span>        <span class="n">shadedRpcController</span><span class="o">.</span><span class="na">reset</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">shadedRpcController</span> <span class="k">instanceof</span> <span class="n">HBaseRpcController</span><span class="o">)</span> <span class="o">{</span>
+          <span class="n">HBaseRpcController</span> <span class="n">hrc</span> <span class="o">=</span> <span class="o">(</span><span class="n">HBaseRpcController</span><span class="o">)</span><span class="n">getRpcController</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
           <span class="c1">// If it is an instance of HBaseRpcController, we can set priority on the controller based
 </span><span class="c1"></span>          <span class="c1">// off the tableName. Set call timeout too.
-</span><span class="c1"></span>          <span class="n">hrc</span><span class="p">.</span><span class="na">setPriority</span><span class="p">(</span><span class="n">tableName</span><span class="p">);</span>
-          <span class="n">hrc</span><span class="p">.</span><span class="na">setPriority</span><span class="p">(</span><span class="n">priority</span><span class="p">);</span>
-          <span class="n">hrc</span><span class="p">.</span><span class="na">setCallTimeout</span><span class="p">(</span><span class="n">callTimeout</span><span class="p">);</span>
-        <span class="p">}</span>
-      <span class="p">}</span>
-      <span class="k">return</span> <span class="n">rpcCall</span><span class="p">();</span>
-    <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="err">Exception e</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">throw</span> <span class="n">ProtobufUtil</span><span class="p">.</span><span class="na">handleRemoteException</span><span class="p">(</span><span class="n">e</span><span class="p">);</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
+</span><span class="c1"></span>          <span class="n">hrc</span><span class="o">.</span><span class="na">setPriority</span><span class="o">(</span><span class="n">tableName</span><span class="o">)</span><span class="o">;</span>
+          <span class="n">hrc</span><span class="o">.</span><span class="na">setPriority</span><span class="o">(</span><span class="n">priority</span><span class="o">)</span><span class="o">;</span>
+          <span class="n">hrc</span><span class="o">.</span><span class="na">setCallTimeout</span><span class="o">(</span><span class="n">callTimeout</span><span class="o">)</span><span class="o">;</span>
+        <span class="o">}</span>
+      <span class="o">}</span>
+      <span class="k">return</span> <span class="n">rpcCall</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+    <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">throw</span> <span class="n">ProtobufUtil</span><span class="o">.</span><span class="na">handleRemoteException</span><span class="o">(</span><span class="n">e</span><span class="o">)</span><span class="o">;</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
 
   <span class="cm">/**
 </span><span class="cm">   * Run the RPC call. Implement this method. To get at the rpcController that has been created
@@ -726,62 +688,54 @@ In view of the limitation of one single post, the client-side is discussed only.
 </span><span class="cm">   * code base.
 </span><span class="cm">   * @throws Exception
 </span><span class="cm">   */</span>
-  <span class="err">protected abstract T rpcCall</span><span class="p">()</span> <span class="err">throws Exception</span><span class="p">;</span>
+  <span class="kd">protected</span> <span class="kd">abstract</span> <span class="n">T</span> <span class="nf">rpcCall</span><span class="o">(</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span><span class="o">;</span>
 
-  <span class="err">public void </span><span class="n">prepare</span><span class="p">(</span><span class="err">final boolean </span><span class="n">reload</span><span class="p">)</span> <span class="err">throws IOException </span><span class="p">{</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">prepare</span><span class="o">(</span><span class="kd">final</span> <span class="kt">boolean</span> <span class="n">reload</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
     <span class="c1">// check table state if this is a retry
-</span><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="n">reload</span> <span class="o">&amp;&amp;</span> <span class="n">tableName</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">tableName</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="n">TableName</span><span class="p">.</span><span class="na">META_TABLE_NAME</span><span class="p">)</span>
-        <span class="o">&amp;&amp;</span> <span class="n">getConnection</span><span class="p">().</span><span class="na">isTableDisabled</span><span class="p">(</span><span class="n">tableName</span><span class="p">))</span> <span class="p">{</span>
-      <span class="k">throw</span> <span class="k">new</span> <span class="n">TableNotEnabledException</span><span class="p">(</span><span class="n">tableName</span><span class="p">.</span><span class="na">getNameAsString</span><span class="p">()</span> <span class="o">+</span> <span class="s">&#34; is disabled.&#34;</span><span class="p">);</span>
-    <span class="p">}</span>
-    <span class="k">try</span> <span class="p">(</span><span class="err">RegionLocator regionLocator </span><span class="o">=</span> <span class="n">connection</span><span class="p">.</span><span class="na">getRegionLocator</span><span class="p">(</span><span class="n">tableName</span><span class="p">))</span> <span class="p">{</span>
-      <span class="k">this</span><span class="p">.</span><span class="na">location</span> <span class="o">=</span> <span class="n">regionLocator</span><span class="p">.</span><span class="na">getRegionLocation</span><span class="p">(</span><span class="n">row</span><span class="p">);</span>
-    <span class="p">}</span>
-    <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="na">location</span> <span class="o">==</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">throw</span> <span class="k">new</span> <span class="n">IOException</span><span class="p">(</span><span class="s">&#34;Failed to find location, tableName=&#34;</span> <span class="o">+</span> <span class="n">tableName</span> <span class="o">+</span>
-          <span class="s">&#34;, row=&#34;</span> <span class="o">+</span> <span class="n">Bytes</span><span class="p">.</span><span class="na">toString</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#34;, reload=&#34;</span> <span class="o">+</span> <span class="n">reload</span><span class="p">);</span>
-    <span class="p">}</span>
-    <span class="n">setStubByServiceName</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="na">location</span><span class="p">.</span><span class="na">getServerName</span><span class="p">());</span>
-  <span class="p">}</span>
+</span><span class="c1"></span>    <span class="k">if</span> <span class="o">(</span><span class="n">reload</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">tableName</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="o">!</span><span class="n">tableName</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">TableName</span><span class="o">.</span><span class="na">META_TABLE_NAME</span><span class="o">)</span>
+        <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">getConnection</span><span class="o">(</span><span class="o">)</span><span class="o">.</span><span class="na">isTableDisabled</span><span class="o">(</span><span class="n">tableName</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">throw</span> <span class="k">new</span> <span class="n">TableNotEnabledException</span><span class="o">(</span><span class="n">tableName</span><span class="o">.</span><span class="na">getNameAsString</span><span class="o">(</span><span class="o">)</span> <span class="o">+</span> <span class="s">&#34; is disabled.&#34;</span><span class="o">)</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="k">try</span> <span class="o">(</span><span class="n">RegionLocator</span> <span class="n">regionLocator</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="na">getRegionLocator</span><span class="o">(</span><span class="n">tableName</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">this</span><span class="o">.</span><span class="na">location</span> <span class="o">=</span> <span class="n">regionLocator</span><span class="o">.</span><span class="na">getRegionLocation</span><span class="o">(</span><span class="n">row</span><span class="o">)</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">location</span> <span class="o">=</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">throw</span> <span class="k">new</span> <span class="n">IOException</span><span class="o">(</span><span class="s">&#34;Failed to find location, tableName=&#34;</span> <span class="o">+</span> <span class="n">tableName</span> <span class="o">+</span>
+          <span class="s">&#34;, row=&#34;</span> <span class="o">+</span> <span class="n">Bytes</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="n">row</span><span class="o">)</span> <span class="o">+</span> <span class="s">&#34;, reload=&#34;</span> <span class="o">+</span> <span class="n">reload</span><span class="o">)</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="n">setStubByServiceName</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">location</span><span class="o">.</span><span class="na">getServerName</span><span class="o">(</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
+  <span class="o">}</span>
 
   <span class="cm">/**
 </span><span class="cm">   * Set the RPC client stub
 </span><span class="cm">   * @param serviceName to get the rpc stub for
 </span><span class="cm">   * @throws IOException When client could not be created
 </span><span class="cm">   */</span>
-  <span class="err">protected abstract void setStubByServiceName</span><span class="p">(</span><span class="err">ServerName serviceName</span><span class="p">)</span> <span class="err">throws IOException</span><span class="p">;</span>
-<span class="p">}</span></code></pre></td></tr></table>
+  <span class="kd">protected</span> <span class="kd">abstract</span> <span class="kt">void</span> <span class="nf">setStubByServiceName</span><span class="o">(</span><span class="n">ServerName</span> <span class="n">serviceName</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>The <code>prepare()</code> method,</p>
-
+</div><p>The <code>prepare()</code> method,</p>
 <ol>
 <li>checks table state</li>
-<li>gets region&rsquo;s location of one certain row.</li>
+<li>gets region's location of one certain row.</li>
 <li>sets RPC client stub by service name.</li>
 </ol>
-
 <blockquote>
-<p>The detail of get region&rsquo;s location see here: <a href="https://hellokangning.github.io/en/post/how-does-client-find-the-region/">How Does Client Find the Region</a></p>
+<p>The detail of get region's location see here: <a href="https://hellokangning.github.io/en/post/how-does-client-find-the-region/">How Does Client Find the Region</a></p>
 </blockquote>
-
-<p><code>setStubByServiceName</code> is an abstract method and should be implemented by <code>RegionServerCallable</code>&rsquo;s children.</p>
-
+<p><code>setStubByServiceName</code> is an abstract method and should be implemented by <code>RegionServerCallable</code>'s children.</p>
 <p>And the <code>call()</code> method,</p>
-
 <ol>
-<li>gets <code>RpcController</code>, reset it, the set its priority and timeout if it&rsquo;s <code>HBaseRpcController</code>.</li>
+<li>gets <code>RpcController</code>, reset it, the set its priority and timeout if it's <code>HBaseRpcController</code>.</li>
 <li>call <code>rpcCall()</code> for the remaining work.</li>
 </ol>
-
 <p>Like <code>setStubByServiceName</code>, <code>rpcCall()</code> is also abstract, waiting for being implemented.</p>
-
-<p>One son of <code>RegionServerCallable</code>, <code>ClientServiceCallable</code> get <code>stub</code> from <code>Connection</code>&rsquo;s client. We will penetrate <code>Connection</code> thereafter.</p>
-
-<p>See the definition of <code>ClientServiceCallable</code>, <code>stub</code>&rsquo;s type is determined to <code>ClientProtos.ClientService.BlockingInterface</code>. With <code>stub</code> in hand, <code>ClientServiceCallable</code> can mutate request finally. Remember int the <code>put</code> method of <code>HTable</code>, <code>doMutate</code> is called when initializing <code>ServerCallable</code>.</p>
+<p>One son of <code>RegionServerCallable</code>, <code>ClientServiceCallable</code> get <code>stub</code> from <code>Connection</code>'s client. We will penetrate <code>Connection</code> thereafter.</p>
+<p>See the definition of <code>ClientServiceCallable</code>, <code>stub</code>'s type is determined to <code>ClientProtos.ClientService.BlockingInterface</code>. With <code>stub</code> in hand, <code>ClientServiceCallable</code> can mutate request finally. Remember int the <code>put</code> method of <code>HTable</code>, <code>doMutate</code> is called when initializing <code>ServerCallable</code>.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -802,25 +756,25 @@ In view of the limitation of one single post, the client-side is discussed only.
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// ClientServiceCallable.java
 </span><span class="c1"></span>
 <span class="nd">@InterfaceAudience.Private</span>
-<span class="err">public abstract class ClientServiceCallable</span><span class="o">&lt;</span><span class="err">T&gt; extends
-</span><span class="err">    </span><span class="n">RegionServerCallable</span><span class="o">&lt;</span><span class="n">T</span><span class="p">,</span> <span class="n">ClientProtos</span><span class="p">.</span><span class="na">ClientService</span><span class="p">.</span><span class="na">BlockingInterface</span><span class="o">&gt;</span> <span class="p">{</span>
+<span class="kd">public</span> <span class="kd">abstract</span> <span class="kd">class</span> <span class="nc">ClientServiceCallable</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="kd">extends</span>
+    <span class="n">RegionServerCallable</span><span class="o">&lt;</span><span class="n">T</span><span class="o">,</span> <span class="n">ClientProtos</span><span class="o">.</span><span class="na">ClientService</span><span class="o">.</span><span class="na">BlockingInterface</span><span class="o">&gt;</span> <span class="o">{</span>
 
   <span class="nd">@Override</span>
-  <span class="err">protected void </span><span class="n">setStubByServiceName</span><span class="p">(</span><span class="err">ServerName serviceName</span><span class="p">)</span> <span class="err">throws IOException </span><span class="p">{</span>
-    <span class="n">setStub</span><span class="p">(</span><span class="n">getConnection</span><span class="p">().</span><span class="na">getClient</span><span class="p">(</span><span class="n">serviceName</span><span class="p">));</span>
-  <span class="p">}</span>
+  <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">setStubByServiceName</span><span class="o">(</span><span class="n">ServerName</span> <span class="n">serviceName</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+    <span class="n">setStub</span><span class="o">(</span><span class="n">getConnection</span><span class="o">(</span><span class="o">)</span><span class="o">.</span><span class="na">getClient</span><span class="o">(</span><span class="n">serviceName</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
+  <span class="o">}</span>
 
-  <span class="err">protected ClientProtos</span><span class="p">.</span><span class="na">MutateResponse</span> <span class="n">doMutate</span><span class="p">(</span><span class="err">ClientProtos.MutateRequest request</span><span class="p">)</span>
-  <span class="err">throws org</span><span class="p">.</span><span class="na">apache</span><span class="p">.</span><span class="na">hadoop</span><span class="p">.</span><span class="na">hbase</span><span class="p">.</span><span class="na">shaded</span><span class="p">.</span><span class="na">com</span><span class="p">.</span><span class="na">google</span><span class="p">.</span><span class="na">protobuf</span><span class="p">.</span><span class="na">ServiceException</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="n">getStub</span><span class="p">().</span><span class="na">mutate</span><span class="p">(</span><span class="n">getRpcController</span><span class="p">(),</span> <span class="n">request</span><span class="p">);</span>
-  <span class="p">}</span>
-<span class="p">}</span></code></pre></td></tr></table>
+  <span class="kd">protected</span> <span class="n">ClientProtos</span><span class="o">.</span><span class="na">MutateResponse</span> <span class="nf">doMutate</span><span class="o">(</span><span class="n">ClientProtos</span><span class="o">.</span><span class="na">MutateRequest</span> <span class="n">request</span><span class="o">)</span>
+  <span class="kd">throws</span> <span class="n">org</span><span class="o">.</span><span class="na">apache</span><span class="o">.</span><span class="na">hadoop</span><span class="o">.</span><span class="na">hbase</span><span class="o">.</span><span class="na">shaded</span><span class="o">.</span><span class="na">com</span><span class="o">.</span><span class="na">google</span><span class="o">.</span><span class="na">protobuf</span><span class="o">.</span><span class="na">ServiceException</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">getStub</span><span class="o">(</span><span class="o">)</span><span class="o">.</span><span class="na">mutate</span><span class="o">(</span><span class="n">getRpcController</span><span class="o">(</span><span class="o">)</span><span class="o">,</span> <span class="n">request</span><span class="o">)</span><span class="o">;</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>The Child of <code>ClientServiceCallable</code>, <code>ScannerCallable</code>, implements <code>rpcCall()</code>, as we expected. A reduced version list in the following,</p>
+</div><p>The Child of <code>ClientServiceCallable</code>, <code>ScannerCallable</code>, implements <code>rpcCall()</code>, as we expected. A reduced version list in the following,</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -865,53 +819,51 @@ In view of the limitation of one single post, the client-side is discussed only.
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// ScannerCallable.java
 </span><span class="c1"></span>
 <span class="nd">@InterfaceAudience.Private</span>
-<span class="err">public class ScannerCallable extends </span><span class="n">ClientServiceCallable</span><span class="o">&lt;</span><span class="n">Result</span><span class="p">[]</span><span class="o">&gt;</span> <span class="p">{</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">ScannerCallable</span> <span class="kd">extends</span> <span class="n">ClientServiceCallable</span><span class="o">&lt;</span><span class="n">Result</span><span class="o">[</span><span class="o">]</span><span class="o">&gt;</span> <span class="o">{</span>
   <span class="nd">@Override</span>
-  <span class="err">protected Result</span><span class="p">[]</span> <span class="n">rpcCall</span><span class="p">()</span> <span class="err">throws Exception </span><span class="p">{</span>
-    <span class="err">ScanResponse response</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="na">scannerId</span> <span class="o">==</span> <span class="o">-</span><span class="n">1L</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">response</span> <span class="o">=</span> <span class="n">openScanner</span><span class="p">();</span>
-    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-      <span class="n">response</span> <span class="o">=</span> <span class="n">next</span><span class="p">();</span>
-    <span class="p">}</span>
+  <span class="kd">protected</span> <span class="n">Result</span><span class="o">[</span><span class="o">]</span> <span class="nf">rpcCall</span><span class="o">(</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+    <span class="n">ScanResponse</span> <span class="n">response</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">scannerId</span> <span class="o">=</span><span class="o">=</span> <span class="o">-</span><span class="n">1L</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">response</span> <span class="o">=</span> <span class="n">openScanner</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+      <span class="n">response</span> <span class="o">=</span> <span class="n">next</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+    <span class="o">}</span>
 
-    <span class="err">Result[] rrs </span><span class="o">=</span> <span class="n">ResponseConverter</span><span class="p">.</span><span class="na">getResults</span><span class="p">(</span><span class="n">getRpcControllerCellScanner</span><span class="p">(),</span> <span class="n">response</span><span class="p">);</span>
+    <span class="n">Result</span><span class="o">[</span><span class="o">]</span> <span class="n">rrs</span> <span class="o">=</span> <span class="n">ResponseConverter</span><span class="o">.</span><span class="na">getResults</span><span class="o">(</span><span class="n">getRpcControllerCellScanner</span><span class="o">(</span><span class="o">)</span><span class="o">,</span> <span class="n">response</span><span class="o">)</span><span class="o">;</span>
 
-    <span class="n">updateResultsMetrics</span><span class="p">(</span><span class="n">scanMetrics</span><span class="p">,</span> <span class="n">rrs</span><span class="p">,</span> <span class="n">isRegionServerRemote</span><span class="p">);</span>
-    <span class="k">return</span> <span class="n">rrs</span><span class="p">;</span>
-  <span class="p">}</span>
+    <span class="n">updateResultsMetrics</span><span class="o">(</span><span class="n">scanMetrics</span><span class="o">,</span> <span class="n">rrs</span><span class="o">,</span> <span class="n">isRegionServerRemote</span><span class="o">)</span><span class="o">;</span>
+    <span class="k">return</span> <span class="n">rrs</span><span class="o">;</span>
+  <span class="o">}</span>
 
-  <span class="err">private ScanResponse </span><span class="n">openScanner</span><span class="p">()</span> <span class="err">throws IOException </span><span class="p">{</span>
-    <span class="n">incRPCCallsMetrics</span><span class="p">(</span><span class="n">scanMetrics</span><span class="p">,</span> <span class="n">isRegionServerRemote</span><span class="p">);</span>
-    <span class="err">ScanRequest request </span><span class="o">=</span> <span class="n">RequestConverter</span><span class="p">.</span><span class="na">buildScanRequest</span><span class="p">(</span>
-      <span class="n">getLocation</span><span class="p">().</span><span class="na">getRegionInfo</span><span class="p">().</span><span class="na">getRegionName</span><span class="p">(),</span> <span class="k">this</span><span class="p">.</span><span class="na">scan</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="na">caching</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
-    <span class="k">try</span> <span class="p">{</span>
-      <span class="err">ScanResponse response </span><span class="o">=</span> <span class="n">getStub</span><span class="p">().</span><span class="na">scan</span><span class="p">(</span><span class="n">getRpcController</span><span class="p">(),</span> <span class="n">request</span><span class="p">);</span>
-      <span class="err">long id </span><span class="o">=</span> <span class="n">response</span><span class="p">.</span><span class="na">getScannerId</span><span class="p">();</span>
-      <span class="k">if</span> <span class="p">(</span><span class="n">logScannerActivity</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">LOG</span><span class="p">.</span><span class="na">info</span><span class="p">(</span><span class="s">&#34;Open scanner=&#34;</span> <span class="o">+</span> <span class="n">id</span> <span class="o">+</span> <span class="s">&#34; for scan=&#34;</span> <span class="o">+</span> <span class="n">scan</span><span class="p">.</span><span class="na">toString</span><span class="p">()</span>
-          <span class="o">+</span> <span class="s">&#34; on region &#34;</span> <span class="o">+</span> <span class="n">getLocation</span><span class="p">().</span><span class="na">toString</span><span class="p">());</span>
-      <span class="p">}</span>
-      <span class="k">if</span> <span class="p">(</span><span class="n">response</span><span class="p">.</span><span class="na">hasMvccReadPoint</span><span class="p">())</span> <span class="p">{</span>
-        <span class="k">this</span><span class="p">.</span><span class="na">scan</span><span class="p">.</span><span class="na">setMvccReadPoint</span><span class="p">(</span><span class="n">response</span><span class="p">.</span><span class="na">getMvccReadPoint</span><span class="p">());</span>
-      <span class="p">}</span>
-      <span class="k">this</span><span class="p">.</span><span class="na">scannerId</span> <span class="o">=</span> <span class="n">id</span><span class="p">;</span>
-      <span class="k">return</span> <span class="n">response</span><span class="p">;</span>
-    <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="err">Exception e</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">throw</span> <span class="n">ProtobufUtil</span><span class="p">.</span><span class="na">handleRemoteException</span><span class="p">(</span><span class="n">e</span><span class="p">);</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-<span class="p">}</span></code></pre></td></tr></table>
+  <span class="kd">private</span> <span class="n">ScanResponse</span> <span class="nf">openScanner</span><span class="o">(</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+    <span class="n">incRPCCallsMetrics</span><span class="o">(</span><span class="n">scanMetrics</span><span class="o">,</span> <span class="n">isRegionServerRemote</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">ScanRequest</span> <span class="n">request</span> <span class="o">=</span> <span class="n">RequestConverter</span><span class="o">.</span><span class="na">buildScanRequest</span><span class="o">(</span>
+      <span class="n">getLocation</span><span class="o">(</span><span class="o">)</span><span class="o">.</span><span class="na">getRegionInfo</span><span class="o">(</span><span class="o">)</span><span class="o">.</span><span class="na">getRegionName</span><span class="o">(</span><span class="o">)</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="na">scan</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="na">caching</span><span class="o">,</span> <span class="kc">false</span><span class="o">)</span><span class="o">;</span>
+    <span class="k">try</span> <span class="o">{</span>
+      <span class="n">ScanResponse</span> <span class="n">response</span> <span class="o">=</span> <span class="n">getStub</span><span class="o">(</span><span class="o">)</span><span class="o">.</span><span class="na">scan</span><span class="o">(</span><span class="n">getRpcController</span><span class="o">(</span><span class="o">)</span><span class="o">,</span> <span class="n">request</span><span class="o">)</span><span class="o">;</span>
+      <span class="kt">long</span> <span class="n">id</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="na">getScannerId</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">logScannerActivity</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&#34;Open scanner=&#34;</span> <span class="o">+</span> <span class="n">id</span> <span class="o">+</span> <span class="s">&#34; for scan=&#34;</span> <span class="o">+</span> <span class="n">scan</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="o">)</span>
+          <span class="o">+</span> <span class="s">&#34; on region &#34;</span> <span class="o">+</span> <span class="n">getLocation</span><span class="o">(</span><span class="o">)</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
+      <span class="o">}</span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">response</span><span class="o">.</span><span class="na">hasMvccReadPoint</span><span class="o">(</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">scan</span><span class="o">.</span><span class="na">setMvccReadPoint</span><span class="o">(</span><span class="n">response</span><span class="o">.</span><span class="na">getMvccReadPoint</span><span class="o">(</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
+      <span class="o">}</span>
+      <span class="k">this</span><span class="o">.</span><span class="na">scannerId</span> <span class="o">=</span> <span class="n">id</span><span class="o">;</span>
+      <span class="k">return</span> <span class="n">response</span><span class="o">;</span>
+    <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">throw</span> <span class="n">ProtobufUtil</span><span class="o">.</span><span class="na">handleRemoteException</span><span class="o">(</span><span class="n">e</span><span class="o">)</span><span class="o">;</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><code>rpcCall()</code> call another private method <code>openScanner</code>, the laster one invokes <code>getStub()</code>, <code>ClientProtos.ClientService.BlockingInterface</code>, to get response.</p>
-
+</div><p><code>rpcCall()</code> call another private method <code>openScanner</code>, the laster one invokes <code>getStub()</code>, <code>ClientProtos.ClientService.BlockingInterface</code>, to get response.</p>
 <h1 id="rpccontroller"><code>RpcController</code></h1>
-
 <p><code>HBaseRpcController</code> is a readily comprehensible interface, implementing from <code>protobuf.RpcController</code>. it carries some properties, such as priority, timeout, of the request.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -928,21 +880,21 @@ In view of the limitation of one single post, the client-side is discussed only.
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// HBaseRpcController.java
 </span><span class="c1"></span>
 <span class="nd">@InterfaceAudience.Private</span>
-<span class="err">public interface HBaseRpcController extends </span><span class="n">RpcController</span><span class="p">,</span> <span class="n">CellScannable</span> <span class="p">{</span>
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">HBaseRpcController</span> <span class="kd">extends</span> <span class="n">RpcController</span><span class="o">,</span> <span class="n">CellScannable</span> <span class="o">{</span>
 
   <span class="c1">// Priority for this request
-</span><span class="c1"></span>  <span class="err">void setPriority</span><span class="p">(</span><span class="err">int priority</span><span class="p">);</span>
-  <span class="err">int getPriority</span><span class="p">();</span>
+</span><span class="c1"></span>  <span class="kt">void</span> <span class="nf">setPriority</span><span class="o">(</span><span class="kt">int</span> <span class="n">priority</span><span class="o">)</span><span class="o">;</span>
+  <span class="kt">int</span> <span class="nf">getPriority</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
 
-  <span class="err">int getCallTimeout</span><span class="p">();</span>
-  <span class="err">void setCallTimeout</span><span class="p">(</span><span class="err">int callTimeout</span><span class="p">);</span>
-<span class="p">}</span></code></pre></td></tr></table>
+  <span class="kt">int</span> <span class="nf">getCallTimeout</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+  <span class="kt">void</span> <span class="nf">setCallTimeout</span><span class="o">(</span><span class="kt">int</span> <span class="n">callTimeout</span><span class="o">)</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><code>HBaseRpcControllerImpl</code> contains of some getters and setters. Nothing need to be emphasized.</p>
+</div><p><code>HBaseRpcControllerImpl</code> contains of some getters and setters. Nothing need to be emphasized.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -968,34 +920,30 @@ In view of the limitation of one single post, the client-side is discussed only.
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// HBaseRpcControllerImpl.java
 </span><span class="c1"></span>
 <span class="nd">@InterfaceAudience.Private</span>
-<span class="err">public class HBaseRpcControllerImpl implements </span><span class="n">HBaseRpcController</span> <span class="p">{</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">HBaseRpcControllerImpl</span> <span class="kd">implements</span> <span class="n">HBaseRpcController</span> <span class="o">{</span>
   <span class="nd">@Override</span>
-  <span class="err">public void </span><span class="n">reset</span><span class="p">()</span> <span class="p">{</span>
-    <span class="n">priority</span> <span class="o">=</span> <span class="n">0</span><span class="p">;</span>
-    <span class="n">cellScanner</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
-    <span class="n">exception</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
-    <span class="n">callTimeout</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">reset</span><span class="o">(</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">priority</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span>
+    <span class="n">cellScanner</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="n">exception</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="n">callTimeout</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
     <span class="c1">// In the implementations of some callable with replicas, rpc calls are executed in a executor
 </span><span class="c1"></span>    <span class="c1">// and we could cancel the operation from outside which means there could be a race between
 </span><span class="c1"></span>    <span class="c1">// reset and startCancel. Although I think the race should be handled by the callable since the
 </span><span class="c1"></span>    <span class="c1">// reset may clear the cancel state...
-</span><span class="c1"></span>    <span class="kd">synchronized</span> <span class="p">(</span><span class="k">this</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">done</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
-      <span class="n">cancelled</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
-      <span class="n">cancellationCbs</span><span class="p">.</span><span class="na">clear</span><span class="p">();</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-<span class="p">}</span></code></pre></td></tr></table>
+</span><span class="c1"></span>    <span class="kd">synchronized</span> <span class="o">(</span><span class="k">this</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">done</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+      <span class="n">cancelled</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+      <span class="n">cancellationCbs</span><span class="o">.</span><span class="na">clear</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<h1 id="connection"><code>Connection</code></h1>
-
-<p>At last, hope you don&rsquo;t forget <code>Connection</code>, which is responsible for locating region during this process.</p>
-
+</div><h1 id="connection"><code>Connection</code></h1>
+<p>At last, hope you don't forget <code>Connection</code>, which is responsible for locating region during this process.</p>
 <p>See more, please jump to <a href="https://hellokangning.github.io/en/post/how-does-client-find-the-region/">How Does Client Find the Region</a>.</p>
-
 <p><strong>Reference</strong></p>
-
 <ol>
 <li><a href="http://blog.javachen.com/2014/06/13/hbase-code-about-htable-put.html">HBase源码分析：HTable put过程</a></li>
 </ol>

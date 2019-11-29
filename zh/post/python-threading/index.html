@@ -27,7 +27,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.59.1 with theme even" />
+<meta name="generator" content="Hugo 0.60.0 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/zh/post/python-threading/" />
@@ -44,7 +44,6 @@
 
 <meta property="og:title" content="Python Threading" />
 <meta property="og:description" content="今天看了 《Python源码剖析》 中多线程的章节，看完头都秃了。但还是感觉自己没有吸收多少，知识一股脑倾泻下来，然后匆匆流过。在两个番茄钟的间隙，我全景思考了下，还是要从上往下入手，先将 threading 模块梳理清楚。其次是带着问题来阅读源码，跟着作者的思路容易迷，而问题最好是从 threading 的使用姿势中来。
-
 来看廖雪峰老师Python教程中的例子：
 
 
@@ -86,14 +85,11 @@ print(&#39;thread %s ended.&#39; % threading.current_thread().name)
 
 看完这段代码，我的脑海中浮现了这几个问题：
 
-
 Thread 是如何描述线程对象的？
 启动线程的时候做了些啥，线程对象保存在哪里？
 除了 Thread，threading 里还保存了写东西，否则 threading.current_thread() 怎么实现？
 
-
 除此之外，还有一些线程的常见问题，如：
-
 
 threading 提供了哪些线程同步方式，锁？
 " />
@@ -103,7 +99,6 @@ threading 提供了哪些线程同步方式，锁？
 <meta property="article:modified_time" content="2019-08-05T14:46:40+08:00" />
 <meta itemprop="name" content="Python Threading">
 <meta itemprop="description" content="今天看了 《Python源码剖析》 中多线程的章节，看完头都秃了。但还是感觉自己没有吸收多少，知识一股脑倾泻下来，然后匆匆流过。在两个番茄钟的间隙，我全景思考了下，还是要从上往下入手，先将 threading 模块梳理清楚。其次是带着问题来阅读源码，跟着作者的思路容易迷，而问题最好是从 threading 的使用姿势中来。
-
 来看廖雪峰老师Python教程中的例子：
 
 
@@ -145,30 +140,23 @@ print(&#39;thread %s ended.&#39; % threading.current_thread().name)
 
 看完这段代码，我的脑海中浮现了这几个问题：
 
-
 Thread 是如何描述线程对象的？
 启动线程的时候做了些啥，线程对象保存在哪里？
 除了 Thread，threading 里还保存了写东西，否则 threading.current_thread() 怎么实现？
 
-
 除此之外，还有一些线程的常见问题，如：
-
 
 threading 提供了哪些线程同步方式，锁？
 ">
-
-
 <meta itemprop="datePublished" content="2019-08-05T14:46:40&#43;08:00" />
 <meta itemprop="dateModified" content="2019-08-05T14:46:40&#43;08:00" />
-<meta itemprop="wordCount" content="2746">
+<meta itemprop="wordCount" content="2741">
 
 
 
-<meta itemprop="keywords" content="" />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Python Threading"/>
 <meta name="twitter:description" content="今天看了 《Python源码剖析》 中多线程的章节，看完头都秃了。但还是感觉自己没有吸收多少，知识一股脑倾泻下来，然后匆匆流过。在两个番茄钟的间隙，我全景思考了下，还是要从上往下入手，先将 threading 模块梳理清楚。其次是带着问题来阅读源码，跟着作者的思路容易迷，而问题最好是从 threading 的使用姿势中来。
-
 来看廖雪峰老师Python教程中的例子：
 
 
@@ -210,14 +198,11 @@ print(&#39;thread %s ended.&#39; % threading.current_thread().name)
 
 看完这段代码，我的脑海中浮现了这几个问题：
 
-
 Thread 是如何描述线程对象的？
 启动线程的时候做了些啥，线程对象保存在哪里？
 除了 Thread，threading 里还保存了写东西，否则 threading.current_thread() 怎么实现？
 
-
 除此之外，还有一些线程的常见问题，如：
-
 
 threading 提供了哪些线程同步方式，锁？
 "/>
@@ -294,7 +279,7 @@ threading 提供了哪些线程同步方式，锁？
         <div class="post-category">
             <a href="/zh/categories/python/"> Python </a>
             </div>
-          <span class="more-meta"> 约 2746 字 </span>
+          <span class="more-meta"> 约 2741 字 </span>
           <span class="more-meta"> 预计阅读 6 分钟 </span>
         
       </div>
@@ -304,31 +289,25 @@ threading 提供了哪些线程同步方式，锁？
   <h2 class="post-toc-title">文章目录</h2>
   <div class="post-toc-content always-active">
     <nav id="TableOfContents">
-<ul>
-<li><a href="#thread">Thread</a>
-<ul>
-<li><a href="#构造函数">构造函数</a></li>
-<li><a href="#start">start()</a></li>
-<li><a href="#join">join()</a></li>
-</ul></li>
-<li><a href="#event">Event</a></li>
-<li><a href="#condition">Condition</a>
-<ul>
-<li><a href="#wait">wait()</a></li>
-<li><a href="#notify">notify()</a></li>
-</ul></li>
-<li><a href="#总结">总结</a></li>
-</ul>
+  <ul>
+    <li><a href="#heading">构造函数</a></li>
+    <li><a href="#start">start()</a></li>
+    <li><a href="#join">join()</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#wait">wait()</a></li>
+    <li><a href="#notify">notify()</a></li>
+  </ul>
 </nav>
   </div>
 </div>
     <div class="post-content">
       <p>今天看了 <a href="https://book.douban.com/subject/3117898/">《Python源码剖析》</a> 中多线程的章节，看完头都秃了。但还是感觉自己没有吸收多少，知识一股脑倾泻下来，然后匆匆流过。在两个番茄钟的间隙，我全景思考了下，还是要从上往下入手，先将 threading 模块梳理清楚。其次是带着问题来阅读源码，跟着作者的思路容易迷，而问题最好是从 threading 的使用姿势中来。</p>
-
 <p>来看廖雪峰老师<a href="https://www.liaoxuefeng.com/wiki/1016959663602400/1017629247922688">Python教程</a>中的例子：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -348,58 +327,50 @@ threading 提供了哪些线程同步方式，锁？
 <td class="lntd">
 <pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">time</span><span class="o">,</span> <span class="nn">threading</span>
 
-<span class="k">def</span> <span class="nf">loop</span><span class="p">():</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;thread </span><span class="si">%s</span><span class="s1"> is running...&#39;</span> <span class="o">%</span> <span class="n">threading</span><span class="o">.</span><span class="n">current_thread</span><span class="p">()</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">loop</span><span class="p">(</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">thread </span><span class="si">%s</span><span class="s1"> is running...</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">threading</span><span class="o">.</span><span class="n">current_thread</span><span class="p">(</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
     <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">while</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">:</span>
         <span class="n">n</span> <span class="o">=</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;thread </span><span class="si">%s</span><span class="s1"> &gt;&gt;&gt; </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">threading</span><span class="o">.</span><span class="n">current_thread</span><span class="p">()</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+        <span class="k">print</span><span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">thread </span><span class="si">%s</span><span class="s1"> &gt;&gt;&gt; </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">threading</span><span class="o">.</span><span class="n">current_thread</span><span class="p">(</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span><span class="p">)</span>
         <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;thread </span><span class="si">%s</span><span class="s1"> ended.&#39;</span> <span class="o">%</span> <span class="n">threading</span><span class="o">.</span><span class="n">current_thread</span><span class="p">()</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">thread </span><span class="si">%s</span><span class="s1"> ended.</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">threading</span><span class="o">.</span><span class="n">current_thread</span><span class="p">(</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 
-<span class="k">print</span><span class="p">(</span><span class="s1">&#39;thread </span><span class="si">%s</span><span class="s1"> is running...&#39;</span> <span class="o">%</span> <span class="n">threading</span><span class="o">.</span><span class="n">current_thread</span><span class="p">()</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-<span class="n">t</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">loop</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;LoopThread&#39;</span><span class="p">)</span>
-<span class="n">t</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-<span class="n">t</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
-<span class="k">print</span><span class="p">(</span><span class="s1">&#39;thread </span><span class="si">%s</span><span class="s1"> ended.&#39;</span> <span class="o">%</span> <span class="n">threading</span><span class="o">.</span><span class="n">current_thread</span><span class="p">()</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></code></pre></td></tr></table>
+<span class="k">print</span><span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">thread </span><span class="si">%s</span><span class="s1"> is running...</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">threading</span><span class="o">.</span><span class="n">current_thread</span><span class="p">(</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">loop</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">LoopThread</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">t</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="p">)</span>
+<span class="n">t</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">thread </span><span class="si">%s</span><span class="s1"> ended.</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">threading</span><span class="o">.</span><span class="n">current_thread</span><span class="p">(</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>看完这段代码，我的脑海中浮现了这几个问题：</p>
-
+</div><p>看完这段代码，我的脑海中浮现了这几个问题：</p>
 <ol>
 <li><code>Thread</code> 是如何描述线程对象的？</li>
 <li>启动线程的时候做了些啥，线程对象保存在哪里？</li>
 <li>除了 <code>Thread</code>，threading 里还保存了写东西，否则 <code>threading.current_thread()</code> 怎么实现？</li>
 </ol>
-
 <p>除此之外，还有一些线程的常见问题，如：</p>
-
 <ol>
 <li>threading 提供了哪些线程同步方式，锁？</li>
 </ol>
-
 <h1 id="thread">Thread</h1>
-
 <p><code>Thread</code> 类在单独线程中运行的操作，定义操作的方式有两种：</p>
-
 <ol>
 <li>传入 <code>Thread.__init__()</code> 一个 <code>callable</code> 对象</li>
 <li>子类中重写 <code>run()</code> 对象，其他方法不需要重写。</li>
 </ol>
-
-<h2 id="构造函数">构造函数</h2>
+<h2 id="heading">构造函数</h2>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-python" data-lang="python"><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                 <span class="n">args</span><span class="o">=</span><span class="p">(),</span> <span class="n">kwargs</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">daemon</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span></code></pre></td></tr></table>
+                 <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="p">)</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">daemon</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>调用这个构造函数时，必需带有关键字参数。参数如下：</p>
-
+</div><p>调用这个构造函数时，必需带有关键字参数。参数如下：</p>
 <ul>
 <li><code>group</code> 应该为 <code>None</code>；为了日后扩展 ThreadGroup 类实现而保留。</li>
 <li><code>target</code> 是用于 <code>run()</code> 方法调用的可调用对象。默认是 <code>None</code>，表示不需要调用任何方法。</li>
@@ -408,15 +379,12 @@ threading 提供了哪些线程同步方式，锁？
 <li><code>kwargs</code> 是用于调用目标函数的关键字参数字典。默认是 {}。</li>
 <li>如果 <code>daemon</code> 不是 <code>None</code>，线程将被显式的设置为 守护模式，不管该线程是否是守护模式。如果是 <code>None</code> (默认值)，线程将继承当前线程的守护模式属性。</li>
 </ul>
-
 <p><code>__init__</code> 的实现，就是一些简单的变量赋值和初始化操作，这其中包括把类变量 <code>_initialized</code> 置为 <code>True</code>。</p>
-
 <h2 id="start">start()</h2>
-
 <p><code>start()</code> 开始线程活动。它在一个线程里最多只能被调用一次。它安排对象的 <code>run()</code> 方法在一个独立的控制进程中调用。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -441,61 +409,61 @@ threading 提供了哪些线程同步方式，锁？
 </span><span class="lnt">23
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
 
     <span class="c1"># 必须先调用 __init__() 方法先</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initialized</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&#34;thread.__init__() not called&#34;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa"></span><span class="s2">&#34;</span><span class="s2">thread.__init__() not called</span><span class="s2">&#34;</span><span class="p">)</span>
 
     <span class="c1"># 如果同一个线程对象中调用这个方法的次数大于一次，会抛出 RuntimeError 。</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_started</span><span class="o">.</span><span class="n">is_set</span><span class="p">():</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&#34;threads can only be started once&#34;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_started</span><span class="o">.</span><span class="n">is_set</span><span class="p">(</span><span class="p">)</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa"></span><span class="s2">&#34;</span><span class="s2">threads can only be started once</span><span class="s2">&#34;</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">daemon</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_is_main_interpreter</span><span class="p">():</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&#34;daemon thread are not supported &#34;</span>
-                           <span class="s2">&#34;in subinterpreters&#34;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">daemon</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_is_main_interpreter</span><span class="p">(</span><span class="p">)</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa"></span><span class="s2">&#34;</span><span class="s2">daemon thread are not supported </span><span class="s2">&#34;</span>
+                           <span class="sa"></span><span class="s2">&#34;</span><span class="s2">in subinterpreters</span><span class="s2">&#34;</span><span class="p">)</span>
 
     <span class="k">with</span> <span class="n">_active_limbo_lock</span><span class="p">:</span>
         <span class="n">_limbo</span><span class="p">[</span><span class="bp">self</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">_start_new_thread</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_bootstrap</span><span class="p">,</span> <span class="p">())</span>
+        <span class="n">_start_new_thread</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_bootstrap</span><span class="p">,</span> <span class="p">(</span><span class="p">)</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
         <span class="k">with</span> <span class="n">_active_limbo_lock</span><span class="p">:</span>
             <span class="k">del</span> <span class="n">_limbo</span><span class="p">[</span><span class="bp">self</span><span class="p">]</span>
         <span class="k">raise</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">_started</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span></code></pre></td></tr></table>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_started</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="p">)</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>我们把用到的几个全局变量单独拎出来：</p>
+</div><p>我们把用到的几个全局变量单独拎出来：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-python" data-lang="python"><span class="c1"># Active thread administration</span>
-<span class="n">_active_limbo_lock</span> <span class="o">=</span> <span class="n">_allocate_lock</span><span class="p">()</span>
-<span class="n">_active</span> <span class="o">=</span> <span class="p">{}</span>    <span class="c1"># maps thread id to Thread object</span>
-<span class="n">_limbo</span> <span class="o">=</span> <span class="p">{}</span></code></pre></td></tr></table>
+<span class="n">_active_limbo_lock</span> <span class="o">=</span> <span class="n">_allocate_lock</span><span class="p">(</span><span class="p">)</span>
+<span class="n">_active</span> <span class="o">=</span> <span class="p">{</span><span class="p">}</span>    <span class="c1"># maps thread id to Thread object</span>
+<span class="n">_limbo</span> <span class="o">=</span> <span class="p">{</span><span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>先说下 <code>_allocate_lock()</code> 就对应的 thread 模块的 <code>allocate_lock</code>。<code>_start_new_thread</code> 也指向 thread 模块的 <code>start_new_thread</code>。</p>
+</div><p>先说下 <code>_allocate_lock()</code> 就对应的 thread 模块的 <code>allocate_lock</code>。<code>_start_new_thread</code> 也指向 thread 模块的 <code>start_new_thread</code>。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-python" data-lang="python"><span class="n">_start_new_thread</span> <span class="o">=</span> <span class="n">_thread</span><span class="o">.</span><span class="n">start_new_thread</span>
-<span class="n">_allocate_lock</span> <span class="o">=</span> <span class="n">_thread</span><span class="o">.</span><span class="n">allocate_lock</span></code></pre></td></tr></table>
+<span class="n">_allocate_lock</span> <span class="o">=</span> <span class="n">_thread</span><span class="o">.</span><span class="n">allocate_lock</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>而 <code>_limbo</code> 中保存的是已创建但为运行的线程对象。在启动一个新线程中执行的 <code>bootstrap()</code>。</p>
+</div><p>而 <code>_limbo</code> 中保存的是已创建但为运行的线程对象。在启动一个新线程中执行的 <code>bootstrap()</code>。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -527,50 +495,49 @@ threading 提供了哪些线程同步方式，锁？
 </span><span class="lnt">30
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">_bootstrap</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">_bootstrap</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_bootstrap_inner</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bootstrap_inner</span><span class="p">(</span><span class="p">)</span>
     <span class="k">except</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_daemonic</span> <span class="ow">and</span> <span class="n">_sys</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">return</span>
         <span class="k">raise</span>
 
-<span class="k">def</span> <span class="nf">_bootstrap_inner</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_bootstrap_inner</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_set_ident</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_set_tstate_lock</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_ident</span><span class="p">(</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_tstate_lock</span><span class="p">(</span><span class="p">)</span>
 
         <span class="c1"># ...</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_started</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_started</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="p">)</span>
         <span class="k">with</span> <span class="n">_active_limbo_lock</span><span class="p">:</span>
             <span class="n">_active</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_ident</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span>
             <span class="k">del</span> <span class="n">_limbo</span><span class="p">[</span><span class="bp">self</span><span class="p">]</span>
 
         <span class="c1"># ...</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="p">)</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_invoke_excepthook</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
     <span class="k">finally</span><span class="p">:</span>
         <span class="k">with</span> <span class="n">_active_limbo_lock</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="k">del</span> <span class="n">_active</span><span class="p">[</span><span class="n">get_ident</span><span class="p">()]</span>
+                <span class="k">del</span> <span class="n">_active</span><span class="p">[</span><span class="n">get_ident</span><span class="p">(</span><span class="p">)</span><span class="p">]</span>
             <span class="k">except</span><span class="p">:</span>
-                <span class="k">pass</span></code></pre></td></tr></table>
+                <span class="k">pass</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><code>_bootstrap_inner()</code> 干了这么几件事:</p>
-
+</div><p><code>_bootstrap_inner()</code> 干了这么几件事:</p>
 <ul>
 <li>设置新线程的线程标识符</li>
 <li>为新线程加锁，线程状态被删除之后，该锁会被解释器释放</li>
 <li>将事件标志位置为 <code>True</code></li>
 <li>将线程对象从 <code>_limbo</code> 中移除，并添加到活跃线程 <code>_active</code> 中</li>
-
-<li><p>调用 <code>run()</code> 函数，执行 <code>target</code> 参数的来的可调用对象发起调用</p>
+<li>调用 <code>run()</code> 函数，执行 <code>target</code> 参数的来的可调用对象发起调用</li>
+</ul>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
@@ -580,24 +547,21 @@ threading 提供了哪些线程同步方式，锁？
 </span><span class="lnt">8
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_target</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_target</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_args</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_kwargs</span><span class="p">)</span>
-<span class="k">finally</span><span class="p">:</span>
-    <span class="c1"># Avoid a refcycle if the thread is running a function with</span>
-    <span class="c1"># an argument that has a member that points to the thread.</span>
-    <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_target</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_args</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kwargs</span></code></pre></td></tr></table>
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_target</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_target</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_args</span><span class="p">,</span> <span class="o">*</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_kwargs</span><span class="p">)</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="c1"># Avoid a refcycle if the thread is running a function with</span>
+        <span class="c1"># an argument that has a member that points to the thread.</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_target</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_args</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kwargs</span>
+</code></pre></td></tr></table>
 </div>
-</div></li>
-</ul>
-
-<h2 id="join">join()</h2>
-
+</div><h2 id="join">join()</h2>
 <p><code>join(timeout=None)</code>等待线程终结。这会阻塞调用这个方法的线程，直到被调用 <code>join()</code> 的线程终结 - 不管是正常终结还是抛出未处理异常 &ndash; 或者直到发生超时。这里面起作用的是 <code>_wait_for_tsate_lock()</code> 函数，它等待被释放的锁，就是 <code>start()</code> 启动时加的那个。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
@@ -606,25 +570,22 @@ threading 提供了哪些线程同步方式，锁？
 </span><span class="lnt">7
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">_wait_for_tstate_lock</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">_wait_for_tstate_lock</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="p">:</span>
     <span class="n">lock</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tstate_lock</span>
     <span class="k">if</span> <span class="n">lock</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>  <span class="c1"># already determined that the C code is done</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_stopped</span>
-    <span class="k">elif</span> <span class="n">lock</span><span class="o">.</span><span class="n">acquire</span><span class="p">(</span><span class="n">block</span><span class="p">,</span> <span class="n">timeout</span><span class="p">):</span>
-        <span class="n">lock</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_stop</span><span class="p">()</span></code></pre></td></tr></table>
+    <span class="k">elif</span> <span class="n">lock</span><span class="o">.</span><span class="n">acquire</span><span class="p">(</span><span class="n">block</span><span class="p">,</span> <span class="n">timeout</span><span class="p">)</span><span class="p">:</span>
+        <span class="n">lock</span><span class="o">.</span><span class="n">release</span><span class="p">(</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stop</span><span class="p">(</span><span class="p">)</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>这个锁是也涉及到 thread 模块的 <code>_set_sentinel</code> 函数，留待下回分解。</p>
-
+</div><p>这个锁是也涉及到 thread 模块的 <code>_set_sentinel</code> 函数，留待下回分解。</p>
 <h1 id="event">Event</h1>
-
 <p><code>Thread</code> 类中使用到了事件对象，刚才被有意地跳过了。事件是线程间通信的机制之一，可能是最简单的机制：一个线程发出事件信号，其他线程则等待该信号。</p>
-
 <p><code>Thread</code> 的构造函数中，初始化了一个 <code>Event</code> 对象 <code>_started</code>。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
@@ -633,15 +594,15 @@ threading 提供了哪些线程同步方式，锁？
 <td class="lntd">
 <pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Thread</span><span class="p">:</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                <span class="n">args</span><span class="o">=</span><span class="p">(),</span> <span class="n">kwargs</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">daemon</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+                <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="p">)</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">daemon</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="p">:</span>
             <span class="c1"># ...</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_started</span> <span class="o">=</span> <span class="n">Event</span><span class="p">()</span></code></pre></td></tr></table>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_started</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="p">)</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><code>Event</code> 实现事件对象的类。事件对象管理一个内部标志，调用 <code>set()</code> 方法可将其设置为 <code>True</code>。调用 <code>clear()</code> 方法可将其设置为 <code>False</code>。调用 <code>wait()</code> 方法将进入阻塞直到标志为 <code>True</code>。这个标志初始时为 <code>False</code>。</p>
+</div><p><code>Event</code> 实现事件对象的类。事件对象管理一个内部标志，调用 <code>set()</code> 方法可将其设置为 <code>True</code>。调用 <code>clear()</code> 方法可将其设置为 <code>False</code>。调用 <code>wait()</code> 方法将进入阻塞直到标志为 <code>True</code>。这个标志初始时为 <code>False</code>。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -669,40 +630,37 @@ threading 提供了哪些线程同步方式，锁？
 <td class="lntd">
 <pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Event</span><span class="p">:</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cond</span> <span class="o">=</span> <span class="n">Condition</span><span class="p">(</span><span class="n">Lock</span><span class="p">())</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cond</span> <span class="o">=</span> <span class="n">Condition</span><span class="p">(</span><span class="n">Lock</span><span class="p">(</span><span class="p">)</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_flag</span> <span class="o">=</span> <span class="n">Fals</span>
 
     <span class="c1"># 所有正在等待这个事件的线程将被唤醒。当标志为true时，调用 wait() 方法的线程不会被被阻塞。</span>
-    <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cond</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_flag</span> <span class="o">=</span> <span class="bp">True</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_cond</span><span class="o">.</span><span class="n">notify_all</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cond</span><span class="o">.</span><span class="n">notify_all</span><span class="p">(</span><span class="p">)</span>
 
     <span class="c1"># 之后调用 wait() 方法的线程将会被阻塞，直到调用 set() 方法将内部标志再次设置为true。</span>
-    <span class="k">def</span> <span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cond</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_flag</span> <span class="o">=</span> <span class="bp">False</span>
 
     <span class="c1"># 如果调用时内部标志为true，将立即返回。否则将阻塞线程，直到调用 set() 方法将标志设置为true或者发生可选的超时。</span>
-    <span class="k">def</span> <span class="nf">wait</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">wait</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="p">:</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cond</span><span class="p">:</span>
             <span class="n">signaled</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flag</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">signaled</span><span class="p">:</span>
                 <span class="n">signaled</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cond</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">timeout</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">signaled</span></code></pre></td></tr></table>
+            <span class="k">return</span> <span class="n">signaled</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><code>Event</code> 的实现主要依赖条件对象 <code>Condition</code>。</p>
-
+</div><p><code>Event</code> 的实现主要依赖条件对象 <code>Condition</code>。</p>
 <h1 id="condition">Condition</h1>
-
 <p>一个条件变量对象允许一个或多个线程在被其它线程所通知之前进行等待。</p>
-
 <p><code>Condition</code> 类的构造函数接收 <code>lock</code> 参数，它必须为 <code>Lock</code> 或者 <code>RLock</code> 对象，并且它将被用作底层锁。否则，将会创建新的 RLock 对象，并将其用作底层锁。<code>_waiters</code> 定义了一个双向队列来保存等待线程。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -717,9 +675,9 @@ threading 提供了哪些线程同步方式，锁？
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Condition</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lock</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lock</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">lock</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">lock</span> <span class="o">=</span> <span class="n">RLock</span><span class="p">()</span>
+            <span class="n">lock</span> <span class="o">=</span> <span class="n">RLock</span><span class="p">(</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span> <span class="o">=</span> <span class="n">lock</span>
 
         <span class="c1"># 请求底层锁。此方法调用底层锁的相应方法，返回值是底层锁相应方法的返回值。</span>
@@ -727,17 +685,15 @@ threading 提供了哪些线程同步方式，锁？
         <span class="bp">self</span><span class="o">.</span><span class="n">release</span> <span class="o">=</span> <span class="n">lock</span><span class="o">.</span><span class="n">release</span>
 
         <span class="c1"># ...</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_waiters</span> <span class="o">=</span> <span class="n">_deque</span><span class="p">()</span></code></pre></td></tr></table>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_waiters</span> <span class="o">=</span> <span class="n">_deque</span><span class="p">(</span><span class="p">)</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<h2 id="wait">wait()</h2>
-
+</div><h2 id="wait">wait()</h2>
 <p><code>wait()</code> 等待直到被通知或发生超时。如果线程在调用此方法时没有获得锁，将会引发 <code>RuntimeError</code> 异常。</p>
-
 <p>这个方法释放底层锁，然后阻塞，直到在另外一个线程中调用同一个条件变量的 <code>notify()</code> 或 <code>notify_all()</code> 唤醒它，或者直到可选的超时发生。一旦被唤醒或者超时，它重新获得锁并返回。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -770,21 +726,21 @@ threading 提供了哪些线程同步方式，锁？
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Condition</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">wait</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_owned</span><span class="p">():</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&#34;cannot wait on un-acquired lock&#34;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">wait</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_owned</span><span class="p">(</span><span class="p">)</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa"></span><span class="s2">&#34;</span><span class="s2">cannot wait on un-acquired lock</span><span class="s2">&#34;</span><span class="p">)</span>
 
         <span class="c1"># 获取锁</span>
-        <span class="n">waiter</span> <span class="o">=</span> <span class="n">_allocate_lock</span><span class="p">()</span>
-        <span class="n">waiter</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
+        <span class="n">waiter</span> <span class="o">=</span> <span class="n">_allocate_lock</span><span class="p">(</span><span class="p">)</span>
+        <span class="n">waiter</span><span class="o">.</span><span class="n">acquire</span><span class="p">(</span><span class="p">)</span>
 
         <span class="c1"># 加入等待队列</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_waiters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">waiter</span><span class="p">)</span>
-        <span class="n">saved_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_release_save</span><span class="p">()</span>
+        <span class="n">saved_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_release_save</span><span class="p">(</span><span class="p">)</span>
         <span class="n">gotit</span> <span class="o">=</span> <span class="bp">False</span>
         <span class="k">try</span><span class="p">:</span>    <span class="c1"># restore state no matter what (e.g., KeyboardInterrupt)</span>
             <span class="k">if</span> <span class="n">timeout</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-                <span class="n">waiter</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
+                <span class="n">waiter</span><span class="o">.</span><span class="n">acquire</span><span class="p">(</span><span class="p">)</span>
                 <span class="n">gotit</span> <span class="o">=</span> <span class="bp">True</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">timeout</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -798,15 +754,14 @@ threading 提供了哪些线程同步方式，锁？
                 <span class="k">try</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_waiters</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">waiter</span><span class="p">)</span>
                 <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-                    <span class="k">pass</span>    </code></pre></td></tr></table>
+                    <span class="k">pass</span>    
+</code></pre></td></tr></table>
 </div>
-</div>
-<h2 id="notify">notify()</h2>
-
+</div><h2 id="notify">notify()</h2>
 <p><code>notify(n=1)</code> 默认唤醒一个等待这个条件的线程。这个函数会遍历等待列表 <code>self._waiters</code>，然后依次调用 <code>release()</code> 通知等待线程。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -832,66 +787,53 @@ threading 提供了哪些线程同步方式，锁？
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Condition</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">notify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
-        <span class="s2">&#34;&#34;&#34;Wake up one or more threads waiting on this condition, if any.
-</span><span class="s2">
-</span><span class="s2">        If the calling thread has not acquired the lock when this method is
-</span><span class="s2">        called, a RuntimeError is raised.
-</span><span class="s2">
-</span><span class="s2">        This method wakes up at most n of the threads waiting for the condition
-</span><span class="s2">        variable; it is a no-op if no threads are waiting.
-</span><span class="s2">
-</span><span class="s2">        &#34;&#34;&#34;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_owned</span><span class="p">():</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&#34;cannot notify on un-acquired lock&#34;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">notify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="p">:</span>
+        <span class="sa"></span><span class="s2">&#34;&#34;&#34;</span><span class="s2">Wake up one or more threads waiting on this condition, if any.</span><span class="s2">
+</span><span class="s2"></span><span class="s2">
+</span><span class="s2"></span><span class="s2">        If the calling thread has not acquired the lock when this method is</span><span class="s2">
+</span><span class="s2"></span><span class="s2">        called, a RuntimeError is raised.</span><span class="s2">
+</span><span class="s2"></span><span class="s2">
+</span><span class="s2"></span><span class="s2">        This method wakes up at most n of the threads waiting for the condition</span><span class="s2">
+</span><span class="s2"></span><span class="s2">        variable; it is a no-op if no threads are waiting.</span><span class="s2">
+</span><span class="s2"></span><span class="s2">
+</span><span class="s2"></span><span class="s2">        </span><span class="s2">&#34;&#34;&#34;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_owned</span><span class="p">(</span><span class="p">)</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa"></span><span class="s2">&#34;</span><span class="s2">cannot notify on un-acquired lock</span><span class="s2">&#34;</span><span class="p">)</span>
         <span class="n">all_waiters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_waiters</span>
-        <span class="n">waiters_to_notify</span> <span class="o">=</span> <span class="n">_deque</span><span class="p">(</span><span class="n">_islice</span><span class="p">(</span><span class="n">all_waiters</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+        <span class="n">waiters_to_notify</span> <span class="o">=</span> <span class="n">_deque</span><span class="p">(</span><span class="n">_islice</span><span class="p">(</span><span class="n">all_waiters</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">waiters_to_notify</span><span class="p">:</span>
             <span class="k">return</span>
         <span class="k">for</span> <span class="n">waiter</span> <span class="ow">in</span> <span class="n">waiters_to_notify</span><span class="p">:</span>
-            <span class="n">waiter</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+            <span class="n">waiter</span><span class="o">.</span><span class="n">release</span><span class="p">(</span><span class="p">)</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">all_waiters</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">waiter</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-                <span class="k">pass</span></code></pre></td></tr></table>
+                <span class="k">pass</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<h1 id="总结">总结</h1>
-
+</div><h1 id="heading1">总结</h1>
 <p>回到文章开头的问题，现在应该都有了答案。</p>
-
 <blockquote>
 <p><code>Thread</code> 是如何描述线程对象的？</p>
 </blockquote>
-
 <p>除了构造函数的参数 <code>group</code>、<code>target</code> 等，还包括了锁 <code>_tsstate_lock</code>，事件 <code>_started</code>，初始化标志位 <code>_initialized</code> 等。</p>
-
 <blockquote>
 <p>启动线程的时候做了些啥?</p>
 </blockquote>
-
 <p>这里主要是 <code>start()</code> 完成的工作，包括设置标识符、加锁、设置事件标志、添加到活跃线程、调用 <code>run()</code> 函数等。</p>
-
 <blockquote>
 <p>线程对象保存在哪里？</p>
 </blockquote>
-
 <p>线程创建之后保存在 <code>_limbo</code> 数组中，<code>start()</code> 运行之后从 <code>_limbo</code> 中踢除，进入 <code>_active</code> 字典。</p>
-
 <blockquote>
 <p>除了 <code>Thread</code>，threading 里还保存了写东西，否则 <code>threading.current_thread()</code> 怎么实现？</p>
 </blockquote>
-
 <p>新建的线程都保存在 <code>_active</code> 字典中，根据线程描述符，可以直接拿到对应的线程对象。</p>
-
 <blockquote>
 <p>threading 提供了哪些线程同步方式，锁？</p>
 </blockquote>
-
 <p>threading 提供了 <code>Event</code> 和 <code>Condition</code> 来实线程通信，归根结底还是依赖 thread 模块的锁。</p>
-
 <p><strong>参考</strong></p>
-
 <ul>
 <li><a href="https://docs.python.org/zh-cn/3.7/library/threading.html">threading &mdash; 基于线程的并行</a></li>
 <li><a href="http://www.liujiangblog.com/course/python/79">多线程threading</a></li>

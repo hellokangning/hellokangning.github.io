@@ -18,7 +18,7 @@
 
 <meta name="author" content="Guoqing Geng" /><meta name="description" content="故障检测主要有两种机制：心跳和租约。
  心跳：假设总控机 A 需要确认工作机 B 是否发生故障，那么总控机 A 每隔一段时间，比如 1 秒，向工作机 B 发送一个心跳包。 租约：租约在一定期限内给予持有者特定权力的协议。  租约的协议决定了其用途，它能做的事情远不止故障检测。
- 如果协议内容是服务器确认客户端还存活，那么这个租约的功能就相当于*心跳*； 如果协议内容是服务器保证内容不会被修改，那么这个 租约就相当于*读锁*； 如果协议内容是服务器保证内容只能被这个客户端修改，那么这个租约就相当于*写锁*。  那么在判断客户端是否存活的问题上，心跳和租约有什么区别呢？
+ 如果协议内容是服务器确认客户端还存活，那么这个租约的功能就相当于心跳； 如果协议内容是服务器保证内容不会被修改，那么这个 租约就相当于读锁； 如果协议内容是服务器保证内容只能被这个客户端修改，那么这个租约就相当于写锁。  那么在判断客户端是否存活的问题上，心跳和租约有什么区别呢？
 " /><meta name="keywords" content="lease, heartbeat, distributed" />
 
 
@@ -26,7 +26,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.59.1 with theme even" />
+<meta name="generator" content="Hugo 0.60.0 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/zh/post/are-you-ok/" />
@@ -44,18 +44,14 @@
 <meta property="og:title" content="Are you ok - 分布式系统的租约和心跳" />
 <meta property="og:description" content="故障检测主要有两种机制：心跳和租约。
 
-
 心跳：假设总控机 A 需要确认工作机 B 是否发生故障，那么总控机 A 每隔一段时间，比如 1 秒，向工作机 B 发送一个心跳包。
 租约：租约在一定期限内给予持有者特定权力的协议。
 
-
 租约的协议决定了其用途，它能做的事情远不止故障检测。
 
-
-如果协议内容是服务器确认客户端还存活，那么这个租约的功能就相当于*心跳*；
-如果协议内容是服务器保证内容不会被修改，那么这个 租约就相当于*读锁*；
-如果协议内容是服务器保证内容只能被这个客户端修改，那么这个租约就相当于*写锁*。
-
+如果协议内容是服务器确认客户端还存活，那么这个租约的功能就相当于心跳；
+如果协议内容是服务器保证内容不会被修改，那么这个 租约就相当于读锁；
+如果协议内容是服务器保证内容只能被这个客户端修改，那么这个租约就相当于写锁。
 
 那么在判断客户端是否存活的问题上，心跳和租约有什么区别呢？" />
 <meta property="og:type" content="article" />
@@ -65,45 +61,34 @@
 <meta itemprop="name" content="Are you ok - 分布式系统的租约和心跳">
 <meta itemprop="description" content="故障检测主要有两种机制：心跳和租约。
 
-
 心跳：假设总控机 A 需要确认工作机 B 是否发生故障，那么总控机 A 每隔一段时间，比如 1 秒，向工作机 B 发送一个心跳包。
 租约：租约在一定期限内给予持有者特定权力的协议。
 
-
 租约的协议决定了其用途，它能做的事情远不止故障检测。
 
-
-如果协议内容是服务器确认客户端还存活，那么这个租约的功能就相当于*心跳*；
-如果协议内容是服务器保证内容不会被修改，那么这个 租约就相当于*读锁*；
-如果协议内容是服务器保证内容只能被这个客户端修改，那么这个租约就相当于*写锁*。
-
+如果协议内容是服务器确认客户端还存活，那么这个租约的功能就相当于心跳；
+如果协议内容是服务器保证内容不会被修改，那么这个 租约就相当于读锁；
+如果协议内容是服务器保证内容只能被这个客户端修改，那么这个租约就相当于写锁。
 
 那么在判断客户端是否存活的问题上，心跳和租约有什么区别呢？">
-
-
 <meta itemprop="datePublished" content="2019-07-24T14:24:00&#43;08:00" />
 <meta itemprop="dateModified" content="2019-07-24T14:24:00&#43;08:00" />
-<meta itemprop="wordCount" content="921">
+<meta itemprop="wordCount" content="913">
 
 
 
-<meta itemprop="keywords" content="" />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Are you ok - 分布式系统的租约和心跳"/>
 <meta name="twitter:description" content="故障检测主要有两种机制：心跳和租约。
 
-
 心跳：假设总控机 A 需要确认工作机 B 是否发生故障，那么总控机 A 每隔一段时间，比如 1 秒，向工作机 B 发送一个心跳包。
 租约：租约在一定期限内给予持有者特定权力的协议。
 
-
 租约的协议决定了其用途，它能做的事情远不止故障检测。
 
-
-如果协议内容是服务器确认客户端还存活，那么这个租约的功能就相当于*心跳*；
-如果协议内容是服务器保证内容不会被修改，那么这个 租约就相当于*读锁*；
-如果协议内容是服务器保证内容只能被这个客户端修改，那么这个租约就相当于*写锁*。
-
+如果协议内容是服务器确认客户端还存活，那么这个租约的功能就相当于心跳；
+如果协议内容是服务器保证内容不会被修改，那么这个 租约就相当于读锁；
+如果协议内容是服务器保证内容只能被这个客户端修改，那么这个租约就相当于写锁。
 
 那么在判断客户端是否存活的问题上，心跳和租约有什么区别呢？"/>
 
@@ -179,7 +164,7 @@
         <div class="post-category">
             <a href="/zh/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/"> 分布式系统 </a>
             </div>
-          <span class="more-meta"> 约 921 字 </span>
+          <span class="more-meta"> 约 913 字 </span>
           <span class="more-meta"> 预计阅读 2 分钟 </span>
         
       </div>
@@ -188,78 +173,45 @@
     <div class="post-toc" id="post-toc">
   <h2 class="post-toc-title">文章目录</h2>
   <div class="post-toc-content always-active">
-    <nav id="TableOfContents">
-<ul>
-<li><a href="#completeness-vs-accuracy">Completeness vs Accuracy</a></li>
-<li><a href="#心跳">心跳</a></li>
-<li><a href="#租约">租约</a></li>
-</ul>
-</nav>
+    <nav id="TableOfContents"></nav>
   </div>
 </div>
     <div class="post-content">
       <p>故障检测主要有两种机制：心跳和租约。</p>
-
 <ul>
 <li>心跳：假设总控机 A 需要确认工作机 B 是否发生故障，那么总控机 A 每隔一段时间，比如 1 秒，向工作机 B 发送一个心跳包。</li>
 <li>租约：租约在一定期限内给予持有者特定权力的协议。</li>
 </ul>
-
 <p>租约的协议决定了其用途，它能做的事情远不止故障检测。</p>
-
 <ol>
-<li>如果协议内容是服务器确认客户端还存活，那么这个租约的功能就相当于*心跳*；</li>
-<li>如果协议内容是服务器保证内容不会被修改，那么这个 租约就相当于*读锁*；</li>
-<li>如果协议内容是服务器保证内容只能被这个客户端修改，那么这个租约就相当于*写锁*。</li>
+<li>如果协议内容是服务器确认客户端还存活，那么这个租约的功能就相当于<em>心跳</em>；</li>
+<li>如果协议内容是服务器保证内容不会被修改，那么这个 租约就相当于<em>读锁</em>；</li>
+<li>如果协议内容是服务器保证内容只能被这个客户端修改，那么这个租约就相当于<em>写锁</em>。</li>
 </ol>
-
 <p>那么在判断客户端是否存活的问题上，心跳和租约有什么区别呢？</p>
-
 <h1 id="completeness-vs-accuracy">Completeness vs Accuracy</h1>
-
 <p>故障检测算法有两个重要的衡量标准：</p>
-
 <ul>
 <li>Completeness: every process failure is eventually detected (no misses)</li>
 <li>Accuracy: every detected failure corresponds to a crashed process (no mistakes)</li>
 </ul>
-
 <p>前者（completeness）是说，如果一个进程挂掉，那么一定能被检测到；后者（accuracy）是说，如果 detector 认为 target 进程挂掉了，那么就一定挂掉了，不会出现误判。</p>
-
-<h1 id="心跳">心跳</h1>
-
+<h1 id="heading">心跳</h1>
 <p>心跳有两种方式：</p>
-
 <ol>
 <li>单向的 heartbeat</li>
 <li>交互的 ping-pong</li>
 </ol>
-
 <p>第一种方式下，target 进程需要定时给 detector 发送消息，告知自己的存活性。而 detector 无需给 target 回复任何消息，只是每隔一段时间去检测 target 是否有汇报。</p>
-
 <p>第二种方式更为常见，Redis 就采用的这种方式：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span><span class="lnt">2
-</span></pre></td>
-<td class="lntd">
-<pre class="chroma">detector -&gt; target: Are you ok?
-target -&gt; detector: Yeah, pretty good.</pre></td></tr></table>
-</div>
-</div>
-<p>Detector 发起检测，如果 target 连续 N 次不回复消息，那么 detector 就认为其处于 non-active 状态。</p>
-
+<pre><code>detector -&gt; target: Are you ok?
+target -&gt; detector: Yeah, pretty good.
+</code></pre><p>Detector 发起检测，如果 target 连续 N 次不回复消息，那么 detector 就认为其处于 non-active 状态。</p>
 <p>不管是上述哪种方式，都能满足 completeness，但不满足 accuracy。因为有时候，detector 无法判断究竟是对方进程挂掉了，还是网络不通。如果是因为网络拥塞或者瞬断，还容易引发“双主”问题：target 并未意识到自己被认定失效，还在继续提供正常的服务。</p>
-
-<h1 id="租约">租约</h1>
-
+<h1 id="heading1">租约</h1>
 <p>假设机器 A 需要检测机器 B 是否发生故障，机器 A 可以给机器 B 发放租约，机器 B 持有的租约在有效期内才允许提供服务，否则主动停止服务。机器 B 的租约快要到期的时候向机器 A 重新申请租约。租约机制是怎么解决心跳问题的不足呢？</p>
-
 <p>这里的期限是租约的根本特性，正是这一特性使得租约能够容忍机器失效和网络分割：如果出现网络故障，B 就会因为未成功续约而停止服务。</p>
-
 <p><strong>参考</strong></p>
-
 <ul>
 <li><a href="https://unordered.org/timelines/5a23055296c00000">大数据分布式基础-Lease机制简介和应用</a></li>
 <li><a href="https://www.cnblogs.com/xybaby/p/8710421.html">Hey，man，are you ok? －－ 关于心跳、故障监测、lease机制</a></li>

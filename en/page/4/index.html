@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.59.1 with theme even" />
+<meta name="generator" content="Hugo 0.60.0 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/en/" />
@@ -44,12 +44,9 @@
 <meta property="og:description" content="Guoqing Geng&#39;s blog" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://hellokangning.github.io/en/" />
-
 <meta property="og:updated_time" content="2019-04-28T20:20:38+08:00" />
 <meta itemprop="name" content="Qing&#39;s Landing">
-<meta itemprop="description" content="Guoqing Geng&#39;s blog">
-
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="description" content="Guoqing Geng&#39;s blog"><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Qing&#39;s Landing"/>
 <meta name="twitter:description" content="Guoqing Geng&#39;s blog"/>
 
@@ -203,8 +200,7 @@
   <div class="post-content">
     <div class="post-summary">
       <p>This post includes a few mind maps for Redis ranging from quick start to implementation.</p>
-
-<p><img src="/images/redis-quick-start.png" alt="" /></p>
+<p><img src="/images/redis-quick-start.png" alt=""></p>
     </div>
     <div class="read-more">
       <a href="/en/post/redis-mind-map/" class="read-more-link">Read more...</a>
@@ -228,14 +224,12 @@
   <div class="post-content">
     <div class="post-summary">
       <p>As I mentioned before, it is vital to read code with prepared questions. Hum, How about reading code with answers? The differences between Hashtable and HashMap have been explained many times including,</p>
-
 <ul>
 <li>null key &amp; null value</li>
 <li>synchronized or not</li>
 <li>Enumeration and Iterator</li>
 <li>hash method</li>
 </ul>
-
 <p>I am wondering how these arguments are supported by code. This post will give a view of code illustrating the above confusion.</p>
     </div>
     <div class="read-more">
@@ -260,10 +254,8 @@
   <div class="post-content">
     <div class="post-summary">
       <p>For those who has no patience to look through this post, I conclude it in a word: HashSet is backed by HashMap.</p>
-
 <p>Set is a collection in which every element is unique. So does the keys in HashMap. It is reasonable to infer that the implementation of HashSet is based on HashMap, so it is. Remember <a href="https://hellokangning.github.io/en/post/java-hashmap/#resize">resize</a> of HashMap? it makes no guarantees as to the iteration order of the set.</p>
-
-<p>With the help of HashMap, HashSet offers constant time performance for the basic operations, like <code>add</code>, <code>remove</code>, <code>contains</code> and <code>size</code>. Iterating over this set requires time proportional to the sum of the HashSet instance&rsquo;s size (the number of elements) plus the &ldquo;capacity&rdquo; of the backing HashMap instance (the number of buckets).</p>
+<p>With the help of HashMap, HashSet offers constant time performance for the basic operations, like <code>add</code>, <code>remove</code>, <code>contains</code> and <code>size</code>. Iterating over this set requires time proportional to the sum of the HashSet instance's size (the number of elements) plus the &ldquo;capacity&rdquo; of the backing HashMap instance (the number of buckets).</p>
     </div>
     <div class="read-more">
       <a href="/en/post/java-hashset/" class="read-more-link">Read more...</a>
@@ -287,11 +279,8 @@
   <div class="post-content">
     <div class="post-summary">
       <p>After joining the workforce, I have coded with various programming languages, like C++, Objective-C, Ruby, Python, Scala, Java, Go, etc. I ask to myself spontaneously, which language am I most skillful at? This question dismay me because I cannot answer it immediately.</p>
-
-<p>Since I choice to focus on Big Data, it&rsquo;s pragmatic to equipped with Java and Python, two powerful weapons in this field. Reading the source code of <a href="https://hellokangning.github.io/en/tags/java.util/">java.util</a> is a good start.</p>
-
+<p>Since I choice to focus on Big Data, it's pragmatic to equipped with Java and Python, two powerful weapons in this field. Reading the source code of <a href="https://hellokangning.github.io/en/tags/java.util/">java.util</a> is a good start.</p>
 <p>The leading actor of this post is <code>TreeMap</code>, a Red-Black tree based <code>NavigableMap</code> implementation. It has no array underneath, as many of you think. Because <code>TreeMap</code> inherits directly <code>AbstractMap</code>, in contrast with <a href="https://hellokangning.github.io/en/post/java-linkedhashmap/">LinkedHashMap</a>.</p>
-
 <p>Performances differ on account of distinctive data structures. This implementation provides guaranteed log(n) time cost for the <code>containsKey</code>, <code>get</code>, <code>put</code> and <code>remove</code> operations. Now allow me to show you a close look.</p>
     </div>
     <div class="read-more">
@@ -316,9 +305,7 @@
   <div class="post-content">
     <div class="post-summary">
       <p>As its name implies, <code>LinkedHashMap</code> is a hash table and linked list implementation of the <code>Map</code> interface, with predictable iteration order. Different with <code>HashMap</code>, it maintains a doubly-linked list runing through all of its entries, which also defines the iteration ordering, same as the order in which keys were inserted into the map. This order remains if a key is re-inserted into the map.</p>
-
 <p>Like <code>HashMap</code>, <code>LinkedHashMap</code> provides constant-time performance for the basic operations <code>add</code>, <code>contains</code> and <code>remove</code>, assuming the hash function disperses elements properly among the buckets.  Performance is likely to be just slightly below that of <code>HashMap</code>, due to the added expense of maintaining the linked list,</p>
-
 <p>Thanks to the linked list, this kind of map is well-suited to building LRU caches. So my questions is how <code>LinkedHashMap</code> preserves the linked list when key changes.</p>
     </div>
     <div class="read-more">
@@ -335,17 +322,15 @@
       <div class="post-category">
           <a href="/en/categories/java/"> Java </a>
           </div>
-        <span class="more-meta"> 1340 words </span>
+        <span class="more-meta"> 1338 words </span>
         <span class="more-meta"> 7 mins read </span>
     </div>
   </header>
   
   <div class="post-content">
     <div class="post-summary">
-      <p>It&rsquo;s necessary to learn with questions. Otherwise, you may distract your focus when something you don&rsquo;t know appears, whether should I go deeper or not. With preliminary doubts in your mind, this would not be a problem. Learning can be direct, clear and fruitful, which brings you more sense of achievement.</p>
-
+      <p>It's necessary to learn with questions. Otherwise, you may distract your focus when something you don't know appears, whether should I go deeper or not. With preliminary doubts in your mind, this would not be a problem. Learning can be direct, clear and fruitful, which brings you more sense of achievement.</p>
 <p>For this post about the source code of <code>HashMap</code>, few questions need answers:</p>
-
 <ul>
 <li>data structure underneath</li>
 <li>why <code>HashMap</code> permits nulls and unsynchronized</li>
@@ -375,7 +360,7 @@
   
   <div class="post-content">
     <div class="post-summary">
-      <p><code>LinkedList</code> is a doubly-linked list implementation of the <code>List</code> and <code>Deque</code> interfaces. By &ldquo;doubly-linked&rdquo;, it means we can traverse the list from the beginning to the end, and vice versa. This class is a member of Java Collections Framework, located in <code>java.util</code>. Let&rsquo;s go straight to the source code.</p>
+      <p><code>LinkedList</code> is a doubly-linked list implementation of the <code>List</code> and <code>Deque</code> interfaces. By &ldquo;doubly-linked&rdquo;, it means we can traverse the list from the beginning to the end, and vice versa. This class is a member of Java Collections Framework, located in <code>java.util</code>. Let's go straight to the source code.</p>
     </div>
     <div class="read-more">
       <a href="/en/post/java-linkedlist/" class="read-more-link">Read more...</a>
@@ -399,7 +384,6 @@
   <div class="post-content">
     <div class="post-summary">
       <p><code>String</code> is one of the most common type of data in computer languages. A Java string is a series of characters gathered together, such as &ldquo;abc&rdquo;. Strings are constant, which means their value cannot be changed after created.</p>
-
 <p>This post introduces the basic of Java string, includes methods for examining individual characters of the sequence, for comparing strings, for searching strings, for extracting substrings and so on.</p>
     </div>
     <div class="read-more">

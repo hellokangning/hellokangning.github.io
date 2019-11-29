@@ -24,7 +24,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.59.1 with theme even" />
+<meta name="generator" content="Hugo 0.60.0 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/en/post/difference-between-range-and-xrange/" />
@@ -42,7 +42,6 @@
 <meta property="og:title" content="The Difference between range and xrange" />
 <meta property="og:description" content="Short answer:
 
-
 range creates a list, so if you do range(1, 10000000) it creates a list in memory with 9999999 elements. This will become an expensive operation on very large ranges.
 xrange is a sequence object that evaluates lazily(it will only compute the next value when needed).
 " />
@@ -53,23 +52,18 @@ xrange is a sequence object that evaluates lazily(it will only compute the next 
 <meta itemprop="name" content="The Difference between range and xrange">
 <meta itemprop="description" content="Short answer:
 
-
 range creates a list, so if you do range(1, 10000000) it creates a list in memory with 9999999 elements. This will become an expensive operation on very large ranges.
 xrange is a sequence object that evaluates lazily(it will only compute the next value when needed).
 ">
-
-
 <meta itemprop="datePublished" content="2017-09-01T16:22:27&#43;08:00" />
 <meta itemprop="dateModified" content="2017-09-01T16:22:27&#43;08:00" />
 <meta itemprop="wordCount" content="194">
 
 
 
-<meta itemprop="keywords" content="" />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="The Difference between range and xrange"/>
 <meta name="twitter:description" content="Short answer:
-
 
 range creates a list, so if you do range(1, 10000000) it creates a list in memory with 9999999 elements. This will become an expensive operation on very large ranges.
 xrange is a sequence object that evaluates lazily(it will only compute the next value when needed).
@@ -156,22 +150,17 @@ xrange is a sequence object that evaluates lazily(it will only compute the next 
     
     <div class="post-content">
       <p>Short answer:</p>
-
 <ul>
 <li><code>range</code> creates a list, so if you do <code>range(1, 10000000)</code> it creates a list in memory with 9999999 elements. This will become an expensive operation on very large ranges.</li>
 <li><code>xrange</code> is a sequence object that <em>evaluates lazily</em>(it will only compute the next value when needed).</li>
 </ul>
-
-<p>For performance, especially when you&rsquo;re iterating over a large range, xrange() is usually better. However, there are still a few cases why you might prefer <code>range()</code>:</p>
-
+<p>For performance, especially when you're iterating over a large range, xrange() is usually better. However, there are still a few cases why you might prefer <code>range()</code>:</p>
 <ul>
-<li>In python 3, <code>range()</code> does what <code>xrange()</code> used to do and <code>xrange()</code> does not exist. If you want to write code that will run on both Python 2 and Python 3, you can&rsquo;t use <code>xrange()</code>.</li>
+<li>In python 3, <code>range()</code> does what <code>xrange()</code> used to do and <code>xrange()</code> does not exist. If you want to write code that will run on both Python 2 and Python 3, you can't use <code>xrange()</code>.</li>
 <li><code>range()</code> can actually be faster in some cases - eg. if iterating over the same sequence multiple times.  <code>xrange()</code> has to reconstruct the integer object every time, but <code>range()</code> will have real integer objects. (It will always perform worse in terms of memory however)</li>
-<li><code>xrange()</code> isn&rsquo;t usable in all cases where a real list is needed. For instance, it doesn&rsquo;t support slices, or any list methods.</li>
+<li><code>xrange()</code> isn't usable in all cases where a real list is needed. For instance, it doesn't support slices, or any list methods.</li>
 </ul>
-
 <p><strong>References</strong>:</p>
-
 <ul>
 <li><a href="https://stackoverflow.com/questions/94935/what-is-the-difference-between-range-and-xrange-functions-in-python-2-x">What is the difference between range and xrange functions in Python 2.X?</a></li>
 <li><a href="https://stackoverflow.com/questions/135041/should-you-always-favor-xrange-over-range">Should you always favor xrange() over range()?</a></li>

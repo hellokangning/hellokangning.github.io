@@ -26,7 +26,7 @@ In this post, I will enumerate some special methods that can change the behavior
 
 
 
-<meta name="generator" content="Hugo 0.59.1 with theme even" />
+<meta name="generator" content="Hugo 0.60.0 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/en/post/special-methods-in-python-data-model/" />
@@ -43,9 +43,7 @@ In this post, I will enumerate some special methods that can change the behavior
 
 <meta property="og:title" content="Special Methods in Python Data Model" />
 <meta property="og:description" content="You can think of the Data Model as a description of Python as a framework. It formalizes the interfaces of the building blocks of the languages itself, such as sequences, iterators, functions, classes, context managers and so on.
-
 Python allows operator overloading, which let us to define the custom behavior for a class. For instance, if a class defines a __str__(), then it can return a readable string representation of an object.
-
 In this post, I will enumerate some special methods that can change the behavior of an object and may putted into practice in daily work." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hellokangning.github.io/en/post/special-methods-in-python-data-model/" />
@@ -53,25 +51,18 @@ In this post, I will enumerate some special methods that can change the behavior
 <meta property="article:modified_time" content="2018-10-17T19:19:05+08:00" />
 <meta itemprop="name" content="Special Methods in Python Data Model">
 <meta itemprop="description" content="You can think of the Data Model as a description of Python as a framework. It formalizes the interfaces of the building blocks of the languages itself, such as sequences, iterators, functions, classes, context managers and so on.
-
 Python allows operator overloading, which let us to define the custom behavior for a class. For instance, if a class defines a __str__(), then it can return a readable string representation of an object.
-
 In this post, I will enumerate some special methods that can change the behavior of an object and may putted into practice in daily work.">
-
-
 <meta itemprop="datePublished" content="2018-10-16T15:19:05&#43;08:00" />
 <meta itemprop="dateModified" content="2018-10-17T19:19:05&#43;08:00" />
 <meta itemprop="wordCount" content="807">
 
 
 
-<meta itemprop="keywords" content="" />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Special Methods in Python Data Model"/>
 <meta name="twitter:description" content="You can think of the Data Model as a description of Python as a framework. It formalizes the interfaces of the building blocks of the languages itself, such as sequences, iterators, functions, classes, context managers and so on.
-
 Python allows operator overloading, which let us to define the custom behavior for a class. For instance, if a class defines a __str__(), then it can return a readable string representation of an object.
-
 In this post, I will enumerate some special methods that can change the behavior of an object and may putted into practice in daily work."/>
 
 <!--[if lte IE 9]>
@@ -155,39 +146,20 @@ In this post, I will enumerate some special methods that can change the behavior
     <div class="post-toc" id="post-toc">
   <h2 class="post-toc-title">Contents</h2>
   <div class="post-toc-content always-active">
-    <nav id="TableOfContents">
-<ul>
-<li><a href="#str"><code>__str__</code></a></li>
-<li><a href="#repr"><code>__repr__</code></a></li>
-<li><a href="#hash"><code>__hash__</code></a></li>
-<li><a href="#bool"><code>__bool__</code></a></li>
-<li><a href="#len"><code>__len__</code></a></li>
-<li><a href="#getitem"><code>__getitem__</code></a></li>
-<li><a href="#missing"><code>__missing__</code></a></li>
-<li><a href="#iadd"><code>__iadd__</code></a></li>
-<li><a href="#abs"><code>__abs__</code></a></li>
-<li><a href="#iter"><code>__iter__</code></a></li>
-</ul>
-</nav>
+    <nav id="TableOfContents"></nav>
   </div>
 </div>
     <div class="post-content">
       <p>You can think of the Data Model as a description of Python as a framework. It formalizes the interfaces of the building blocks of the languages itself, such as sequences, iterators, functions, classes, context managers and so on.</p>
-
 <p>Python allows operator overloading, which let us to define the custom behavior for a class. For instance, if a class defines a <code>__str__()</code>, then it can return a readable string representation of an object.</p>
-
 <p>In this post, I will enumerate some special methods that can change the behavior of an object and may putted into practice in daily work.</p>
-
 <p>The special names are always spelled with leading and trailing double underscore, i.e. <code>__str__</code>.</p>
-
 <h1 id="str"><code>__str__</code></h1>
-
 <p><code>__str()__</code> is called by <code>str(object)</code> and built-in functions such as <code>format()</code> and <code>print()</code> for a nicely printable string of an object. the return value must be a <code>string</code> object.</p>
-
 <p>The default implementation defined by the built-in type object calls <code>__repr()__</code>.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -200,40 +172,32 @@ In this post, I will enumerate some special methods that can change the behavior
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Element</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">k</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">v</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> -&gt; </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa"></span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> -&gt; </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
 
-<span class="n">c</span> <span class="o">=</span> <span class="n">Element</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="c1"># print a -&gt; b</span></code></pre></td></tr></table>
+<span class="n">c</span> <span class="o">=</span> <span class="n">Element</span><span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">a</span><span class="s1">&#39;</span><span class="p">,</span> <span class="sa"></span><span class="s1">&#39;</span><span class="s1">b</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="c1"># print a -&gt; b</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<h1 id="repr"><code>__repr__</code></h1>
-
+</div><h1 id="repr"><code>__repr__</code></h1>
 <p><code>__repr__()</code> is called by <code>repr()</code> function to compute the string representation of an object.</p>
-
 <p>The difference between <code>__str__()</code> and <code>__repr__()</code> is</p>
-
 <ul>
 <li><code>__repr__()</code> is for developers, and should be unambiguous.</li>
 <li><code>__str__()</code> is for customers, and should be readable.</li>
 </ul>
-
 <h1 id="hash"><code>__hash__</code></h1>
-
 <p><code>__hash()</code> is called by built-in <code>hash()</code> for operations on members of hashed collections including <code>set</code>, <code>frozenset</code> and <code>dict</code>. <code>__hash__()</code> return an integer, and the objects that are equal should have the same hash value.</p>
-
 <p>A class that overrides <code>__eq__()</code> and does not define <code>__hash__()</code> will have its <code>__hash__()</code> implicitly set to None.</p>
-
 <h1 id="bool"><code>__bool__</code></h1>
-
 <p><code>__bool__()</code> by the built-in <code>bool()</code> is called to implement truth value testing. When this method is not defined, <code>__len__()</code> is called.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -251,36 +215,32 @@ In this post, I will enumerate some special methods that can change the behavior
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Element</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">k</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">v</span>
 
-    <span class="k">def</span> <span class="nf">__bool__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__bool__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="o">!=</span> <span class="mi">0</span>
 
-<span class="n">a</span> <span class="o">=</span> <span class="n">Element</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span>
+<span class="n">a</span> <span class="o">=</span> <span class="n">Element</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="sa"></span><span class="s1">&#39;</span><span class="s1">a</span><span class="s1">&#39;</span><span class="p">)</span>
 <span class="k">if</span> <span class="n">a</span><span class="p">:</span> <span class="c1"># False</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">)</span> 
+    <span class="k">print</span><span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">a</span><span class="s1">&#39;</span><span class="p">)</span> 
 
-<span class="n">b</span> <span class="o">=</span> <span class="n">Element</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">)</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">Element</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="sa"></span><span class="s1">&#39;</span><span class="s1">b</span><span class="s1">&#39;</span><span class="p">)</span>
 <span class="k">if</span> <span class="n">b</span><span class="p">:</span> <span class="c1"># True</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;b&#39;</span><span class="p">)</span></code></pre></td></tr></table>
+    <span class="k">print</span><span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">b</span><span class="s1">&#39;</span><span class="p">)</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<h1 id="len"><code>__len__</code></h1>
-
+</div><h1 id="len"><code>__len__</code></h1>
 <p><code>__len__()</code> is called to implemented the build-in function <code>len()</code>. It should return the length of the object.</p>
-
 <blockquote>
 <p>For built-in types like <code>list</code>, <code>str</code>, <code>bytearray</code> etc., the interpreter takes a shortcut: the CPython implementation of <code>len()</code> actually returns the value of the <code>ob_size</code> field in the <code>PyVarObject</code> struct that represents any variable-sized built-in object in memory.</p>
 </blockquote>
-
 <h1 id="getitem"><code>__getitem__</code></h1>
-
 <p><code>__getitem__(self, key)</code> is called to implement evaluation of <code>self[key]</code>. For sequence types, the accepted keys should be integers and slice objects.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -303,29 +263,29 @@ In this post, I will enumerate some special methods that can change the behavior
 <td class="lntd">
 <pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
 
-<span class="n">Card</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Card&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;rank&#39;</span><span class="p">,</span><span class="s1">&#39;suit&#39;</span><span class="p">])</span>
+<span class="n">Card</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">Card</span><span class="s1">&#39;</span><span class="p">,</span> <span class="p">[</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">rank</span><span class="s1">&#39;</span><span class="p">,</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">suit</span><span class="s1">&#39;</span><span class="p">]</span><span class="p">)</span>
 
 <span class="k">class</span> <span class="nc">Deck</span><span class="p">:</span>
-    <span class="n">ranks</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">11</span><span class="p">)]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="s1">&#39;JQKA&#39;</span><span class="p">)</span>
-    <span class="n">suits</span> <span class="o">=</span> <span class="s1">&#39;spades diamonds clubs hearts&#39;</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+    <span class="n">ranks</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">11</span><span class="p">)</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">JQKA</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">suits</span> <span class="o">=</span> <span class="sa"></span><span class="s1">&#39;</span><span class="s1">spades diamonds clubs hearts</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cards</span> <span class="o">=</span> <span class="p">[</span><span class="n">Card</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">suits</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranks</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cards</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">position</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">position</span><span class="p">)</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cards</span><span class="p">[</span><span class="n">position</span><span class="p">]</span>
 
-<span class="n">d</span> <span class="o">=</span> <span class="n">Deck</span><span class="p">()</span>
-<span class="k">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="p">))</span> <span class="c1"># print 52</span></code></pre></td></tr></table>
+<span class="n">d</span> <span class="o">=</span> <span class="n">Deck</span><span class="p">(</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="p">)</span> <span class="c1"># print 52</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>By implementing the special methods <code>__len__</code> and <code>__getitem__</code>, our <code>Deck</code> behaves like a standard Python sequence, allowing it to benefit from the core language features - like iteration and slicing.</p>
+</div><p>By implementing the special methods <code>__len__</code> and <code>__getitem__</code>, our <code>Deck</code> behaves like a standard Python sequence, allowing it to benefit from the core language features - like iteration and slicing.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
@@ -334,25 +294,22 @@ In this post, I will enumerate some special methods that can change the behavior
 </span><span class="lnt">7
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="n">d</span> <span class="o">=</span> <span class="n">Deck</span><span class="p">()</span>
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="n">d</span> <span class="o">=</span> <span class="n">Deck</span><span class="p">(</span><span class="p">)</span>
 
 <span class="c1"># [Card(rank=&#39;2&#39;, suit=&#39;spades&#39;), Card(rank=&#39;3&#39;, suit=&#39;spades&#39;), Card(rank=&#39;4&#39;, suit=&#39;spades&#39;)]</span>
-<span class="k">print</span><span class="p">(</span><span class="n">d</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span> 
+<span class="k">print</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span><span class="p">)</span> 
 
-<span class="k">for</span> <span class="n">card</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="n">card</span><span class="p">)</span></code></pre></td></tr></table>
+<span class="k">for</span> <span class="n">card</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">card</span><span class="p">)</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<h1 id="missing"><code>__missing__</code></h1>
-
+</div><h1 id="missing"><code>__missing__</code></h1>
 <p><code>__missing__(self, key)</code> is called by <code>dict.__getitem__()</code> when key is not present.</p>
-
 <h1 id="iadd"><code>__iadd__</code></h1>
-
 <p><code>__iadd__(self, other)</code> implements addition with assignment. For instance, for <code>a += b</code>, <code>__iadd__</code> might return <code>a + b</code>, which would be assigned to <code>a</code>.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -371,29 +328,28 @@ In this post, I will enumerate some special methods that can change the behavior
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Element</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">k</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">v</span>
 
-    <span class="k">def</span> <span class="fm">__iadd__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="o">+=</span> <span class="n">other</span><span class="o">.</span><span class="n">key</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">+=</span> <span class="n">other</span><span class="o">.</span><span class="n">value</span>
+    <span class="k">def</span> <span class="fm">__iadd__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="o">+</span><span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span><span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">value</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s1">&#39;</span><span class="si">%d</span><span class="s1"> -&gt; </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa"></span><span class="s1">&#39;</span><span class="si">%d</span><span class="s1"> -&gt; </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
 
-<span class="n">a</span> <span class="o">=</span> <span class="n">Element</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span>
-<span class="n">a</span> <span class="o">+=</span> <span class="n">Element</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="c1"># 3 -&gt; ab</span></code></pre></td></tr></table>
+<span class="n">a</span> <span class="o">=</span> <span class="n">Element</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="sa"></span><span class="s1">&#39;</span><span class="s1">a</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">a</span> <span class="o">+</span><span class="o">=</span> <span class="n">Element</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="sa"></span><span class="s1">&#39;</span><span class="s1">b</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="c1"># 3 -&gt; ab</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<h1 id="abs"><code>__abs__</code></h1>
-
+</div><h1 id="abs"><code>__abs__</code></h1>
 <p>The <code>abs</code> built-in function returns the absolute value of integers and floats, and the magnitude of <code>complex</code> number. Actually, it is <code>__abs__</code> that takes effect underneath.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -407,22 +363,21 @@ In this post, I will enumerate some special methods that can change the behavior
 <td class="lntd">
 <pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">hypot</span>
 <span class="k">class</span> <span class="nc">Vector</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span>
-    <span class="k">def</span> <span class="fm">__abs__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__abs__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">hypot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
 
 <span class="n">v</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="c1"># 5.0</span></code></pre></td></tr></table>
+<span class="k">print</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="p">)</span> <span class="c1"># 5.0</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<h1 id="iter"><code>__iter__</code></h1>
-
+</div><h1 id="iter"><code>__iter__</code></h1>
 <p>This method is called when an iterator is required for a container. This method should return a new iterator object that can iterate over all the objects in the container.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -436,23 +391,22 @@ In this post, I will enumerate some special methods that can change the behavior
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Vector</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span>
 
-    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">))</span>
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span><span class="p">)</span>
 
 <span class="n">v</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
 <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">v</span>
-<span class="k">print</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="c1"># 2 3</span></code></pre></td></tr></table>
+<span class="k">print</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="c1"># 2 3</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><strong>Reference</strong></p>
-
+</div><p><strong>Reference</strong></p>
 <ul>
 <li><a href="https://docs.python.org/3.8/reference/datamodel.html">Data Model</a></li>
-<li><a href="https://rszalski.github.io/magicmethods/">A Guide to Python&rsquo;s Magic Methods</a></li>
+<li><a href="https://rszalski.github.io/magicmethods/">A Guide to Python's Magic Methods</a></li>
 </ul>
     </div>
 

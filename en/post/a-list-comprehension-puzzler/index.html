@@ -17,7 +17,7 @@
 
 
 <meta name="author" content="Guoqing Geng" /><meta name="description" content="Sometimes, we need to initialize a list with a certain number of nested lists, for example, a list with 3 lists of length 3 that can represent a Tic-tac-toe board.
-1 2 3 4 5 6  &amp;gt;&amp;gt;&amp;gt; board = [[&amp;#39;&amp;#39;] * 3] * 3 &amp;gt;&amp;gt; board [[&amp;#39;&amp;#39;, &amp;#39;&amp;#39;, &amp;#39;&amp;#39;], [&amp;#39;&amp;#39;, &amp;#39;&amp;#39;, &amp;#39;&amp;#39;], [&amp;#39;&amp;#39;, &amp;#39;&amp;#39;, &amp;#39;&amp;#39;]] &amp;gt;&amp;gt; board[1][2] = &amp;#39;X&amp;#39; &amp;gt;&amp;gt; board [[&amp;#39;&amp;#39;, &amp;#39;&amp;#39;, &amp;#39;X&amp;#39;], [&amp;#39;&amp;#39;, &amp;#39;&amp;#39;, &amp;#39;X&amp;#39;], [&amp;#39;&amp;#39;, &amp;#39;&amp;#39;, &amp;#39;X&amp;#39;]]   The output is not expected, why?
+&amp;gt;&amp;gt;&amp;gt; board = [[&#39;&#39;] * 3] * 3 &amp;gt;&amp;gt; board [[&#39;&#39;, &#39;&#39;, &#39;&#39;], [&#39;&#39;, &#39;&#39;, &#39;&#39;], [&#39;&#39;, &#39;&#39;, &#39;&#39;]] &amp;gt;&amp;gt; board[1][2] = &#39;X&#39; &amp;gt;&amp;gt; board [[&#39;&#39;, &#39;&#39;, &#39;X&#39;], [&#39;&#39;, &#39;&#39;, &#39;X&#39;], [&#39;&#39;, &#39;&#39;, &#39;X&#39;]] The output is not expected, why?
 " /><meta name="keywords" content="elasticsearch, python, hbase, redis" />
 
 
@@ -25,7 +25,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.59.1 with theme even" />
+<meta name="generator" content="Hugo 0.60.0 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/en/post/a-list-comprehension-puzzler/" />
@@ -42,24 +42,12 @@
 
 <meta property="og:title" content="A List Comprehension Puzzler" />
 <meta property="og:description" content="Sometimes, we need to initialize a list with a certain number of nested lists, for example, a list with 3 lists of length 3 that can represent a Tic-tac-toe board.
-
-
-1
-2
-3
-4
-5
-6
-
-
 &gt;&gt;&gt; board = [[&#39;&#39;] * 3] * 3
 &gt;&gt; board
 [[&#39;&#39;, &#39;&#39;, &#39;&#39;], [&#39;&#39;, &#39;&#39;, &#39;&#39;], [&#39;&#39;, &#39;&#39;, &#39;&#39;]]
 &gt;&gt; board[1][2] = &#39;X&#39;
 &gt;&gt; board
 [[&#39;&#39;, &#39;&#39;, &#39;X&#39;], [&#39;&#39;, &#39;&#39;, &#39;X&#39;], [&#39;&#39;, &#39;&#39;, &#39;X&#39;]]
-
-
 The output is not expected, why?" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hellokangning.github.io/en/post/a-list-comprehension-puzzler/" />
@@ -67,55 +55,28 @@ The output is not expected, why?" />
 <meta property="article:modified_time" content="2018-10-24T11:19:09+08:00" />
 <meta itemprop="name" content="A List Comprehension Puzzler">
 <meta itemprop="description" content="Sometimes, we need to initialize a list with a certain number of nested lists, for example, a list with 3 lists of length 3 that can represent a Tic-tac-toe board.
-
-
-1
-2
-3
-4
-5
-6
-
-
 &gt;&gt;&gt; board = [[&#39;&#39;] * 3] * 3
 &gt;&gt; board
 [[&#39;&#39;, &#39;&#39;, &#39;&#39;], [&#39;&#39;, &#39;&#39;, &#39;&#39;], [&#39;&#39;, &#39;&#39;, &#39;&#39;]]
 &gt;&gt; board[1][2] = &#39;X&#39;
 &gt;&gt; board
 [[&#39;&#39;, &#39;&#39;, &#39;X&#39;], [&#39;&#39;, &#39;&#39;, &#39;X&#39;], [&#39;&#39;, &#39;&#39;, &#39;X&#39;]]
-
-
 The output is not expected, why?">
-
-
 <meta itemprop="datePublished" content="2018-10-24T11:19:09&#43;08:00" />
 <meta itemprop="dateModified" content="2018-10-24T11:19:09&#43;08:00" />
-<meta itemprop="wordCount" content="245">
+<meta itemprop="wordCount" content="233">
 
 
 
-<meta itemprop="keywords" content="" />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="A List Comprehension Puzzler"/>
 <meta name="twitter:description" content="Sometimes, we need to initialize a list with a certain number of nested lists, for example, a list with 3 lists of length 3 that can represent a Tic-tac-toe board.
-
-
-1
-2
-3
-4
-5
-6
-
-
 &gt;&gt;&gt; board = [[&#39;&#39;] * 3] * 3
 &gt;&gt; board
 [[&#39;&#39;, &#39;&#39;, &#39;&#39;], [&#39;&#39;, &#39;&#39;, &#39;&#39;], [&#39;&#39;, &#39;&#39;, &#39;&#39;]]
 &gt;&gt; board[1][2] = &#39;X&#39;
 &gt;&gt; board
 [[&#39;&#39;, &#39;&#39;, &#39;X&#39;], [&#39;&#39;, &#39;&#39;, &#39;X&#39;], [&#39;&#39;, &#39;&#39;, &#39;X&#39;]]
-
-
 The output is not expected, why?"/>
 
 <!--[if lte IE 9]>
@@ -190,7 +151,7 @@ The output is not expected, why?"/>
         <div class="post-category">
             <a href="/en/categories/python/"> Python </a>
             </div>
-          <span class="more-meta"> 245 words </span>
+          <span class="more-meta"> 233 words </span>
           <span class="more-meta"> 2 mins read </span>
         
       </div>
@@ -199,81 +160,53 @@ The output is not expected, why?"/>
     
     <div class="post-content">
       <p>Sometimes, we need to initialize a list with a certain number of nested lists, for example, a list with 3 lists of length 3 that can represent a Tic-tac-toe board.</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span></pre></td>
-<td class="lntd">
-<pre class="chroma">&gt;&gt;&gt; board = [[&#39;&#39;] * 3] * 3
+<pre><code>&gt;&gt;&gt; board = [[''] * 3] * 3
 &gt;&gt; board
-[[&#39;&#39;, &#39;&#39;, &#39;&#39;], [&#39;&#39;, &#39;&#39;, &#39;&#39;], [&#39;&#39;, &#39;&#39;, &#39;&#39;]]
-&gt;&gt; board[1][2] = &#39;X&#39;
+[['', '', ''], ['', '', ''], ['', '', '']]
+&gt;&gt; board[1][2] = 'X'
 &gt;&gt; board
-[[&#39;&#39;, &#39;&#39;, &#39;X&#39;], [&#39;&#39;, &#39;&#39;, &#39;X&#39;], [&#39;&#39;, &#39;&#39;, &#39;X&#39;]]</pre></td></tr></table>
-</div>
-</div>
-<p>The output is not expected, why?</p>
-
+[['', '', 'X'], ['', '', 'X'], ['', '', 'X']]
+</code></pre><p>The output is not expected, why?</p>
 <p>Because the outer list is made of three references to the same inner list, a fact that you can see from <code>id(board[0]) == id(board[1])</code> is <code>True</code>. While it is unchanged, all seems right. After placing a mark in row 1, column 2, it reveals that all rows are alias referring to the same object.</p>
-
 <p>In essence, the above code behaves like:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="n">row</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span>
-<span class="n">board</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
-    <span class="n">board</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span></code></pre></td></tr></table>
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="n">row</span> <span class="o">=</span> <span class="p">[</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span>
+<span class="n">board</span> <span class="o">=</span> <span class="p">[</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="p">:</span>
+    <span class="n">board</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>It is much obvious that the same <code>row</code> is appended 3 times to <code>board</code>.</p>
-
+</div><p>It is much obvious that the same <code>row</code> is appended 3 times to <code>board</code>.</p>
 <p>The correct way to achieve our goal is:</p>
+<pre><code>&gt;&gt;&gt; board = [[''] * 3 for _ in range(3)]
+&gt;&gt; board
+[['', '', ''], ['', '', ''], ['', '', '']]
+&gt;&gt; board[1][2] = 'X'
+&gt;&gt; board
+[['', '', ''], ['', '', 'X'], ['', '', '']]
+</code></pre><p>Actually, it is equivalent to this code:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span></pre></td>
-<td class="lntd">
-<pre class="chroma">&gt;&gt;&gt; board = [[&#39;&#39;] * 3 for _ in range(3)]
-&gt;&gt; board
-[[&#39;&#39;, &#39;&#39;, &#39;&#39;], [&#39;&#39;, &#39;&#39;, &#39;&#39;], [&#39;&#39;, &#39;&#39;, &#39;&#39;]]
-&gt;&gt; board[1][2] = &#39;X&#39;
-&gt;&gt; board
-[[&#39;&#39;, &#39;&#39;, &#39;&#39;], [&#39;&#39;, &#39;&#39;, &#39;X&#39;], [&#39;&#39;, &#39;&#39;, &#39;&#39;]]</pre></td></tr></table>
-</div>
-</div>
-<p>Actually, it is equivalent to this code:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="n">board</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
-    <span class="n">row</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span>
-    <span class="n">board</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span></code></pre></td></tr></table>
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="n">board</span> <span class="o">=</span> <span class="p">[</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="p">:</span>
+    <span class="n">row</span> <span class="o">=</span> <span class="p">[</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span>
+    <span class="n">board</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><strong>Reference</strong></p>
-
+</div><p><strong>Reference</strong></p>
 <p><a href="https://book.douban.com/subject/26278021/">Fluent Python</a></p>
     </div>
 

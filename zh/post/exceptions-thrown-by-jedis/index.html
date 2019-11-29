@@ -24,7 +24,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.59.1 with theme even" />
+<meta name="generator" content="Hugo 0.60.0 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/zh/post/exceptions-thrown-by-jedis/" />
@@ -47,16 +47,13 @@
 <meta property="article:modified_time" content="2019-01-02T16:21:00+08:00" />
 <meta itemprop="name" content="Jedis 的常见异常">
 <meta itemprop="description" content="最近在读的 Redis开发与运维，很好地总结了客户端的常见异常。这篇博客权且作为读书笔记。">
-
-
 <meta itemprop="datePublished" content="2019-01-02T16:21:00&#43;08:00" />
 <meta itemprop="dateModified" content="2019-01-02T16:21:00&#43;08:00" />
-<meta itemprop="wordCount" content="975">
+<meta itemprop="wordCount" content="953">
 
 
 
-<meta itemprop="keywords" content="" />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Jedis 的常见异常"/>
 <meta name="twitter:description" content="最近在读的 Redis开发与运维，很好地总结了客户端的常见异常。这篇博客权且作为读书笔记。"/>
 
@@ -132,7 +129,7 @@
         <div class="post-category">
             <a href="/zh/categories/redis/"> Redis </a>
             </div>
-          <span class="more-meta"> 约 975 字 </span>
+          <span class="more-meta"> 约 953 字 </span>
           <span class="more-meta"> 预计阅读 2 分钟 </span>
         
       </div>
@@ -141,178 +138,76 @@
     <div class="post-toc" id="post-toc">
   <h2 class="post-toc-title">文章目录</h2>
   <div class="post-toc-content always-active">
-    <nav id="TableOfContents">
-<ul>
-<li><a href="#无法从连接池获取到连接">无法从连接池获取到连接</a></li>
-<li><a href="#客户端读写超时">客户端读写超时</a></li>
-<li><a href="#客户端连接超时">客户端连接超时</a></li>
-<li><a href="#客户端缓冲区异常">客户端缓冲区异常</a></li>
-<li><a href="#redis-正在加载持久化文件">Redis 正在加载持久化文件</a></li>
-<li><a href="#redis-使用的内存超过-maxmemory-配置">Redis 使用的内存超过 <code>maxmemory</code> 配置</a></li>
-<li><a href="#客户端连接数过大">客户端连接数过大</a></li>
-</ul>
-</nav>
+    <nav id="TableOfContents"></nav>
   </div>
 </div>
     <div class="post-content">
       <p>最近在读的 <a href="https://book.douban.com/subject/26971561/">Redis开发与运维</a>，很好地总结了客户端的常见异常。这篇博客权且作为读书笔记。</p>
-
-<h1 id="无法从连接池获取到连接">无法从连接池获取到连接</h1>
-
+<h1 id="heading">无法从连接池获取到连接</h1>
 <p>JedisPool 中的 Jedis 对象个数默认是 8 个。如果有 8 个 Jedis 对象被占用，并且没有归还，此时调用者还要从 JedisPool 中借用 Jedis，就需要进行等待（例如设置了 <code>maxWaitMillis &gt; 0</code>），如果在 <code>maxWaitMillis</code> 时间内仍然无法获取到 Jedis 对象就会抛出如下异常：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span></pre></td>
-<td class="lntd">
-<pre class="chroma">redis.clients.jedis.exceptions.JedisConnectionException: Could not get a resource
+<pre><code>redis.clients.jedis.exceptions.JedisConnectionException: Could not get a resource
 from the pool
 …
 Caused by: java.util.NoSuchElementException: Timeout waiting for idle object
 at org.apache.commons.pool2.impl.GenericObjectPool.borrowObject(GenericObjectPool.
-java:449)</pre></td></tr></table>
-</div>
-</div>
-<p>另外一种情况，是设置了 <code>blockWhenExhausted = false</code>。调用者不会等待，直接抛出异常。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span></pre></td>
-<td class="lntd">
-<pre class="chroma">redis.clients.jedis.exceptions.JedisConnectionException: Could not get a resource
+java:449)
+</code></pre><p>另外一种情况，是设置了 <code>blockWhenExhausted = false</code>。调用者不会等待，直接抛出异常。</p>
+<pre><code>redis.clients.jedis.exceptions.JedisConnectionException: Could not get a resource
 from the pool
 …
 Caused by: java.util.NoSuchElementException: Pool exhausted
 at org.apache.commons.pool2.impl.GenericObjectPool.borrowObject(GenericObjectPool.
-java:464)</pre></td></tr></table>
-</div>
-</div>
-<p>为甚么连接池没有资源了呢，原因非常多，首先检查下客户端：</p>
-
+java:464)
+</code></pre><p>为甚么连接池没有资源了呢，原因非常多，首先检查下客户端：</p>
 <ol>
 <li>高并发下连接池设置过小。</li>
 <li>没有正确释放连接池。</li>
 <li>存在慢查询时，该 Jedis 对象归还速度会很慢，导致池子满了。</li>
 </ol>
-
 <p>如果客户端正常，服务端的某些原因可能导致用户命令的阻塞，也会使客户端抛出这种异常。</p>
-
-<h1 id="客户端读写超时">客户端读写超时</h1>
-
+<h1 id="heading1">客户端读写超时</h1>
 <p>Jedis 在调用 Redis 时，如果出现了读写超时后，会出现下面的异常：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span><span class="lnt">2
-</span></pre></td>
-<td class="lntd">
-<pre class="chroma">redis.clients.jedis.exceptions.JedisConnectionException:
-java.net.SocketTimeoutException: Read timed out</pre></td></tr></table>
-</div>
-</div>
-<p>造成该异常的原因也有以下几种：</p>
-
+<pre><code>redis.clients.jedis.exceptions.JedisConnectionException:
+java.net.SocketTimeoutException: Read timed out
+</code></pre><p>造成该异常的原因也有以下几种：</p>
 <ul>
 <li>读写超时间设置得过短。</li>
 <li>命令本身就比较慢。</li>
 <li>客户端与服务端网络不正常。</li>
 <li>Redis自身发生阻塞。</li>
 </ul>
-
-<h1 id="客户端连接超时">客户端连接超时</h1>
-
+<h1 id="heading2">客户端连接超时</h1>
 <p>Jedis 在调用 Redis 时，如果出现了连接超时后，会出现下面的异常：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span><span class="lnt">2
-</span></pre></td>
-<td class="lntd">
-<pre class="chroma">redis.clients.jedis.exceptions.JedisConnectionException:
-java.net.SocketTimeoutException: connect timed out</pre></td></tr></table>
-</div>
-</div>
-<p>造成该异常的原因也有以下几种：</p>
-
+<pre><code>redis.clients.jedis.exceptions.JedisConnectionException:
+java.net.SocketTimeoutException: connect timed out
+</code></pre><p>造成该异常的原因也有以下几种：</p>
 <ol>
 <li>连接超时设置得过短，</li>
 <li>Redis发生阻塞，造成tcp-backlog已满，造成新的连接失败。</li>
 <li>客户端与服务端网络不正常。</li>
 </ol>
-
-<h1 id="客户端缓冲区异常">客户端缓冲区异常</h1>
-
+<h1 id="heading3">客户端缓冲区异常</h1>
 <p>Jedis 在调用 Redis 时，如果出现客户端数据流异常，会出现下面的异常：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span></pre></td>
-<td class="lntd">
-<pre class="chroma">redis.clients.jedis.exceptions.JedisConnectionException: Unexpected end of stream.</pre></td></tr></table>
-</div>
-</div>
-<p>造成这个异常的原因可能有如下几种：</p>
-
+<pre><code>redis.clients.jedis.exceptions.JedisConnectionException: Unexpected end of stream.
+</code></pre><p>造成这个异常的原因可能有如下几种：</p>
 <ol>
 <li>输出缓冲区满。例如将普通客户端的输出缓冲区设置为 <code>1M 1M 60</code>： <code>config set client-output-buffer-limit &quot;normal 1048576 1048576 60 slave 268435456 67108864 60 pubsub 33554432 8388608 60</code>。如果使用get命令获取一个bigkey（例如3M），就会出现这个异常。</li>
 <li>长时间闲置连接被服务端主动断开。</li>
 <li>不正常并发读写：Jedis对象同时被多个线程并发操作，可能会出现上述异常。</li>
 </ol>
-
-<h1 id="redis-正在加载持久化文件">Redis 正在加载持久化文件</h1>
-
+<h1 id="redis-">Redis 正在加载持久化文件</h1>
 <p>Jedis 调用 Redis 时，如果 Redis 正在加载持久化文件，那么会收到下面的异常：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span></pre></td>
-<td class="lntd">
-<pre class="chroma">redis.clients.jedis.exceptions.JedisDataException: LOADING Redis is loading the dataset in memory</pre></td></tr></table>
-</div>
-</div>
-<h1 id="redis-使用的内存超过-maxmemory-配置">Redis 使用的内存超过 <code>maxmemory</code> 配置</h1>
-
+<pre><code>redis.clients.jedis.exceptions.JedisDataException: LOADING Redis is loading the dataset in memory
+</code></pre><h1 id="redis--maxmemory-">Redis 使用的内存超过 <code>maxmemory</code> 配置</h1>
 <p>Jedis 执行写操作时，如果 Redis 的使用内存大于 <code>maxmemory</code> 的设置，会收到下面的异常，此时应该调整 <code>maxmemory</code> 并找到造成内存增长的原因：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span></pre></td>
-<td class="lntd">
-<pre class="chroma">redis.clients.jedis.exceptions.JedisDataException: OOM command not allowed when used memory &gt; &#39;maxmemory&#39;.</pre></td></tr></table>
-</div>
-</div>
-<h1 id="客户端连接数过大">客户端连接数过大</h1>
-
+<pre><code>redis.clients.jedis.exceptions.JedisDataException: OOM command not allowed when used memory &gt; 'maxmemory'.
+</code></pre><h1 id="heading4">客户端连接数过大</h1>
 <p>如果客户端连接数超过了maxclients，新申请的连接就会出现如下异常：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span></pre></td>
-<td class="lntd">
-<pre class="chroma">redis.clients.jedis.exceptions.JedisDataException: ERR max number of clients reached</pre></td></tr></table>
-</div>
-</div>
-<p>此时新的客户端连接执行任何命令，返回结果都是如下：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span><span class="lnt">2
-</span></pre></td>
-<td class="lntd">
-<pre class="chroma">127.0.0.1:6379&gt; get hello
-(error) ERR max number of clients reached</pre></td></tr></table>
-</div>
-</div>
+<pre><code>redis.clients.jedis.exceptions.JedisDataException: ERR max number of clients reached
+</code></pre><p>此时新的客户端连接执行任何命令，返回结果都是如下：</p>
+<pre><code>127.0.0.1:6379&gt; get hello
+(error) ERR max number of clients reached
+</code></pre>
     </div>
 
     

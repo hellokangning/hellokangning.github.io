@@ -17,14 +17,14 @@
 
 
 <meta name="author" content="Guoqing Geng" /><meta name="description" content="继续每天的知心姐姐时间，这次客户邮件说，CPU 使用率飙升，同时 GET/LLEN 等命令，都要执行几十毫秒。看了一下慢日志，我去：
-1 2 3 4 5 6 7 8 9 10  Id:900909 When:(1/1/2019 6:16:15 PM) Duration:41564us Command:(Llen PRIVATE ARG) Id:900908 When:(1/1/2019 6:16:14 PM) Duration:17041us Command:(get PRIVATE ARG) Id:900907 When:(1/1/2019 6:16:14 PM) Duration:51032us Command:(get PRIVATE ARG) Id:900906 When:(1/1/2019 6:16:12 PM) Duration:49292us Command:(get PRIVATE ARG) Id:900905 When:(1/1/2019 6:16:11 PM) Duration:56329us Command:(Llen PRIVATE ARG) Id:900904 When:(1/1/2019 6:16:10 PM) Duration:10562us Command:(get PRIVATE ARG) Id:900903 When:(1/1/2019 6:16:10 PM) Duration:35680us Command:(get PRIVATE ARG) Id:900902 When:(1/1/2019 6:16:10 PM) Duration:16367us Command:(get PRIVATE ARG) Id:900901 When:(1/1/2019 6:16:10 PM) Duration:29851us Command:(Llen PRIVATE ARG) Id:900900 When:(1/1/2019 6:16:08 PM) Duration:29050us Command:(get PRIVATE ARG)  " /><meta name="keywords" content="Redis, Lantency" />
+Id:900909 When:(1/1/2019 6:16:15 PM) Duration:41564us Command:(Llen PRIVATE ARG) Id:900908 When:(1/1/2019 6:16:14 PM) Duration:17041us Command:(get PRIVATE ARG) Id:900907 When:(1/1/2019 6:16:14 PM) Duration:51032us Command:(get PRIVATE ARG) Id:900906 When:(1/1/2019 6:16:12 PM) Duration:49292us Command:(get PRIVATE ARG) Id:900905 When:(1/1/2019 6:16:11 PM) Duration:56329us Command:(Llen PRIVATE ARG) Id:900904 When:(1/1/2019 6:16:10 PM) Duration:10562us Command:(get PRIVATE ARG) Id:900903 When:(1/1/2019 6:16:10 PM) Duration:35680us Command:(get PRIVATE ARG) Id:900902 When:(1/1/2019 6:16:10 PM) Duration:16367us Command:(get PRIVATE ARG) Id:900901 When:(1/1/2019 6:16:10 PM) Duration:29851us Command:(Llen PRIVATE ARG) Id:900900 When:(1/1/2019 6:16:08 PM) Duration:29050us Command:(get PRIVATE ARG) " /><meta name="keywords" content="Redis, Lantency" />
 
 
 
 
 
 
-<meta name="generator" content="Hugo 0.59.1 with theme even" />
+<meta name="generator" content="Hugo 0.60.0 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/zh/post/redis-anomalous-latency-because-of-page-fault/" />
@@ -41,20 +41,6 @@
 
 <meta property="og:title" content="页错误引发的 Redis 延迟" />
 <meta property="og:description" content="继续每天的知心姐姐时间，这次客户邮件说，CPU 使用率飙升，同时 GET/LLEN 等命令，都要执行几十毫秒。看了一下慢日志，我去：
-
-
- 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-
-
 Id:900909 When:(1/1/2019 6:16:15 PM) Duration:41564us Command:(Llen PRIVATE ARG)
 Id:900908 When:(1/1/2019 6:16:14 PM) Duration:17041us Command:(get PRIVATE ARG)
 Id:900907 When:(1/1/2019 6:16:14 PM) Duration:51032us Command:(get PRIVATE ARG)
@@ -65,7 +51,6 @@ Id:900903 When:(1/1/2019 6:16:10 PM) Duration:35680us Command:(get PRIVATE ARG)
 Id:900902 When:(1/1/2019 6:16:10 PM) Duration:16367us Command:(get PRIVATE ARG)
 Id:900901 When:(1/1/2019 6:16:10 PM) Duration:29851us Command:(Llen PRIVATE ARG)
 Id:900900 When:(1/1/2019 6:16:08 PM) Duration:29050us Command:(get PRIVATE ARG)
-
 " />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hellokangning.github.io/zh/post/redis-anomalous-latency-because-of-page-fault/" />
@@ -73,20 +58,6 @@ Id:900900 When:(1/1/2019 6:16:08 PM) Duration:29050us Command:(get PRIVATE ARG)
 <meta property="article:modified_time" content="2019-01-07T14:11:18+08:00" />
 <meta itemprop="name" content="页错误引发的 Redis 延迟">
 <meta itemprop="description" content="继续每天的知心姐姐时间，这次客户邮件说，CPU 使用率飙升，同时 GET/LLEN 等命令，都要执行几十毫秒。看了一下慢日志，我去：
-
-
- 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-
-
 Id:900909 When:(1/1/2019 6:16:15 PM) Duration:41564us Command:(Llen PRIVATE ARG)
 Id:900908 When:(1/1/2019 6:16:14 PM) Duration:17041us Command:(get PRIVATE ARG)
 Id:900907 When:(1/1/2019 6:16:14 PM) Duration:51032us Command:(get PRIVATE ARG)
@@ -97,34 +68,16 @@ Id:900903 When:(1/1/2019 6:16:10 PM) Duration:35680us Command:(get PRIVATE ARG)
 Id:900902 When:(1/1/2019 6:16:10 PM) Duration:16367us Command:(get PRIVATE ARG)
 Id:900901 When:(1/1/2019 6:16:10 PM) Duration:29851us Command:(Llen PRIVATE ARG)
 Id:900900 When:(1/1/2019 6:16:08 PM) Duration:29050us Command:(get PRIVATE ARG)
-
 ">
-
-
 <meta itemprop="datePublished" content="2019-01-07T14:11:18&#43;08:00" />
 <meta itemprop="dateModified" content="2019-01-07T14:11:18&#43;08:00" />
-<meta itemprop="wordCount" content="592">
+<meta itemprop="wordCount" content="582">
 
 
 
-<meta itemprop="keywords" content="苦逼运维," />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="苦逼运维," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="页错误引发的 Redis 延迟"/>
 <meta name="twitter:description" content="继续每天的知心姐姐时间，这次客户邮件说，CPU 使用率飙升，同时 GET/LLEN 等命令，都要执行几十毫秒。看了一下慢日志，我去：
-
-
- 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-
-
 Id:900909 When:(1/1/2019 6:16:15 PM) Duration:41564us Command:(Llen PRIVATE ARG)
 Id:900908 When:(1/1/2019 6:16:14 PM) Duration:17041us Command:(get PRIVATE ARG)
 Id:900907 When:(1/1/2019 6:16:14 PM) Duration:51032us Command:(get PRIVATE ARG)
@@ -135,7 +88,6 @@ Id:900903 When:(1/1/2019 6:16:10 PM) Duration:35680us Command:(get PRIVATE ARG)
 Id:900902 When:(1/1/2019 6:16:10 PM) Duration:16367us Command:(get PRIVATE ARG)
 Id:900901 When:(1/1/2019 6:16:10 PM) Duration:29851us Command:(Llen PRIVATE ARG)
 Id:900900 When:(1/1/2019 6:16:08 PM) Duration:29050us Command:(get PRIVATE ARG)
-
 "/>
 
 <!--[if lte IE 9]>
@@ -210,7 +162,7 @@ Id:900900 When:(1/1/2019 6:16:08 PM) Duration:29050us Command:(get PRIVATE ARG)
         <div class="post-category">
             <a href="/zh/categories/redis/"> Redis </a>
             </div>
-          <span class="more-meta"> 约 592 字 </span>
+          <span class="more-meta"> 约 582 字 </span>
           <span class="more-meta"> 预计阅读 2 分钟 </span>
         
       </div>
@@ -219,21 +171,7 @@ Id:900900 When:(1/1/2019 6:16:08 PM) Duration:29050us Command:(get PRIVATE ARG)
     
     <div class="post-content">
       <p>继续每天的知心姐姐时间，这次客户邮件说，CPU 使用率飙升，同时 GET/LLEN 等命令，都要执行几十毫秒。看了一下慢日志，我去：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span></pre></td>
-<td class="lntd">
-<pre class="chroma">Id:900909 When:(1/1/2019 6:16:15 PM) Duration:41564us Command:(Llen PRIVATE ARG)
+<pre><code>Id:900909 When:(1/1/2019 6:16:15 PM) Duration:41564us Command:(Llen PRIVATE ARG)
 Id:900908 When:(1/1/2019 6:16:14 PM) Duration:17041us Command:(get PRIVATE ARG)
 Id:900907 When:(1/1/2019 6:16:14 PM) Duration:51032us Command:(get PRIVATE ARG)
 Id:900906 When:(1/1/2019 6:16:12 PM) Duration:49292us Command:(get PRIVATE ARG)
@@ -242,43 +180,27 @@ Id:900904 When:(1/1/2019 6:16:10 PM) Duration:10562us Command:(get PRIVATE ARG)
 Id:900903 When:(1/1/2019 6:16:10 PM) Duration:35680us Command:(get PRIVATE ARG)
 Id:900902 When:(1/1/2019 6:16:10 PM) Duration:16367us Command:(get PRIVATE ARG)
 Id:900901 When:(1/1/2019 6:16:10 PM) Duration:29851us Command:(Llen PRIVATE ARG)
-Id:900900 When:(1/1/2019 6:16:08 PM) Duration:29050us Command:(get PRIVATE ARG)</pre></td></tr></table>
-</div>
-</div>
-<p>甘总教育我们，出了问题，不要惊慌。先看下 QPS, 20k 左右，不算低了。</p>
-
-<p><img src="/images/redis-page-fault-ops.png" alt="" /></p>
-
+Id:900900 When:(1/1/2019 6:16:08 PM) Duration:29050us Command:(get PRIVATE ARG)
+</code></pre><p>甘总教育我们，出了问题，不要惊慌。先看下 QPS, 20k 左右，不算低了。</p>
+<p><img src="/images/redis-page-fault-ops.png" alt=""></p>
 <p>比较奇怪的时命中率，非常之低，仅有10%左右。</p>
-
-<p><img src="/images/redis-page-fault-hit-ratio.png" alt="" /></p>
-
+<p><img src="/images/redis-page-fault-hit-ratio.png" alt=""></p>
 <p>赶紧跟客户反映了一下，估计是使用姿势的问题。Cache 这么用，是极大的浪费。</p>
-
 <p>另外一个异常情况就是响应大小，20KB。Redis 对于大文件的支持很有限，具体可以参见：<a href="https://groups.google.com/forum/#!topic/redis-db/n7aa2A4DZDs">What is the ideal value size range for redis? Is 100KB too large?</a>。</p>
-
-<p><img src="/images/redis-page-fault-response-size.png" alt="" /></p>
-
+<p><img src="/images/redis-page-fault-response-size.png" alt=""></p>
 <p>这命中率和响应体的问题都说服不了客户，他们还在追问为什么 CPU 这么嗨。继续调查，看到页错误的时候，心里暗喜：</p>
-
-<p><img src="/images/redis-page-fault-hard-page-fault.png" alt="" /></p>
-
+<p><img src="/images/redis-page-fault-hard-page-fault.png" alt=""></p>
 <p>来看 Redis 官方关于 <a href="https://redis.io/topics/latency">Lantency</a> 的解释：</p>
-
 <blockquote>
 <p>If a Redis page is moved by the kernel from the memory to the swap file, when the data stored in this memory page is used by Redis (for example accessing a key stored into this memory page) the kernel will stop the Redis process in order to move the page back into the main memory. This is a slow operation involving random I/Os (compared to accessing a page that is already in memory) and will result into anomalous latency experienced by Redis clients.</p>
 </blockquote>
-
 <p>正是用户的访问方式，导致页面被频繁置换，引发了此次的延迟问题。</p>
-
 <p>扩展一下，导致页错误的可能原因还有：</p>
-
 <ol>
 <li>分配的内存不够用了。</li>
 <li>Redis 里的大部分数据闲置着，没有访问，本文遇到的就是这种情况。</li>
 <li>大量的 I/O 也可能是罪魁祸首。文件被 cache 住，需要用到系统缓存，导致了 swap。RDB 和 AOF 都可能产生大文件。</li>
 </ol>
-
 <p>收工。</p>
     </div>
 

@@ -16,7 +16,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
 
-<meta name="author" content="Guoqing Geng" /><meta name="description" content="This is a question that I was asked during an interview: what does the concurrent mode failure means? It&amp;rsquo;s really a good question to check your understanding of Concurrent Mark Sweep (CMS) Collector.
+<meta name="author" content="Guoqing Geng" /><meta name="description" content="This is a question that I was asked during an interview: what does the concurrent mode failure means? It&#39;s really a good question to check your understanding of Concurrent Mark Sweep (CMS) Collector.
 This post starts with concurrent mode failure and explains the whole steps of one CMS cycle.
 In a nutshell,
  The message &amp;ldquo;concurrent mode failure&amp;rdquo; signifies that the concurrent collection of the Old Generation did not finish before the Old Generation became full.
@@ -27,7 +27,7 @@ In a nutshell,
 
 
 
-<meta name="generator" content="Hugo 0.59.1 with theme even" />
+<meta name="generator" content="Hugo 0.60.0 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/en/post/what-is-the-concurrent-mode-failure/" />
@@ -43,12 +43,9 @@ In a nutshell,
 
 
 <meta property="og:title" content="What Is the Concurrent Mode Failure?" />
-<meta property="og:description" content="This is a question that I was asked during an interview: what does the concurrent mode failure means? It&rsquo;s really a good question to check your understanding of Concurrent Mark Sweep (CMS) Collector.
-
+<meta property="og:description" content="This is a question that I was asked during an interview: what does the concurrent mode failure means? It&#39;s really a good question to check your understanding of Concurrent Mark Sweep (CMS) Collector.
 This post starts with concurrent mode failure and explains the whole steps of one CMS cycle.
-
 In a nutshell,
-
 
 The message &ldquo;concurrent mode failure&rdquo; signifies that the concurrent collection of the Old Generation did not finish before the Old Generation became full.
 " />
@@ -57,32 +54,23 @@ The message &ldquo;concurrent mode failure&rdquo; signifies that the concurrent 
 <meta property="article:published_time" content="2018-10-31T14:25:16+08:00" />
 <meta property="article:modified_time" content="2018-10-31T14:25:16+08:00" />
 <meta itemprop="name" content="What Is the Concurrent Mode Failure?">
-<meta itemprop="description" content="This is a question that I was asked during an interview: what does the concurrent mode failure means? It&rsquo;s really a good question to check your understanding of Concurrent Mark Sweep (CMS) Collector.
-
+<meta itemprop="description" content="This is a question that I was asked during an interview: what does the concurrent mode failure means? It&#39;s really a good question to check your understanding of Concurrent Mark Sweep (CMS) Collector.
 This post starts with concurrent mode failure and explains the whole steps of one CMS cycle.
-
 In a nutshell,
-
 
 The message &ldquo;concurrent mode failure&rdquo; signifies that the concurrent collection of the Old Generation did not finish before the Old Generation became full.
 ">
-
-
 <meta itemprop="datePublished" content="2018-10-31T14:25:16&#43;08:00" />
 <meta itemprop="dateModified" content="2018-10-31T14:25:16&#43;08:00" />
 <meta itemprop="wordCount" content="687">
 
 
 
-<meta itemprop="keywords" content="JVM," />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="JVM," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="What Is the Concurrent Mode Failure?"/>
-<meta name="twitter:description" content="This is a question that I was asked during an interview: what does the concurrent mode failure means? It&rsquo;s really a good question to check your understanding of Concurrent Mark Sweep (CMS) Collector.
-
+<meta name="twitter:description" content="This is a question that I was asked during an interview: what does the concurrent mode failure means? It&#39;s really a good question to check your understanding of Concurrent Mark Sweep (CMS) Collector.
 This post starts with concurrent mode failure and explains the whole steps of one CMS cycle.
-
 In a nutshell,
-
 
 The message &ldquo;concurrent mode failure&rdquo; signifies that the concurrent collection of the Old Generation did not finish before the Old Generation became full.
 "/>
@@ -168,64 +156,40 @@ The message &ldquo;concurrent mode failure&rdquo; signifies that the concurrent 
     <div class="post-toc" id="post-toc">
   <h2 class="post-toc-title">Contents</h2>
   <div class="post-toc-content always-active">
-    
+    <nav id="TableOfContents"></nav>
   </div>
 </div>
     <div class="post-content">
-      <p>This is a question that I was asked during an interview: what does the concurrent mode failure means? It&rsquo;s really a good question to check your understanding of Concurrent Mark Sweep (CMS) Collector.</p>
-
+      <p>This is a question that I was asked during an interview: what does the concurrent mode failure means? It's really a good question to check your understanding of Concurrent Mark Sweep (CMS) Collector.</p>
 <p>This post starts with concurrent mode failure and explains the whole steps of one CMS cycle.</p>
-
 <p>In a nutshell,</p>
-
 <blockquote>
 <p>The message &ldquo;concurrent mode failure&rdquo; signifies that the concurrent collection of the Old Generation did not finish before the Old Generation became full.</p>
 </blockquote>
-
-<p>By the word &ldquo;concurrent&rdquo; in Concurrent Mark Sweep, it means CMS does not explicitly stop the application threads to perform mark-sweep in the Old Generation. In real world situation, Minor Garbage Collections of the Young Generation can occur anytime during concurrent collecting the Old Generation. That&rsquo;s the root cause of concurrent mode failure. If the Young Generation grows too fast and overflows to Old Generation, but the CMS could not clear out in the background, you will get a &ldquo;Concurrent Mode Failure&rdquo;.</p>
-
+<p>By the word &ldquo;concurrent&rdquo; in Concurrent Mark Sweep, it means CMS does not explicitly stop the application threads to perform mark-sweep in the Old Generation. In real world situation, Minor Garbage Collections of the Young Generation can occur anytime during concurrent collecting the Old Generation. That's the root cause of concurrent mode failure. If the Young Generation grows too fast and overflows to Old Generation, but the CMS could not clear out in the background, you will get a &ldquo;Concurrent Mode Failure&rdquo;.</p>
 <p>Recall a cycle of CMS If yout want to understand it thoroughly.</p>
-
 <blockquote>
 <p>The following contents are copied from <a href="https://plumbr.io/handbook/garbage-collection-algorithms-implementations#concurrent-mark-and-sweep">Concurrent Mark and Sweep</a>.</p>
 </blockquote>
-
 <p><strong>Phase 1: Initial Mark</strong>. This is one of the two stop-the-world events during CMS. The goal of this phase is to mark all the objects in the Old Generation that are either direct GC roots or are referenced from some live object in the Young Generation. The latter is important since the Old Generation is collected separately.</p>
-
-<p><img src="/images/cms-initial-mark.png" alt="" /></p>
-
+<p><img src="/images/cms-initial-mark.png" alt=""></p>
 <p><strong>Phase 2: Concurrent Mark</strong>. During this phase the Garbage Collector traverses the Old Generation and marks all live objects, starting from the roots found in the previous phase of &ldquo;Initial Mark&rdquo;. The &ldquo;Concurrent Mark&rdquo; phase, as its name suggests, runs concurrently with your application and does not stop the application threads. Note that not all the live objects in the Old Generation may be marked, since the application is mutating references during the marking.</p>
-
-<p><img src="/images/cms-concurrent-mark.png" alt="" /></p>
-
+<p><img src="/images/cms-concurrent-mark.png" alt=""></p>
 <p>In the illustration, a reference pointing away from the &ldquo;Current object&rdquo; was removed concurrently with the marking thread.</p>
-
 <p><strong>Phase 3: Concurrent Preclean</strong>. This is again a concurrent phase, running in parallel with the application threads, not stopping them. While the previous phase was running concurrently with the application, some references were changed. Whenever that happens, the JVM marks the area of the heap (called &ldquo;Card&rdquo;) that contains the mutated object as &ldquo;dirty&rdquo;(this is known as Card Marking).</p>
-
-<p><img src="/images/cms-concurrent-preclean-1.png" alt="" /></p>
-
+<p><img src="/images/cms-concurrent-preclean-1.png" alt=""></p>
 <p>In the pre-cleaning phase, these dirty objects are accounted for, and the objects reachable from them are also marked. The cards are cleaned when this is done.</p>
-
-<p><img src="/images/cms-concurrent-preclean-2.png" alt="" /></p>
-
+<p><img src="/images/cms-concurrent-preclean-2.png" alt=""></p>
 <p><strong>Phase 4: Concurrent Abortable Preclean</strong>. Again, a concurrent phase that is not stopping the application’s threads. This one attempts to take as much work off the shoulders of the stop-the-world Final Remark as possible. The exact duration of this phase depends on a number of factors, since it iterates doing the same thing until one of the abortion conditions (such as the number of iterations, amount of useful work done, elapsed wall clock time, etc) is met.</p>
-
 <p><strong>Phase 5: Final Remark</strong>. This is the second and last stop-the-world phase during the event. The goal of this stop-the-world phase is to finalize marking all live objects in the Old Generation. Since the previous preclean phases were concurrent, they may have been unable to keep up with the application’s mutating speeds. A stop-the-world pause is required to finish the ordeal.</p>
-
 <p>Usually CMS tries to run final remark phase when Young Generation is as empty as possible in order to eliminate the possibility of several stop-the-world phases happening back-to-back.</p>
-
 <p>After the five marking phases, all live objects in the Old Generation are marked and now garbage collector is going to reclaim all unused objects by sweeping the Old Generation:</p>
-
 <p><strong>Phase 6: Concurrent Sweep</strong>. Performed concurrently with the application, without the need for the stop-the-world pauses. The purpose of the phase is to remove unused objects and to reclaim the space occupied by them for future use.</p>
-
-<p><img src="/images/cms-concurrent-sweep.png" alt="" /></p>
-
+<p><img src="/images/cms-concurrent-sweep.png" alt=""></p>
 <p><strong>Phase 7: Concurrent Reset</strong>. Concurrently executed phase, resetting inner data structures of the CMS algorithm and preparing them for the next cycle.</p>
-
 <p><strong>Reference</strong></p>
-
 <ul>
-<li><a href="https://blogs.oracle.com/jonthecollector/what-the-hecks-a-concurrent-mode">What the Heck&rsquo;s a Concurrent Mode?</a></li>
+<li><a href="https://blogs.oracle.com/jonthecollector/what-the-hecks-a-concurrent-mode">What the Heck's a Concurrent Mode?</a></li>
 <li><a href="https://plumbr.io/handbook/garbage-collection-algorithms-implementations#concurrent-mark-and-sweep">Concurrent Mark and Sweep</a></li>
 <li><a href="https://kyryloholodnov.wordpress.com/2014/02/19/concurrent-mode-failure-in-practice-part-1/">Concurrent Mode Failure in Practice, Part 1</a></li>
 </ul>

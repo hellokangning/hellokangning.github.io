@@ -25,7 +25,7 @@ Second, sys.exit is intended for use in programs. According to official document
 
 
 
-<meta name="generator" content="Hugo 0.59.1 with theme even" />
+<meta name="generator" content="Hugo 0.60.0 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/en/post/exit-options-in-python/" />
@@ -52,16 +52,13 @@ Second, sys.exit is intended for use in programs. According to official document
 <meta itemprop="description" content="First candidate is os._exit, which exits without calling cleanup handlers, flushing stdio buffers, etc. (and which should normally only be used in the child process after a fork()).
 Second, sys.exit is intended for use in programs. According to official document:
  This is implemented by raising the SystemExit exception, so cleanup actions specified by finally clauses of try statements are honored, and it is possible to intercept the exit attempt at an outer level.">
-
-
 <meta itemprop="datePublished" content="2017-09-01T16:47:37&#43;08:00" />
 <meta itemprop="dateModified" content="2017-09-01T16:47:37&#43;08:00" />
 <meta itemprop="wordCount" content="125">
 
 
 
-<meta itemprop="keywords" content="" />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Exit Options in Python"/>
 <meta name="twitter:description" content="First candidate is os._exit, which exits without calling cleanup handlers, flushing stdio buffers, etc. (and which should normally only be used in the child process after a fork()).
 Second, sys.exit is intended for use in programs. According to official document:
@@ -148,17 +145,12 @@ Second, sys.exit is intended for use in programs. According to official document
     
     <div class="post-content">
       <p>First candidate is <code>os._exit</code>, which exits without calling cleanup handlers, flushing stdio buffers, etc. (and which should normally only be used in the child process after a <code>fork()</code>).</p>
-
 <p>Second, <code>sys.exit</code> is intended for use in programs. According to official document:</p>
-
 <blockquote>
 <p>This is implemented by raising the <code>SystemExit</code> exception, so cleanup actions specified by finally clauses of try statements are honored, and it is possible to intercept the exit attempt at an outer level. Since <code>exit()</code> ultimately “only” raises an exception, it will only exit the process when called from the main thread, and the exception is not intercepted.</p>
 </blockquote>
-
 <p>Third, <code>exit</code> is a helper for the interactive shell and will also throw <code>SystemExit</code> exception.</p>
-
 <p><strong>Reference</strong>:</p>
-
 <ul>
 <li><a href="https://stackoverflow.com/questions/6501121/difference-between-exit-and-sys-exit-in-python">Difference between exit() and sys.exit() in Python</a></li>
 <li><a href="https://docs.python.org/2/library/sys.html">System-specific parameters and functions</a></li>

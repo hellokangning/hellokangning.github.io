@@ -24,7 +24,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.59.1 with theme even" />
+<meta name="generator" content="Hugo 0.60.0 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/en/post/jvm-series-oop-klass/" />
@@ -47,16 +47,13 @@
 <meta property="article:modified_time" content="2018-04-10T14:46:26+08:00" />
 <meta itemprop="name" content="JVM Series: Oop and Klass">
 <meta itemprop="description" content="As a part of JVM Series, this post tries to explore the object model in JVM.">
-
-
 <meta itemprop="datePublished" content="2018-04-10T14:46:26&#43;08:00" />
 <meta itemprop="dateModified" content="2018-04-10T14:46:26&#43;08:00" />
 <meta itemprop="wordCount" content="1033">
 
 
 
-<meta itemprop="keywords" content="JVM," />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="JVM," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="JVM Series: Oop and Klass"/>
 <meta name="twitter:description" content="As a part of JVM Series, this post tries to explore the object model in JVM."/>
 
@@ -141,28 +138,19 @@
     <div class="post-toc" id="post-toc">
   <h2 class="post-toc-title">Contents</h2>
   <div class="post-toc-content always-active">
-    <nav id="TableOfContents">
-<ul>
-<li><a href="#what-does-the-new-keyword-actually-do">What does the <code>new</code> keyword actually do</a></li>
-<li><a href="#oop"><code>oop</code></a></li>
-<li><a href="#klass"><code>Klass</code></a></li>
-</ul>
-</nav>
+    <nav id="TableOfContents"></nav>
   </div>
 </div>
     <div class="post-content">
       <p>As a part of <a href="https://hellokangning.github.io/en/tags/jvm/">JVM Series</a>, this post tries to explore the object model in JVM.</p>
-
 <blockquote>
 <p>All codes in this post are based on jdk9-b94.</p>
 </blockquote>
-
 <h1 id="what-does-the-new-keyword-actually-do">What does the <code>new</code> keyword actually do</h1>
-
 <p>When you new a object in Java, you need to know what actually happens beneath this statement. <code>_new</code> method in <code>InterpreterRuntime</code> will be invoked.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -195,15 +183,15 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="c1">// InterpreterRuntime.cpp
 </span><span class="c1"></span>
-<span class="n">IRT_ENTRY</span><span class="p">(</span><span class="kt">void</span><span class="p">,</span> <span class="n">InterpreterRuntime</span><span class="o">::</span><span class="n">_new</span><span class="p">(</span><span class="n">JavaThread</span><span class="o">*</span> <span class="kr">thread</span><span class="p">,</span> <span class="n">ConstantPool</span><span class="o">*</span> <span class="n">pool</span><span class="p">,</span> <span class="kt">int</span> <span class="n">index</span><span class="p">))</span>
-  <span class="n">Klass</span><span class="o">*</span> <span class="n">k</span> <span class="o">=</span> <span class="n">pool</span><span class="o">-&gt;</span><span class="n">klass_at</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">CHECK</span><span class="p">);</span>
-  <span class="n">InstanceKlass</span><span class="o">*</span> <span class="n">klass</span> <span class="o">=</span> <span class="n">InstanceKlass</span><span class="o">::</span><span class="n">cast</span><span class="p">(</span><span class="n">k</span><span class="p">);</span>
+<span class="n">IRT_ENTRY</span><span class="p">(</span><span class="kt">void</span><span class="p">,</span> <span class="n">InterpreterRuntime</span><span class="o">:</span><span class="o">:</span><span class="n">_new</span><span class="p">(</span><span class="n">JavaThread</span><span class="o">*</span> <span class="kr">thread</span><span class="p">,</span> <span class="n">ConstantPool</span><span class="o">*</span> <span class="n">pool</span><span class="p">,</span> <span class="kt">int</span> <span class="n">index</span><span class="p">)</span><span class="p">)</span>
+  <span class="n">Klass</span><span class="o">*</span> <span class="n">k</span> <span class="o">=</span> <span class="n">pool</span><span class="o">-</span><span class="o">&gt;</span><span class="n">klass_at</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">CHECK</span><span class="p">)</span><span class="p">;</span>
+  <span class="n">InstanceKlass</span><span class="o">*</span> <span class="n">klass</span> <span class="o">=</span> <span class="n">InstanceKlass</span><span class="o">:</span><span class="o">:</span><span class="n">cast</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="p">;</span>
 
   <span class="c1">// Make sure we are not instantiating an abstract klass
-</span><span class="c1"></span>  <span class="n">klass</span><span class="o">-&gt;</span><span class="n">check_valid_for_instantiation</span><span class="p">(</span><span class="nb">true</span><span class="p">,</span> <span class="n">CHECK</span><span class="p">);</span>
+</span><span class="c1"></span>  <span class="n">klass</span><span class="o">-</span><span class="o">&gt;</span><span class="n">check_valid_for_instantiation</span><span class="p">(</span><span class="nb">true</span><span class="p">,</span> <span class="n">CHECK</span><span class="p">)</span><span class="p">;</span>
 
   <span class="c1">// Make sure klass is initialized
-</span><span class="c1"></span>  <span class="n">klass</span><span class="o">-&gt;</span><span class="n">initialize</span><span class="p">(</span><span class="n">CHECK</span><span class="p">);</span>
+</span><span class="c1"></span>  <span class="n">klass</span><span class="o">-</span><span class="o">&gt;</span><span class="n">initialize</span><span class="p">(</span><span class="n">CHECK</span><span class="p">)</span><span class="p">;</span>
 
   <span class="c1">// At this point the class may not be fully initialized
 </span><span class="c1"></span>  <span class="c1">// because of recursive initialization. If it is fully
@@ -219,16 +207,15 @@
 </span><span class="c1"></span>  <span class="c1">//       Java).
 </span><span class="c1"></span>  <span class="c1">//       If we have a breakpoint, then we don&#39;t rewrite
 </span><span class="c1"></span>  <span class="c1">//       because the _breakpoint bytecode would be lost.
-</span><span class="c1"></span>  <span class="n">oop</span> <span class="n">obj</span> <span class="o">=</span> <span class="n">klass</span><span class="o">-&gt;</span><span class="n">allocate_instance</span><span class="p">(</span><span class="n">CHECK</span><span class="p">);</span>
-  <span class="kr">thread</span><span class="o">-&gt;</span><span class="n">set_vm_result</span><span class="p">(</span><span class="n">obj</span><span class="p">);</span>
+</span><span class="c1"></span>  <span class="n">oop</span> <span class="n">obj</span> <span class="o">=</span> <span class="n">klass</span><span class="o">-</span><span class="o">&gt;</span><span class="n">allocate_instance</span><span class="p">(</span><span class="n">CHECK</span><span class="p">)</span><span class="p">;</span>
+  <span class="kr">thread</span><span class="o">-</span><span class="o">&gt;</span><span class="n">set_vm_result</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="p">;</span>
 <span class="n">IRT_END</span>
 </code></pre></td></tr></table>
 </div>
-</div>
-<p>It seems like the <code>klass</code> takes the most responsibilities to allocate instance. We will penetrate into it of course, but later on. After allocation, constructor will be called to initilized the raw object.</p>
+</div><p>It seems like the <code>klass</code> takes the most responsibilities to allocate instance. We will penetrate into it of course, but later on. After allocation, constructor will be called to initilized the raw object.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -245,24 +232,23 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="c1">// jvm.cpp
 </span><span class="c1"></span>
-<span class="n">JVM_ENTRY</span><span class="p">(</span><span class="n">jobject</span><span class="p">,</span> <span class="n">JVM_NewInstanceFromConstructor</span><span class="p">(</span><span class="n">JNIEnv</span> <span class="o">*</span><span class="n">env</span><span class="p">,</span> <span class="n">jobject</span> <span class="n">c</span><span class="p">,</span> <span class="n">jobjectArray</span> <span class="n">args0</span><span class="p">))</span>
-  <span class="n">JVMWrapper</span><span class="p">(</span><span class="s">&#34;JVM_NewInstanceFromConstructor&#34;</span><span class="p">);</span>
-  <span class="n">oop</span> <span class="n">constructor_mirror</span> <span class="o">=</span> <span class="n">JNIHandles</span><span class="o">::</span><span class="n">resolve</span><span class="p">(</span><span class="n">c</span><span class="p">);</span>
-  <span class="n">objArrayHandle</span> <span class="nf">args</span><span class="p">(</span><span class="n">THREAD</span><span class="p">,</span> <span class="n">objArrayOop</span><span class="p">(</span><span class="n">JNIHandles</span><span class="o">::</span><span class="n">resolve</span><span class="p">(</span><span class="n">args0</span><span class="p">)));</span>
-  <span class="n">oop</span> <span class="n">result</span> <span class="o">=</span> <span class="n">Reflection</span><span class="o">::</span><span class="n">invoke_constructor</span><span class="p">(</span><span class="n">constructor_mirror</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">CHECK_NULL</span><span class="p">);</span>
-  <span class="n">jobject</span> <span class="n">res</span> <span class="o">=</span> <span class="n">JNIHandles</span><span class="o">::</span><span class="n">make_local</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">result</span><span class="p">);</span>
-  <span class="k">if</span> <span class="p">(</span><span class="n">JvmtiExport</span><span class="o">::</span><span class="n">should_post_vm_object_alloc</span><span class="p">())</span> <span class="p">{</span>
-    <span class="n">JvmtiExport</span><span class="o">::</span><span class="n">post_vm_object_alloc</span><span class="p">(</span><span class="n">JavaThread</span><span class="o">::</span><span class="n">current</span><span class="p">(),</span> <span class="n">result</span><span class="p">);</span>
+<span class="n">JVM_ENTRY</span><span class="p">(</span><span class="n">jobject</span><span class="p">,</span> <span class="n">JVM_NewInstanceFromConstructor</span><span class="p">(</span><span class="n">JNIEnv</span> <span class="o">*</span><span class="n">env</span><span class="p">,</span> <span class="n">jobject</span> <span class="n">c</span><span class="p">,</span> <span class="n">jobjectArray</span> <span class="n">args0</span><span class="p">)</span><span class="p">)</span>
+  <span class="n">JVMWrapper</span><span class="p">(</span><span class="sa"></span><span class="s">&#34;</span><span class="s">JVM_NewInstanceFromConstructor</span><span class="s">&#34;</span><span class="p">)</span><span class="p">;</span>
+  <span class="n">oop</span> <span class="n">constructor_mirror</span> <span class="o">=</span> <span class="n">JNIHandles</span><span class="o">:</span><span class="o">:</span><span class="n">resolve</span><span class="p">(</span><span class="n">c</span><span class="p">)</span><span class="p">;</span>
+  <span class="n">objArrayHandle</span> <span class="nf">args</span><span class="p">(</span><span class="n">THREAD</span><span class="p">,</span> <span class="n">objArrayOop</span><span class="p">(</span><span class="n">JNIHandles</span><span class="o">:</span><span class="o">:</span><span class="n">resolve</span><span class="p">(</span><span class="n">args0</span><span class="p">)</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
+  <span class="n">oop</span> <span class="n">result</span> <span class="o">=</span> <span class="n">Reflection</span><span class="o">:</span><span class="o">:</span><span class="n">invoke_constructor</span><span class="p">(</span><span class="n">constructor_mirror</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">CHECK_NULL</span><span class="p">)</span><span class="p">;</span>
+  <span class="n">jobject</span> <span class="n">res</span> <span class="o">=</span> <span class="n">JNIHandles</span><span class="o">:</span><span class="o">:</span><span class="n">make_local</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">JvmtiExport</span><span class="o">:</span><span class="o">:</span><span class="n">should_post_vm_object_alloc</span><span class="p">(</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">JvmtiExport</span><span class="o">:</span><span class="o">:</span><span class="n">post_vm_object_alloc</span><span class="p">(</span><span class="n">JavaThread</span><span class="o">:</span><span class="o">:</span><span class="n">current</span><span class="p">(</span><span class="p">)</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span><span class="p">;</span>
   <span class="p">}</span>
   <span class="k">return</span> <span class="n">res</span><span class="p">;</span>
 <span class="n">JVM_END</span>
 </code></pre></td></tr></table>
 </div>
-</div>
-<p><code>JVM_NewInstanceFromConstructor</code> resorts to <code>Reflection</code>, let&rsquo;s what the latter does.</p>
+</div><p><code>JVM_NewInstanceFromConstructor</code> resorts to <code>Reflection</code>, let's what the latter does.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -293,42 +279,39 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="c1">// reflection.cpp
 </span><span class="c1"></span>
-<span class="n">oop</span> <span class="n">Reflection</span><span class="o">::</span><span class="n">invoke_constructor</span><span class="p">(</span><span class="n">oop</span> <span class="n">constructor_mirror</span><span class="p">,</span> <span class="n">objArrayHandle</span> <span class="n">args</span><span class="p">,</span> <span class="n">TRAPS</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">oop</span> <span class="n">mirror</span>             <span class="o">=</span> <span class="n">java_lang_reflect_Constructor</span><span class="o">::</span><span class="n">clazz</span><span class="p">(</span><span class="n">constructor_mirror</span><span class="p">);</span>
-  <span class="kt">int</span> <span class="n">slot</span>               <span class="o">=</span> <span class="n">java_lang_reflect_Constructor</span><span class="o">::</span><span class="n">slot</span><span class="p">(</span><span class="n">constructor_mirror</span><span class="p">);</span>
-  <span class="kt">bool</span> <span class="k">override</span>          <span class="o">=</span> <span class="n">java_lang_reflect_Constructor</span><span class="o">::</span><span class="k">override</span><span class="p">(</span><span class="n">constructor_mirror</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">;</span>
-  <span class="n">objArrayHandle</span> <span class="nf">ptypes</span><span class="p">(</span><span class="n">THREAD</span><span class="p">,</span> <span class="n">objArrayOop</span><span class="p">(</span><span class="n">java_lang_reflect_Constructor</span><span class="o">::</span><span class="n">parameter_types</span><span class="p">(</span><span class="n">constructor_mirror</span><span class="p">)));</span>
+<span class="n">oop</span> <span class="n">Reflection</span><span class="o">:</span><span class="o">:</span><span class="n">invoke_constructor</span><span class="p">(</span><span class="n">oop</span> <span class="n">constructor_mirror</span><span class="p">,</span> <span class="n">objArrayHandle</span> <span class="n">args</span><span class="p">,</span> <span class="n">TRAPS</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">oop</span> <span class="n">mirror</span>             <span class="o">=</span> <span class="n">java_lang_reflect_Constructor</span><span class="o">:</span><span class="o">:</span><span class="n">clazz</span><span class="p">(</span><span class="n">constructor_mirror</span><span class="p">)</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">slot</span>               <span class="o">=</span> <span class="n">java_lang_reflect_Constructor</span><span class="o">:</span><span class="o">:</span><span class="n">slot</span><span class="p">(</span><span class="n">constructor_mirror</span><span class="p">)</span><span class="p">;</span>
+  <span class="kt">bool</span> <span class="k">override</span>          <span class="o">=</span> <span class="n">java_lang_reflect_Constructor</span><span class="o">:</span><span class="o">:</span><span class="k">override</span><span class="p">(</span><span class="n">constructor_mirror</span><span class="p">)</span> <span class="o">!</span><span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="n">objArrayHandle</span> <span class="nf">ptypes</span><span class="p">(</span><span class="n">THREAD</span><span class="p">,</span> <span class="n">objArrayOop</span><span class="p">(</span><span class="n">java_lang_reflect_Constructor</span><span class="o">:</span><span class="o">:</span><span class="n">parameter_types</span><span class="p">(</span><span class="n">constructor_mirror</span><span class="p">)</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
 
-  <span class="n">InstanceKlass</span><span class="o">*</span> <span class="n">klass</span> <span class="o">=</span> <span class="n">InstanceKlass</span><span class="o">::</span><span class="n">cast</span><span class="p">(</span><span class="n">java_lang_Class</span><span class="o">::</span><span class="n">as_Klass</span><span class="p">(</span><span class="n">mirror</span><span class="p">));</span>
-  <span class="n">Method</span><span class="o">*</span> <span class="n">m</span> <span class="o">=</span> <span class="n">klass</span><span class="o">-&gt;</span><span class="n">method_with_idnum</span><span class="p">(</span><span class="n">slot</span><span class="p">);</span>
-  <span class="k">if</span> <span class="p">(</span><span class="n">m</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">THROW_MSG_0</span><span class="p">(</span><span class="n">vmSymbols</span><span class="o">::</span><span class="n">java_lang_InternalError</span><span class="p">(),</span> <span class="s">&#34;invoke&#34;</span><span class="p">);</span>
+  <span class="n">InstanceKlass</span><span class="o">*</span> <span class="n">klass</span> <span class="o">=</span> <span class="n">InstanceKlass</span><span class="o">:</span><span class="o">:</span><span class="n">cast</span><span class="p">(</span><span class="n">java_lang_Class</span><span class="o">:</span><span class="o">:</span><span class="n">as_Klass</span><span class="p">(</span><span class="n">mirror</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
+  <span class="n">Method</span><span class="o">*</span> <span class="n">m</span> <span class="o">=</span> <span class="n">klass</span><span class="o">-</span><span class="o">&gt;</span><span class="n">method_with_idnum</span><span class="p">(</span><span class="n">slot</span><span class="p">)</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">m</span> <span class="o">=</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">THROW_MSG_0</span><span class="p">(</span><span class="n">vmSymbols</span><span class="o">:</span><span class="o">:</span><span class="n">java_lang_InternalError</span><span class="p">(</span><span class="p">)</span><span class="p">,</span> <span class="sa"></span><span class="s">&#34;</span><span class="s">invoke</span><span class="s">&#34;</span><span class="p">)</span><span class="p">;</span>
   <span class="p">}</span>
-  <span class="n">methodHandle</span> <span class="nf">method</span><span class="p">(</span><span class="n">THREAD</span><span class="p">,</span> <span class="n">m</span><span class="p">);</span>
-  <span class="n">assert</span><span class="p">(</span><span class="n">method</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">()</span> <span class="o">==</span> <span class="n">vmSymbols</span><span class="o">::</span><span class="n">object_initializer_name</span><span class="p">(),</span> <span class="s">&#34;invalid constructor&#34;</span><span class="p">);</span>
+  <span class="n">methodHandle</span> <span class="nf">method</span><span class="p">(</span><span class="n">THREAD</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span><span class="p">;</span>
+  <span class="n">assert</span><span class="p">(</span><span class="n">method</span><span class="o">-</span><span class="o">&gt;</span><span class="n">name</span><span class="p">(</span><span class="p">)</span> <span class="o">=</span><span class="o">=</span> <span class="n">vmSymbols</span><span class="o">:</span><span class="o">:</span><span class="n">object_initializer_name</span><span class="p">(</span><span class="p">)</span><span class="p">,</span> <span class="sa"></span><span class="s">&#34;</span><span class="s">invalid constructor</span><span class="s">&#34;</span><span class="p">)</span><span class="p">;</span>
 
   <span class="c1">// Make sure klass gets initialize
-</span><span class="c1"></span>  <span class="n">klass</span><span class="o">-&gt;</span><span class="n">initialize</span><span class="p">(</span><span class="n">CHECK_NULL</span><span class="p">);</span>
+</span><span class="c1"></span>  <span class="n">klass</span><span class="o">-</span><span class="o">&gt;</span><span class="n">initialize</span><span class="p">(</span><span class="n">CHECK_NULL</span><span class="p">)</span><span class="p">;</span>
 
   <span class="c1">// Create new instance (the receiver)
-</span><span class="c1"></span>  <span class="n">klass</span><span class="o">-&gt;</span><span class="n">check_valid_for_instantiation</span><span class="p">(</span><span class="nb">false</span><span class="p">,</span> <span class="n">CHECK_NULL</span><span class="p">);</span>
-  <span class="n">Handle</span> <span class="n">receiver</span> <span class="o">=</span> <span class="n">klass</span><span class="o">-&gt;</span><span class="n">allocate_instance_handle</span><span class="p">(</span><span class="n">CHECK_NULL</span><span class="p">);</span>
+</span><span class="c1"></span>  <span class="n">klass</span><span class="o">-</span><span class="o">&gt;</span><span class="n">check_valid_for_instantiation</span><span class="p">(</span><span class="nb">false</span><span class="p">,</span> <span class="n">CHECK_NULL</span><span class="p">)</span><span class="p">;</span>
+  <span class="n">Handle</span> <span class="n">receiver</span> <span class="o">=</span> <span class="n">klass</span><span class="o">-</span><span class="o">&gt;</span><span class="n">allocate_instance_handle</span><span class="p">(</span><span class="n">CHECK_NULL</span><span class="p">)</span><span class="p">;</span>
 
   <span class="c1">// Ignore result from call and return receiver
-</span><span class="c1"></span>  <span class="n">invoke</span><span class="p">(</span><span class="n">klass</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">receiver</span><span class="p">,</span> <span class="k">override</span><span class="p">,</span> <span class="n">ptypes</span><span class="p">,</span> <span class="n">T_VOID</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="nb">false</span><span class="p">,</span> <span class="n">CHECK_NULL</span><span class="p">);</span>
-  <span class="k">return</span> <span class="nf">receiver</span><span class="p">();</span>
+</span><span class="c1"></span>  <span class="n">invoke</span><span class="p">(</span><span class="n">klass</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">receiver</span><span class="p">,</span> <span class="k">override</span><span class="p">,</span> <span class="n">ptypes</span><span class="p">,</span> <span class="n">T_VOID</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="nb">false</span><span class="p">,</span> <span class="n">CHECK_NULL</span><span class="p">)</span><span class="p">;</span>
+  <span class="k">return</span> <span class="nf">receiver</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
-</div>
-<p>And <code>klass</code> appears, yes, again. a <code>oop</code> will be returnd after constructor, apparently, it is a managed pointer to an object.</p>
-
+</div><p>And <code>klass</code> appears, yes, again. a <code>oop</code> will be returnd after constructor, apparently, it is a managed pointer to an object.</p>
 <h1 id="oop"><code>oop</code></h1>
-
 <p><code>oop</code> is a type alias to <code>oopDesc*</code> which we can see in <code>oopHierarchy.hpp</code>.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
@@ -346,11 +329,10 @@
 <span class="k">typedef</span> <span class="k">class</span>     <span class="nc">typeArrayOopDesc</span><span class="o">*</span>            <span class="n">typeArrayOop</span><span class="p">;</span>
 </code></pre></td></tr></table>
 </div>
-</div>
-<p>Here comes <code>oopDesc</code>, which is the top baseclass for objects classes. The <code>{name}Desc</code> classes describe the format of Java objects so the fields can be accessed from C++. NO virtual functions allowed.</p>
+</div><p>Here comes <code>oopDesc</code>, which is the top baseclass for objects classes. The <code>{name}Desc</code> classes describe the format of Java objects so the fields can be accessed from C++. NO virtual functions allowed.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
@@ -370,46 +352,33 @@
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
-</div>
-<p>So far, <code>oop</code> and <code>Klass</code> are linked together. Unsatisfied, we still want to figure what is the usage of these fields.</p>
-
+</div><p>So far, <code>oop</code> and <code>Klass</code> are linked together. Unsatisfied, we still want to figure what is the usage of these fields.</p>
 <ul>
 <li><code>_mark</code>, used for GC, lock etc.</li>
 <li><code>_metadata</code>, a union for compressed pointer in 64-bit OS.</li>
 </ul>
-
 <p>Other methods includes,</p>
-
 <ul>
 <li><code>inline void* oopDesc::field_base(int offset) const { return (void*)&amp;((char*)this)[offset]; }</code> get the offset where data area starts.</li>
 <li><code>inline jint* oopDesc::int_field_addr(int offset) const { return (jint*)field_base(offset); }</code> return the address of int field.</li>
 <li><code>inline jint oopDesc::int_field(int offset) const  { return *int_field_addr(offset);}</code> get the int value.</li>
 <li><code>inline jint oopDesc::int_field_acquire(int offset) const { return OrderAccess::load_acquire(int_field_addr(offset));}</code> acquire int field with one lock.</li>
 </ul>
-
 <p>The hierarchy of <code>oop</code> shows in the following,</p>
-
-<p><img src="/images/oop-klass-class-diagram.png" alt="" /></p>
-
+<p><img src="/images/oop-klass-class-diagram.png" alt=""></p>
 <p>and the layout in memory.</p>
-
-<p><img src="/images/opp-memory-layout" alt="" /></p>
-
+<p><img src="/images/opp-memory-layout" alt=""></p>
 <h1 id="klass"><code>Klass</code></h1>
-
 <p>A <code>Klass</code> provides:</p>
-
 <ol>
 <li>language level class object (method dictionary etc.)</li>
 <li>provide vm dispatch behavior for the object</li>
 </ol>
-
 <p>Both functions are combined into one C++ class.</p>
-
 <p>Remember <code>allocate_instance</code> of <code>InstanceKlass</code> is called for returning <code>oop</code> object in <code>invoke_constructor</code>?</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -427,27 +396,25 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="c1">// instanceKlass.cpp
 </span><span class="c1"></span>
-<span class="n">instanceOop</span> <span class="n">InstanceKlass</span><span class="o">::</span><span class="n">allocate_instance</span><span class="p">(</span><span class="n">TRAPS</span><span class="p">)</span> <span class="p">{</span>
-  <span class="kt">bool</span> <span class="n">has_finalizer_flag</span> <span class="o">=</span> <span class="n">has_finalizer</span><span class="p">();</span> <span class="c1">// Query before possible GC
-</span><span class="c1"></span>  <span class="kt">int</span> <span class="n">size</span> <span class="o">=</span> <span class="n">size_helper</span><span class="p">();</span>  <span class="c1">// Query before forming handle.
+<span class="n">instanceOop</span> <span class="n">InstanceKlass</span><span class="o">:</span><span class="o">:</span><span class="n">allocate_instance</span><span class="p">(</span><span class="n">TRAPS</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kt">bool</span> <span class="n">has_finalizer_flag</span> <span class="o">=</span> <span class="n">has_finalizer</span><span class="p">(</span><span class="p">)</span><span class="p">;</span> <span class="c1">// Query before possible GC
+</span><span class="c1"></span>  <span class="kt">int</span> <span class="n">size</span> <span class="o">=</span> <span class="n">size_helper</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>  <span class="c1">// Query before forming handle.
 </span><span class="c1"></span>
   <span class="n">instanceOop</span> <span class="n">i</span><span class="p">;</span>
 
-  <span class="n">i</span> <span class="o">=</span> <span class="p">(</span><span class="n">instanceOop</span><span class="p">)</span><span class="n">CollectedHeap</span><span class="o">::</span><span class="n">obj_allocate</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">CHECK_NULL</span><span class="p">);</span>
-  <span class="k">if</span> <span class="p">(</span><span class="n">has_finalizer_flag</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">RegisterFinalizersAtInit</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">i</span> <span class="o">=</span> <span class="n">register_finalizer</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">CHECK_NULL</span><span class="p">);</span>
+  <span class="n">i</span> <span class="o">=</span> <span class="p">(</span><span class="n">instanceOop</span><span class="p">)</span><span class="n">CollectedHeap</span><span class="o">:</span><span class="o">:</span><span class="n">obj_allocate</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">CHECK_NULL</span><span class="p">)</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">has_finalizer_flag</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="o">!</span><span class="n">RegisterFinalizersAtInit</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">register_finalizer</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">CHECK_NULL</span><span class="p">)</span><span class="p">;</span>
   <span class="p">}</span>
   <span class="k">return</span> <span class="n">i</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
-</div>
-<p><code>CollectedHeap</code>, the name of this class implies it will allocate this object in heap. Yes it does.</p>
-
+</div><p><code>CollectedHeap</code>, the name of this class implies it will allocate this object in heap. Yes it does.</p>
 <p>A <code>CollectedHeap</code> is an implementation of a java heap for HotSpot. This is an abstract class: there may be many different kinds of heaps.  This class defines the functions that a heap must implement, and contains infrastructure common to all heaps.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -462,26 +429,22 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="c1">// CollectedHeap.inline.hpp
 </span><span class="c1"></span>
-<span class="n">oop</span> <span class="n">CollectedHeap</span><span class="o">::</span><span class="n">obj_allocate</span><span class="p">(</span><span class="n">Klass</span><span class="o">*</span> <span class="n">klass</span><span class="p">,</span> <span class="kt">int</span> <span class="n">size</span><span class="p">,</span> <span class="n">TRAPS</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">debug_only</span><span class="p">(</span><span class="n">check_for_valid_allocation_state</span><span class="p">());</span>
-  <span class="n">assert</span><span class="p">(</span><span class="o">!</span><span class="n">Universe</span><span class="o">::</span><span class="n">heap</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">is_gc_active</span><span class="p">(),</span> <span class="s">&#34;Allocation during gc not allowed&#34;</span><span class="p">);</span>
-  <span class="n">assert</span><span class="p">(</span><span class="n">size</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&#34;int won&#39;t convert to size_t&#34;</span><span class="p">);</span>
-  <span class="n">HeapWord</span><span class="o">*</span> <span class="n">obj</span> <span class="o">=</span> <span class="n">common_mem_allocate_init</span><span class="p">(</span><span class="n">klass</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">CHECK_NULL</span><span class="p">);</span>
-  <span class="n">post_allocation_setup_obj</span><span class="p">(</span><span class="n">klass</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">size</span><span class="p">);</span>
-  <span class="n">NOT_PRODUCT</span><span class="p">(</span><span class="n">Universe</span><span class="o">::</span><span class="n">heap</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">check_for_bad_heap_word_value</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">size</span><span class="p">));</span>
+<span class="n">oop</span> <span class="n">CollectedHeap</span><span class="o">:</span><span class="o">:</span><span class="n">obj_allocate</span><span class="p">(</span><span class="n">Klass</span><span class="o">*</span> <span class="n">klass</span><span class="p">,</span> <span class="kt">int</span> <span class="n">size</span><span class="p">,</span> <span class="n">TRAPS</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">debug_only</span><span class="p">(</span><span class="n">check_for_valid_allocation_state</span><span class="p">(</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
+  <span class="n">assert</span><span class="p">(</span><span class="o">!</span><span class="n">Universe</span><span class="o">:</span><span class="o">:</span><span class="n">heap</span><span class="p">(</span><span class="p">)</span><span class="o">-</span><span class="o">&gt;</span><span class="n">is_gc_active</span><span class="p">(</span><span class="p">)</span><span class="p">,</span> <span class="sa"></span><span class="s">&#34;</span><span class="s">Allocation during gc not allowed</span><span class="s">&#34;</span><span class="p">)</span><span class="p">;</span>
+  <span class="n">assert</span><span class="p">(</span><span class="n">size</span> <span class="o">&gt;</span><span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="sa"></span><span class="s">&#34;</span><span class="s">int won&#39;t convert to size_t</span><span class="s">&#34;</span><span class="p">)</span><span class="p">;</span>
+  <span class="n">HeapWord</span><span class="o">*</span> <span class="n">obj</span> <span class="o">=</span> <span class="n">common_mem_allocate_init</span><span class="p">(</span><span class="n">klass</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">CHECK_NULL</span><span class="p">)</span><span class="p">;</span>
+  <span class="n">post_allocation_setup_obj</span><span class="p">(</span><span class="n">klass</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span><span class="p">;</span>
+  <span class="n">NOT_PRODUCT</span><span class="p">(</span><span class="n">Universe</span><span class="o">:</span><span class="o">:</span><span class="n">heap</span><span class="p">(</span><span class="p">)</span><span class="o">-</span><span class="o">&gt;</span><span class="n">check_for_bad_heap_word_value</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
   <span class="k">return</span> <span class="p">(</span><span class="n">oop</span><span class="p">)</span><span class="n">obj</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
-</div>
-<p>Why bother dividing <code>oop</code> and &lsquo;Klass&rsquo; while both for metadata? As the official said,</p>
-
+</div><p>Why bother dividing <code>oop</code> and &lsquo;Klass&rsquo; while both for metadata? As the official said,</p>
 <blockquote>
-<p>One reason for the oop/klass dichotomy in the implementation is that <strong>we don&rsquo;t want a C++ vtbl pointer in every object</strong>. Thus, normal oops don&rsquo;t have any virtual functions. Instead, they forward all &ldquo;virtual&rdquo; functions to their klass, which does have a vtbl and does the C++ dispatch depending on the object&rsquo;s actual type.</p>
+<p>One reason for the oop/klass dichotomy in the implementation is that <strong>we don't want a C++ vtbl pointer in every object</strong>. Thus, normal oops don't have any virtual functions. Instead, they forward all &ldquo;virtual&rdquo; functions to their klass, which does have a vtbl and does the C++ dispatch depending on the object's actual type.</p>
 </blockquote>
-
 <p><strong>Reference</strong></p>
-
 <ul>
 <li><a href="https://yq.aliyun.com/articles/20279">HotSpotVM 对象机制实现浅析#1</a></li>
 <li><a href="https://www.jianshu.com/p/252e27863822">JVM源码分析之Java类的加载过程</a></li>

@@ -17,7 +17,7 @@
 
 
 <meta name="author" content="Guoqing Geng" /><meta name="description" content="C string is used only for literal constant in Redis. For the situation that the string can be modified, Redis provide a Simple Dynamic String(SDS). The key in Redis is actually a SDS, and if you insert a key-value with SET msg &amp;quot;hello world&amp;quot;, a SDS instance will be constructed for the key. In this case, the value is also a SDS instance with the content of &amp;ldquo;hello world&amp;rdquo;.
-Besides string, SDS is also used for buffer which can serve the AOF module and client&amp;rsquo;s input.
+Besides string, SDS is also used for buffer which can serve the AOF module and client&#39;s input.
 This post will dive into the implementation of SDS comparing with classic C string.
 " /><meta name="keywords" content="Simple Dynamic String, Redis" />
 
@@ -26,7 +26,7 @@ This post will dive into the implementation of SDS comparing with classic C stri
 
 
 
-<meta name="generator" content="Hugo 0.59.1 with theme even" />
+<meta name="generator" content="Hugo 0.60.0 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/en/post/redis-internals-sds/" />
@@ -43,9 +43,7 @@ This post will dive into the implementation of SDS comparing with classic C stri
 
 <meta property="og:title" content="Redis Internals: SDS" />
 <meta property="og:description" content="C string is used only for literal constant in Redis. For the situation that the string can be modified, Redis provide a Simple Dynamic String(SDS). The key in Redis is actually a SDS, and if you insert a key-value with SET msg &quot;hello world&quot;, a SDS instance will be constructed for the key. In this case, the value is also a SDS instance with the content of &ldquo;hello world&rdquo;.
-
-Besides string, SDS is also used for buffer which can serve the AOF module and client&rsquo;s input.
-
+Besides string, SDS is also used for buffer which can serve the AOF module and client&#39;s input.
 This post will dive into the implementation of SDS comparing with classic C string." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hellokangning.github.io/en/post/redis-internals-sds/" />
@@ -53,25 +51,18 @@ This post will dive into the implementation of SDS comparing with classic C stri
 <meta property="article:modified_time" content="2018-11-01T12:03:50+08:00" />
 <meta itemprop="name" content="Redis Internals: SDS">
 <meta itemprop="description" content="C string is used only for literal constant in Redis. For the situation that the string can be modified, Redis provide a Simple Dynamic String(SDS). The key in Redis is actually a SDS, and if you insert a key-value with SET msg &quot;hello world&quot;, a SDS instance will be constructed for the key. In this case, the value is also a SDS instance with the content of &ldquo;hello world&rdquo;.
-
-Besides string, SDS is also used for buffer which can serve the AOF module and client&rsquo;s input.
-
+Besides string, SDS is also used for buffer which can serve the AOF module and client&#39;s input.
 This post will dive into the implementation of SDS comparing with classic C string.">
-
-
 <meta itemprop="datePublished" content="2018-11-01T09:26:50&#43;08:00" />
 <meta itemprop="dateModified" content="2018-11-01T12:03:50&#43;08:00" />
-<meta itemprop="wordCount" content="1908">
+<meta itemprop="wordCount" content="1900">
 
 
 
-<meta itemprop="keywords" content="Data Structure," />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="Data Structure," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Redis Internals: SDS"/>
 <meta name="twitter:description" content="C string is used only for literal constant in Redis. For the situation that the string can be modified, Redis provide a Simple Dynamic String(SDS). The key in Redis is actually a SDS, and if you insert a key-value with SET msg &quot;hello world&quot;, a SDS instance will be constructed for the key. In this case, the value is also a SDS instance with the content of &ldquo;hello world&rdquo;.
-
-Besides string, SDS is also used for buffer which can serve the AOF module and client&rsquo;s input.
-
+Besides string, SDS is also used for buffer which can serve the AOF module and client&#39;s input.
 This post will dive into the implementation of SDS comparing with classic C string."/>
 
 <!--[if lte IE 9]>
@@ -146,7 +137,7 @@ This post will dive into the implementation of SDS comparing with classic C stri
         <div class="post-category">
             <a href="/en/categories/redis/"> Redis </a>
             </div>
-          <span class="more-meta"> 1908 words </span>
+          <span class="more-meta"> 1900 words </span>
           <span class="more-meta"> 4 mins read </span>
         
       </div>
@@ -155,36 +146,21 @@ This post will dive into the implementation of SDS comparing with classic C stri
     <div class="post-toc" id="post-toc">
   <h2 class="post-toc-title">Contents</h2>
   <div class="post-toc-content always-active">
-    <nav id="TableOfContents">
-<ul>
-<li><a href="#definition">Definition</a></li>
-<li><a href="#an-example">An Example</a></li>
-<li><a href="#benefits-comparing-with-c-string">Benefits Comparing with C String</a></li>
-<li><a href="#init-a-sds">Init a SDS</a></li>
-<li><a href="#get-length">Get Length</a></li>
-<li><a href="#avoid-buffer-overflow">Avoid Buffer Overflow</a></li>
-<li><a href="#reallocation">Reallocation</a></li>
-</ul>
-</nav>
+    <nav id="TableOfContents"></nav>
   </div>
 </div>
     <div class="post-content">
       <p>C string is used only for literal constant in Redis. For the situation that the string can be modified, Redis provide a Simple Dynamic String(SDS). The key in Redis is actually a SDS, and if you insert a key-value with <code>SET msg &quot;hello world&quot;</code>, a SDS instance will be constructed for the key. In this case, the value is also a SDS instance with the content of &ldquo;hello world&rdquo;.</p>
-
-<p>Besides string, SDS is also used for buffer which can serve the AOF module and client&rsquo;s input.</p>
-
+<p>Besides string, SDS is also used for buffer which can serve the AOF module and client's input.</p>
 <p>This post will dive into the implementation of SDS comparing with classic C string.</p>
-
 <blockquote>
 <p>The code analyzed in this post is based on 5.0.0</p>
 </blockquote>
-
 <h1 id="definition">Definition</h1>
-
 <p>SDS is defined in <code>sds.h</code>. The struct changed after 3.2 to save memory. Now, Redis offers five types of SDS: <code>sdshdr5</code>, <code>sdshdr8</code>, <code>sdshdr16</code>, <code>sdshdr32</code>, <code>sdshdr64</code>. The length of content determines which struct will be used.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -226,63 +202,60 @@ This post will dive into the implementation of SDS comparing with classic C stri
 </span><span class="lnt">40
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="cp">#define SDS_TYPE_5  0
-</span><span class="cp">#define SDS_TYPE_8  1
-</span><span class="cp">#define SDS_TYPE_16 2
-</span><span class="cp">#define SDS_TYPE_32 3
-</span><span class="cp">#define SDS_TYPE_64 4
-</span><span class="cp">#define SDS_TYPE_MASK 7
-</span><span class="cp">#define SDS_TYPE_BITS 3
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="cp">#</span><span class="cp">define SDS_TYPE_5  0</span><span class="cp">
+</span><span class="cp"></span><span class="cp">#</span><span class="cp">define SDS_TYPE_8  1</span><span class="cp">
+</span><span class="cp"></span><span class="cp">#</span><span class="cp">define SDS_TYPE_16 2</span><span class="cp">
+</span><span class="cp"></span><span class="cp">#</span><span class="cp">define SDS_TYPE_32 3</span><span class="cp">
+</span><span class="cp"></span><span class="cp">#</span><span class="cp">define SDS_TYPE_64 4</span><span class="cp">
+</span><span class="cp"></span><span class="cp">#</span><span class="cp">define SDS_TYPE_MASK 7</span><span class="cp">
+</span><span class="cp"></span><span class="cp">#</span><span class="cp">define SDS_TYPE_BITS 3</span><span class="cp">
 </span><span class="cp"></span>
 <span class="k">typedef</span> <span class="kt">char</span> <span class="o">*</span><span class="n">sds</span><span class="p">;</span>
 
 <span class="cm">/* Note: sdshdr5 is never used, we just access the flags byte directly.
 </span><span class="cm"> * However is here to document the layout of type 5 SDS strings. */</span>
-<span class="k">struct</span> <span class="nf">__attribute__</span> <span class="p">((</span><span class="n">__packed__</span><span class="p">))</span> <span class="n">sdshdr5</span> <span class="p">{</span>
+<span class="k">struct</span> <span class="nf">__attribute__</span> <span class="p">(</span><span class="p">(</span><span class="n">__packed__</span><span class="p">)</span><span class="p">)</span> <span class="n">sdshdr5</span> <span class="p">{</span>
     <span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">flags</span><span class="p">;</span> <span class="cm">/* 3 lsb of type, and 5 msb of string length */</span>
-    <span class="kt">char</span> <span class="n">buf</span><span class="p">[];</span>
-<span class="p">};</span>
-<span class="k">struct</span> <span class="nf">__attribute__</span> <span class="p">((</span><span class="n">__packed__</span><span class="p">))</span> <span class="n">sdshdr8</span> <span class="p">{</span>
+    <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="p">]</span><span class="p">;</span>
+<span class="p">}</span><span class="p">;</span>
+<span class="k">struct</span> <span class="nf">__attribute__</span> <span class="p">(</span><span class="p">(</span><span class="n">__packed__</span><span class="p">)</span><span class="p">)</span> <span class="n">sdshdr8</span> <span class="p">{</span>
     <span class="n">uint8_t</span> <span class="n">len</span><span class="p">;</span> <span class="cm">/* used */</span>
     <span class="n">uint8_t</span> <span class="n">alloc</span><span class="p">;</span> <span class="cm">/* excluding the header and null terminator */</span>
     <span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">flags</span><span class="p">;</span> <span class="cm">/* 3 lsb of type, 5 unused bits */</span>
-    <span class="kt">char</span> <span class="n">buf</span><span class="p">[];</span>
-<span class="p">};</span>
-<span class="k">struct</span> <span class="nf">__attribute__</span> <span class="p">((</span><span class="n">__packed__</span><span class="p">))</span> <span class="n">sdshdr16</span> <span class="p">{</span>
+    <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="p">]</span><span class="p">;</span>
+<span class="p">}</span><span class="p">;</span>
+<span class="k">struct</span> <span class="nf">__attribute__</span> <span class="p">(</span><span class="p">(</span><span class="n">__packed__</span><span class="p">)</span><span class="p">)</span> <span class="n">sdshdr16</span> <span class="p">{</span>
     <span class="n">uint16_t</span> <span class="n">len</span><span class="p">;</span> <span class="cm">/* used */</span>
     <span class="n">uint16_t</span> <span class="n">alloc</span><span class="p">;</span> <span class="cm">/* excluding the header and null terminator */</span>
     <span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">flags</span><span class="p">;</span> <span class="cm">/* 3 lsb of type, 5 unused bits */</span>
-    <span class="kt">char</span> <span class="n">buf</span><span class="p">[];</span>
-<span class="p">};</span>
-<span class="k">struct</span> <span class="nf">__attribute__</span> <span class="p">((</span><span class="n">__packed__</span><span class="p">))</span> <span class="n">sdshdr32</span> <span class="p">{</span>
+    <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="p">]</span><span class="p">;</span>
+<span class="p">}</span><span class="p">;</span>
+<span class="k">struct</span> <span class="nf">__attribute__</span> <span class="p">(</span><span class="p">(</span><span class="n">__packed__</span><span class="p">)</span><span class="p">)</span> <span class="n">sdshdr32</span> <span class="p">{</span>
     <span class="n">uint32_t</span> <span class="n">len</span><span class="p">;</span> <span class="cm">/* used */</span>
     <span class="n">uint32_t</span> <span class="n">alloc</span><span class="p">;</span> <span class="cm">/* excluding the header and null terminator */</span>
     <span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">flags</span><span class="p">;</span> <span class="cm">/* 3 lsb of type, 5 unused bits */</span>
-    <span class="kt">char</span> <span class="n">buf</span><span class="p">[];</span>
-<span class="p">};</span>
-<span class="k">struct</span> <span class="nf">__attribute__</span> <span class="p">((</span><span class="n">__packed__</span><span class="p">))</span> <span class="n">sdshdr64</span> <span class="p">{</span>
+    <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="p">]</span><span class="p">;</span>
+<span class="p">}</span><span class="p">;</span>
+<span class="k">struct</span> <span class="nf">__attribute__</span> <span class="p">(</span><span class="p">(</span><span class="n">__packed__</span><span class="p">)</span><span class="p">)</span> <span class="n">sdshdr64</span> <span class="p">{</span>
     <span class="n">uint64_t</span> <span class="n">len</span><span class="p">;</span> <span class="cm">/* used */</span>
     <span class="n">uint64_t</span> <span class="n">alloc</span><span class="p">;</span> <span class="cm">/* excluding the header and null terminator */</span>
     <span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">flags</span><span class="p">;</span> <span class="cm">/* 3 lsb of type, 5 unused bits */</span>
-    <span class="kt">char</span> <span class="n">buf</span><span class="p">[];</span>
-<span class="p">};</span></code></pre></td></tr></table>
+    <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="p">]</span><span class="p">;</span>
+<span class="p">}</span><span class="p">;</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>Allow me to skip <code>sdshr5</code> which will never be used. The other four structures all incorporate the following member:</p>
-
+</div><p>Allow me to skip <code>sdshr5</code> which will never be used. The other four structures all incorporate the following member:</p>
 <ul>
 <li><code>buf</code>: the array storing the actual characters and ends with &ldquo;\0&rdquo;.</li>
 <li><code>len</code>: the length of this SDS, it will exclude the trailing &ldquo;\0&rdquo;.</li>
 <li><code>alloc</code> the memory allocated for this SDS, but may be used partially. The available size is <code>alloc - len</code>. This variable also exclude the last &ldquo;\0&rdquo;.</li>
 <li><code>flags</code>: 3 bits of <code>char</code> indicates the type of this SDS.</li>
 </ul>
-
 <p>Then you may ask how does these structures save memory? Firstly, <code>len</code> and <code>alloc</code> are <code>int</code> types with different size. Secondly, <code>__attribute__ ((__packed__))</code> tells the compiler do not add padding between fields of the struct. Redis also takes addressing into considering and implements its own <code>zmalloc</code> rather than <code>malloc</code>.</p>
-
 <p>When someone tries to instantiate a new SDS, a inline function <code>sdsReqTyp</code> will be called to select the corresponding type on account of its length.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -300,80 +273,68 @@ This post will dive into the implementation of SDS comparing with classic C stri
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-c" data-lang="c"><span class="k">static</span> <span class="kr">inline</span> <span class="kt">char</span> <span class="nf">sdsReqType</span><span class="p">(</span><span class="n">size_t</span> <span class="n">string_size</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">string_size</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="o">&lt;&lt;</span><span class="mi">5</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">string_size</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="o">&lt;</span><span class="o">&lt;</span><span class="mi">5</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">SDS_TYPE_5</span><span class="p">;</span> <span class="c1">// less than 2^5
-</span><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="n">string_size</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="o">&lt;&lt;</span><span class="mi">8</span><span class="p">)</span>
+</span><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="n">string_size</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="o">&lt;</span><span class="o">&lt;</span><span class="mi">8</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">SDS_TYPE_8</span><span class="p">;</span> <span class="c1">// less than 2^8
-</span><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="n">string_size</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="o">&lt;&lt;</span><span class="mi">16</span><span class="p">)</span>
+</span><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="n">string_size</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="o">&lt;</span><span class="o">&lt;</span><span class="mi">16</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">SDS_TYPE_16</span><span class="p">;</span>
-<span class="cp">#if (LONG_MAX == LLONG_MAX)
-</span><span class="cp"></span>    <span class="k">if</span> <span class="p">(</span><span class="n">string_size</span> <span class="o">&lt;</span> <span class="mi">1ll</span><span class="o">&lt;&lt;</span><span class="mi">32</span><span class="p">)</span>
+<span class="cp">#</span><span class="cp">if (LONG_MAX == LLONG_MAX)</span><span class="cp">
+</span><span class="cp"></span>    <span class="k">if</span> <span class="p">(</span><span class="n">string_size</span> <span class="o">&lt;</span> <span class="mi">1ll</span><span class="o">&lt;</span><span class="o">&lt;</span><span class="mi">32</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">SDS_TYPE_32</span><span class="p">;</span>
     <span class="k">return</span> <span class="n">SDS_TYPE_64</span><span class="p">;</span>
-<span class="cp">#else
+<span class="cp">#</span><span class="cp">else</span><span class="cp">
 </span><span class="cp"></span>    <span class="k">return</span> <span class="n">SDS_TYPE_32</span><span class="p">;</span>
-<span class="cp">#endif
-</span><span class="cp"></span><span class="p">}</span></code></pre></td></tr></table>
+<span class="cp">#</span><span class="cp">endif</span><span class="cp">
+</span><span class="cp"></span><span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<h1 id="an-example">An Example</h1>
-
+</div><h1 id="an-example">An Example</h1>
 <p>Assume a SDS with the content of &ldquo;Redis&rdquo;, here is the illustration.</p>
-
-<p><img src="/images/redis-sds-example.png" alt="" /></p>
-
+<p><img src="/images/redis-sds-example.png" alt=""></p>
 <p>Another case is a SDS storing &ldquo;Redis&rdquo; with redundant space.</p>
-
-<p><img src="/images/redis-sds-redundant-space.png" alt="" /></p>
-
+<p><img src="/images/redis-sds-redundant-space.png" alt=""></p>
 <h1 id="benefits-comparing-with-c-string">Benefits Comparing with C String</h1>
-
-<p>What&rsquo;s the benefits of SDS comparing with C string?</p>
-
+<p>What's the benefits of SDS comparing with C string?</p>
 <ul>
 <li>Get length with O(1) complexity.</li>
 <li>Avoid buffer overflow.</li>
 <li>Reduce the frequency of reallocating memory. It will trigger reallocation if you <code>strcat</code> of <code>strtrim</code> a C string.</li>
 <li>Binary safety. &ldquo;\0&rdquo; can be in the middle of a SDS, not in C string. Because C string use &ldquo;\0&rdquo; to determine the length, while SDS has the length in the header.</li>
 </ul>
-
 <p>Two useful macros must be explained because they are used widely.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="cp">#define SDS_HDR_VAR(T,s) struct sdshdr##T *sh = (void*)((s)-(sizeof(struct sdshdr##T)));
-</span><span class="cp">#define SDS_HDR(T,s) ((struct sdshdr##T *)((s)-(sizeof(struct sdshdr##T))))</span></code></pre></td></tr></table>
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="cp">#</span><span class="cp">define SDS_HDR_VAR(T,s) struct sdshdr##T *sh = (void*)((s)-(sizeof(struct sdshdr##T)));</span><span class="cp">
+</span><span class="cp"></span><span class="cp">#</span><span class="cp">define SDS_HDR(T,s) ((struct sdshdr##T *)((s)-(sizeof(struct sdshdr##T))))</span><span class="cp">
+</span></code></pre></td></tr></table>
 </div>
-</div>
-<p>They can return a header pointer to SDS and <code>##</code> is a connector. For example, <code>SDS_HDR(8, s)</code> will be expanded to</p>
+</div><p>They can return a header pointer to SDS and <code>##</code> is a connector. For example, <code>SDS_HDR(8, s)</code> will be expanded to</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="p">((</span><span class="k">struct</span> <span class="n">sdshdr8</span> <span class="o">*</span><span class="p">)((</span><span class="n">s</span><span class="p">)</span><span class="o">-</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span> <span class="n">sdshdr8</span><span class="p">))))</span></code></pre></td></tr></table>
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="p">(</span><span class="p">(</span><span class="k">struct</span> <span class="n">sdshdr8</span> <span class="o">*</span><span class="p">)</span><span class="p">(</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="o">-</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span> <span class="n">sdshdr8</span><span class="p">)</span><span class="p">)</span><span class="p">)</span><span class="p">)</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>The tricky point is the type of <code>sds</code> is <code>char*</code> meaning it points to a char array. The advantage is enjoying the built-in functions of C String.</p>
-
+</div><p>The tricky point is the type of <code>sds</code> is <code>char*</code> meaning it points to a char array. The advantage is enjoying the built-in functions of C String.</p>
 <h1 id="init-a-sds">Init a SDS</h1>
-
 <p>A new SDS can be created with specified <code>init</code> pointer and <code>initLe</code>. The string is always null-terminated, even you create a sds string with <code>s = sdsnewlen(&quot;abc&quot;, 3)</code>.</p>
-
 <p>In order to init a SDS:</p>
-
 <ol>
 <li>Decide its type according to the length</li>
 <li>Allocate memory with built-in <code>zmalloc</code></li>
 <li>Init the header of SDS</li>
-
-<li><p>Memory copy</p>
+<li>Memory copy</li>
+</ol>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -433,72 +394,69 @@ This post will dive into the implementation of SDS comparing with classic C stri
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-c" data-lang="c"><span class="n">sds</span> <span class="nf">sdsnewlen</span><span class="p">(</span><span class="k">const</span> <span class="kt">void</span> <span class="o">*</span><span class="n">init</span><span class="p">,</span> <span class="n">size_t</span> <span class="n">initlen</span><span class="p">)</span> <span class="p">{</span>
-<span class="kt">void</span> <span class="o">*</span><span class="n">sh</span><span class="p">;</span>
-<span class="n">sds</span> <span class="n">s</span><span class="p">;</span>
-<span class="kt">char</span> <span class="n">type</span> <span class="o">=</span> <span class="n">sdsReqType</span><span class="p">(</span><span class="n">initlen</span><span class="p">);</span>
-<span class="cm">/* Empty strings are usually created in order to append. Use type 8
-</span><span class="cm"> * since type 5 is not good at this. */</span>
-<span class="k">if</span> <span class="p">(</span><span class="n">type</span> <span class="o">==</span> <span class="n">SDS_TYPE_5</span> <span class="o">&amp;&amp;</span> <span class="n">initlen</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="n">type</span> <span class="o">=</span> <span class="n">SDS_TYPE_8</span><span class="p">;</span>
-<span class="kt">int</span> <span class="n">hdrlen</span> <span class="o">=</span> <span class="n">sdsHdrSize</span><span class="p">(</span><span class="n">type</span><span class="p">);</span>
-<span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">fp</span><span class="p">;</span> <span class="cm">/* flags pointer. */</span>
+    <span class="kt">void</span> <span class="o">*</span><span class="n">sh</span><span class="p">;</span>
+    <span class="n">sds</span> <span class="n">s</span><span class="p">;</span>
+    <span class="kt">char</span> <span class="n">type</span> <span class="o">=</span> <span class="n">sdsReqType</span><span class="p">(</span><span class="n">initlen</span><span class="p">)</span><span class="p">;</span>
+    <span class="cm">/* Empty strings are usually created in order to append. Use type 8
+</span><span class="cm">     * since type 5 is not good at this. */</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">type</span> <span class="o">=</span><span class="o">=</span> <span class="n">SDS_TYPE_5</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">initlen</span> <span class="o">=</span><span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="n">type</span> <span class="o">=</span> <span class="n">SDS_TYPE_8</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">hdrlen</span> <span class="o">=</span> <span class="n">sdsHdrSize</span><span class="p">(</span><span class="n">type</span><span class="p">)</span><span class="p">;</span>
+    <span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">fp</span><span class="p">;</span> <span class="cm">/* flags pointer. */</span>
 
-<span class="n">sh</span> <span class="o">=</span> <span class="n">s_malloc</span><span class="p">(</span><span class="n">hdrlen</span><span class="o">+</span><span class="n">initlen</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
-<span class="k">if</span> <span class="p">(</span><span class="n">init</span><span class="o">==</span><span class="n">SDS_NOINIT</span><span class="p">)</span>
-    <span class="n">init</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
-<span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">init</span><span class="p">)</span>
-    <span class="n">memset</span><span class="p">(</span><span class="n">sh</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">hdrlen</span><span class="o">+</span><span class="n">initlen</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
-<span class="k">if</span> <span class="p">(</span><span class="n">sh</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
-<span class="n">s</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">sh</span><span class="o">+</span><span class="n">hdrlen</span><span class="p">;</span>
-<span class="n">fp</span> <span class="o">=</span> <span class="p">((</span><span class="kt">unsigned</span> <span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">s</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-<span class="k">switch</span><span class="p">(</span><span class="n">type</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">case</span> <span class="nl">SDS_TYPE_5</span><span class="p">:</span> <span class="p">{</span>
-        <span class="o">*</span><span class="n">fp</span> <span class="o">=</span> <span class="n">type</span> <span class="o">|</span> <span class="p">(</span><span class="n">initlen</span> <span class="o">&lt;&lt;</span> <span class="n">SDS_TYPE_BITS</span><span class="p">);</span>
-        <span class="k">break</span><span class="p">;</span>
+    <span class="n">sh</span> <span class="o">=</span> <span class="n">s_malloc</span><span class="p">(</span><span class="n">hdrlen</span><span class="o">+</span><span class="n">initlen</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="o">=</span><span class="n">SDS_NOINIT</span><span class="p">)</span>
+        <span class="n">init</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">init</span><span class="p">)</span>
+        <span class="n">memset</span><span class="p">(</span><span class="n">sh</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">hdrlen</span><span class="o">+</span><span class="n">initlen</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">sh</span> <span class="o">=</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">sh</span><span class="o">+</span><span class="n">hdrlen</span><span class="p">;</span>
+    <span class="n">fp</span> <span class="o">=</span> <span class="p">(</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">s</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+    <span class="k">switch</span><span class="p">(</span><span class="n">type</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="nl">SDS_TYPE_5</span><span class="p">:</span> <span class="p">{</span>
+            <span class="o">*</span><span class="n">fp</span> <span class="o">=</span> <span class="n">type</span> <span class="o">|</span> <span class="p">(</span><span class="n">initlen</span> <span class="o">&lt;</span><span class="o">&lt;</span> <span class="n">SDS_TYPE_BITS</span><span class="p">)</span><span class="p">;</span>
+            <span class="k">break</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">case</span> <span class="nl">SDS_TYPE_8</span><span class="p">:</span> <span class="p">{</span>
+            <span class="n">SDS_HDR_VAR</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="n">s</span><span class="p">)</span><span class="p">;</span>
+            <span class="n">sh</span><span class="o">-</span><span class="o">&gt;</span><span class="n">len</span> <span class="o">=</span> <span class="n">initlen</span><span class="p">;</span>
+            <span class="n">sh</span><span class="o">-</span><span class="o">&gt;</span><span class="n">alloc</span> <span class="o">=</span> <span class="n">initlen</span><span class="p">;</span>
+            <span class="o">*</span><span class="n">fp</span> <span class="o">=</span> <span class="n">type</span><span class="p">;</span>
+            <span class="k">break</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">case</span> <span class="nl">SDS_TYPE_16</span><span class="p">:</span> <span class="p">{</span>
+            <span class="n">SDS_HDR_VAR</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="n">s</span><span class="p">)</span><span class="p">;</span>
+            <span class="n">sh</span><span class="o">-</span><span class="o">&gt;</span><span class="n">len</span> <span class="o">=</span> <span class="n">initlen</span><span class="p">;</span>
+            <span class="n">sh</span><span class="o">-</span><span class="o">&gt;</span><span class="n">alloc</span> <span class="o">=</span> <span class="n">initlen</span><span class="p">;</span>
+            <span class="o">*</span><span class="n">fp</span> <span class="o">=</span> <span class="n">type</span><span class="p">;</span>
+            <span class="k">break</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">case</span> <span class="nl">SDS_TYPE_32</span><span class="p">:</span> <span class="p">{</span>
+            <span class="n">SDS_HDR_VAR</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span><span class="n">s</span><span class="p">)</span><span class="p">;</span>
+            <span class="n">sh</span><span class="o">-</span><span class="o">&gt;</span><span class="n">len</span> <span class="o">=</span> <span class="n">initlen</span><span class="p">;</span>
+            <span class="n">sh</span><span class="o">-</span><span class="o">&gt;</span><span class="n">alloc</span> <span class="o">=</span> <span class="n">initlen</span><span class="p">;</span>
+            <span class="o">*</span><span class="n">fp</span> <span class="o">=</span> <span class="n">type</span><span class="p">;</span>
+            <span class="k">break</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">case</span> <span class="nl">SDS_TYPE_64</span><span class="p">:</span> <span class="p">{</span>
+            <span class="n">SDS_HDR_VAR</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span><span class="n">s</span><span class="p">)</span><span class="p">;</span>
+            <span class="n">sh</span><span class="o">-</span><span class="o">&gt;</span><span class="n">len</span> <span class="o">=</span> <span class="n">initlen</span><span class="p">;</span>
+            <span class="n">sh</span><span class="o">-</span><span class="o">&gt;</span><span class="n">alloc</span> <span class="o">=</span> <span class="n">initlen</span><span class="p">;</span>
+            <span class="o">*</span><span class="n">fp</span> <span class="o">=</span> <span class="n">type</span><span class="p">;</span>
+            <span class="k">break</span><span class="p">;</span>
+        <span class="p">}</span>
     <span class="p">}</span>
-    <span class="k">case</span> <span class="nl">SDS_TYPE_8</span><span class="p">:</span> <span class="p">{</span>
-        <span class="n">SDS_HDR_VAR</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="n">s</span><span class="p">);</span>
-        <span class="n">sh</span><span class="o">-&gt;</span><span class="n">len</span> <span class="o">=</span> <span class="n">initlen</span><span class="p">;</span>
-        <span class="n">sh</span><span class="o">-&gt;</span><span class="n">alloc</span> <span class="o">=</span> <span class="n">initlen</span><span class="p">;</span>
-        <span class="o">*</span><span class="n">fp</span> <span class="o">=</span> <span class="n">type</span><span class="p">;</span>
-        <span class="k">break</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="k">case</span> <span class="nl">SDS_TYPE_16</span><span class="p">:</span> <span class="p">{</span>
-        <span class="n">SDS_HDR_VAR</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="n">s</span><span class="p">);</span>
-        <span class="n">sh</span><span class="o">-&gt;</span><span class="n">len</span> <span class="o">=</span> <span class="n">initlen</span><span class="p">;</span>
-        <span class="n">sh</span><span class="o">-&gt;</span><span class="n">alloc</span> <span class="o">=</span> <span class="n">initlen</span><span class="p">;</span>
-        <span class="o">*</span><span class="n">fp</span> <span class="o">=</span> <span class="n">type</span><span class="p">;</span>
-        <span class="k">break</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="k">case</span> <span class="nl">SDS_TYPE_32</span><span class="p">:</span> <span class="p">{</span>
-        <span class="n">SDS_HDR_VAR</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span><span class="n">s</span><span class="p">);</span>
-        <span class="n">sh</span><span class="o">-&gt;</span><span class="n">len</span> <span class="o">=</span> <span class="n">initlen</span><span class="p">;</span>
-        <span class="n">sh</span><span class="o">-&gt;</span><span class="n">alloc</span> <span class="o">=</span> <span class="n">initlen</span><span class="p">;</span>
-        <span class="o">*</span><span class="n">fp</span> <span class="o">=</span> <span class="n">type</span><span class="p">;</span>
-        <span class="k">break</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="k">case</span> <span class="nl">SDS_TYPE_64</span><span class="p">:</span> <span class="p">{</span>
-        <span class="n">SDS_HDR_VAR</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span><span class="n">s</span><span class="p">);</span>
-        <span class="n">sh</span><span class="o">-&gt;</span><span class="n">len</span> <span class="o">=</span> <span class="n">initlen</span><span class="p">;</span>
-        <span class="n">sh</span><span class="o">-&gt;</span><span class="n">alloc</span> <span class="o">=</span> <span class="n">initlen</span><span class="p">;</span>
-        <span class="o">*</span><span class="n">fp</span> <span class="o">=</span> <span class="n">type</span><span class="p">;</span>
-        <span class="k">break</span><span class="p">;</span>
-    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">initlen</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">init</span><span class="p">)</span>
+        <span class="n">memcpy</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">init</span><span class="p">,</span> <span class="n">initlen</span><span class="p">)</span><span class="p">;</span>
+    <span class="n">s</span><span class="p">[</span><span class="n">initlen</span><span class="p">]</span> <span class="o">=</span> <span class="sa"></span><span class="sc">&#39;</span><span class="sc">\0</span><span class="sc">&#39;</span><span class="p">;</span>
+    <span class="k">return</span> <span class="n">s</span><span class="p">;</span>
 <span class="p">}</span>
-<span class="k">if</span> <span class="p">(</span><span class="n">initlen</span> <span class="o">&amp;&amp;</span> <span class="n">init</span><span class="p">)</span>
-    <span class="n">memcpy</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">init</span><span class="p">,</span> <span class="n">initlen</span><span class="p">);</span>
-<span class="n">s</span><span class="p">[</span><span class="n">initlen</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39;\0&#39;</span><span class="p">;</span>
-<span class="k">return</span> <span class="n">s</span><span class="p">;</span>
-<span class="p">}</span></code></pre></td></tr></table>
+</code></pre></td></tr></table>
 </div>
-</div></li>
-</ol>
-
-<h1 id="get-length">Get Length</h1>
-
+</div><h1 id="get-length">Get Length</h1>
 <p>With a variable <code>len</code>, Redis can get the length of SDS with time complexity of O(1) which C string must visit all characters until the EOL.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -517,31 +475,29 @@ This post will dive into the implementation of SDS comparing with classic C stri
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-c" data-lang="c"><span class="k">static</span> <span class="kr">inline</span> <span class="n">size_t</span> <span class="nf">sdslen</span><span class="p">(</span><span class="k">const</span> <span class="n">sds</span> <span class="n">s</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">flags</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">];</span>
+    <span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">flags</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="p">;</span>
     <span class="k">switch</span><span class="p">(</span><span class="n">flags</span><span class="o">&amp;</span><span class="n">SDS_TYPE_MASK</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">case</span> <span class="nl">SDS_TYPE_5</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">SDS_TYPE_5_LEN</span><span class="p">(</span><span class="n">flags</span><span class="p">);</span>
+            <span class="k">return</span> <span class="n">SDS_TYPE_5_LEN</span><span class="p">(</span><span class="n">flags</span><span class="p">)</span><span class="p">;</span>
         <span class="k">case</span> <span class="nl">SDS_TYPE_8</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">SDS_HDR</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="n">s</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">len</span><span class="p">;</span>
+            <span class="k">return</span> <span class="n">SDS_HDR</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="n">s</span><span class="p">)</span><span class="o">-</span><span class="o">&gt;</span><span class="n">len</span><span class="p">;</span>
         <span class="k">case</span> <span class="nl">SDS_TYPE_16</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">SDS_HDR</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="n">s</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">len</span><span class="p">;</span>
+            <span class="k">return</span> <span class="n">SDS_HDR</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="n">s</span><span class="p">)</span><span class="o">-</span><span class="o">&gt;</span><span class="n">len</span><span class="p">;</span>
         <span class="k">case</span> <span class="nl">SDS_TYPE_32</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">SDS_HDR</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span><span class="n">s</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">len</span><span class="p">;</span>
+            <span class="k">return</span> <span class="n">SDS_HDR</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span><span class="n">s</span><span class="p">)</span><span class="o">-</span><span class="o">&gt;</span><span class="n">len</span><span class="p">;</span>
         <span class="k">case</span> <span class="nl">SDS_TYPE_64</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">SDS_HDR</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span><span class="n">s</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">len</span><span class="p">;</span>
+            <span class="k">return</span> <span class="n">SDS_HDR</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span><span class="n">s</span><span class="p">)</span><span class="o">-</span><span class="o">&gt;</span><span class="n">len</span><span class="p">;</span>
     <span class="p">}</span>
     <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span></code></pre></td></tr></table>
+<span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<h1 id="avoid-buffer-overflow">Avoid Buffer Overflow</h1>
-
+</div><h1 id="avoid-buffer-overflow">Avoid Buffer Overflow</h1>
 <p>For C string, it may cause buffer overflow if you forget allocate enough space for the string when you update it. SDS can avoid this situation because it will check the available memory before modification.</p>
-
 <p>Take <code>sdscat</code> for example, it will append the specified null terminated C string <code>t</code> to the SDS string <code>s</code>.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -558,25 +514,25 @@ This post will dive into the implementation of SDS comparing with classic C stri
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-c" data-lang="c"><span class="n">sds</span> <span class="nf">sdscat</span><span class="p">(</span><span class="n">sds</span> <span class="n">s</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">t</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="n">sdscatlen</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">t</span><span class="p">));</span>
+    <span class="k">return</span> <span class="n">sdscatlen</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
 <span class="p">}</span>
 
 <span class="n">sds</span> <span class="nf">sdscatlen</span><span class="p">(</span><span class="n">sds</span> <span class="n">s</span><span class="p">,</span> <span class="k">const</span> <span class="kt">void</span> <span class="o">*</span><span class="n">t</span><span class="p">,</span> <span class="n">size_t</span> <span class="n">len</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">size_t</span> <span class="n">curlen</span> <span class="o">=</span> <span class="n">sdslen</span><span class="p">(</span><span class="n">s</span><span class="p">);</span>
+    <span class="n">size_t</span> <span class="n">curlen</span> <span class="o">=</span> <span class="n">sdslen</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="p">;</span>
 
-    <span class="n">s</span> <span class="o">=</span> <span class="n">sdsMakeRoomFor</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">len</span><span class="p">);</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">s</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
-    <span class="n">memcpy</span><span class="p">(</span><span class="n">s</span><span class="o">+</span><span class="n">curlen</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">len</span><span class="p">);</span>
-    <span class="n">sdssetlen</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">curlen</span><span class="o">+</span><span class="n">len</span><span class="p">);</span>
-    <span class="n">s</span><span class="p">[</span><span class="n">curlen</span><span class="o">+</span><span class="n">len</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39;\0&#39;</span><span class="p">;</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">sdsMakeRoomFor</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">len</span><span class="p">)</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">s</span> <span class="o">=</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="n">memcpy</span><span class="p">(</span><span class="n">s</span><span class="o">+</span><span class="n">curlen</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">len</span><span class="p">)</span><span class="p">;</span>
+    <span class="n">sdssetlen</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">curlen</span><span class="o">+</span><span class="n">len</span><span class="p">)</span><span class="p">;</span>
+    <span class="n">s</span><span class="p">[</span><span class="n">curlen</span><span class="o">+</span><span class="n">len</span><span class="p">]</span> <span class="o">=</span> <span class="sa"></span><span class="sc">&#39;</span><span class="sc">\0</span><span class="sc">&#39;</span><span class="p">;</span>
     <span class="k">return</span> <span class="n">s</span><span class="p">;</span>
-<span class="p">}</span></code></pre></td></tr></table>
+<span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><code>sdsMakeRoomFor</code> enlarges the free space at the end of the SDS so that the caller is sure that it can overwrite up to the new SDS after this function.</p>
+</div><p><code>sdsMakeRoomFor</code> enlarges the free space at the end of the SDS so that the caller is sure that it can overwrite up to the new SDS after this function.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -624,92 +580,84 @@ This post will dive into the implementation of SDS comparing with classic C stri
 <td class="lntd">
 <pre class="chroma"><code class="language-c" data-lang="c"><span class="n">sds</span> <span class="nf">sdsMakeRoomFor</span><span class="p">(</span><span class="n">sds</span> <span class="n">s</span><span class="p">,</span> <span class="n">size_t</span> <span class="n">addlen</span><span class="p">)</span> <span class="p">{</span>
     <span class="kt">void</span> <span class="o">*</span><span class="n">sh</span><span class="p">,</span> <span class="o">*</span><span class="n">newsh</span><span class="p">;</span>
-    <span class="n">size_t</span> <span class="n">avail</span> <span class="o">=</span> <span class="n">sdsavail</span><span class="p">(</span><span class="n">s</span><span class="p">);</span>
+    <span class="n">size_t</span> <span class="n">avail</span> <span class="o">=</span> <span class="n">sdsavail</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="p">;</span>
     <span class="n">size_t</span> <span class="n">len</span><span class="p">,</span> <span class="n">newlen</span><span class="p">;</span>
     <span class="kt">char</span> <span class="n">type</span><span class="p">,</span> <span class="n">oldtype</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">SDS_TYPE_MASK</span><span class="p">;</span>
     <span class="kt">int</span> <span class="n">hdrlen</span><span class="p">;</span>
 
     <span class="cm">/* Return ASAP if there is enough space left. */</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">avail</span> <span class="o">&gt;=</span> <span class="n">addlen</span><span class="p">)</span> <span class="k">return</span> <span class="n">s</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">avail</span> <span class="o">&gt;</span><span class="o">=</span> <span class="n">addlen</span><span class="p">)</span> <span class="k">return</span> <span class="n">s</span><span class="p">;</span>
 
-    <span class="n">len</span> <span class="o">=</span> <span class="n">sdslen</span><span class="p">(</span><span class="n">s</span><span class="p">);</span>
-    <span class="n">sh</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">s</span><span class="o">-</span><span class="n">sdsHdrSize</span><span class="p">(</span><span class="n">oldtype</span><span class="p">);</span>
-    <span class="n">newlen</span> <span class="o">=</span> <span class="p">(</span><span class="n">len</span><span class="o">+</span><span class="n">addlen</span><span class="p">);</span>
+    <span class="n">len</span> <span class="o">=</span> <span class="n">sdslen</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="p">;</span>
+    <span class="n">sh</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">s</span><span class="o">-</span><span class="n">sdsHdrSize</span><span class="p">(</span><span class="n">oldtype</span><span class="p">)</span><span class="p">;</span>
+    <span class="n">newlen</span> <span class="o">=</span> <span class="p">(</span><span class="n">len</span><span class="o">+</span><span class="n">addlen</span><span class="p">)</span><span class="p">;</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">newlen</span> <span class="o">&lt;</span> <span class="n">SDS_MAX_PREALLOC</span><span class="p">)</span>
-        <span class="n">newlen</span> <span class="o">*=</span> <span class="mi">2</span><span class="p">;</span>
+        <span class="n">newlen</span> <span class="o">*</span><span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
     <span class="k">else</span>
-        <span class="n">newlen</span> <span class="o">+=</span> <span class="n">SDS_MAX_PREALLOC</span><span class="p">;</span>
+        <span class="n">newlen</span> <span class="o">+</span><span class="o">=</span> <span class="n">SDS_MAX_PREALLOC</span><span class="p">;</span>
 
-    <span class="n">type</span> <span class="o">=</span> <span class="n">sdsReqType</span><span class="p">(</span><span class="n">newlen</span><span class="p">);</span>
+    <span class="n">type</span> <span class="o">=</span> <span class="n">sdsReqType</span><span class="p">(</span><span class="n">newlen</span><span class="p">)</span><span class="p">;</span>
 
     <span class="cm">/* Don&#39;t use type 5: the user is appending to the string and type 5 is
 </span><span class="cm">     * not able to remember empty space, so sdsMakeRoomFor() must be called
 </span><span class="cm">     * at every appending operation. */</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">type</span> <span class="o">==</span> <span class="n">SDS_TYPE_5</span><span class="p">)</span> <span class="n">type</span> <span class="o">=</span> <span class="n">SDS_TYPE_8</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">type</span> <span class="o">=</span><span class="o">=</span> <span class="n">SDS_TYPE_5</span><span class="p">)</span> <span class="n">type</span> <span class="o">=</span> <span class="n">SDS_TYPE_8</span><span class="p">;</span>
 
-    <span class="n">hdrlen</span> <span class="o">=</span> <span class="n">sdsHdrSize</span><span class="p">(</span><span class="n">type</span><span class="p">);</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">oldtype</span><span class="o">==</span><span class="n">type</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">newsh</span> <span class="o">=</span> <span class="n">s_realloc</span><span class="p">(</span><span class="n">sh</span><span class="p">,</span> <span class="n">hdrlen</span><span class="o">+</span><span class="n">newlen</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">newsh</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="n">hdrlen</span> <span class="o">=</span> <span class="n">sdsHdrSize</span><span class="p">(</span><span class="n">type</span><span class="p">)</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">oldtype</span><span class="o">=</span><span class="o">=</span><span class="n">type</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">newsh</span> <span class="o">=</span> <span class="n">s_realloc</span><span class="p">(</span><span class="n">sh</span><span class="p">,</span> <span class="n">hdrlen</span><span class="o">+</span><span class="n">newlen</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">newsh</span> <span class="o">=</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
         <span class="n">s</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">newsh</span><span class="o">+</span><span class="n">hdrlen</span><span class="p">;</span>
     <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
         <span class="cm">/* Since the header size changes, need to move the string forward,
 </span><span class="cm">         * and can&#39;t use realloc */</span>
-        <span class="n">newsh</span> <span class="o">=</span> <span class="n">s_malloc</span><span class="p">(</span><span class="n">hdrlen</span><span class="o">+</span><span class="n">newlen</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">newsh</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
-        <span class="n">memcpy</span><span class="p">((</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">newsh</span><span class="o">+</span><span class="n">hdrlen</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">len</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
-        <span class="n">s_free</span><span class="p">(</span><span class="n">sh</span><span class="p">);</span>
+        <span class="n">newsh</span> <span class="o">=</span> <span class="n">s_malloc</span><span class="p">(</span><span class="n">hdrlen</span><span class="o">+</span><span class="n">newlen</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">newsh</span> <span class="o">=</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+        <span class="n">memcpy</span><span class="p">(</span><span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">newsh</span><span class="o">+</span><span class="n">hdrlen</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">len</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="p">;</span>
+        <span class="n">s_free</span><span class="p">(</span><span class="n">sh</span><span class="p">)</span><span class="p">;</span>
         <span class="n">s</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">newsh</span><span class="o">+</span><span class="n">hdrlen</span><span class="p">;</span>
         <span class="n">s</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">type</span><span class="p">;</span>
-        <span class="n">sdssetlen</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">len</span><span class="p">);</span>
+        <span class="n">sdssetlen</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">len</span><span class="p">)</span><span class="p">;</span>
     <span class="p">}</span>
-    <span class="n">sdssetalloc</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">newlen</span><span class="p">);</span>
+    <span class="n">sdssetalloc</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">newlen</span><span class="p">)</span><span class="p">;</span>
     <span class="k">return</span> <span class="n">s</span><span class="p">;</span>
-<span class="p">}</span></code></pre></td></tr></table>
+<span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>Steps:</p>
-
+</div><p>Steps:</p>
 <ol>
 <li>Return ASAP if available memory is enough</li>
 <li>Reallocate memory</li>
 <li>Change header size if needed</li>
 <li>Set new length</li>
 </ol>
-
 <h1 id="reallocation">Reallocation</h1>
-
 <p>How does SDS reduce the need for reallocation? The first solution is pre-allocation in <code>sdsMakeRoomFor</code>.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="n">newlen</span> <span class="o">=</span> <span class="p">(</span><span class="n">len</span><span class="o">+</span><span class="n">addlen</span><span class="p">);</span>
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="n">newlen</span> <span class="o">=</span> <span class="p">(</span><span class="n">len</span><span class="o">+</span><span class="n">addlen</span><span class="p">)</span><span class="p">;</span>
 <span class="k">if</span> <span class="p">(</span><span class="n">newlen</span> <span class="o">&lt;</span> <span class="n">SDS_MAX_PREALLOC</span><span class="p">)</span>
-    <span class="n">newlen</span> <span class="o">*=</span> <span class="mi">2</span><span class="p">;</span>
+    <span class="n">newlen</span> <span class="o">*</span><span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
 <span class="k">else</span>
-    <span class="n">newlen</span> <span class="o">+=</span> <span class="n">SDS_MAX_PREALLOC</span><span class="p">;</span></code></pre></td></tr></table>
+    <span class="n">newlen</span> <span class="o">+</span><span class="o">=</span> <span class="n">SDS_MAX_PREALLOC</span><span class="p">;</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>If the new length is smaller than 1MB, it will multiply by 2, or plus by 1MB.</p>
-
-<p>Back to the SDS instance <code>s</code> with value of &ldquo;Redis&rdquo;, append &ldquo; Cluster&rdquo; to it by calling <code>sdscat(s, &quot; Cluster&quot;)</code>. the new <code>alloc</code> will be <code>(5+8)*2 = 26</code>.</p>
-
-<p><img src="/images/redis-sds-sdscat-1.png" alt="" /></p>
-
-<p>Then it will not reallocate more memory if we append &ldquo; Tutorial&rdquo; again.</p>
-
-<p><img src="/images/redis-sds-sdscat-2.png" alt="" /></p>
-
+</div><p>If the new length is smaller than 1MB, it will multiply by 2, or plus by 1MB.</p>
+<p>Back to the SDS instance <code>s</code> with value of &ldquo;Redis&rdquo;, append &quot; Cluster&rdquo; to it by calling <code>sdscat(s, &quot; Cluster&quot;)</code>. the new <code>alloc</code> will be <code>(5+8)*2 = 26</code>.</p>
+<p><img src="/images/redis-sds-sdscat-1.png" alt=""></p>
+<p>Then it will not reallocate more memory if we append &quot; Tutorial&rdquo; again.</p>
+<p><img src="/images/redis-sds-sdscat-2.png" alt=""></p>
 <p>The second solution is lazy release. If the SDS length shrinks, for example <code>sdstrim</code>, only the <code>len</code> variable is changed rather than deallocate the superfluous space which can be released by explicitly calling <code>sdsRemoveFreeSpace</code>. But after <code>sdsRemoveFreeSpace</code>, the next concatenation operations will require reallocation.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -746,39 +694,38 @@ This post will dive into the implementation of SDS comparing with classic C stri
 <pre class="chroma"><code class="language-c" data-lang="c"><span class="n">sds</span> <span class="nf">sdsRemoveFreeSpace</span><span class="p">(</span><span class="n">sds</span> <span class="n">s</span><span class="p">)</span> <span class="p">{</span>
     <span class="kt">void</span> <span class="o">*</span><span class="n">sh</span><span class="p">,</span> <span class="o">*</span><span class="n">newsh</span><span class="p">;</span>
     <span class="kt">char</span> <span class="n">type</span><span class="p">,</span> <span class="n">oldtype</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">SDS_TYPE_MASK</span><span class="p">;</span>
-    <span class="kt">int</span> <span class="n">hdrlen</span><span class="p">,</span> <span class="n">oldhdrlen</span> <span class="o">=</span> <span class="n">sdsHdrSize</span><span class="p">(</span><span class="n">oldtype</span><span class="p">);</span>
-    <span class="n">size_t</span> <span class="n">len</span> <span class="o">=</span> <span class="n">sdslen</span><span class="p">(</span><span class="n">s</span><span class="p">);</span>
+    <span class="kt">int</span> <span class="n">hdrlen</span><span class="p">,</span> <span class="n">oldhdrlen</span> <span class="o">=</span> <span class="n">sdsHdrSize</span><span class="p">(</span><span class="n">oldtype</span><span class="p">)</span><span class="p">;</span>
+    <span class="n">size_t</span> <span class="n">len</span> <span class="o">=</span> <span class="n">sdslen</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="p">;</span>
     <span class="n">sh</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">s</span><span class="o">-</span><span class="n">oldhdrlen</span><span class="p">;</span>
 
     <span class="cm">/* Check what would be the minimum SDS header that is just good enough to
 </span><span class="cm">     * fit this string. */</span>
-    <span class="n">type</span> <span class="o">=</span> <span class="n">sdsReqType</span><span class="p">(</span><span class="n">len</span><span class="p">);</span>
-    <span class="n">hdrlen</span> <span class="o">=</span> <span class="n">sdsHdrSize</span><span class="p">(</span><span class="n">type</span><span class="p">);</span>
+    <span class="n">type</span> <span class="o">=</span> <span class="n">sdsReqType</span><span class="p">(</span><span class="n">len</span><span class="p">)</span><span class="p">;</span>
+    <span class="n">hdrlen</span> <span class="o">=</span> <span class="n">sdsHdrSize</span><span class="p">(</span><span class="n">type</span><span class="p">)</span><span class="p">;</span>
 
     <span class="cm">/* If the type is the same, or at least a large enough type is still
 </span><span class="cm">     * required, we just realloc(), letting the allocator to do the copy
 </span><span class="cm">     * only if really needed. Otherwise if the change is huge, we manually
 </span><span class="cm">     * reallocate the string to use the different header type. */</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">oldtype</span><span class="o">==</span><span class="n">type</span> <span class="o">||</span> <span class="n">type</span> <span class="o">&gt;</span> <span class="n">SDS_TYPE_8</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">newsh</span> <span class="o">=</span> <span class="n">s_realloc</span><span class="p">(</span><span class="n">sh</span><span class="p">,</span> <span class="n">oldhdrlen</span><span class="o">+</span><span class="n">len</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">newsh</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">oldtype</span><span class="o">=</span><span class="o">=</span><span class="n">type</span> <span class="o">|</span><span class="o">|</span> <span class="n">type</span> <span class="o">&gt;</span> <span class="n">SDS_TYPE_8</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">newsh</span> <span class="o">=</span> <span class="n">s_realloc</span><span class="p">(</span><span class="n">sh</span><span class="p">,</span> <span class="n">oldhdrlen</span><span class="o">+</span><span class="n">len</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">newsh</span> <span class="o">=</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
         <span class="n">s</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">newsh</span><span class="o">+</span><span class="n">oldhdrlen</span><span class="p">;</span>
     <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-        <span class="n">newsh</span> <span class="o">=</span> <span class="n">s_malloc</span><span class="p">(</span><span class="n">hdrlen</span><span class="o">+</span><span class="n">len</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">newsh</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
-        <span class="n">memcpy</span><span class="p">((</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">newsh</span><span class="o">+</span><span class="n">hdrlen</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">len</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
-        <span class="n">s_free</span><span class="p">(</span><span class="n">sh</span><span class="p">);</span>
+        <span class="n">newsh</span> <span class="o">=</span> <span class="n">s_malloc</span><span class="p">(</span><span class="n">hdrlen</span><span class="o">+</span><span class="n">len</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">newsh</span> <span class="o">=</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+        <span class="n">memcpy</span><span class="p">(</span><span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">newsh</span><span class="o">+</span><span class="n">hdrlen</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">len</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="p">;</span>
+        <span class="n">s_free</span><span class="p">(</span><span class="n">sh</span><span class="p">)</span><span class="p">;</span>
         <span class="n">s</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">newsh</span><span class="o">+</span><span class="n">hdrlen</span><span class="p">;</span>
         <span class="n">s</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">type</span><span class="p">;</span>
-        <span class="n">sdssetlen</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">len</span><span class="p">);</span>
+        <span class="n">sdssetlen</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">len</span><span class="p">)</span><span class="p">;</span>
     <span class="p">}</span>
-    <span class="n">sdssetalloc</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">len</span><span class="p">);</span>
+    <span class="n">sdssetalloc</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">len</span><span class="p">)</span><span class="p">;</span>
     <span class="k">return</span> <span class="n">s</span><span class="p">;</span>
-<span class="p">}</span></code></pre></td></tr></table>
+<span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><strong>Reference</strong></p>
-
+</div><p><strong>Reference</strong></p>
 <ul>
 <li><a href="http://czrzchao.com/redisSourceSds">redis源码解读(一):基础数据结构之SDS</a></li>
 <li><a href="http://www.hoohack.me/2017/11/13/read-redis-src-sds">［Redis源码阅读］sds字符串实现</a></li>

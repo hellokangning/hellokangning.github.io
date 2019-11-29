@@ -25,7 +25,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.59.1 with theme even" />
+<meta name="generator" content="Hugo 0.60.0 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/zh/post/redis-sentinel-automatic-failover/" />
@@ -43,7 +43,6 @@
 <meta property="og:title" content="Redis 哨兵：自动故障转移" />
 <meta property="og:description" content="Redis 哨兵是 Redis 的高可用实现方案。本节首先会回顾主从复制模式下故障处理可能产生的问题，而后引出高可用的概念，最后重点分析 Redis 哨兵的基本架构、优势，以及是如何实现高可用的。
 
-
 本文大部分摘录自：Redis开发与运维
 " />
 <meta property="og:type" content="article" />
@@ -53,22 +52,17 @@
 <meta itemprop="name" content="Redis 哨兵：自动故障转移">
 <meta itemprop="description" content="Redis 哨兵是 Redis 的高可用实现方案。本节首先会回顾主从复制模式下故障处理可能产生的问题，而后引出高可用的概念，最后重点分析 Redis 哨兵的基本架构、优势，以及是如何实现高可用的。
 
-
 本文大部分摘录自：Redis开发与运维
 ">
-
-
 <meta itemprop="datePublished" content="2019-02-02T14:21:53&#43;08:00" />
 <meta itemprop="dateModified" content="2019-02-02T14:21:53&#43;08:00" />
-<meta itemprop="wordCount" content="2499">
+<meta itemprop="wordCount" content="2498">
 
 
 
-<meta itemprop="keywords" content="" />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Redis 哨兵：自动故障转移"/>
 <meta name="twitter:description" content="Redis 哨兵是 Redis 的高可用实现方案。本节首先会回顾主从复制模式下故障处理可能产生的问题，而后引出高可用的概念，最后重点分析 Redis 哨兵的基本架构、优势，以及是如何实现高可用的。
-
 
 本文大部分摘录自：Redis开发与运维
 "/>
@@ -145,7 +139,7 @@
         <div class="post-category">
             <a href="/zh/categories/redis/"> Redis </a>
             </div>
-          <span class="more-meta"> 约 2499 字 </span>
+          <span class="more-meta"> 约 2498 字 </span>
           <span class="more-meta"> 预计阅读 5 分钟 </span>
         
       </div>
@@ -154,171 +148,130 @@
     <div class="post-toc" id="post-toc">
   <h2 class="post-toc-title">文章目录</h2>
   <div class="post-toc-content always-active">
-    <nav id="TableOfContents">
-<ul>
-<li><a href="#主从复制的问题">主从复制的问题</a></li>
-<li><a href="#故障转移">故障转移</a></li>
-<li><a href="#哨兵的自动故障转移">哨兵的自动故障转移</a></li>
-<li><a href="#主观下线和客观下线">主观下线和客观下线</a></li>
-<li><a href="#领导哨兵节点选举">领导哨兵节点选举</a></li>
-</ul>
-</nav>
+    <nav id="TableOfContents"></nav>
   </div>
 </div>
     <div class="post-content">
       <p>Redis 哨兵是 Redis 的高可用实现方案。本节首先会回顾主从复制模式下故障处理可能产生的问题，而后引出高可用的概念，最后重点分析 Redis 哨兵的基本架构、优势，以及是如何实现高可用的。</p>
-
 <blockquote>
 <p>本文大部分摘录自：<a href="https://book.douban.com/subject/26971561/">Redis开发与运维</a></p>
 </blockquote>
-
-<h1 id="主从复制的问题">主从复制的问题</h1>
-
+<h1 id="heading">主从复制的问题</h1>
 <p>Redis 的主从复制模式可以将主节点的数据改变同步给从节点，这样从节点就可以起到两个作用：</p>
-
 <ol>
 <li>作为主节点的一个备份，一旦主节点出了故障不可达的情况，从节点可以作为后备“顶”上来，并且保证数据尽量不丢失（主从复制是最终一致性）。</li>
 <li>从节点可以扩展主节点的读能力，一旦主节点不能支撑住大并发量的读操作，从节点可以在一定程度上帮助主节点分担读压力。</li>
 </ol>
-
 <p>但是主从复制也带来了以下问题：</p>
-
 <ol>
 <li>一旦主节点出现故障，需要手动将一个从节点晋升为主节点，同时需要修改应用方的主节点地址，还需要命令其他从节点去复制新的主节点，整个过程都需要人工干预。</li>
 <li>主节点的写能力受到单机的限制。</li>
 <li>主节点的存储能力受到单机的限制。</li>
 </ol>
-
 <p>其中第一个问题就是Redis的高可用问题，也是 Redis 引入哨兵机制的原因。</p>
-
-<h1 id="故障转移">故障转移</h1>
-
+<h1 id="heading1">故障转移</h1>
 <p>在没有哨兵的情况下，Redis 的主节点发生故障后：</p>
-
 <ol>
-<li><p>客户端连接主节点失败，两个从节点与主节点连接失败造成复制中断。
-<img src="/images/redis-failover-master-disconnected.png" alt="" /></p></li>
-
-<li><p>如果主节点无法启动，则要选出一个从节点（slave-1），对其执行 <em>slaveof no one</em> 命令使其成为新的主节点。
-<img src="/images/redis-failover-slaveof-no-one.png" alt="" /></p></li>
-
-<li><p>原来的从节点（slave-1）成为新的主节点后，更新应用方的主节点信息，重新启动应用方。
-<img src="/images/redis-failover-restart-client.png" alt="" /></p></li>
-
-<li><p>客户端命令另一个从节点（slave-2）去复制新的主节点（new-master）。
-<img src="/images/redis-failover-slave-new-master.png" alt="" /></p></li>
-
-<li><p>待原来的主节点恢复后，让它去复制新的主节点。
-<img src="/images/redis-failover-replicate-new-master.png" alt="" /></p></li>
+<li>
+<p>客户端连接主节点失败，两个从节点与主节点连接失败造成复制中断。
+<img src="/images/redis-failover-master-disconnected.png" alt=""></p>
+</li>
+<li>
+<p>如果主节点无法启动，则要选出一个从节点（slave-1），对其执行 <em>slaveof no one</em> 命令使其成为新的主节点。
+<img src="/images/redis-failover-slaveof-no-one.png" alt=""></p>
+</li>
+<li>
+<p>原来的从节点（slave-1）成为新的主节点后，更新应用方的主节点信息，重新启动应用方。
+<img src="/images/redis-failover-restart-client.png" alt=""></p>
+</li>
+<li>
+<p>客户端命令另一个从节点（slave-2）去复制新的主节点（new-master）。
+<img src="/images/redis-failover-slave-new-master.png" alt=""></p>
+</li>
+<li>
+<p>待原来的主节点恢复后，让它去复制新的主节点。
+<img src="/images/redis-failover-replicate-new-master.png" alt=""></p>
+</li>
 </ol>
-
 <p>整个过程需要人工介入，且仍然存在以下问题：</p>
-
 <ol>
 <li>判断节点不可达的机制是否健全和标准。</li>
 <li>如果有多个从节点，怎样保证只有一个被晋升为主节点。</li>
 <li>通知客户端新的主节点机制是否足够健壮。</li>
 </ol>
-
 <p>Redis 哨兵正是用于解决这些问题。</p>
-
-<h1 id="哨兵的自动故障转移">哨兵的自动故障转移</h1>
-
+<h1 id="heading2">哨兵的自动故障转移</h1>
 <p>当主节点出现故障时，Redis 哨兵能自动完成故障发现和故障转移，并通知应用方，从而实现真正的高可用。</p>
-
 <p>Redis 哨兵是一个分布式架构，其中包含若干个哨兵节点和 Redis 数据节点，每个哨兵节点会对数据节点和其余哨兵节点进行监控，当它发现节点不可达时，会对节点做下线标识。如果被标识的是主节点，它还会和其他哨兵节点进行“协商”，当大多数哨兵节点都认为主节点不可达时，它们会选举出一个哨兵节点来完成自动故障转移的工作，同时会将这个变化实时通知给 Redis 应用方。整个过程完全是自动的，不需要人工来介入，所以这套方案很有效地解决了 Redis 的高可用问题。</p>
-
-<p><img src="/images/redis-sentinel-architecture.png" alt="" /></p>
-
+<p><img src="/images/redis-sentinel-architecture.png" alt=""></p>
 <p>有了哨兵之后，整个故障转移的逻辑就变成：</p>
-
 <ol>
-<li><p>主节点出现故障，此时两个从节点与主节点失去连接，主从复制失败。
-<img src="/images/redis-failover-master-disconnected.png" alt="" /></p></li>
-
-<li><p>每个哨兵节点通过定期监控发现主节点出现了故障。
-<img src="/images/redis-failover-sentinel-monitor.png" alt="" /></p></li>
-
-<li><p>多个哨兵节点对主节点的故障达成一致，选举出 sentinel-3 节点作为领导者负责故障转移。
-<img src="/images/redis-failover-sentinel-vote.png" alt="" /></p></li>
-
-<li><p>哨兵领导者节点执行了故障转移，整个过程和上节完全一致，只不过是自动完成的。
-<img src="/images/redis-failover-sentinel-automatic.png" alt="" /></p></li>
-
-<li><p>故障转移后整个 Redis 哨兵的拓扑结构如下图所示：
-<img src="/images/redis-failover-sentinel-finished.png" alt="" /></p></li>
+<li>
+<p>主节点出现故障，此时两个从节点与主节点失去连接，主从复制失败。
+<img src="/images/redis-failover-master-disconnected.png" alt=""></p>
+</li>
+<li>
+<p>每个哨兵节点通过定期监控发现主节点出现了故障。
+<img src="/images/redis-failover-sentinel-monitor.png" alt=""></p>
+</li>
+<li>
+<p>多个哨兵节点对主节点的故障达成一致，选举出 sentinel-3 节点作为领导者负责故障转移。
+<img src="/images/redis-failover-sentinel-vote.png" alt=""></p>
+</li>
+<li>
+<p>哨兵领导者节点执行了故障转移，整个过程和上节完全一致，只不过是自动完成的。
+<img src="/images/redis-failover-sentinel-automatic.png" alt=""></p>
+</li>
+<li>
+<p>故障转移后整个 Redis 哨兵的拓扑结构如下图所示：
+<img src="/images/redis-failover-sentinel-finished.png" alt=""></p>
+</li>
 </ol>
-
 <p>通过上面介绍的 Redis 哨兵逻辑架构以及故障转移的处理，可以看出：</p>
-
 <ul>
 <li>监控：哨兵节点会定期检测 Redis 数据节点、其余哨兵是否可达。</li>
 <li>通知：哨兵节点会将故障转移的结果通知给应用方。</li>
 <li>主节点故障转移：实现从节点晋升为主节点并维护后续正确的主从关系。</li>
 <li>配置提供者：在 Redis 哨兵结构中，客户端在初始化的时候连接的是哨兵节点集合，从中获取主节点信息。</li>
 </ul>
-
 <p>同时看到，Redis 哨兵包含了若个节点，这样做也带来了两个好处：</p>
-
 <ol>
 <li>对于节点的故障判断是由多个哨兵节点共同完成，这样可以有效地防止误判。</li>
 <li>哨兵节点集合是由若干个哨兵节点组成的，这样即使个别哨兵节点不可用，整个哨兵节点集合依然是健壮的。</li>
 </ol>
-
 <p>哨兵本身就是独立的 Redis 节点，只不过它们有一些特殊，它们不存储数据 (这里指接收用户的写命令，毕竟哨兵节点必须存储 <strong>+switch-master</strong> 信息)，只支持部分命令。</p>
-
 <p>那么，哨兵是如何判断节点故障的呢，这里就涉及到主观下线和客观下线的区别了。</p>
-
-<h1 id="主观下线和客观下线">主观下线和客观下线</h1>
-
+<h1 id="heading3">主观下线和客观下线</h1>
 <p>每个哨兵节点会每隔1秒对主节点、从节点、其他哨兵节点发送 ping 命令做心跳检测，当这些节点超过 <code>down-after-milliseconds</code> 没有进行有效回复，哨兵节点就会对该节点做失败判定，这个行为叫做主观下线。</p>
-
 <p>主观下线是当前哨兵节点的一家之言，可能存在误判。从节点、哨兵节点在主观下线后，没有后续的故障转移操作。</p>
-
-<p>当哨兵主观下线的节点是主节点时，该哨兵节点会通过 <code>sentinel is-master-down-by-addr</code> 命令向其他哨兵节点询问对主节点的判断，当超过 <quorum> 个数，哨兵节点认为主节点确实有问题，这时该哨兵节点会做出客观下线的决定，这样客观下线的含义是比较明显了，也就是大部分哨兵节点都对主节点的下线做了同意的判定。</p>
-
+<p>当哨兵主观下线的节点是主节点时，该哨兵节点会通过 <code>sentinel is-master-down-by-addr</code> 命令向其他哨兵节点询问对主节点的判断，当超过 <!-- raw HTML omitted --> 个数，哨兵节点认为主节点确实有问题，这时该哨兵节点会做出客观下线的决定，这样客观下线的含义是比较明显了，也就是大部分哨兵节点都对主节点的下线做了同意的判定。</p>
 <p><code>sentinel is-master-down-by-addr</code> 命令的格式为:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span></pre></td>
-<td class="lntd">
-<pre class="chroma">sentinel is-master-down-by-addr &lt;ip&gt; &lt;port&gt; &lt;current_epoch&gt; &lt;runid&gt;</pre></td></tr></table>
-</div>
-</div>
-<p>其中，</p>
-
+<pre><code>sentinel is-master-down-by-addr &lt;ip&gt; &lt;port&gt; &lt;current_epoch&gt; &lt;runid&gt;
+</code></pre><p>其中，</p>
 <ul>
 <li><code>current_epoch</code>：当前配置纪元。</li>
 <li><code>runid</code>：此参数有两种类型，不同类型决定了此 API 作用的不同。
-
 <ol>
 <li>当 <code>runid</code> 等于 &ldquo;*&rdquo; 时，作用是哨兵节点直接交换对主节点下线的判定。</li>
 <li>当 <code>runid</code> 等于当前哨兵节点的 <code>runid</code> 时，作用是当前哨兵节点希望目标哨兵节点同意自己成为领导者的请求。</li>
-</ol></li>
+</ol>
+</li>
 </ul>
-
 <p><code>sentinel is-master-down-by-addr</code> 的返回结果包含三个参数：</p>
-
 <ul>
 <li><code>down_state</code>：目标哨兵节点对于主节点的下线判断，1是下线，0是在线。</li>
 <li><code>leader_runid</code>：当 <code>leader_runid</code> 等于 &ldquo;*&rdquo; 时，代表返回结果是用来做主节点是否不可达，当 <code>leader_runid</code> 等于具体的 <code>runid</code>，代表目标节点同意 <code>runid</code> 成为领导者。</li>
 <li><code>leader_epoch</code>：领导者纪元。</li>
 </ul>
-
-<h1 id="领导哨兵节点选举">领导哨兵节点选举</h1>
-
+<h1 id="heading4">领导哨兵节点选举</h1>
 <p>主节点的故障转移只需要一个哨兵节点来完成，在此之前，哨兵节点之间会进行领导者选举。Redis 使用 Raft 算法实现领导者选举：</p>
-
 <ol>
 <li>每个在线的哨兵节点都有资格成为领导者，当它确认主节点主观下线时候，会向其他哨兵节点发送 <code>sentinel is-master-down-by-addr</code> 命令，要求将自己设置为领导者。</li>
 <li>收到命令的哨兵节点，如果没有同意过其他哨兵节点的 <code>sentinel is-master-down-by-addr</code> 命令，将同意该请求，否则拒绝。</li>
 <li>如果该哨兵节点发现自己的票数已经大于等于 <code>max(quorum, num(sentinels)/2+1)</code>，那么它将成为领导者。</li>
 <li>如果此过程没有选举出领导者，将进入下一次选举。</li>
 </ol>
-
 <p>最后，哪些节点会入哨兵领导者的法眼，成为新的主节点呢：</p>
-
 <ul>
 <li>过滤：“不健康”（主观下线、断线）、5秒内没有回复过哨兵节点 ping 响应、与主节点失联超过 <code>down-after-milliseconds*10</code> 秒。</li>
 <li>选择 <code>slave-priority</code>（从节点优先级）最高的从节点列表，如果存在则返回，不存在则继续。</li>

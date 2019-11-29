@@ -24,7 +24,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.59.1 with theme even" />
+<meta name="generator" content="Hugo 0.60.0 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/en/post/managing-ordered-sequences-with-bisect/" />
@@ -47,16 +47,13 @@
 <meta property="article:modified_time" content="2018-10-24T14:16:14+08:00" />
 <meta itemprop="name" content="Managing Ordered Sequences With bisect">
 <meta itemprop="description" content="The bisect module offers two main functions - bisect and insort - that use the binary search algorithm to quickly find an d insert items in any sorted sequence.">
-
-
 <meta itemprop="datePublished" content="2018-09-24T14:16:14&#43;08:00" />
 <meta itemprop="dateModified" content="2018-10-24T14:16:14&#43;08:00" />
-<meta itemprop="wordCount" content="352">
+<meta itemprop="wordCount" content="338">
 
 
 
-<meta itemprop="keywords" content="" />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Managing Ordered Sequences With bisect"/>
 <meta name="twitter:description" content="The bisect module offers two main functions - bisect and insort - that use the binary search algorithm to quickly find an d insert items in any sorted sequence."/>
 
@@ -132,7 +129,7 @@
         <div class="post-category">
             <a href="/en/categories/python/"> Python </a>
             </div>
-          <span class="more-meta"> 352 words </span>
+          <span class="more-meta"> 338 words </span>
           <span class="more-meta"> 2 mins read </span>
         
       </div>
@@ -141,25 +138,17 @@
     <div class="post-toc" id="post-toc">
   <h2 class="post-toc-title">Contents</h2>
   <div class="post-toc-content always-active">
-    <nav id="TableOfContents">
-<ul>
-<li><a href="#searching-with-bisect">Searching with <code>bisect</code></a></li>
-<li><a href="#inserting-with-bisect-insort">Inserting with <code>bisect.insort</code></a></li>
-</ul>
-</nav>
+    <nav id="TableOfContents"></nav>
   </div>
 </div>
     <div class="post-content">
       <p>The <code>bisect</code> module offers two main functions - <code>bisect</code> and <code>insort</code> - that use the binary search algorithm to quickly find an d insert items in any sorted sequence.</p>
-
 <h1 id="searching-with-bisect">Searching with <code>bisect</code></h1>
-
 <p><code>bisect(haystack, needle)</code> does a binary search for <code>needle</code> in <code>haystack</code>, which must be sorted.</p>
-
 <p><code>bisect</code> is actually an alias for <code>bisect_right</code>, and there is a sister function named <code>bisect_left</code>. Their difference is apparent only when the needle compares equal to an item in the list: <code>bisect_right</code> returns an insertion pointer after the existing item, while <code>bisect_left</code> returns the position of the existing item, so insertion would occur before it.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -188,21 +177,21 @@
     <span class="n">l</span> <span class="o">=</span> <span class="n">bisect</span><span class="o">.</span><span class="n">bisect_left</span><span class="p">(</span><span class="n">haystack</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
     <span class="n">r</span> <span class="o">=</span> <span class="n">bisect</span><span class="o">.</span><span class="n">bisect</span><span class="p">(</span><span class="n">haystack</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
 
-    <span class="s2">&#34;&#34;&#34;
-</span><span class="s2">    0 0
-</span><span class="s2">    0 1
-</span><span class="s2">    1 1
-</span><span class="s2">    1 3
-</span><span class="s2">    5 6
-</span><span class="s2">    6 6
-</span><span class="s2">    &#34;&#34;&#34;</span>
-    <span class="k">print</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span></code></pre></td></tr></table>
+    <span class="sa"></span><span class="s2">&#34;&#34;&#34;</span><span class="s2">
+</span><span class="s2"></span><span class="s2">    0 0</span><span class="s2">
+</span><span class="s2"></span><span class="s2">    0 1</span><span class="s2">
+</span><span class="s2"></span><span class="s2">    1 1</span><span class="s2">
+</span><span class="s2"></span><span class="s2">    1 3</span><span class="s2">
+</span><span class="s2"></span><span class="s2">    5 6</span><span class="s2">
+</span><span class="s2"></span><span class="s2">    6 6</span><span class="s2">
+</span><span class="s2"></span><span class="s2">    </span><span class="s2">&#34;&#34;&#34;</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>The <code>bisect()</code> function can be useful for numeric table lookups. This example uses <code>bisect()</code> to look up a letter grade for an exam score (say) based on a set of ordered numeric breakpoints: 90 and up is an ‘A’, 80 to 89 is a ‘B’, and so on:</p>
+</div><p>The <code>bisect()</code> function can be useful for numeric table lookups. This example uses <code>bisect()</code> to look up a letter grade for an exam score (say) based on a set of ordered numeric breakpoints: 90 and up is an ‘A’, 80 to 89 is a ‘B’, and so on:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
@@ -210,20 +199,19 @@
 </span><span class="lnt">6
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">grade</span><span class="p">(</span><span class="n">score</span><span class="p">,</span> <span class="n">breakpoints</span><span class="o">=</span><span class="p">[</span><span class="mi">60</span><span class="p">,</span> <span class="mi">70</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span> <span class="n">grades</span><span class="o">=</span><span class="s1">&#39;FDCBA&#39;</span><span class="p">):</span>
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">grade</span><span class="p">(</span><span class="n">score</span><span class="p">,</span> <span class="n">breakpoints</span><span class="o">=</span><span class="p">[</span><span class="mi">60</span><span class="p">,</span> <span class="mi">70</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="mi">90</span><span class="p">]</span><span class="p">,</span> <span class="n">grades</span><span class="o">=</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">FDCBA</span><span class="s1">&#39;</span><span class="p">)</span><span class="p">:</span>
     <span class="n">i</span> <span class="o">=</span> <span class="n">bisect</span><span class="p">(</span><span class="n">breakpoints</span><span class="p">,</span> <span class="n">score</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">grades</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
 
 <span class="c1"># [&#39;F&#39;, &#39;A&#39;, &#39;C&#39;, &#39;C&#39;, &#39;B&#39;, &#39;A&#39;, &#39;A&#39;]</span>
-<span class="p">[</span><span class="n">grade</span><span class="p">(</span><span class="n">score</span><span class="p">)</span> <span class="k">for</span> <span class="n">score</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">33</span><span class="p">,</span> <span class="mi">99</span><span class="p">,</span> <span class="mi">77</span><span class="p">,</span> <span class="mi">70</span><span class="p">,</span> <span class="mi">89</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="mi">100</span><span class="p">]]</span></code></pre></td></tr></table>
+<span class="p">[</span><span class="n">grade</span><span class="p">(</span><span class="n">score</span><span class="p">)</span> <span class="k">for</span> <span class="n">score</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">33</span><span class="p">,</span> <span class="mi">99</span><span class="p">,</span> <span class="mi">77</span><span class="p">,</span> <span class="mi">70</span><span class="p">,</span> <span class="mi">89</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span><span class="p">]</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<h1 id="inserting-with-bisect-insort">Inserting with <code>bisect.insort</code></h1>
-
+</div><h1 id="inserting-with-bisectinsort">Inserting with <code>bisect.insort</code></h1>
 <p><code>insort(seq, item)</code> inserts <code>item</code> to <code>seq</code> so as to keep <code>seq</code> in ascending order.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -242,36 +230,22 @@
 <span class="n">SIZE</span> <span class="o">=</span> <span class="mi">7</span>
 <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1902</span><span class="p">)</span>
 
-<span class="n">lst</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">SIZE</span><span class="p">):</span>
+<span class="n">lst</span> <span class="o">=</span> <span class="p">[</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">SIZE</span><span class="p">)</span><span class="p">:</span>
     <span class="n">item</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randrange</span><span class="p">(</span><span class="n">SIZE</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span>
     <span class="n">bisect</span><span class="o">.</span><span class="n">insort</span><span class="p">(</span><span class="n">lst</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%2d</span><span class="s1"> -&gt; &#39;</span> <span class="o">%</span> <span class="n">item</span><span class="p">,</span> <span class="n">lst</span><span class="p">)</span></code></pre></td></tr></table>
+    <span class="k">print</span><span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="si">%2d</span><span class="s1"> -&gt; </span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">item</span><span class="p">,</span> <span class="n">lst</span><span class="p">)</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>The output of above code is:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span></pre></td>
-<td class="lntd">
-<pre class="chroma"> 0 -&gt;  [0]
+</div><p>The output of above code is:</p>
+<pre><code> 0 -&gt;  [0]
  0 -&gt;  [0, 0]
  7 -&gt;  [0, 0, 7]
  8 -&gt;  [0, 0, 7, 8]
 12 -&gt;  [0, 0, 7, 8, 12]
  7 -&gt;  [0, 0, 7, 7, 8, 12]
- 3 -&gt;  [0, 0, 3, 7, 7, 8, 12]</pre></td></tr></table>
-</div>
-</div>
-<p><strong>Reference</strong></p>
-
+ 3 -&gt;  [0, 0, 3, 7, 7, 8, 12]
+</code></pre><p><strong>Reference</strong></p>
 <p><a href="https://book.douban.com/subject/26278021/">Fluent Python</a></p>
     </div>
 

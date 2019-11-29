@@ -27,7 +27,7 @@ Redis Sentinel(哨兵) 就是为了解决这些问题而生的，它是 Redis 2.
 
 
 
-<meta name="generator" content="Hugo 0.59.1 with theme even" />
+<meta name="generator" content="Hugo 0.60.0 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/zh/post/redis-sentinel-client-connection/" />
@@ -44,11 +44,8 @@ Redis Sentinel(哨兵) 就是为了解决这些问题而生的，它是 Redis 2.
 
 <meta property="og:title" content="Redis 哨兵: 客户端连接" />
 <meta property="og:description" content="Redis 的主从复制模式下，一旦主节点不可达，需要人工干预进行故障转移，无论对于 Redis 的使用方还是运维方都带来了极大不便。对应用方来说无法感知主节点的变化，可能会造成数据丢失或读错误，也可能会短暂的服务不可用。对于运维来说，整个故障转移需要人工介入，实时性和准确性都无法保障。
-
 Redis Sentinel(哨兵) 就是为了解决这些问题而生的，它是 Redis 2.8 引入的高可用实现方案，包括故障发现、故障转移、配置中心、客户端通知等。
-
 本文的关注点是哨兵下的客户端连接问题。
-
 
 本文大部分摘录自：Redis开发与运维
 " />
@@ -58,31 +55,22 @@ Redis Sentinel(哨兵) 就是为了解决这些问题而生的，它是 Redis 2.
 <meta property="article:modified_time" content="2019-01-29T10:21:46+08:00" />
 <meta itemprop="name" content="Redis 哨兵: 客户端连接">
 <meta itemprop="description" content="Redis 的主从复制模式下，一旦主节点不可达，需要人工干预进行故障转移，无论对于 Redis 的使用方还是运维方都带来了极大不便。对应用方来说无法感知主节点的变化，可能会造成数据丢失或读错误，也可能会短暂的服务不可用。对于运维来说，整个故障转移需要人工介入，实时性和准确性都无法保障。
-
 Redis Sentinel(哨兵) 就是为了解决这些问题而生的，它是 Redis 2.8 引入的高可用实现方案，包括故障发现、故障转移、配置中心、客户端通知等。
-
 本文的关注点是哨兵下的客户端连接问题。
-
 
 本文大部分摘录自：Redis开发与运维
 ">
-
-
 <meta itemprop="datePublished" content="2019-01-29T10:21:46&#43;08:00" />
 <meta itemprop="dateModified" content="2019-01-29T10:21:46&#43;08:00" />
 <meta itemprop="wordCount" content="2263">
 
 
 
-<meta itemprop="keywords" content="" />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Redis 哨兵: 客户端连接"/>
 <meta name="twitter:description" content="Redis 的主从复制模式下，一旦主节点不可达，需要人工干预进行故障转移，无论对于 Redis 的使用方还是运维方都带来了极大不便。对应用方来说无法感知主节点的变化，可能会造成数据丢失或读错误，也可能会短暂的服务不可用。对于运维来说，整个故障转移需要人工介入，实时性和准确性都无法保障。
-
 Redis Sentinel(哨兵) 就是为了解决这些问题而生的，它是 Redis 2.8 引入的高可用实现方案，包括故障发现、故障转移、配置中心、客户端通知等。
-
 本文的关注点是哨兵下的客户端连接问题。
-
 
 本文大部分摘录自：Redis开发与运维
 "/>
@@ -168,115 +156,87 @@ Redis Sentinel(哨兵) 就是为了解决这些问题而生的，它是 Redis 2.
     <div class="post-toc" id="post-toc">
   <h2 class="post-toc-title">文章目录</h2>
   <div class="post-toc-content always-active">
-    <nav id="TableOfContents">
-<ul>
-<li><a href="#哨兵客户端的基本原理">哨兵客户端的基本原理</a></li>
-<li><a href="#哨兵监控任务">哨兵监控任务</a></li>
-<li><a href="#jedis-操作哨兵">Jedis 操作哨兵</a></li>
-</ul>
-</nav>
+    <nav id="TableOfContents"></nav>
   </div>
 </div>
     <div class="post-content">
       <p>Redis 的主从复制模式下，一旦主节点不可达，需要人工干预进行故障转移，无论对于 Redis 的使用方还是运维方都带来了极大不便。对应用方来说无法感知主节点的变化，可能会造成数据丢失或读错误，也可能会短暂的服务不可用。对于运维来说，整个故障转移需要人工介入，实时性和准确性都无法保障。</p>
-
 <p>Redis Sentinel(哨兵) 就是为了解决这些问题而生的，它是 Redis 2.8 引入的高可用实现方案，包括故障发现、故障转移、配置中心、客户端通知等。</p>
-
 <p>本文的关注点是哨兵下的客户端连接问题。</p>
-
 <blockquote>
 <p>本文大部分摘录自：<a href="https://book.douban.com/subject/26971561/">Redis开发与运维</a></p>
 </blockquote>
-
 <p>哨兵是一个配置提供者，而不是代理。在引入哨兵之后，客户端会先连接哨兵，再获取到主节点之后，客户端会和主节点直接通信。如果发生了故障转移，哨兵会通知到客户端。这也需要客户端对哨兵的显式支持。</p>
-
-<p>最了解主节点信息的就是哨兵节点集合，各个主节点是用 <master-name> 进行标识。所以无论是哪种编程语言的客户端，都需要知道哨兵节点集合和 <code>masterName</code> 两个参数才能正确连接哨兵。</p>
-
-<h1 id="哨兵客户端的基本原理">哨兵客户端的基本原理</h1>
-
+<p>最了解主节点信息的就是哨兵节点集合，各个主节点是用 <!-- raw HTML omitted --> 进行标识。所以无论是哪种编程语言的客户端，都需要知道哨兵节点集合和 <code>masterName</code> 两个参数才能正确连接哨兵。</p>
+<h1 id="heading">哨兵客户端的基本原理</h1>
 <p>实现一个哨兵客户端的基本步骤如下：</p>
-
 <ol>
-<li><p>遍历哨兵集合获取到一个可用的哨兵节点。因为哨兵节点之间是共享数据的，任意节点都可以获取到主节点的信息。
-<img src="/images/redis-sentinel-get-sentinel-node.png" alt="" /></p></li>
-
-<li><p>通过 <em>sentinel get-master-addr-by-name master-name</em> API 来获取对应主节点的信息。
-<img src="/images/redis-sentinel-get-master-info.png" alt="" /></p></li>
-
-<li><p>验证获取到的主节点是不是真正的主节点，防止故障转移期间主节点的变化。
-<img src="/images/redis-sentinel-verify-master-node.png" alt="" /></p></li>
-
-<li><p>保持和哨兵节点集合的联系，时刻获取关于主节点的相关信息。
-<img src="/images/redis-sentinel-sub-sentinel-channel.png" alt="" /></p></li>
+<li>
+<p>遍历哨兵集合获取到一个可用的哨兵节点。因为哨兵节点之间是共享数据的，任意节点都可以获取到主节点的信息。
+<img src="/images/redis-sentinel-get-sentinel-node.png" alt=""></p>
+</li>
+<li>
+<p>通过 <em>sentinel get-master-addr-by-name master-name</em> API 来获取对应主节点的信息。
+<img src="/images/redis-sentinel-get-master-info.png" alt=""></p>
+</li>
+<li>
+<p>验证获取到的主节点是不是真正的主节点，防止故障转移期间主节点的变化。
+<img src="/images/redis-sentinel-verify-master-node.png" alt=""></p>
+</li>
+<li>
+<p>保持和哨兵节点集合的联系，时刻获取关于主节点的相关信息。
+<img src="/images/redis-sentinel-sub-sentinel-channel.png" alt=""></p>
+</li>
 </ol>
-
 <p>从上面的模型可以看出，哨兵客户端只在初始化和切换主节点时才需要和哨兵集合通信，来获取主节点的信息。</p>
-
 <p>那么，哨兵是如何发现主节点变化的呢？答案是通过定时监控任务。</p>
-
-<h1 id="哨兵监控任务">哨兵监控任务</h1>
-
+<h1 id="heading1">哨兵监控任务</h1>
 <p>一套合理的监控机制是哨兵节点判定节点不可达的重要保证，Redis 哨兵通过三个定时监控任务完成对各个节点发现和监控：</p>
-
 <p><strong>1. 每隔10秒，每个哨兵节点会向主节点和从节点发送 info 命令获取最新的拓扑结构。</strong></p>
-
 <p>这个定时任务的作用具体可以表现在三个方面：</p>
-
 <ul>
 <li>通过向主节点执行 <em>info</em> 命令，获取从节点的信息，这也是为什么哨兵节点不需要显式配置监控从节点。</li>
 <li>当有新的从节点加入时都可以立刻感知出来。</li>
 <li>节点不可达或者故障转移后，可以通过 info 命令实时更新节点拓扑信息。</li>
 </ul>
-
 <p><strong>2. 每隔2秒，每个哨兵节点会向 Redis 数据节点的 <code>__sentinel__：hello</code> 频道上发送该哨兵节点对于主节点的判断以及当前哨兵节点的信息，同时每个哨兵节点也会订阅该频道，来了解其他哨兵节点以及它们对主节点的判断。</strong></p>
-
-<p><img src="/images/redis-sentinel-sub-sentinel-hello.png" alt="" /></p>
-
+<p><img src="/images/redis-sentinel-sub-sentinel-hello.png" alt=""></p>
 <p>这个定时任务可以完成以下两个工作：</p>
-
 <ul>
 <li>发现新的哨兵节点：通过订阅主节点的 <code>__sentinel__：hello</code> 了解其他的哨兵节点信息，如果是新加入的哨兵节点，将该哨兵节点信息保存起来，并与该哨兵节点创建连接。</li>
 <li>哨兵节点之间交换主节点的状态，作为后面客观下线以及领导者选举的依据。</li>
 </ul>
-
 <p><strong>3. 每隔1秒，每个哨兵节点会向主节点、从节点、其余哨兵节点发送一条 <em>ping</em> 命令做一次心跳检测，来确认这些节点当前是否可达。</strong></p>
-
-<p><img src="/images/redis-sentinel-ping-servers.png" alt="" /></p>
-
+<p><img src="/images/redis-sentinel-ping-servers.png" alt=""></p>
 <p>通过上面的定时任务，哨兵节点对主节点、从节点、其余哨兵节点都建立起连接，实现了对每个节点的监控，这个定时任务是节点失败判定的重要依据。</p>
-
-<h1 id="jedis-操作哨兵">Jedis 操作哨兵</h1>
-
-<p><img src="/images/redis-sentinel-access-master.png" alt="" /></p>
-
+<h1 id="jedis-">Jedis 操作哨兵</h1>
+<p><img src="/images/redis-sentinel-access-master.png" alt=""></p>
 <p>Jedis 针对 Redis 哨兵给出了一个 <code>JedisSentinelPool</code>，很显然这个连接池保存的连接还是针对主节点的。Jedis 给出很多构造方法，其中最全的如下所示：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="err">public JedisSentinelPool</span><span class="p">(</span><span class="err">String masterName</span><span class="p">,</span> <span class="err">Set&lt;String&gt; sentinels</span><span class="p">,</span>
-    <span class="err">final GenericObjectPoolConfig </span><span class="n">poolConfig</span><span class="p">,</span> <span class="err">final int </span><span class="n">connectionTimeout</span><span class="p">,</span>
-    <span class="err">final int </span><span class="n">soTimeout</span><span class="p">,</span>
-    <span class="err">final String </span><span class="n">password</span><span class="p">,</span> <span class="err">final int </span><span class="n">database</span><span class="p">,</span>
-    <span class="err">final String </span><span class="n">clientName</span><span class="p">)</span></code></pre></td></tr></table>
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="nf">JedisSentinelPool</span><span class="o">(</span><span class="n">String</span> <span class="n">masterName</span><span class="o">,</span> <span class="n">Set</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">sentinels</span><span class="o">,</span>
+    <span class="kd">final</span> <span class="n">GenericObjectPoolConfig</span> <span class="n">poolConfig</span><span class="o">,</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">connectionTimeout</span><span class="o">,</span>
+    <span class="kd">final</span> <span class="kt">int</span> <span class="n">soTimeout</span><span class="o">,</span>
+    <span class="kd">final</span> <span class="n">String</span> <span class="n">password</span><span class="o">,</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">database</span><span class="o">,</span>
+    <span class="kd">final</span> <span class="n">String</span> <span class="n">clientName</span><span class="o">)</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>其中，</p>
-
+</div><p>其中，</p>
 <ul>
 <li>masterName：主节点名。</li>
 <li>sentinels：哨兵节点集合。</li>
 </ul>
-
 <p><code>JedisSentinelPool</code> 的初始化方法。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
@@ -287,21 +247,21 @@ Redis Sentinel(哨兵) 就是为了解决这些问题而生的，它是 Redis 2.
 </span><span class="lnt">9
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="err">public JedisSentinelPool</span><span class="p">(</span><span class="err">String masterName</span><span class="p">,</span> <span class="err">Set&lt;String&gt; sentinels</span><span class="p">,</span>
-    <span class="err">final GenericObjectPoolConfig </span><span class="n">poolConfig</span><span class="p">,</span> <span class="err">final int </span><span class="n">connectionTimeout</span><span class="p">,</span>
-    <span class="err">final int </span><span class="n">soTimeout</span><span class="p">,</span> <span class="err">final String </span><span class="n">password</span><span class="p">,</span> <span class="err">final int </span><span class="n">database</span><span class="p">,</span>
-    <span class="err">final String </span><span class="n">clientName</span><span class="p">)</span> <span class="p">{</span>
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="nf">JedisSentinelPool</span><span class="o">(</span><span class="n">String</span> <span class="n">masterName</span><span class="o">,</span> <span class="n">Set</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">sentinels</span><span class="o">,</span>
+    <span class="kd">final</span> <span class="n">GenericObjectPoolConfig</span> <span class="n">poolConfig</span><span class="o">,</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">connectionTimeout</span><span class="o">,</span>
+    <span class="kd">final</span> <span class="kt">int</span> <span class="n">soTimeout</span><span class="o">,</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">password</span><span class="o">,</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">database</span><span class="o">,</span>
+    <span class="kd">final</span> <span class="n">String</span> <span class="n">clientName</span><span class="o">)</span> <span class="o">{</span>
         <span class="err">…</span>
-        <span class="err">HostAndPort master </span><span class="o">=</span> <span class="n">initSentinels</span><span class="p">(</span><span class="n">sentinels</span><span class="p">,</span> <span class="n">masterName</span><span class="p">);</span>
-        <span class="n">initPool</span><span class="p">(</span><span class="n">master</span><span class="p">);</span>
+        <span class="n">HostAndPort</span> <span class="n">master</span> <span class="o">=</span> <span class="n">initSentinels</span><span class="o">(</span><span class="n">sentinels</span><span class="o">,</span> <span class="n">masterName</span><span class="o">)</span><span class="o">;</span>
+        <span class="n">initPool</span><span class="o">(</span><span class="n">master</span><span class="o">)</span><span class="o">;</span>
         <span class="err">…</span>
-<span class="p">}</span></code></pre></td></tr></table>
+<span class="o">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>下面的代码就是 <code>JedisSentinelPool</code> 初始化代码的重要函数 <code>initSentinels(Set&lt;String&gt;sentinels，final String masterName)</code> 包含了哨兵节点集合和 <code>masterName</code> 参数，用来获取指定主节点的 ip 和端口。</p>
+</div><p>下面的代码就是 <code>JedisSentinelPool</code> 初始化代码的重要函数 <code>initSentinels(Set&lt;String&gt;sentinels，final String masterName)</code> 包含了哨兵节点集合和 <code>masterName</code> 参数，用来获取指定主节点的 ip 和端口。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -339,57 +299,55 @@ Redis Sentinel(哨兵) 就是为了解决这些问题而生的，它是 Redis 2.
 </span><span class="lnt">36
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="err">private HostAndPort </span><span class="n">initSentinels</span><span class="p">(</span><span class="err">Set&lt;String&gt; sentinels</span><span class="p">,</span> <span class="err">final String </span><span class="n">masterName</span><span class="p">)</span> <span class="p">{</span>
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">private</span> <span class="n">HostAndPort</span> <span class="nf">initSentinels</span><span class="o">(</span><span class="n">Set</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">sentinels</span><span class="o">,</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">masterName</span><span class="o">)</span> <span class="o">{</span>
     <span class="c1">// 主节点
-</span><span class="c1"></span>    <span class="err">HostAndPort master </span><span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+</span><span class="c1"></span>    <span class="n">HostAndPort</span> <span class="n">master</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
     <span class="c1">// 遍历所有 哨兵 节点
-</span><span class="c1"></span>    <span class="k">for</span> <span class="p">(</span><span class="err">String sentinel </span><span class="o">:</span> <span class="n">sentinels</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="c1"></span>    <span class="k">for</span> <span class="o">(</span><span class="n">String</span> <span class="n">sentinel</span> <span class="o">:</span> <span class="n">sentinels</span><span class="o">)</span> <span class="o">{</span>
         <span class="c1">// 连接 哨兵 节点
-</span><span class="c1"></span>        <span class="err">HostAndPort hap </span><span class="o">=</span> <span class="n">toHostAndPort</span><span class="p">(</span><span class="n">Arrays</span><span class="p">.</span><span class="na">asList</span><span class="p">(</span><span class="n">sentinel</span><span class="p">.</span><span class="na">split</span><span class="p">(</span><span class="s">&#34;:&#34;</span><span class="p">)));</span>
-        <span class="err">Jedis jedis </span><span class="o">=</span> <span class="k">new</span> <span class="n">Jedis</span><span class="p">(</span><span class="n">hap</span><span class="p">.</span><span class="na">getHost</span><span class="p">(),</span> <span class="n">hap</span><span class="p">.</span><span class="na">getPort</span><span class="p">());</span>
+</span><span class="c1"></span>        <span class="n">HostAndPort</span> <span class="n">hap</span> <span class="o">=</span> <span class="n">toHostAndPort</span><span class="o">(</span><span class="n">Arrays</span><span class="o">.</span><span class="na">asList</span><span class="o">(</span><span class="n">sentinel</span><span class="o">.</span><span class="na">split</span><span class="o">(</span><span class="s">&#34;:&#34;</span><span class="o">)</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
+        <span class="n">Jedis</span> <span class="n">jedis</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Jedis</span><span class="o">(</span><span class="n">hap</span><span class="o">.</span><span class="na">getHost</span><span class="o">(</span><span class="o">)</span><span class="o">,</span> <span class="n">hap</span><span class="o">.</span><span class="na">getPort</span><span class="o">(</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
         <span class="c1">// 使用 sentinel get-master-addr-by-name masterName 获取主节点信息
-</span><span class="c1"></span>        <span class="err">List&lt;String&gt; masterAddr </span><span class="o">=</span> <span class="n">jedis</span><span class="p">.</span><span class="na">sentinelGetMasterAddrByName</span><span class="p">(</span><span class="n">masterName</span><span class="p">);</span>
+</span><span class="c1"></span>        <span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">masterAddr</span> <span class="o">=</span> <span class="n">jedis</span><span class="o">.</span><span class="na">sentinelGetMasterAddrByName</span><span class="o">(</span><span class="n">masterName</span><span class="o">)</span><span class="o">;</span>
         <span class="c1">// 命令返回列表为空或者长度不为 2 ，继续从下一个  节点查询
-</span><span class="c1"></span>        <span class="k">if</span> <span class="p">(</span><span class="n">masterAddr</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">||</span> <span class="n">masterAddr</span><span class="p">.</span><span class="na">size</span><span class="p">()</span> <span class="o">!=</span> <span class="n">2</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">continue</span><span class="p">;</span>
-        <span class="p">}</span>
+</span><span class="c1"></span>        <span class="k">if</span> <span class="o">(</span><span class="n">masterAddr</span> <span class="o">=</span><span class="o">=</span> <span class="kc">null</span> <span class="o">|</span><span class="o">|</span> <span class="n">masterAddr</span><span class="o">.</span><span class="na">size</span><span class="o">(</span><span class="o">)</span> <span class="o">!</span><span class="o">=</span> <span class="n">2</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">continue</span><span class="o">;</span>
+        <span class="o">}</span>
         <span class="c1">// 解析 masterAddr 获取主节点信息
-</span><span class="c1"></span>        <span class="n">master</span> <span class="o">=</span> <span class="n">toHostAndPort</span><span class="p">(</span><span class="n">masterAddr</span><span class="p">);</span>
+</span><span class="c1"></span>        <span class="n">master</span> <span class="o">=</span> <span class="n">toHostAndPort</span><span class="o">(</span><span class="n">masterAddr</span><span class="o">)</span><span class="o">;</span>
         <span class="c1">// 找到后直接跳出 for 循环
-</span><span class="c1"></span>        <span class="k">break</span><span class="p">;</span>
-    <span class="p">}</span>
+</span><span class="c1"></span>        <span class="k">break</span><span class="o">;</span>
+    <span class="o">}</span>
 
-    <span class="k">if</span> <span class="p">(</span><span class="n">master</span> <span class="o">==</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">master</span> <span class="o">=</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
         <span class="c1">// 直接抛出异常，
-</span><span class="c1"></span>        <span class="k">throw</span> <span class="k">new</span> <span class="n">Exception</span><span class="p">();</span>
-    <span class="p">}</span>
+</span><span class="c1"></span>        <span class="k">throw</span> <span class="k">new</span> <span class="n">Exception</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+    <span class="o">}</span>
 
     <span class="c1">// 为每个哨兵节点开启主节点 switch 的监控线程
-</span><span class="c1"></span>    <span class="k">for</span> <span class="p">(</span><span class="err">String sentinel </span><span class="o">:</span> <span class="n">sentinels</span><span class="p">)</span> <span class="p">{</span>
-        <span class="err">final HostAndPort </span><span class="n">hap</span> <span class="o">=</span> <span class="n">toHostAndPort</span><span class="p">(</span><span class="n">Arrays</span><span class="p">.</span><span class="na">asList</span><span class="p">(</span><span class="n">sentinel</span><span class="p">.</span><span class="na">split</span><span class="p">(</span><span class="s">&#34;:&#34;</span><span class="p">)));</span>
-        <span class="err">MasterListener masterListener </span><span class="o">=</span> <span class="k">new</span> <span class="n">MasterListener</span><span class="p">(</span><span class="n">masterName</span><span class="p">,</span> <span class="n">hap</span><span class="p">.</span><span class="na">getHost</span><span class="p">(),</span>
-        <span class="n">hap</span><span class="p">.</span><span class="na">getPort</span><span class="p">());</span>
-        <span class="n">masterListener</span><span class="p">.</span><span class="na">start</span><span class="p">();</span>
-    <span class="p">}</span>
+</span><span class="c1"></span>    <span class="k">for</span> <span class="o">(</span><span class="n">String</span> <span class="n">sentinel</span> <span class="o">:</span> <span class="n">sentinels</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kd">final</span> <span class="n">HostAndPort</span> <span class="n">hap</span> <span class="o">=</span> <span class="n">toHostAndPort</span><span class="o">(</span><span class="n">Arrays</span><span class="o">.</span><span class="na">asList</span><span class="o">(</span><span class="n">sentinel</span><span class="o">.</span><span class="na">split</span><span class="o">(</span><span class="s">&#34;:&#34;</span><span class="o">)</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
+        <span class="n">MasterListener</span> <span class="n">masterListener</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MasterListener</span><span class="o">(</span><span class="n">masterName</span><span class="o">,</span> <span class="n">hap</span><span class="o">.</span><span class="na">getHost</span><span class="o">(</span><span class="o">)</span><span class="o">,</span>
+        <span class="n">hap</span><span class="o">.</span><span class="na">getPort</span><span class="o">(</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
+        <span class="n">masterListener</span><span class="o">.</span><span class="na">start</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+    <span class="o">}</span>
 
     <span class="c1">// 返回结果
-</span><span class="c1"></span>    <span class="k">return</span> <span class="n">master</span><span class="p">;</span>
-<span class="p">}</span></code></pre></td></tr></table>
+</span><span class="c1"></span>    <span class="k">return</span> <span class="n">master</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>具体过程如下：</p>
-
+</div><p>具体过程如下：</p>
 <ol>
 <li>遍历节点集合，找到一个可用的节点，如果找不到就从节点集合中去找下一个，如果都找不到直接抛出异常给客户端：</li>
 <li>找到一个可用的节点，执行 <code>sentinelGetMasterAddrByName(masterName)</code>，找到对应主节点信息：</li>
 <li><code>JedisSentinelPool</code> 中没有发现对主节点角色验证的代码，这是因为 <code>get-master-addr-by-name master-name</code> 这个API本身就会自动获取真正的主节点（例如故障转移期间）。</li>
 <li>为每一个节点单独启动一个线程，利用 Redis 的发布订阅功能，每个线程订阅哨兵节点上切换主节点的相关频道 <strong>+switch-master</strong>。</li>
 </ol>
-
 <p>下面代码就是 <code>MasterListener</code> 的核心监听代码，代码中比较重要的部分就是订阅节点的 <strong>+switch-master</strong> 频道，它就是 Redis 在结束对主节点故障转移后会发布切换主节点的消息，哨兵节点基本将故障转移的各个阶段发生的行为都通过这种发布订阅的形式对外提供，开发者只需订阅感兴趣的频道即可。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -406,27 +364,25 @@ Redis Sentinel(哨兵) 就是为了解决这些问题而生的，它是 Redis 2.
 </span><span class="lnt">15
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="err">Jedis sentinelJedis </span><span class="o">=</span> <span class="k">new</span> <span class="n">Jedis</span><span class="p">(</span><span class="n">sentinelHost</span><span class="p">,</span> <span class="n">sentinelPort</span><span class="p">);</span>
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="n">Jedis</span> <span class="n">sentinelJedis</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Jedis</span><span class="o">(</span><span class="n">sentinelHost</span><span class="o">,</span> <span class="n">sentinelPort</span><span class="o">)</span><span class="o">;</span>
 <span class="c1">// 客户端订阅哨兵节点上&#34;+switch-master&#34;(切换主节点)频道
-</span><span class="c1"></span><span class="n">sentinelJedis</span><span class="p">.</span><span class="na">subscribe</span><span class="p">(</span><span class="k">new</span> <span class="n">JedisPubSub</span><span class="p">()</span> <span class="p">{</span>
+</span><span class="c1"></span><span class="n">sentinelJedis</span><span class="o">.</span><span class="na">subscribe</span><span class="o">(</span><span class="k">new</span> <span class="n">JedisPubSub</span><span class="o">(</span><span class="o">)</span> <span class="o">{</span>
     <span class="nd">@Override</span>
-    <span class="err">public void </span><span class="n">onMessage</span><span class="p">(</span><span class="err">String channel</span><span class="p">,</span> <span class="err">String message</span><span class="p">)</span> <span class="p">{</span>
-        <span class="err">String[] switchMasterMsg </span><span class="o">=</span> <span class="n">message</span><span class="p">.</span><span class="na">split</span><span class="p">(</span><span class="s">&#34; &#34;</span><span class="p">);</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">switchMasterMsg</span><span class="p">.</span><span class="na">length</span> <span class="o">&gt;</span> <span class="n">3</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onMessage</span><span class="o">(</span><span class="n">String</span> <span class="n">channel</span><span class="o">,</span> <span class="n">String</span> <span class="n">message</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">String</span><span class="o">[</span><span class="o">]</span> <span class="n">switchMasterMsg</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="na">split</span><span class="o">(</span><span class="s">&#34; &#34;</span><span class="o">)</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">switchMasterMsg</span><span class="o">.</span><span class="na">length</span> <span class="o">&gt;</span> <span class="n">3</span><span class="o">)</span> <span class="o">{</span>
             <span class="c1">// 判断是否为当前 masterName
-</span><span class="c1"></span>            <span class="k">if</span> <span class="p">(</span><span class="n">masterName</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="n">switchMasterMsg</span><span class="p">[</span><span class="n">0</span><span class="p">]))</span> <span class="p">{</span>
+</span><span class="c1"></span>            <span class="k">if</span> <span class="o">(</span><span class="n">masterName</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">switchMasterMsg</span><span class="o">[</span><span class="n">0</span><span class="o">]</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
                 <span class="c1">// 发现当前 masterName 发生 switch ，使用 initPool 重新初始化连接池
-</span><span class="c1"></span>                <span class="n">initPool</span><span class="p">(</span><span class="n">toHostAndPort</span><span class="p">(</span><span class="n">switchMasterMsg</span><span class="p">[</span><span class="n">3</span><span class="p">],</span> <span class="n">switchMasterMsg</span><span class="p">[</span><span class="n">4</span><span class="p">]));</span>
-            <span class="p">}</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">},</span> <span class="s">&#34;+switch-master&#34;</span><span class="p">);</span></code></pre></td></tr></table>
+</span><span class="c1"></span>                <span class="n">initPool</span><span class="o">(</span><span class="n">toHostAndPort</span><span class="o">(</span><span class="n">switchMasterMsg</span><span class="o">[</span><span class="n">3</span><span class="o">]</span><span class="o">,</span> <span class="n">switchMasterMsg</span><span class="o">[</span><span class="n">4</span><span class="o">]</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span><span class="o">,</span> <span class="s">&#34;+switch-master&#34;</span><span class="o">)</span><span class="o">;</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><img src="/images/redis-sentinel-failover-reconnect.png" alt="" /></p>
-
+</div><p><img src="/images/redis-sentinel-failover-reconnect.png" alt=""></p>
 <p><strong>Reference</strong></p>
-
 <ul>
 <li><a href="https://dbaplus.cn/news-158-2278-1.html">实现故障恢复自动化：详解Redis哨兵技术</a></li>
 <li><a href="https://mp.weixin.qq.com/s?__biz=MzI4NTA1MDEwNg==&amp;mid=2650774648&amp;idx=1&amp;sn=97f585eadbb3ce0b1cc10caf5230280b&amp;chksm=f3f929edc48ea0fb372dc206bcb6363521e23d65e27c1852de137dc24165967c8d53e3fa11ce#rd">为什么不搞集群服务也能实现Redis高可用？</a></li>

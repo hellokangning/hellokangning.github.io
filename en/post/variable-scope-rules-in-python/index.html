@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.59.1 with theme even" />
+<meta name="generator" content="Hugo 0.60.0 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/en/post/variable-scope-rules-in-python/" />
@@ -46,16 +46,13 @@
 <meta property="article:modified_time" content="2018-10-29T15:44:51+08:00" />
 <meta itemprop="name" content="Variable Scope Rules in Python">
 <meta itemprop="description" content="Variable Scope">
-
-
 <meta itemprop="datePublished" content="2017-10-29T15:44:51&#43;08:00" />
 <meta itemprop="dateModified" content="2018-10-29T15:44:51&#43;08:00" />
-<meta itemprop="wordCount" content="348">
+<meta itemprop="wordCount" content="313">
 
 
 
-<meta itemprop="keywords" content="" />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Variable Scope Rules in Python"/>
 <meta name="twitter:description" content="Variable Scope"/>
 
@@ -131,7 +128,7 @@
         <div class="post-category">
             <a href="/en/categories/python/"> Python </a>
             </div>
-          <span class="more-meta"> 348 words </span>
+          <span class="more-meta"> 313 words </span>
           <span class="more-meta"> 2 mins read </span>
         
       </div>
@@ -139,10 +136,10 @@
 
     
     <div class="post-content">
-      <p>What&rsquo;s the output of the following code:</p>
+      <p>What's the output of the following code:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
@@ -151,28 +148,21 @@
 </span><span class="lnt">7
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="n">ans</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">def</span> <span class="nf">bt</span><span class="p">():</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
-        <span class="n">ans</span> <span class="o">+=</span> <span class="p">[</span><span class="n">i</span><span class="p">]</span>
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="n">ans</span> <span class="o">=</span> <span class="p">[</span><span class="p">]</span>
+<span class="k">def</span> <span class="nf">bt</span><span class="p">(</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="p">:</span>
+        <span class="n">ans</span> <span class="o">+</span><span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="p">]</span>
 
-<span class="n">bt</span><span class="p">()</span>
-<span class="k">print</span><span class="p">(</span><span class="n">ans</span><span class="p">)</span></code></pre></td></tr></table>
+<span class="n">bt</span><span class="p">(</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">ans</span><span class="p">)</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>It will raise an exception, which may beyond your expectation.</p>
+</div><p>It will raise an exception, which may beyond your expectation.</p>
+<pre><code>UnboundLocalError: local variable 'ans' referenced before assignment
+</code></pre><p>And how about this code.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span></pre></td>
-<td class="lntd">
-<pre class="chroma">UnboundLocalError: local variable &#39;ans&#39; referenced before assignment</pre></td></tr></table>
-</div>
-</div>
-<p>And how about this code.</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
@@ -181,38 +171,17 @@
 </span><span class="lnt">7
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="n">ans</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">def</span> <span class="nf">bt</span><span class="p">():</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="n">ans</span> <span class="o">=</span> <span class="p">[</span><span class="p">]</span>
+<span class="k">def</span> <span class="nf">bt</span><span class="p">(</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="p">:</span>
         <span class="n">ans</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
 
-<span class="n">bt</span><span class="p">()</span>
-<span class="k">print</span><span class="p">(</span><span class="n">ans</span><span class="p">)</span></code></pre></td></tr></table>
+<span class="n">bt</span><span class="p">(</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">ans</span><span class="p">)</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>Yes, it works well and prints <code>[1, 2, 3]</code>. And let&rsquo;s see the bytecode of the above code.</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span></pre></td>
-<td class="lntd">
-<pre class="chroma">  6           0 SETUP_LOOP              26 (to 28)
+</div><p>Yes, it works well and prints <code>[1, 2, 3]</code>. And let's see the bytecode of the above code.</p>
+<pre><code>  6           0 SETUP_LOOP              26 (to 28)
               2 LOAD_GLOBAL              0 (range)
               4 LOAD_CONST               1 (3)
               6 CALL_FUNCTION            1
@@ -228,34 +197,10 @@
              24 JUMP_ABSOLUTE           10
         &gt;&gt;   26 POP_BLOCK
         &gt;&gt;   28 LOAD_CONST               0 (None)
-             30 RETURN_VALUE</pre></td></tr></table>
-</div>
-</div>
-<p><code>LOAD_GLOBAL</code> command before <code>ans</code> means it tries to load the global variable <code>ans</code>.</p>
-
+             30 RETURN_VALUE
+</code></pre><p><code>LOAD_GLOBAL</code> command before <code>ans</code> means it tries to load the global variable <code>ans</code>.</p>
 <p>But the bytecode of the exceptional code says it loads a local variable <code>ans</code>.</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span></pre></td>
-<td class="lntd">
-<pre class="chroma">  6           0 SETUP_LOOP              26 (to 28)
+<pre><code>  6           0 SETUP_LOOP              26 (to 28)
               2 LOAD_GLOBAL              0 (range)
               4 LOAD_CONST               1 (3)
               6 CALL_FUNCTION            1
@@ -271,19 +216,15 @@
              24 JUMP_ABSOLUTE           10
         &gt;&gt;   26 POP_BLOCK
         &gt;&gt;   28 LOAD_CONST               0 (None)
-             30 RETURN_VALUE</pre></td></tr></table>
-</div>
-</div>
-<p>This is not a bug, but a design choice:</p>
-
+             30 RETURN_VALUE
+</code></pre><p>This is not a bug, but a design choice:</p>
 <blockquote>
 <p>Python does not require you to declare variables, but assumes that a variable assigned in the body of a function is local.</p>
 </blockquote>
-
 <p>If you want to treat <code>ans</code> as a global variable in spite of the assignment within the function, use <code>global</code> declaration:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
@@ -293,18 +234,17 @@
 </span><span class="lnt">8
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="n">ans</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">def</span> <span class="nf">bt</span><span class="p">():</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="n">ans</span> <span class="o">=</span> <span class="p">[</span><span class="p">]</span>
+<span class="k">def</span> <span class="nf">bt</span><span class="p">(</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="p">:</span>
         <span class="k">global</span> <span class="n">ans</span>
-        <span class="n">ans</span> <span class="o">+=</span> <span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">ans</span> <span class="o">+</span><span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="p">]</span>
 
-<span class="n">bt</span><span class="p">()</span>
-<span class="k">print</span><span class="p">(</span><span class="n">ans</span><span class="p">)</span></code></pre></td></tr></table>
+<span class="n">bt</span><span class="p">(</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">ans</span><span class="p">)</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><strong>Reference</strong></p>
-
+</div><p><strong>Reference</strong></p>
 <p><a href="https://book.douban.com/subject/26278021/">Fluent Python</a></p>
     </div>
 
