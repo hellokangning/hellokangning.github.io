@@ -26,7 +26,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.60.1 with theme even" />
+<meta name="generator" content="Hugo 0.64.1 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/zh/post/redis-full-sync-explained/" />
@@ -59,7 +59,7 @@
 ">
 <meta itemprop="datePublished" content="2019-01-20T21:38:27-08:00" />
 <meta itemprop="dateModified" content="2019-01-21T09:38:27-08:00" />
-<meta itemprop="wordCount" content="2351">
+<meta itemprop="wordCount" content="2362">
 
 
 
@@ -143,7 +143,7 @@
         <div class="post-category">
             <a href="/zh/categories/redis/"> Redis </a>
             </div>
-          <span class="more-meta"> 约 2351 字 </span>
+          <span class="more-meta"> 约 2362 字 </span>
           <span class="more-meta"> 预计阅读 5 分钟 </span>
         
       </div>
@@ -154,17 +154,17 @@
   <div class="post-toc-content always-active">
     <nav id="TableOfContents">
   <ul>
-    <li><a href="#1-">1. 保存主节点的信息</a></li>
-    <li><a href="#2--socket-">2. 主从建立 socket 连接</a></li>
-    <li><a href="#3--ping-">3. 发送 ping 命令</a></li>
-    <li><a href="#4-">4. 权限验证</a></li>
-    <li><a href="#5-">5. 同步数据集</a></li>
-    <li><a href="#6-">6. 命令持续复制</a></li>
+    <li><a href="#1-保存主节点的信息">1. 保存主节点的信息</a></li>
+    <li><a href="#2-主从建立-socket-连接">2. 主从建立 socket 连接</a></li>
+    <li><a href="#3-发送-ping-命令">3. 发送 ping 命令</a></li>
+    <li><a href="#4-权限验证">4. 权限验证</a></li>
+    <li><a href="#5-同步数据集">5. 同步数据集</a></li>
+    <li><a href="#6-命令持续复制">6. 命令持续复制</a></li>
   </ul>
 
   <ul>
-    <li><a href="#heading4">网络传输超时</a></li>
-    <li><a href="#heading5">缓冲区溢出</a></li>
+    <li><a href="#网络传输超时">网络传输超时</a></li>
+    <li><a href="#缓冲区溢出">缓冲区溢出</a></li>
   </ul>
 </nav>
   </div>
@@ -175,29 +175,38 @@
 <blockquote>
 <p>本文大部分摘录自：<a href="https://book.douban.com/subject/26971561/">Redis开发与运维</a></p>
 </blockquote>
-<h1 id="heading">同步的过程</h1>
+<h1 id="同步的过程">同步的过程</h1>
 <p>slave 的 <em>slaveof</em> 命令执行之后，同步过程便开始了：</p>
-<h2 id="1-">1. 保存主节点的信息</h2>
+<h2 id="1-保存主节点的信息">1. 保存主节点的信息</h2>
 <p>执行 <em>slaveof</em> 后，slave 只保存 master 的地址信息便直接返回，这时复制流程开没有开始。</p>
 <p>在 slave 上执行 <em>info replication</em> 可以看到如下信息：</p>
-<pre><code>master_host: 127.0.0.1
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">master_host: 127.0.0.1
 master_port: 6379
 master_link_status: down
-</code></pre><p>注意这个 <em>master_link_status</em> 是下线的状态。</p>
-<h2 id="2--socket-">2. 主从建立 socket 连接</h2>
+</code></pre></td></tr></table>
+</div>
+</div><p>注意这个 <em>master_link_status</em> 是下线的状态。</p>
+<h2 id="2-主从建立-socket-连接">2. 主从建立 socket 连接</h2>
 <p>slave 内部通过每秒运行的定时任务维护复制的逻辑。当定时任务发现新的 master 之后（先抑制住内心的激动：终于不用干活了），会尝试与 master 建立连接。</p>
 <p>如果 slave 建立连接失败，定时任务会无限重试直到成功或者 <em>slave no one</em> 命令。</p>
 <p>slave 的 <em>info replication</em> 输出的 <em>master_link_down_since_seconds</em> 会记录与 master 连接失败的系统时间。</p>
-<h2 id="3--ping-">3. 发送 ping 命令</h2>
+<h2 id="3-发送-ping-命令">3. 发送 ping 命令</h2>
 <p>连接建立成功后，slave 会发送 <em>ping</em> 请求进行首次通信，就像加了微信之后先发个“在吗”一样，检测一下 socket 是否可用以及 master 当前能否处理请求。</p>
 <p>如果 slave 没有收到 <em>pong</em> 的回复，就会很知趣地断开复制连接，不再死缠烂打。</p>
-<h2 id="4-">4. 权限验证</h2>
+<h2 id="4-权限验证">4. 权限验证</h2>
 <p>如果 master 设置了 <em>requirepass</em> 参数，则 slave 必须配置 <em>masterauth</em> 参数才能通过验证。</p>
-<h2 id="5-">5. 同步数据集</h2>
+<h2 id="5-同步数据集">5. 同步数据集</h2>
 <p>主从正常通信后，对于首次建立连接的场景，master 会把全部的数据发送给 slave。Redis 在 2.8 之后采用新的复制命令：<em>psync</em> ，原来的 <em>sync</em> 仍然支持，只是为了保持兼容性。新版同步分两种，即全量同步和部分同步，本文的重点就是全量同步。</p>
-<h2 id="6-">6. 命令持续复制</h2>
+<h2 id="6-命令持续复制">6. 命令持续复制</h2>
 <p>当 master 把当前的数据发给 slave 之后，便完成了复制的建立流程。接下来，master 会持续地把写命令发送给 slave，保证主从数据的一致性。</p>
-<h1 id="heading1">全量同步和部分同步</h1>
+<h1 id="全量同步和部分同步">全量同步和部分同步</h1>
 <p>Reids 使用 <em>psync</em> 命令完成同步，同步过程分为两种：</p>
 <ul>
 <li>全量同步：一般用于初次复制的场景。</li>
@@ -226,34 +235,64 @@ master_link_status: down
 </ul>
 </li>
 </ol>
-<h1 id="heading2">全量同步</h1>
+<h1 id="全量同步">全量同步</h1>
 <p>全量同步的流程说明：</p>
 <ol>
 <li>发送 <em>psync</em> 命令进行数据同步，如果是第一次进行复制，slave 没有复制偏移量和主节点的运行 ID，只能发送 <em>psync -1</em> 。</li>
 <li>master 根据 slave 的 <em>psync</em> 命令解析出全量同步的请求，并回复 <em>+FULLRESYNC</em> 。</li>
 <li>slave 接到 master 的响应数据，保存运行 ID 和偏移量，并打印日志：</li>
 </ol>
-<pre><code>Partial resynchronization not possible (no cached master)
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">Partial resynchronization not possible (no cached master)
 Full resync from master: xxxxx
-</code></pre><ol start="4">
+</code></pre></td></tr></table>
+</div>
+</div><ol start="4">
 <li>master 执行 <em>bgsave</em> 保存 RDB 文件到本地。</li>
 <li>master 发送 RDB 文件给 slave，slave 把接收到的 RDB 保存在本地，接受完 RDB 后，slave 的日志中可以看到:</li>
 </ol>
-<pre><code>16:24:01.057 * MASTER &lt;-&gt; SLAVE sync: receiving 2778899 bytes from master
-</code></pre><ol start="6">
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">16:24:01.057 * MASTER &lt;-&gt; SLAVE sync: receiving 2778899 bytes from master
+</code></pre></td></tr></table>
+</div>
+</div><ol start="6">
 <li>slave 开始接收 RDB 文件到接收完成这u但时间，master 仍然相应读写命令，并将它们保存在客户端缓冲区。slave 加载 RDB 完成后，master 把缓冲区中的数据再发给 slave。</li>
 <li>slave 接收完 master 发来的全部数据后，会清空自身旧数据，对应日志如下：</li>
 </ol>
-<pre><code>16:24:02:034 * MASTER &lt;-&gt; SLAVE sync: Flushing old data
-</code></pre><ol start="8">
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">16:24:02:034 * MASTER &lt;-&gt; SLAVE sync: Flushing old data
+</code></pre></td></tr></table>
+</div>
+</div><ol start="8">
 <li>slave 清空数据后，开始加载 RDB 快照，对应日志如下：</li>
 </ol>
-<pre><code>16:24:03:034 * MASTER &lt;-&gt; SLAVE sync: Loading DB in memory
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">16:24:03:034 * MASTER &lt;-&gt; SLAVE sync: Loading DB in memory
 16:24:04:034 * MASTER &lt;-&gt; SLAVE sync: Finished with sucess
-</code></pre><ol start="9">
+</code></pre></td></tr></table>
+</div>
+</div><ol start="9">
 <li>slave 加载 RDB 完成后，如果当前节点开启了 AOF，会立刻做 <em>bgrewriteaof</em> 操作，为了保证全量同步后 AOF 文件立即可用。</li>
 </ol>
-<h1 id="heading3">全量同步的可能问题</h1>
+<h1 id="全量同步的可能问题">全量同步的可能问题</h1>
 <p>全量同步是一个非常消耗资源的操作，它的时间开销包括：</p>
 <ul>
 <li>master <em>bgsave</em> 的时间</li>
@@ -263,17 +302,31 @@ Full resync from master: xxxxx
 <li>可能的 AOF 重写时间</li>
 </ul>
 <p>除此之外，全量同步可能引发的问题还有：</p>
-<h2 id="heading4">网络传输超时</h2>
+<h2 id="网络传输超时">网络传输超时</h2>
 <p>RDB 文件超过 6GB 以上时，要格外小心，传输文件会非常耗时。通过分析 Full resync 和 MASTER &lt;-&gt; SLAVE 这两行日志之间的时间差，可以算出 RDB 文件的传输时间。</p>
 <p>如果传输时间超过 <em>repl-timeout</em> 配置的值（默认 60 秒），slave 将放弃接收 RDB 文件并清理已下载的临时文件，导致同步失败。此时打印的日志:</p>
-<pre><code>#Timeout receiving bulk data from MASTER...If the problem persists try to set the 'repl-time' parameter in redis.conf to a larger value.
-</code></pre><h2 id="heading5">缓冲区溢出</h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">#Timeout receiving bulk data from MASTER...If the problem persists try to set the &#39;repl-time&#39; parameter in redis.conf to a larger value.
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="缓冲区溢出">缓冲区溢出</h2>
 <p>如果 master 创建和传输 RDB 文件的时间较长，对于高流量的写入场景，容易造成客户端缓冲区的溢出。</p>
 <p>默认配置为 <em>client-output-buffer-limit slave 256MB 64MB 60</em> ，如果 60 秒内缓冲区消耗持续大于 64MB 或直接超过 256MB，master 将关闭客户端连接。</p>
 <p>对应日志如下:</p>
-<pre><code>M 27 May 12:13:33.669 # Client id=2 addr=127.0.0.1:24555 age=1 idle=1 flags=S qbuf=0 qbuf-free=0 obl=18824 oll=21382 omem=26844240 events=r cmd=psync scheduled to be closed ASAP for overcoming of output buffer limits.
-</code></pre><p>这时候要根据 master 数据量和写命令并发量调整 <em>client-output-buffer-limit slave</em> 参数。</p>
-<h1 id="heading6">延迟问题</h1>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">M 27 May 12:13:33.669 # Client id=2 addr=127.0.0.1:24555 age=1 idle=1 flags=S qbuf=0 qbuf-free=0 obl=18824 oll=21382 omem=26844240 events=r cmd=psync scheduled to be closed ASAP for overcoming of output buffer limits.
+</code></pre></td></tr></table>
+</div>
+</div><p>这时候要根据 master 数据量和写命令并发量调整 <em>client-output-buffer-limit slave</em> 参数。</p>
+<h1 id="延迟问题">延迟问题</h1>
 <p>全量同步期间可能会引发性能问题，来源可能有两个:</p>
 <ul>
 <li>fork 操作</li>
@@ -282,7 +335,7 @@ Full resync from master: xxxxx
 <p>为了在后台生成 RDB 文件，master 必须 fork 一个子进程来做这件事。fork 是一个很消耗资源的操作，涉及到进程间的拷贝。在涉及到虚拟内存的页表操作时，延迟尤甚。</p>
 <p>更多的内容可以看这里：<a href="https://redis.io/topics/latency#latency-generated-by-fork">Latency generated by fork</a></p>
 <p>另外，如果页被频繁在内存和磁盘之间 swap，也会引发延迟。RDB 和 AOF 都可能产生大文件，而大量的 I/O 需要用到系统缓存，导致了 swap。之前的这篇 <a href="https://hellokangning.github.io/zh/post/redis-anomalous-latency-because-of-page-fault/">页错误引发的 Redis 延迟</a> 说的就是这个事儿。</p>
-<h1 id="heading7">规避全量同步</h1>
+<h1 id="规避全量同步">规避全量同步</h1>
 <p>如何规避全量同步是需要重点关注的运维点，下面针对需要全量同步的场景逐个分析。</p>
 <p>第一次建立连接：这时必须进行全量同步，无法避免。可以在低峰时操作，或者避免使用大数据量的 Redis 节点。</p>
 <p>节点运行 ID 不匹配：主从关系建立后，slave 会保存 master 的运行 ID。如果 master 发生故障重启，运行 ID 会改变。slave 发现该变化之后，会认为自己从一个新 master 复制数据。对于这种情况，可以手动提升 slave 为主节点。采用 Sentinel 或集群方案也是不错的选择。</p>
@@ -354,7 +407,7 @@ Full resync from master: xxxxx
   <span class="copyright-year">
     &copy; 
     2016 - 
-    2019
+    2020
     <span class="heart">
       <i class="iconfont icon-heart"></i>
     </span>

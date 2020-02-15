@@ -26,7 +26,7 @@ LRU 只是其中的一种剔除方法。使用 Redis 作为 LRU 时，必须用�
 
 
 
-<meta name="generator" content="Hugo 0.60.1 with theme even" />
+<meta name="generator" content="Hugo 0.64.1 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/zh/post/redis-as-an-lru-cache/" />
@@ -55,7 +55,7 @@ Redis 作为缓存使用时，很容易在增加新数据时剔除旧数据。�
 LRU 只是其中的一种剔除方法。使用 Redis 作为 LRU 时，必须用到 maxmemory 参数来限制可用内存的大小。">
 <meta itemprop="datePublished" content="2018-12-24T16:47:34&#43;08:00" />
 <meta itemprop="dateModified" content="2018-12-25T13:47:34&#43;08:00" />
-<meta itemprop="wordCount" content="1465">
+<meta itemprop="wordCount" content="1467">
 
 
 
@@ -137,7 +137,7 @@ LRU 只是其中的一种剔除方法。使用 Redis 作为 LRU 时，必须用�
         <div class="post-category">
             <a href="/zh/categories/redis/"> Redis </a>
             </div>
-          <span class="more-meta"> 约 1465 字 </span>
+          <span class="more-meta"> 约 1467 字 </span>
           <span class="more-meta"> 预计阅读 3 分钟 </span>
         
       </div>
@@ -153,12 +153,19 @@ LRU 只是其中的一种剔除方法。使用 Redis 作为 LRU 时，必须用�
       <p>本文翻译自 <a href="https://redis.io/topics/lru-cache">Using Redis as an LRU Cache</a>。</p>
 <p>Redis 作为缓存使用时，很容易在增加新数据时剔除旧数据。这也是 <em>memcached</em> 的默认行为。</p>
 <p>LRU 只是其中的一种剔除方法。使用 Redis 作为 LRU 时，必须用到 <code>maxmemory</code> 参数来限制可用内存的大小。</p>
-<h1 id="heading">最大可用内存</h1>
+<h1 id="最大可用内存">最大可用内存</h1>
 <p><code>maxmemory</code> 选项可以在 <code>redis.conf</code> 中配置，也可以使用 CONFIG SET 命令在运行时设置。如果要设置 100M　的限制，可以在　<code>redis.conf</code> 加上一行：</p>
-<pre><code>maxmemory 100mb
-</code></pre><p>值为 0 意味着没有内存限制，在 64 位系统下默认为 0，32 位有个隐形的限制，即 3GB。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">maxmemory 100mb
+</code></pre></td></tr></table>
+</div>
+</div><p>值为 0 意味着没有内存限制，在 64 位系统下默认为 0，32 位有个隐形的限制，即 3GB。</p>
 <p>到达 <code>maxmemory</code> 的限制时，有一些策略可供选择，可以是返回错误、或者逐出某些键值。</p>
-<h1 id="heading1">剔除策略</h1>
+<h1 id="剔除策略">剔除策略</h1>
 <p>策略通过 <code>maxmemory-policy</code> 参数来配置，可选项包括：</p>
 <ul>
 <li><strong>noeviction</strong>：如果内存达到最大限制，且客户端尝试执行一些增加内存的命令时，返回错误。</li>
@@ -178,7 +185,7 @@ LRU 只是其中的一种剔除方法。使用 Redis 作为 LRU 时，必须用�
 <li><strong>volatile-lru</strong> 和 <strong>volatile-random</strong> 适用于有部分键值需要永久保存的情况。当然，最好还是用两个 Redis 实例来分而治之。</li>
 </ul>
 <p>Note：设置 key 的过期时间会占用内存，所以使用 <strong>allkeys-lru</strong> 对内存会更加友好。</p>
-<h1 id="heading2">剔除的过程</h1>
+<h1 id="剔除的过程">剔除的过程</h1>
 <p>剔除键值的过程如下：</p>
 <ol>
 <li>客户端运行了一个命令，试图增加数据。</li>
@@ -186,12 +193,19 @@ LRU 只是其中的一种剔除方法。使用 Redis 作为 LRU 时，必须用�
 <li>Redis 执行新的命令。</li>
 </ol>
 <p>Redis 会不断越过限制，然后通过逐出键值，再返回限制之下。如果某个命令会大量使用内存，在其后一段时间内，内存会明显超过限制。</p>
-<h1 id="-lru-">近似 LRU 算法</h1>
+<h1 id="近似-lru-算法">近似 LRU 算法</h1>
 <p>Redis 没有实现严格的 LRU　算法，这就是说它不能剔除最适合的键值。但 Redis 对部分键值进行采样，并剔除样本中的最久未被访问的键值。</p>
 <p>Redis 3.0 引入了候选池，极大地提升了性能，同时也更贴近真正的 LRU 算法。</p>
 <p>Redis 的 LRU 算法允许设置每次剔除时的采样数量，通过配置项 <code>maxmemory-samples</code> 就可以调整 LRU 算法的精度。</p>
-<pre><code>max-memory-samples 5
-</code></pre><p>Redis 没有实现严格 LRU 是为了节省内存。对于使用 Redis LRU 的应用来说，近似算法和严格 LRU 是一样的，从下图就能看出来：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">max-memory-samples 5
+</code></pre></td></tr></table>
+</div>
+</div><p>Redis 没有实现严格 LRU 是为了节省内存。对于使用 Redis LRU 的应用来说，近似算法和严格 LRU 是一样的，从下图就能看出来：</p>
 <p><img src="/images/redis-approx-lru.png" alt=""></p>
 <p>生成上述图表的步骤:</p>
 <ol>
@@ -208,7 +222,7 @@ LRU 只是其中的一种剔除方法。使用 Redis 作为 LRU 时，必须用�
 <p>理论上，前半部分的键将会因为过期而被逐出内存。Redis LRU 在概率上做到了这一点。</p>
 <p>从图上也能看出，Redis 3.0 相比 2.8 有了不小的进步。采样空间为 10 的时候，性能已经接近 Reidis 3.0 的理论值。</p>
 <p>需要注意的是，LRU 只是一种模型，用于预测未来访问给定键值的可能性。如果你的访问满足幂律分布，那么大多数的请求在 LRU 近似算法能够很好地处理。在幂律分布的情况下，真实 LRU 和 Redis LRU 的差异非常之小。</p>
-<h1 id="heading3">更多</h1>
+<h1 id="更多">更多</h1>
 <p>关于 LRU 的算法，有一道经典的 <a href="https://leetcode.com/problems/lru-cache">LeetCode</a>，常见的解法是哈希表+双向链表。美团的这篇 <a href="https://tech.meituan.com/lrucache_practice_dsp.html">LruCache在美团DSP系统中的应用演进</a> 干货也不少。</p>
     </div>
 
@@ -277,7 +291,7 @@ LRU 只是其中的一种剔除方法。使用 Redis 作为 LRU 时，必须用�
   <span class="copyright-year">
     &copy; 
     2016 - 
-    2019
+    2020
     <span class="heart">
       <i class="iconfont icon-heart"></i>
     </span>

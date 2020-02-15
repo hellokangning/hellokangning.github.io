@@ -17,7 +17,7 @@
 
 
 <meta name="author" content="Guoqing Geng" /><meta name="description" content="Dictionary is a data structure for storing key-value pair. Each key in a dictionary is unique and has a corresponding value. Redis implements its own dictionary and use it for hash key.
-As a data structure in server side, dictionary must take memory into consideration. That&#39;s the reason why resizing and rehashing are so significant.
+As a data structure in server side, dictionary must take memory into consideration. That&amp;rsquo;s the reason why resizing and rehashing are so significant.
 " /><meta name="keywords" content="Dictionary, Redis" />
 
 
@@ -25,7 +25,7 @@ As a data structure in server side, dictionary must take memory into considerati
 
 
 
-<meta name="generator" content="Hugo 0.60.1 with theme even" />
+<meta name="generator" content="Hugo 0.64.1 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/en/post/redis-internals-dict/" />
@@ -42,14 +42,14 @@ As a data structure in server side, dictionary must take memory into considerati
 
 <meta property="og:title" content="Redis Internals: Dict" />
 <meta property="og:description" content="Dictionary is a data structure for storing key-value pair. Each key in a dictionary is unique and has a corresponding value. Redis implements its own dictionary and use it for hash key.
-As a data structure in server side, dictionary must take memory into consideration. That&#39;s the reason why resizing and rehashing are so significant." />
+As a data structure in server side, dictionary must take memory into consideration. That&rsquo;s the reason why resizing and rehashing are so significant." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hellokangning.github.io/en/post/redis-internals-dict/" />
 <meta property="article:published_time" content="2018-11-15T19:56:57+08:00" />
 <meta property="article:modified_time" content="2018-11-20T20:56:57+08:00" />
 <meta itemprop="name" content="Redis Internals: Dict">
 <meta itemprop="description" content="Dictionary is a data structure for storing key-value pair. Each key in a dictionary is unique and has a corresponding value. Redis implements its own dictionary and use it for hash key.
-As a data structure in server side, dictionary must take memory into consideration. That&#39;s the reason why resizing and rehashing are so significant.">
+As a data structure in server side, dictionary must take memory into consideration. That&rsquo;s the reason why resizing and rehashing are so significant.">
 <meta itemprop="datePublished" content="2018-11-15T19:56:57&#43;08:00" />
 <meta itemprop="dateModified" content="2018-11-20T20:56:57&#43;08:00" />
 <meta itemprop="wordCount" content="2058">
@@ -59,7 +59,7 @@ As a data structure in server side, dictionary must take memory into considerati
 <meta itemprop="keywords" content="Data Structure," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Redis Internals: Dict"/>
 <meta name="twitter:description" content="Dictionary is a data structure for storing key-value pair. Each key in a dictionary is unique and has a corresponding value. Redis implements its own dictionary and use it for hash key.
-As a data structure in server side, dictionary must take memory into consideration. That&#39;s the reason why resizing and rehashing are so significant."/>
+As a data structure in server side, dictionary must take memory into consideration. That&rsquo;s the reason why resizing and rehashing are so significant."/>
 
 <!--[if lte IE 9]>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
@@ -147,7 +147,7 @@ As a data structure in server side, dictionary must take memory into considerati
 </div>
     <div class="post-content">
       <p>Dictionary is a data structure for storing key-value pair. Each key in a dictionary is unique and has a corresponding value. Redis implements its own dictionary and use it for hash key.</p>
-<p>As a data structure in server side, dictionary must take memory into consideration. That's the reason why resizing and rehashing are so significant.</p>
+<p>As a data structure in server side, dictionary must take memory into consideration. That&rsquo;s the reason why resizing and rehashing are so significant.</p>
 <blockquote>
 <p>The code analyzed in this post is based on 5.0.0</p>
 </blockquote>
@@ -299,10 +299,10 @@ As a data structure in server side, dictionary must take memory into considerati
 </code></pre></td></tr></table>
 </div>
 </div><h1 id="incremental-rehashing">Incremental Rehashing</h1>
-<p>I'd like to introduce <code>_dictRehashStep</code> first so that you may not surprised when it is called in <code>dictAddRaw</code>, <code>dictGenericDelete</code>, <code>dictFind</code> and <code>dictGetRandomKey</code>.</p>
+<p>I&rsquo;d like to introduce <code>_dictRehashStep</code> first so that you may not surprised when it is called in <code>dictAddRaw</code>, <code>dictGenericDelete</code>, <code>dictFind</code> and <code>dictGetRandomKey</code>.</p>
 <p><code>_dictRehashStep</code> performs just a step of rehashing, and only if there are no safe iterators bound to our hash table.</p>
 <blockquote>
-<p>When we have iterators in the middle of a rehashing we can't mess with the two hash tables otherwise some element can be missed or duplicated.</p>
+<p>When we have iterators in the middle of a rehashing we can&rsquo;t mess with the two hash tables otherwise some element can be missed or duplicated.</p>
 </blockquote>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -316,7 +316,7 @@ As a data structure in server side, dictionary must take memory into considerati
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
-</div><p>This function is called by common lookup or update operations in the dictionary, that's why it's called incremental rehashing.</p>
+</div><p>This function is called by common lookup or update operations in the dictionary, that&rsquo;s why it&rsquo;s called incremental rehashing.</p>
 <p><code>ht[0]</code> and <code>ht[1]</code> is coexisting when rehashing, so two tables must be searched if you lookup. Inserting a new item is much easier, it should be done in <code>ht[1]</code> only.</p>
 <p>After rehashing, <code>ht[0]</code> will be empty and reassigned to <code>ht[1]</code>, the later will be reset.</p>
 <div class="highlight"><div class="chroma">
@@ -502,7 +502,7 @@ As a data structure in server side, dictionary must take memory into considerati
 <p>Load factor is an important measure of how full the dictionary is allowed to get before its capacity is automatically increased. Redis always tries to keep <code>USED/BUCKETS</code> ratio near to <code>&lt;=1</code>, which is done by resizing.</p>
 <p><code>dictResize</code> resize the table to the minimal size that contains all the elements. If the dictionary is rehashing indicated by <code>rehashidx</code>, resizing will be skipped.</p>
 <p>The new size of dictionary is the next power of two that is larger than current size. For example, if the present size is 30, then the brand-new size will be 32.</p>
-<p>Please note that the new allocated hash table is assigned to <code>ht[0]</code> or <code>ht[1]</code> depend on this is the first initialization or not. In other words, if it's NOT initialized firstly, <code>ht[1]</code> will be prepared for incremental rehashing.</p>
+<p>Please note that the new allocated hash table is assigned to <code>ht[0]</code> or <code>ht[1]</code> depend on this is the first initialization or not. In other words, if it&rsquo;s NOT initialized firstly, <code>ht[1]</code> will be prepared for incremental rehashing.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt"> 1
@@ -944,7 +944,7 @@ As a data structure in server side, dictionary must take memory into considerati
   <span class="copyright-year">
     &copy; 
     2016 - 
-    2019
+    2020
     <span class="heart">
       <i class="iconfont icon-heart"></i>
     </span>

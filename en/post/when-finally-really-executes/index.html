@@ -17,14 +17,14 @@
 
 
 <meta name="author" content="Guoqing Geng" /><meta name="description" content="Epitome:
- return doesn&#39;t really return, it pushes value to stack, then jumps to finally, which was set up by SETUP_FINALLY before. after executing finally, END_FINALLY returns. " /><meta name="keywords" content="elasticsearch, python, hbase, redis" />
+ return doesn&amp;rsquo;t really return, it pushes value to stack, then jumps to finally, which was set up by SETUP_FINALLY before. after executing finally, END_FINALLY returns. " /><meta name="keywords" content="elasticsearch, python, hbase, redis" />
 
 
 
 
 
 
-<meta name="generator" content="Hugo 0.60.1 with theme even" />
+<meta name="generator" content="Hugo 0.64.1 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/en/post/when-finally-really-executes/" />
@@ -42,7 +42,7 @@
 <meta property="og:title" content="When finally Really Executes" />
 <meta property="og:description" content="Epitome:
 
-return doesn&#39;t really return, it pushes value to stack, then jumps to finally, which was set up by SETUP_FINALLY before.
+return doesn&rsquo;t really return, it pushes value to stack, then jumps to finally, which was set up by SETUP_FINALLY before.
 after executing finally, END_FINALLY returns.
 " />
 <meta property="og:type" content="article" />
@@ -52,12 +52,12 @@ after executing finally, END_FINALLY returns.
 <meta itemprop="name" content="When finally Really Executes">
 <meta itemprop="description" content="Epitome:
 
-return doesn&#39;t really return, it pushes value to stack, then jumps to finally, which was set up by SETUP_FINALLY before.
+return doesn&rsquo;t really return, it pushes value to stack, then jumps to finally, which was set up by SETUP_FINALLY before.
 after executing finally, END_FINALLY returns.
 ">
 <meta itemprop="datePublished" content="2017-09-04T16:22:03&#43;08:00" />
 <meta itemprop="dateModified" content="2017-09-04T16:22:03&#43;08:00" />
-<meta itemprop="wordCount" content="1057">
+<meta itemprop="wordCount" content="1093">
 
 
 
@@ -65,7 +65,7 @@ after executing finally, END_FINALLY returns.
 <meta name="twitter:title" content="When finally Really Executes"/>
 <meta name="twitter:description" content="Epitome:
 
-return doesn&#39;t really return, it pushes value to stack, then jumps to finally, which was set up by SETUP_FINALLY before.
+return doesn&rsquo;t really return, it pushes value to stack, then jumps to finally, which was set up by SETUP_FINALLY before.
 after executing finally, END_FINALLY returns.
 "/>
 
@@ -141,7 +141,7 @@ after executing finally, END_FINALLY returns.
         <div class="post-category">
             <a href="/en/categories/python/"> Python </a>
             </div>
-          <span class="more-meta"> 1057 words </span>
+          <span class="more-meta"> 1093 words </span>
           <span class="more-meta"> 3 mins read </span>
         
       </div>
@@ -151,10 +151,10 @@ after executing finally, END_FINALLY returns.
     <div class="post-content">
       <p>Epitome:</p>
 <ul>
-<li>return doesn't really return, it pushes value to stack, then jumps to finally, which was set up by <code>SETUP_FINALLY</code> before.</li>
+<li>return doesn&rsquo;t really return, it pushes value to stack, then jumps to finally, which was set up by <code>SETUP_FINALLY</code> before.</li>
 <li>after executing finally, <code>END_FINALLY</code> returns.</li>
 </ul>
-<p>Let's be forthright, what will the following code print?</p>
+<p>Let&rsquo;s be forthright, what will the following code print?</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt"> 1
@@ -184,9 +184,17 @@ after executing finally, END_FINALLY returns.
 </code></pre></td></tr></table>
 </div>
 </div><p>The answer is:</p>
-<pre><code>Zero cannot be divisor
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">Zero cannot be divisor
 finally
-</code></pre><p>It seems that <code>finally</code> executes after the <code>return</code> statement. Is it a truth? We'd better change the code a little to penetrate the result.</p>
+</code></pre></td></tr></table>
+</div>
+</div><p>It seems that <code>finally</code> executes after the <code>return</code> statement. Is it a truth? We&rsquo;d better change the code a little to penetrate the result.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt"> 1
@@ -224,7 +232,45 @@ finally
 </code></pre></td></tr></table>
 </div>
 </div><p>Next point, we can see,</p>
-<pre><code>  6           0 SETUP_FINALLY           44 (to 47)
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">  6           0 SETUP_FINALLY           44 (to 47)
               3 SETUP_EXCEPT            12 (to 18)
 
   7           6 LOAD_CONST               1 (100)
@@ -242,7 +288,7 @@ finally
              29 STORE_FAST               0 (e)
              32 POP_TOP
 
-  9          33 LOAD_CONST               3 ('Zero cannot be divisor')
+  9          33 LOAD_CONST               3 (&#39;Zero cannot be divisor&#39;)
              36 PRINT_ITEM
              37 PRINT_NEWLINE
 
@@ -252,17 +298,19 @@ finally
         &gt;&gt;   43 POP_BLOCK
              44 LOAD_CONST               0 (None)
 
- 12     &gt;&gt;   47 LOAD_CONST               4 ('finally')
+ 12     &gt;&gt;   47 LOAD_CONST               4 (&#39;finally&#39;)
              50 PRINT_ITEM
              51 PRINT_NEWLINE
              52 END_FINALLY
              53 LOAD_CONST               0 (None)
              56 RETURN_VALUE
-</code></pre><p>For those who didn't use <code>dis</code> module before:</p>
+</code></pre></td></tr></table>
+</div>
+</div><p>For those who didn&rsquo;t use <code>dis</code> module before:</p>
 <blockquote>
-<p>The dis module supports the analysis of CPython bytecode by disassembling it. According to the above output, first column is line number, the second is offset of bytecode, followed by the name of bytecode. The forth column presents parameter and the one in parenthesis is the result after bytecode's processing parameter.</p>
+<p>The dis module supports the analysis of CPython bytecode by disassembling it. According to the above output, first column is line number, the second is offset of bytecode, followed by the name of bytecode. The forth column presents parameter and the one in parenthesis is the result after bytecode&rsquo;s processing parameter.</p>
 </blockquote>
-<p>As we can see, after <code>RETURN_VALUE</code> in line 10, the <code>END_FINALLY</code> would be executed. That doesn't meet our expectation. What's more wierd, there is another <code>RETURN_VALUE</code> in line 12 after <code>END_FINALLY</code>. Since we get here, the source code is the only thing that we can ask for help.</p>
+<p>As we can see, after <code>RETURN_VALUE</code> in line 10, the <code>END_FINALLY</code> would be executed. That doesn&rsquo;t meet our expectation. What&rsquo;s more wierd, there is another <code>RETURN_VALUE</code> in line 12 after <code>END_FINALLY</code>. Since we get here, the source code is the only thing that we can ask for help.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt"> 1
@@ -457,7 +505,7 @@ finally
 
 </code></pre></td></tr></table>
 </div>
-</div><p><code>RETURN_VALUE</code> does not return really, it simply assgins popped value from stack to <code>retval</code>, set <code>why</code> to <code>WHY_RETURN</code>, then go to <code>fast_block_end</code>. This pathetic scapegoat would push <code>retval</code> from <code>RETURN_VALUE</code> into stack, convert <code>why</code> to <code>Long</code> and push it into stack too, then jump to <code>b-&gt;b_handler</code>. Well, what's <code>b_handler</code> pointing to?</p>
+</div><p><code>RETURN_VALUE</code> does not return really, it simply assgins popped value from stack to <code>retval</code>, set <code>why</code> to <code>WHY_RETURN</code>, then go to <code>fast_block_end</code>. This pathetic scapegoat would push <code>retval</code> from <code>RETURN_VALUE</code> into stack, convert <code>why</code> to <code>Long</code> and push it into stack too, then jump to <code>b-&gt;b_handler</code>. Well, what&rsquo;s <code>b_handler</code> pointing to?</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt"> 1
@@ -589,7 +637,7 @@ finally
 </div><p><code>SETUP_FINALLY</code> calls <code>PyFrame_BlockSetup</code> to setup a block with type, level, handler. From the output of <code>dis</code>(notice the arrows before <code>END_FINALLY</code>), we can guess this handler is <code>END_FINALLY</code>. <code>END_FINALLY</code> gets <code>retval</code> and <code>why</code>, pushed by <code>RETURN_VALUE</code>, from stack, and returns.</p>
 <p>Now we can articulate  all the scratch:</p>
 <ul>
-<li>return doesn't really return, it pushs value to stack, then jumps to finally, which was set up by <code>SETUP_FINALLY</code> before.</li>
+<li>return doesn&rsquo;t really return, it pushs value to stack, then jumps to finally, which was set up by <code>SETUP_FINALLY</code> before.</li>
 <li>after executing finally, <code>END_FINALLY</code> returns.</li>
 </ul>
 <p><strong>Reference</strong></p>
@@ -663,7 +711,7 @@ finally
   <span class="copyright-year">
     &copy; 
     2016 - 
-    2019
+    2020
     <span class="heart">
       <i class="iconfont icon-heart"></i>
     </span>

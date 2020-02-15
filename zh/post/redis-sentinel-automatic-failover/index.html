@@ -25,7 +25,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.60.1 with theme even" />
+<meta name="generator" content="Hugo 0.64.1 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/zh/post/redis-sentinel-automatic-failover/" />
@@ -56,7 +56,7 @@
 ">
 <meta itemprop="datePublished" content="2019-02-02T14:21:53&#43;08:00" />
 <meta itemprop="dateModified" content="2019-02-02T14:21:53&#43;08:00" />
-<meta itemprop="wordCount" content="2498">
+<meta itemprop="wordCount" content="2499">
 
 
 
@@ -139,7 +139,7 @@
         <div class="post-category">
             <a href="/zh/categories/redis/"> Redis </a>
             </div>
-          <span class="more-meta"> 约 2498 字 </span>
+          <span class="more-meta"> 约 2499 字 </span>
           <span class="more-meta"> 预计阅读 5 分钟 </span>
         
       </div>
@@ -156,7 +156,7 @@
 <blockquote>
 <p>本文大部分摘录自：<a href="https://book.douban.com/subject/26971561/">Redis开发与运维</a></p>
 </blockquote>
-<h1 id="heading">主从复制的问题</h1>
+<h1 id="主从复制的问题">主从复制的问题</h1>
 <p>Redis 的主从复制模式可以将主节点的数据改变同步给从节点，这样从节点就可以起到两个作用：</p>
 <ol>
 <li>作为主节点的一个备份，一旦主节点出了故障不可达的情况，从节点可以作为后备“顶”上来，并且保证数据尽量不丢失（主从复制是最终一致性）。</li>
@@ -169,7 +169,7 @@
 <li>主节点的存储能力受到单机的限制。</li>
 </ol>
 <p>其中第一个问题就是Redis的高可用问题，也是 Redis 引入哨兵机制的原因。</p>
-<h1 id="heading1">故障转移</h1>
+<h1 id="故障转移">故障转移</h1>
 <p>在没有哨兵的情况下，Redis 的主节点发生故障后：</p>
 <ol>
 <li>
@@ -200,7 +200,7 @@
 <li>通知客户端新的主节点机制是否足够健壮。</li>
 </ol>
 <p>Redis 哨兵正是用于解决这些问题。</p>
-<h1 id="heading2">哨兵的自动故障转移</h1>
+<h1 id="哨兵的自动故障转移">哨兵的自动故障转移</h1>
 <p>当主节点出现故障时，Redis 哨兵能自动完成故障发现和故障转移，并通知应用方，从而实现真正的高可用。</p>
 <p>Redis 哨兵是一个分布式架构，其中包含若干个哨兵节点和 Redis 数据节点，每个哨兵节点会对数据节点和其余哨兵节点进行监控，当它发现节点不可达时，会对节点做下线标识。如果被标识的是主节点，它还会和其他哨兵节点进行“协商”，当大多数哨兵节点都认为主节点不可达时，它们会选举出一个哨兵节点来完成自动故障转移的工作，同时会将这个变化实时通知给 Redis 应用方。整个过程完全是自动的，不需要人工来介入，所以这套方案很有效地解决了 Redis 的高可用问题。</p>
 <p><img src="/images/redis-sentinel-architecture.png" alt=""></p>
@@ -241,13 +241,20 @@
 </ol>
 <p>哨兵本身就是独立的 Redis 节点，只不过它们有一些特殊，它们不存储数据 (这里指接收用户的写命令，毕竟哨兵节点必须存储 <strong>+switch-master</strong> 信息)，只支持部分命令。</p>
 <p>那么，哨兵是如何判断节点故障的呢，这里就涉及到主观下线和客观下线的区别了。</p>
-<h1 id="heading3">主观下线和客观下线</h1>
+<h1 id="主观下线和客观下线">主观下线和客观下线</h1>
 <p>每个哨兵节点会每隔1秒对主节点、从节点、其他哨兵节点发送 ping 命令做心跳检测，当这些节点超过 <code>down-after-milliseconds</code> 没有进行有效回复，哨兵节点就会对该节点做失败判定，这个行为叫做主观下线。</p>
 <p>主观下线是当前哨兵节点的一家之言，可能存在误判。从节点、哨兵节点在主观下线后，没有后续的故障转移操作。</p>
 <p>当哨兵主观下线的节点是主节点时，该哨兵节点会通过 <code>sentinel is-master-down-by-addr</code> 命令向其他哨兵节点询问对主节点的判断，当超过 <!-- raw HTML omitted --> 个数，哨兵节点认为主节点确实有问题，这时该哨兵节点会做出客观下线的决定，这样客观下线的含义是比较明显了，也就是大部分哨兵节点都对主节点的下线做了同意的判定。</p>
 <p><code>sentinel is-master-down-by-addr</code> 命令的格式为:</p>
-<pre><code>sentinel is-master-down-by-addr &lt;ip&gt; &lt;port&gt; &lt;current_epoch&gt; &lt;runid&gt;
-</code></pre><p>其中，</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">sentinel is-master-down-by-addr &lt;ip&gt; &lt;port&gt; &lt;current_epoch&gt; &lt;runid&gt;
+</code></pre></td></tr></table>
+</div>
+</div><p>其中，</p>
 <ul>
 <li><code>current_epoch</code>：当前配置纪元。</li>
 <li><code>runid</code>：此参数有两种类型，不同类型决定了此 API 作用的不同。
@@ -263,7 +270,7 @@
 <li><code>leader_runid</code>：当 <code>leader_runid</code> 等于 &ldquo;*&rdquo; 时，代表返回结果是用来做主节点是否不可达，当 <code>leader_runid</code> 等于具体的 <code>runid</code>，代表目标节点同意 <code>runid</code> 成为领导者。</li>
 <li><code>leader_epoch</code>：领导者纪元。</li>
 </ul>
-<h1 id="heading4">领导哨兵节点选举</h1>
+<h1 id="领导哨兵节点选举">领导哨兵节点选举</h1>
 <p>主节点的故障转移只需要一个哨兵节点来完成，在此之前，哨兵节点之间会进行领导者选举。Redis 使用 Raft 算法实现领导者选举：</p>
 <ol>
 <li>每个在线的哨兵节点都有资格成为领导者，当它确认主节点主观下线时候，会向其他哨兵节点发送 <code>sentinel is-master-down-by-addr</code> 命令，要求将自己设置为领导者。</li>
@@ -345,7 +352,7 @@
   <span class="copyright-year">
     &copy; 
     2016 - 
-    2019
+    2020
     <span class="heart">
       <i class="iconfont icon-heart"></i>
     </span>

@@ -16,7 +16,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
 
-<meta name="author" content="Guoqing Geng" /><meta name="description" content="It&#39;s necessary to learn with questions. Otherwise, you may distract your focus when something you don&#39;t know appears, whether should I go deeper or not. With preliminary doubts in your mind, this would not be a problem. Learning can be direct, clear and fruitful, which brings you more sense of achievement.
+<meta name="author" content="Guoqing Geng" /><meta name="description" content="It&amp;rsquo;s necessary to learn with questions. Otherwise, you may distract your focus when something you don&amp;rsquo;t know appears, whether should I go deeper or not. With preliminary doubts in your mind, this would not be a problem. Learning can be direct, clear and fruitful, which brings you more sense of achievement.
 For this post about the source code of HashMap, few questions need answers:
  data structure underneath why HashMap permits nulls and unsynchronized does it make guarantees as to the order of the map what happens when I put and get a key with value, and time complexity how the map shrink or expand when size changes " /><meta name="keywords" content="Java, HashMap" />
 
@@ -25,7 +25,7 @@ For this post about the source code of HashMap, few questions need answers:
 
 
 
-<meta name="generator" content="Hugo 0.60.1 with theme even" />
+<meta name="generator" content="Hugo 0.64.1 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/en/post/java-hashmap/" />
@@ -41,7 +41,7 @@ For this post about the source code of HashMap, few questions need answers:
 
 
 <meta property="og:title" content="Java HashMap" />
-<meta property="og:description" content="It&#39;s necessary to learn with questions. Otherwise, you may distract your focus when something you don&#39;t know appears, whether should I go deeper or not. With preliminary doubts in your mind, this would not be a problem. Learning can be direct, clear and fruitful, which brings you more sense of achievement.
+<meta property="og:description" content="It&rsquo;s necessary to learn with questions. Otherwise, you may distract your focus when something you don&rsquo;t know appears, whether should I go deeper or not. With preliminary doubts in your mind, this would not be a problem. Learning can be direct, clear and fruitful, which brings you more sense of achievement.
 For this post about the source code of HashMap, few questions need answers:
 
 data structure underneath
@@ -55,7 +55,7 @@ how the map shrink or expand when size changes
 <meta property="article:published_time" content="2016-06-09T20:42:52+08:00" />
 <meta property="article:modified_time" content="2018-07-09T20:42:52+08:00" />
 <meta itemprop="name" content="Java HashMap">
-<meta itemprop="description" content="It&#39;s necessary to learn with questions. Otherwise, you may distract your focus when something you don&#39;t know appears, whether should I go deeper or not. With preliminary doubts in your mind, this would not be a problem. Learning can be direct, clear and fruitful, which brings you more sense of achievement.
+<meta itemprop="description" content="It&rsquo;s necessary to learn with questions. Otherwise, you may distract your focus when something you don&rsquo;t know appears, whether should I go deeper or not. With preliminary doubts in your mind, this would not be a problem. Learning can be direct, clear and fruitful, which brings you more sense of achievement.
 For this post about the source code of HashMap, few questions need answers:
 
 data structure underneath
@@ -66,13 +66,13 @@ how the map shrink or expand when size changes
 ">
 <meta itemprop="datePublished" content="2016-06-09T20:42:52&#43;08:00" />
 <meta itemprop="dateModified" content="2018-07-09T20:42:52&#43;08:00" />
-<meta itemprop="wordCount" content="1338">
+<meta itemprop="wordCount" content="1340">
 
 
 
 <meta itemprop="keywords" content="java.util,Data Structure," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Java HashMap"/>
-<meta name="twitter:description" content="It&#39;s necessary to learn with questions. Otherwise, you may distract your focus when something you don&#39;t know appears, whether should I go deeper or not. With preliminary doubts in your mind, this would not be a problem. Learning can be direct, clear and fruitful, which brings you more sense of achievement.
+<meta name="twitter:description" content="It&rsquo;s necessary to learn with questions. Otherwise, you may distract your focus when something you don&rsquo;t know appears, whether should I go deeper or not. With preliminary doubts in your mind, this would not be a problem. Learning can be direct, clear and fruitful, which brings you more sense of achievement.
 For this post about the source code of HashMap, few questions need answers:
 
 data structure underneath
@@ -154,7 +154,7 @@ how the map shrink or expand when size changes
         <div class="post-category">
             <a href="/en/categories/java/"> Java </a>
             </div>
-          <span class="more-meta"> 1338 words </span>
+          <span class="more-meta"> 1340 words </span>
           <span class="more-meta"> 7 mins read </span>
         
       </div>
@@ -167,7 +167,7 @@ how the map shrink or expand when size changes
   </div>
 </div>
     <div class="post-content">
-      <p>It's necessary to learn with questions. Otherwise, you may distract your focus when something you don't know appears, whether should I go deeper or not. With preliminary doubts in your mind, this would not be a problem. Learning can be direct, clear and fruitful, which brings you more sense of achievement.</p>
+      <p>It&rsquo;s necessary to learn with questions. Otherwise, you may distract your focus when something you don&rsquo;t know appears, whether should I go deeper or not. With preliminary doubts in your mind, this would not be a problem. Learning can be direct, clear and fruitful, which brings you more sense of achievement.</p>
 <p>For this post about the source code of <code>HashMap</code>, few questions need answers:</p>
 <ul>
 <li>data structure underneath</li>
@@ -212,7 +212,7 @@ how the map shrink or expand when size changes
 <li><code>loadFactor</code>: the load factor for the hash table.</li>
 <li><code>threshold</code>: the next size value at which to resize (same as <code>capacity * load factor</code>).</li>
 </ul>
-<p>The <code>Node</code> is a static and nested class in <code>HashMap</code>. It's basic hash bin node, <strong>used for most entries</strong>. For briefness, I assume <code>Node</code> is used for all entries, but remember <code>TreeNode</code> is the other option.</p>
+<p>The <code>Node</code> is a static and nested class in <code>HashMap</code>. It&rsquo;s basic hash bin node, <strong>used for most entries</strong>. For briefness, I assume <code>Node</code> is used for all entries, but remember <code>TreeNode</code> is the other option.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt">1
@@ -235,8 +235,8 @@ how the map shrink or expand when size changes
 <span class="o">}</span>
 </code></pre></td></tr></table>
 </div>
-</div><p><code>key</code>, <code>hash`,</code>value<code>is easy to understand, and the</code>next`? It is used for handling key conflict.</p>
-<p>Let's see its <code>equals</code> method with compare order:</p>
+</div><p><code>key</code>, <code>hash</code>,<code>value</code> is easy to understand, and the <code>next</code>? It is used for handling key conflict.</p>
+<p>Let&rsquo;s see its <code>equals</code> method with compare order:</p>
 <ul>
 <li>address</li>
 <li>instance identity</li>
@@ -568,7 +568,7 @@ how the map shrink or expand when size changes
 <p><strong>does it make guarantees as to the order of the map</strong></p>
 <p>No, resize of the table may distort the order.</p>
 <p><strong>what happens when I put and get a key with value, and time complexity</strong></p>
-<p><code>put</code> may lead to resize of the map, so it's time complexity is O(n). While the element can be located with index, so <code>get</code> costs O(1) for the optimal situation. If key conflicts, it needs to iterate the whole list sharing the same key.</p>
+<p><code>put</code> may lead to resize of the map, so it&rsquo;s time complexity is O(n). While the element can be located with index, so <code>get</code> costs O(1) for the optimal situation. If key conflicts, it needs to iterate the whole list sharing the same key.</p>
 <p><strong>how the map shrink or expand when size changes</strong></p>
 <p>The question has already been answered. expand? yes! and shrink? no!</p>
     </div>
@@ -641,7 +641,7 @@ how the map shrink or expand when size changes
   <span class="copyright-year">
     &copy; 
     2016 - 
-    2019
+    2020
     <span class="heart">
       <i class="iconfont icon-heart"></i>
     </span>

@@ -39,7 +39,7 @@
       <pubDate>Fri, 09 Mar 2018 18:27:56 +0800</pubDate>
       
       <guid>https://hellokangning.github.io/en/post/troubleshooting-for-threads-explosion-in-hbase-client/</guid>
-      <description>&lt;p&gt;An issue, excessive threads of HBase client, annoyed me for a quite while. It reminds me to penetrate into uses of &lt;code&gt;Executorservice&lt;/code&gt; in HBase client. That&#39;s the origin of this blog.&lt;/p&gt;</description>
+      <description>&lt;p&gt;An issue, excessive threads of HBase client, annoyed me for a quite while. It reminds me to penetrate into uses of &lt;code&gt;Executorservice&lt;/code&gt; in HBase client. That&amp;rsquo;s the origin of this blog.&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -57,7 +57,7 @@
       <pubDate>Tue, 09 Jan 2018 11:33:34 +0800</pubDate>
       
       <guid>https://hellokangning.github.io/en/post/hbase-batch-puts-without-bufferedmutator/</guid>
-      <description>&lt;p&gt;For batch puts, it&#39;s better if you construct a list of puts and then call &lt;code&gt;HTable.put(final List&amp;lt;Put&amp;gt; puts)&lt;/code&gt;, because it uses a single RPC call to commit the batch, but depending on the size of the list write buffer may flush it all or not.&lt;/p&gt;
+      <description>&lt;p&gt;For batch puts, it&amp;rsquo;s better if you construct a list of puts and then call &lt;code&gt;HTable.put(final List&amp;lt;Put&amp;gt; puts)&lt;/code&gt;, because it uses a single RPC call to commit the batch, but depending on the size of the list write buffer may flush it all or not.&lt;/p&gt;
 &lt;p&gt;In this post, &lt;code&gt;BufferedMutator&lt;/code&gt; is excluded. It will be discussed in the near future.&lt;/p&gt;</description>
     </item>
     
@@ -76,7 +76,7 @@
       <pubDate>Tue, 05 Dec 2017 15:14:28 +0800</pubDate>
       
       <guid>https://hellokangning.github.io/en/post/a-lifecycle-of-hbase-put-server-side/</guid>
-      <description>&lt;p&gt;Following the preceding &lt;a href=&#34;https://hellokangning.github.io/en/post/a-lifecycle-of-hbase-put-client-side/&#34;&gt;A Lifecycle of HBase&#39;s Put: Client-side&lt;/a&gt;, this post will figure out how a &lt;code&gt;Put&lt;/code&gt; request does its mutation on &lt;code&gt;HRegionServer&lt;/code&gt;. The whole process involves WAL, MemStore, and Coprocessor etc. After reading this post, hope you make their roles clear.&lt;/p&gt;</description>
+      <description>&lt;p&gt;Following the preceding &lt;a href=&#34;https://hellokangning.github.io/en/post/a-lifecycle-of-hbase-put-client-side/&#34;&gt;A Lifecycle of HBase&amp;rsquo;s Put: Client-side&lt;/a&gt;, this post will figure out how a &lt;code&gt;Put&lt;/code&gt; request does its mutation on &lt;code&gt;HRegionServer&lt;/code&gt;. The whole process involves WAL, MemStore, and Coprocessor etc. After reading this post, hope you make their roles clear.&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -85,7 +85,7 @@
       <pubDate>Fri, 24 Nov 2017 11:38:14 +0800</pubDate>
       
       <guid>https://hellokangning.github.io/en/post/a-lifecycle-of-hbase-put-client-side/</guid>
-      <description>&lt;p&gt;&lt;code&gt;Put&lt;/code&gt; is used to perform insert or update a single row of HBase table. It&#39;s essential to understand its lifecycle, which can be broke into two pieces,&lt;/p&gt;
+      <description>&lt;p&gt;&lt;code&gt;Put&lt;/code&gt; is used to perform insert or update a single row of HBase table. It&amp;rsquo;s essential to understand its lifecycle, which can be broke into two pieces,&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;Client-side, How the &lt;code&gt;put&lt;/code&gt; request is built up and sent to the right &lt;code&gt;RegionServer&lt;/code&gt;.&lt;/li&gt;
 &lt;li&gt;Server-side, How the &lt;code&gt;RegionServer&lt;/code&gt; handle the &lt;code&gt;Put&lt;/code&gt; request and update one row.&lt;/li&gt;
