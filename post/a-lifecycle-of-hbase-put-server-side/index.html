@@ -137,7 +137,7 @@
 
     <div class="post-toc" id="post-toc">
   <h2 class="post-toc-title">Contents</h2>
-  <div class="post-toc-content always-active">
+  <div class="post-toc-content">
     <nav id="TableOfContents">
   <ul>
     <li><a href="#hregionserver">HRegionServer</a></li>
@@ -194,7 +194,7 @@
 <span class="o">}</span>
 </code></pre></td></tr></table>
 </div>
-</div><h2 id="hregionserver"><code>HRegionServer</code></h2>
+</div><h1 id="hregionserver"><code>HRegionServer</code></h1>
 <p><img src="/images/hbase-hregionserver-class.png" alt=""></p>
 <p>And on server-side, who will accept this request? Every <code>RegionServer</code> runs a <code>HRegionServer</code> from commandline. When <code>HregionServer</code> is initialized, it starts <code>RSRpcServices</code>. See the definition of <code>HRegionServer</code> and its constructor.</p>
 <div class="highlight"><div class="chroma">
@@ -237,7 +237,7 @@
 <span class="o">}</span>
 </code></pre></td></tr></table>
 </div>
-</div><h2 id="rsrpsservices"><code>RSRpsServices</code></h2>
+</div><h1 id="rsrpsservices"><code>RSRpsServices</code></h1>
 <p><code>RSRpsServices</code> implements <code>ClientService.BlockingInterface</code>, and override <code>mutate</code> method of course. What <code>mutate</code> method is simple, it calls <code>put</code> method of <code>HRegion</code>, them update metrics.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -303,7 +303,7 @@
 <span class="o">}</span>
 </code></pre></td></tr></table>
 </div>
-</div><h2 id="hregion"><code>HRegion</code></h2>
+</div><h1 id="hregion"><code>HRegion</code></h1>
 <p><img src="/images/hbase-hregion-class.png" alt=""></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -414,7 +414,7 @@
 </code></pre></td></tr></table>
 </div>
 </div><p>After some validations, <code>doMiniBatchMutate</code> becomes the worker that really writes, and <code>requestFlushIfNeeded</code> will flush <code>MemStore</code> to <code>HFile</code>. Let&rsquo;s look at <code>requestFlushIfNeeded</code> first, since <code>doMiniBatchMutate</code> is more complicated and will take a large chunk of this post.</p>
-<h3 id="requestflushifneeded"><code>requestFlushIfNeeded</code></h3>
+<h2 id="requestflushifneeded"><code>requestFlushIfNeeded</code></h2>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt"> 1
@@ -670,7 +670,7 @@
 <span class="o">}</span>
 </code></pre></td></tr></table>
 </div>
-</div><h3 id="dominibatchmutate"><code>doMiniBatchMutate</code></h3>
+</div><h2 id="dominibatchmutate"><code>doMiniBatchMutate</code></h2>
 <p><img src="/images/hbase-hregion-dominibatchmutate-interaction.png" alt=""></p>
 <p>Hope this graph tells the complete steps of <code>doMiniBatchMutate</code>. A sketch lists here:</p>
 <ol>
@@ -1328,6 +1328,11 @@
 
     <footer id="footer" class="footer">
       <div class="social-links">
+      <a href="mailto:hellokangning@hotmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://www.linkedin.com/in/guoqing-geng-9032b820/" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="https://github.com/hellokangning" class="iconfont icon-github" title="github"></a>
+      <a href="https://www.douban.com/people/hellokangning/" class="iconfont icon-douban" title="douban"></a>
+      <a href="https://www.instagram.com/hellokangning/" class="iconfont icon-instagram" title="instagram"></a>
   <a href="https://hellokangning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
 </div>
 

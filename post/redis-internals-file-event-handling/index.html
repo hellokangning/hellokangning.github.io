@@ -153,7 +153,7 @@ In this post, we will take a look at multiplexing event handling processing requ
 
     <div class="post-toc" id="post-toc">
   <h2 class="post-toc-title">Contents</h2>
-  <div class="post-toc-content always-active">
+  <div class="post-toc-content">
     <nav id="TableOfContents">
   <ul>
     <li><a href="#data-structures">Data Structures</a></li>
@@ -174,7 +174,7 @@ In this post, we will take a look at multiplexing event handling processing requ
 <blockquote>
 <p>The code analysed in this post is based on 5.0.0</p>
 </blockquote>
-<h2 id="data-structures">Data Structures</h2>
+<h1 id="data-structures">Data Structures</h1>
 <p><code>redisServer</code> , global state of Redis server, has a lot of fields including</p>
 <ul>
 <li><code>el</code> with type <code>aeEventLoop</code></li>
@@ -281,7 +281,7 @@ In this post, we will take a look at multiplexing event handling processing requ
 <li><code>querybuf</code> accumulates the requests from the client, which are parsed by the Redis server according to the Redis protocol and executed by calling the implementations of the commands the client is executing.</li>
 <li><code>reply</code> and <code>buf</code> are dynamic and static buffers that accumulate the replies the server sends to the client. These buffers are incrementally written to the socket as soon as the file descriptor is writable.</li>
 </ul>
-<h2 id="create-event-loop">Create Event Loop</h2>
+<h1 id="create-event-loop">Create Event Loop</h1>
 <p><code>initServer</code> in <code>main</code> method creates</p>
 <ol>
 <li>a event loop for <code>server.el</code></li>
@@ -502,7 +502,7 @@ In this post, we will take a look at multiplexing event handling processing requ
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
-</div><h2 id="process-events">Process Events</h2>
+</div><h1 id="process-events">Process Events</h1>
 <p><code>aeMain()</code> starts the event loop which listens for new connections.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -742,7 +742,7 @@ In this post, we will take a look at multiplexing event handling processing requ
 </span><span class="c1"></span><span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
-</div><h2 id="read-requests">Read Requests</h2>
+</div><h1 id="read-requests">Read Requests</h1>
 <p><strong>networking.c</strong> defines all the I/O functions with clients, masters and replicas (which in Redis are just special clients):</p>
 <ul>
 <li><code>createClient()</code> allocates and initializes a new client.</li>
@@ -835,6 +835,11 @@ In this post, we will take a look at multiplexing event handling processing requ
 
     <footer id="footer" class="footer">
       <div class="social-links">
+      <a href="mailto:hellokangning@hotmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://www.linkedin.com/in/guoqing-geng-9032b820/" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="https://github.com/hellokangning" class="iconfont icon-github" title="github"></a>
+      <a href="https://www.douban.com/people/hellokangning/" class="iconfont icon-douban" title="douban"></a>
+      <a href="https://www.instagram.com/hellokangning/" class="iconfont icon-instagram" title="instagram"></a>
   <a href="https://hellokangning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
 </div>
 

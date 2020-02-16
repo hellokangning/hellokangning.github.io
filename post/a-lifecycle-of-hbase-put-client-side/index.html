@@ -153,7 +153,7 @@ In view of the limitation of one single post, the client-side is discussed only.
 
     <div class="post-toc" id="post-toc">
   <h2 class="post-toc-title">Contents</h2>
-  <div class="post-toc-content always-active">
+  <div class="post-toc-content">
     <nav id="TableOfContents">
   <ul>
     <li><a href="#table">Table</a></li>
@@ -185,7 +185,7 @@ In view of the limitation of one single post, the client-side is discussed only.
 <p>So far, A more complicated class diagram is needed,</p>
 <p><img src="/images/hbase-client-put-class.png" alt=""></p>
 <p>Then, please allow me to show the source code, since it never lies.</p>
-<h2 id="table"><code>Table</code></h2>
+<h1 id="table"><code>Table</code></h1>
 <p><code>Table</code> is used to communicate with a single HBase table, and obtained an instance from a <code>Connection</code>. <code>Table</code> interface has two methods about <code>Put</code>, one for single operation, the other for batch puts.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -321,7 +321,7 @@ In view of the limitation of one single post, the client-side is discussed only.
 </ol>
 <p>Take a glimpse on <code>validatePut</code>. It checks if this put is empty, then iterates all the values, if non-empty, to make sure the they are all smaller than maximum Key-Value size, which is configured before.</p>
 <p>Let&rsquo;s skip <code>ServerCallable</code>, which we will take a close look later, and deep into <code>RpcRetryingCaller</code> first, considering <code>callWithRetries</code> method in <code>RpcRetryingCaller</code> takes <code>ServerCallable</code> as an input parameter.</p>
-<h2 id="rpcretryingcaller"><code>RpcRetryingCaller</code></h2>
+<h1 id="rpcretryingcaller"><code>RpcRetryingCaller</code></h1>
 <p><code>RpcRetryingCaller</code> is also an interface without any member field. it leaves unimplemented <code>callWithRetries</code> to its implementation, <code>RpcRetryingCallerImpl</code>.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -542,7 +542,7 @@ In view of the limitation of one single post, the client-side is discussed only.
 <li><code>throwable()</code>, if <code>call()</code> throws any <code>Throwable</code> exception.</li>
 </ol>
 <p>Next, It&rsquo;s time for <code>ServerCallable</code>'s appearance on the stage.</p>
-<h2 id="servercallable"><code>ServerCallable</code></h2>
+<h1 id="servercallable"><code>ServerCallable</code></h1>
 <p>The root class of <code>ServerCallable</code> is <code>RetryingCallable</code>, a callable that will be retried. It declares two important methods, <code>prepare()</code> and <code>call()</code>, which will be used in the remaining <code>Put</code> process.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -867,7 +867,7 @@ In view of the limitation of one single post, the client-side is discussed only.
 </code></pre></td></tr></table>
 </div>
 </div><p><code>rpcCall()</code> call another private method <code>openScanner</code>, the laster one invokes <code>getStub()</code>, <code>ClientProtos.ClientService.BlockingInterface</code>, to get response.</p>
-<h2 id="rpccontroller"><code>RpcController</code></h2>
+<h1 id="rpccontroller"><code>RpcController</code></h1>
 <p><code>HBaseRpcController</code> is a readily comprehensible interface, implementing from <code>protobuf.RpcController</code>. it carries some properties, such as priority, timeout, of the request.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -948,7 +948,7 @@ In view of the limitation of one single post, the client-side is discussed only.
 <span class="o">}</span>
 </code></pre></td></tr></table>
 </div>
-</div><h2 id="connection"><code>Connection</code></h2>
+</div><h1 id="connection"><code>Connection</code></h1>
 <p>At last, hope you don&rsquo;t forget <code>Connection</code>, which is responsible for locating region during this process.</p>
 <p>See more, please jump to <a href="https://hellokangning.github.io/en/post/how-does-client-find-the-region/">How Does Client Find the Region</a>.</p>
 <p><strong>Reference</strong></p>
@@ -999,6 +999,11 @@ In view of the limitation of one single post, the client-side is discussed only.
 
     <footer id="footer" class="footer">
       <div class="social-links">
+      <a href="mailto:hellokangning@hotmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://www.linkedin.com/in/guoqing-geng-9032b820/" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="https://github.com/hellokangning" class="iconfont icon-github" title="github"></a>
+      <a href="https://www.douban.com/people/hellokangning/" class="iconfont icon-douban" title="douban"></a>
+      <a href="https://www.instagram.com/hellokangning/" class="iconfont icon-instagram" title="instagram"></a>
   <a href="https://hellokangning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
 </div>
 

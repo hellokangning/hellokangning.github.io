@@ -151,20 +151,30 @@
 
     <div class="post-toc" id="post-toc">
   <h2 class="post-toc-title">Contents</h2>
-  <div class="post-toc-content always-active">
+  <div class="post-toc-content">
     <nav id="TableOfContents">
   <ul>
-    <li><a href="#1-保存主节点的信息">1. 保存主节点的信息</a></li>
-    <li><a href="#2-主从建立-socket-连接">2. 主从建立 socket 连接</a></li>
-    <li><a href="#3-发送-ping-命令">3. 发送 ping 命令</a></li>
-    <li><a href="#4-权限验证">4. 权限验证</a></li>
-    <li><a href="#5-同步数据集">5. 同步数据集</a></li>
-    <li><a href="#6-命令持续复制">6. 命令持续复制</a></li>
-  </ul>
-
-  <ul>
-    <li><a href="#网络传输超时">网络传输超时</a></li>
-    <li><a href="#缓冲区溢出">缓冲区溢出</a></li>
+    <li><a href="#同步的过程">同步的过程</a>
+      <ul>
+        <li><a href="#1-保存主节点的信息">1. 保存主节点的信息</a></li>
+        <li><a href="#2-主从建立-socket-连接">2. 主从建立 socket 连接</a></li>
+        <li><a href="#3-发送-ping-命令">3. 发送 ping 命令</a></li>
+        <li><a href="#4-权限验证">4. 权限验证</a></li>
+        <li><a href="#5-同步数据集">5. 同步数据集</a></li>
+        <li><a href="#6-命令持续复制">6. 命令持续复制</a></li>
+      </ul>
+    </li>
+    <li><a href="#全量同步和部分同步">全量同步和部分同步</a></li>
+    <li><a href="#psync">psync</a></li>
+    <li><a href="#全量同步">全量同步</a></li>
+    <li><a href="#全量同步的可能问题">全量同步的可能问题</a>
+      <ul>
+        <li><a href="#网络传输超时">网络传输超时</a></li>
+        <li><a href="#缓冲区溢出">缓冲区溢出</a></li>
+      </ul>
+    </li>
+    <li><a href="#延迟问题">延迟问题</a></li>
+    <li><a href="#规避全量同步">规避全量同步</a></li>
   </ul>
 </nav>
   </div>
@@ -384,6 +394,11 @@ Full resync from master: xxxxx
 
     <footer id="footer" class="footer">
       <div class="social-links">
+      <a href="mailto:hellokangning@hotmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://www.linkedin.com/in/guoqing-geng-9032b820/" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="https://github.com/hellokangning" class="iconfont icon-github" title="github"></a>
+      <a href="https://www.douban.com/people/hellokangning/" class="iconfont icon-douban" title="douban"></a>
+      <a href="https://www.instagram.com/hellokangning/" class="iconfont icon-instagram" title="instagram"></a>
   <a href="https://hellokangning.github.io/zh/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
 </div>
 
