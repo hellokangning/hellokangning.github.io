@@ -17,7 +17,7 @@
 
 
 <meta name="author" content="Guoqing Geng" /><meta name="description" content="最近在做 Kubernetes Security 相关的工作。作为一个 Kubernetes 新手，刚看到 yaml 文件中的 namespace 时，很容易和 Linux 的 Namespace 搞混。加上在读 Kubernetes 文档的时候，总时不时看到 Linux Namespace 的字样就更加困惑起来。以此为契机，正好把 Linux Namespace 再好好梳理一下，解开心中的谜团：
- Linux 的 Namespace 是如何实现资源的隔离 Linux 下哪些资源可以按照 Namespace 组织，如何组织 Container 哪些地方用到了 Linux Namespace " /><meta name="keywords" content="elasticsearch, python, hbase, redis" />
+ Linux 的 Namespace 是如何实现资源的隔离 Linux 下哪些资源可以按照 Namespace 组织，如何组织 Container 哪些地方用到了 Linux Namespace " />
 
 
 
@@ -144,15 +144,15 @@ Container 哪些地方用到了 Linux Namespace
         <div class="post-category">
             <a href="/zh/categories/%E5%AE%B9%E5%99%A8/"> 容器 </a>
             </div>
-          <span class="more-meta"> 约 2998 字 </span>
-          <span class="more-meta"> 预计阅读 6 分钟 </span>
+          <span class="more-meta"> 2998 words </span>
+          <span class="more-meta"> 6 mins read </span>
         
       </div>
     </header>
 
     <div class="post-toc" id="post-toc">
-  <h2 class="post-toc-title">文章目录</h2>
-  <div class="post-toc-content always-active">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content">
     <nav id="TableOfContents">
   <ul>
     <li><a href="#clone-创建新-namespace">clone() 创建新 namespace</a></li>
@@ -179,9 +179,9 @@ Container 哪些地方用到了 Linux Namespace
 <li>每个子系统的 namespace 结构，将此前所有的全局组件包装到 namespace 中</li>
 <li>将给定进程关联到所属各个 namespace 的机制</li>
 </ol>
-<!-- raw HTML omitted -->
+<blockquote>
 <p>本文采用的源码是内核 5.4</p>
-<!-- raw HTML omitted -->
+</blockquote>
 <p>Linux内核中进程用 <code>task_struct</code> 结构体表示，我们称为进程描述符。该结构体定义在 <code>sched.h</code> 中，记录了进程相关的所有信息，比如进程地址空间，进程状态，打开的文件等。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -621,7 +621,7 @@ rwxrwxrwx. 1 mtk mtk 0 Apr 28 12:46 uts -&gt; uts:[4026531838]
         
         <a class="next" href="/zh/post/this-is-professionalism/">
             <span class="next-text nav-default">这个就叫专业 🚬</span>
-            <span class="next-text nav-mobile">下一篇</span>
+            <span class="next-text nav-mobile">Next</span>
             <i class="iconfont icon-right"></i>
           </a>
       </nav>
@@ -652,21 +652,16 @@ rwxrwxrwx. 1 mtk mtk 0 Apr 28 12:46 uts -&gt; uts:[4026531838]
 
     <footer id="footer" class="footer">
       <div class="social-links">
-      <a href="mailto:hellokangning@hotmail.com" class="iconfont icon-email" title="email"></a>
-      <a href="https://www.linkedin.com/in/guoqing-geng-9032b820/" class="iconfont icon-linkedin" title="linkedin"></a>
-      <a href="https://github.com/hellokangning" class="iconfont icon-github" title="github"></a>
-      <a href="https://www.douban.com/people/hellokangning/" class="iconfont icon-douban" title="douban"></a>
-      <a href="https://www.instagram.com/hellokangning/" class="iconfont icon-instagram" title="instagram"></a>
   <a href="https://hellokangning.github.io/zh/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
 </div>
 
 <div class="copyright">
   <span class="power-by">
-    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
   </span>
   <span class="division">|</span>
   <span class="theme-info">
-    主题 - 
+    Theme - 
     <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
   </span>
 

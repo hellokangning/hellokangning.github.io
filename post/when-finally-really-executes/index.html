@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>When finally Really Executes - Qing&#39;s Landing</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Guoqing Geng" /><meta name="description" content="Epitome:
+ return doesn&amp;rsquo;t really return, it pushes value to stack, then jumps to finally, which was set up by SETUP_FINALLY before. after executing finally, END_FINALLY returns. " />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.64.1 with theme even" />
+
+
+<link rel="canonical" href="https://hellokangning.github.io/post/when-finally-really-executes/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+
+<meta property="og:title" content="When finally Really Executes" />
+<meta property="og:description" content="Epitome:
+
+return doesn&rsquo;t really return, it pushes value to stack, then jumps to finally, which was set up by SETUP_FINALLY before.
+after executing finally, END_FINALLY returns.
+" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hellokangning.github.io/post/when-finally-really-executes/" />
+<meta property="article:published_time" content="2017-09-04T16:22:03+08:00" />
+<meta property="article:modified_time" content="2017-09-04T16:22:03+08:00" />
+<meta itemprop="name" content="When finally Really Executes">
+<meta itemprop="description" content="Epitome:
+
+return doesn&rsquo;t really return, it pushes value to stack, then jumps to finally, which was set up by SETUP_FINALLY before.
+after executing finally, END_FINALLY returns.
+">
+<meta itemprop="datePublished" content="2017-09-04T16:22:03&#43;08:00" />
+<meta itemprop="dateModified" content="2017-09-04T16:22:03&#43;08:00" />
+<meta itemprop="wordCount" content="1093">
+
+
+
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="When finally Really Executes"/>
+<meta name="twitter:description" content="Epitome:
+
+return doesn&rsquo;t really return, it pushes value to stack, then jumps to finally, which was set up by SETUP_FINALLY before.
+after executing finally, END_FINALLY returns.
+"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Qing&#39;s Landing</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/en/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/zh/">
+        <li class="mobile-menu-item">中文</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Qing&#39;s Landing</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/en/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/zh/">中文</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">When finally Really Executes</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> Sep 4, 2017 </span>
+        <div class="post-category">
+            <a href="/categories/python/"> Python </a>
+            </div>
+          <span class="more-meta"> 1093 words </span>
+          <span class="more-meta"> 3 mins read </span>
+        
+      </div>
+    </header>
+
+    
+    <div class="post-content">
+      <p>Epitome:</p>
+<ul>
+<li>return doesn&rsquo;t really return, it pushes value to stack, then jumps to finally, which was set up by <code>SETUP_FINALLY</code> before.</li>
+<li>after executing finally, <code>END_FINALLY</code> returns.</li>
+</ul>
+<p>Let&rsquo;s be forthright, what will the following code print?</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="mi">100</span><span class="o">/</span><span class="mi">0</span>
+    <span class="k">except</span> <span class="ne">ZeroDivisionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">print</span> <span class="sa"></span><span class="s1">&#39;</span><span class="s1">Zero cannot be divisor</span><span class="s1">&#39;</span>
+        <span class="k">return</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="k">print</span> <span class="sa"></span><span class="s1">&#39;</span><span class="s1">finally</span><span class="s1">&#39;</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="sa"></span><span class="s2">&#34;</span><span class="s2">__main__</span><span class="s2">&#34;</span><span class="p">:</span>
+    <span class="n">func</span><span class="p">(</span><span class="p">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>The answer is:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">Zero cannot be divisor
+finally
+</code></pre></td></tr></table>
+</div>
+</div><p>It seems that <code>finally</code> executes after the <code>return</code> statement. Is it a truth? We&rsquo;d better change the code a little to penetrate the result.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="ch">#!/usr/bin/env python2</span>
+<span class="c1"># coding=utf-8</span>
+<span class="kn">from</span> <span class="nn">dis</span> <span class="kn">import</span> <span class="n">dis</span>
+
+<span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="mi">100</span><span class="o">/</span><span class="mi">0</span>
+    <span class="k">except</span> <span class="ne">ZeroDivisionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">print</span> <span class="sa"></span><span class="s1">&#39;</span><span class="s1">Zero cannot be divisor</span><span class="s1">&#39;</span>
+        <span class="k">return</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="k">print</span> <span class="sa"></span><span class="s1">&#39;</span><span class="s1">finally</span><span class="s1">&#39;</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="sa"></span><span class="s2">&#34;</span><span class="s2">__main__</span><span class="s2">&#34;</span><span class="p">:</span>
+    <span class="n">dis</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>Next point, we can see,</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">  6           0 SETUP_FINALLY           44 (to 47)
+              3 SETUP_EXCEPT            12 (to 18)
+
+  7           6 LOAD_CONST               1 (100)
+              9 LOAD_CONST               2 (0)
+             12 BINARY_DIVIDE
+             13 POP_TOP
+             14 POP_BLOCK
+             15 JUMP_FORWARD            25 (to 43)
+
+  8     &gt;&gt;   18 DUP_TOP
+             19 LOAD_GLOBAL              0 (ZeroDivisionError)
+             22 COMPARE_OP              10 (exception match)
+             25 POP_JUMP_IF_FALSE       42
+             28 POP_TOP
+             29 STORE_FAST               0 (e)
+             32 POP_TOP
+
+  9          33 LOAD_CONST               3 (&#39;Zero cannot be divisor&#39;)
+             36 PRINT_ITEM
+             37 PRINT_NEWLINE
+
+ 10          38 LOAD_CONST               0 (None)
+             41 RETURN_VALUE
+        &gt;&gt;   42 END_FINALLY
+        &gt;&gt;   43 POP_BLOCK
+             44 LOAD_CONST               0 (None)
+
+ 12     &gt;&gt;   47 LOAD_CONST               4 (&#39;finally&#39;)
+             50 PRINT_ITEM
+             51 PRINT_NEWLINE
+             52 END_FINALLY
+             53 LOAD_CONST               0 (None)
+             56 RETURN_VALUE
+</code></pre></td></tr></table>
+</div>
+</div><p>For those who didn&rsquo;t use <code>dis</code> module before:</p>
+<blockquote>
+<p>The dis module supports the analysis of CPython bytecode by disassembling it. According to the above output, first column is line number, the second is offset of bytecode, followed by the name of bytecode. The forth column presents parameter and the one in parenthesis is the result after bytecode&rsquo;s processing parameter.</p>
+</blockquote>
+<p>As we can see, after <code>RETURN_VALUE</code> in line 10, the <code>END_FINALLY</code> would be executed. That doesn&rsquo;t meet our expectation. What&rsquo;s more wierd, there is another <code>RETURN_VALUE</code> in line 12 after <code>END_FINALLY</code>. Since we get here, the source code is the only thing that we can ask for help.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span><span class="lnt">80
+</span><span class="lnt">81
+</span><span class="lnt">82
+</span><span class="lnt">83
+</span><span class="lnt">84
+</span><span class="lnt">85
+</span><span class="lnt">86
+</span><span class="lnt">87
+</span><span class="lnt">88
+</span><span class="lnt">89
+</span><span class="lnt">90
+</span><span class="lnt">91
+</span><span class="lnt">92
+</span><span class="lnt">93
+</span><span class="lnt">94
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="c1">// ceval.c
+</span><span class="c1"></span>        <span class="n">TARGET_NOARG</span><span class="p">(</span><span class="n">RETURN_VALUE</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">retval</span> <span class="o">=</span> <span class="n">POP</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
+            <span class="n">why</span> <span class="o">=</span> <span class="n">WHY_RETURN</span><span class="p">;</span>
+            <span class="k">goto</span> <span class="n">fast_block_end</span><span class="p">;</span>
+        <span class="p">}</span>
+
+<span class="nl">fast_block_end</span><span class="p">:</span>
+        <span class="k">while</span> <span class="p">(</span><span class="n">why</span> <span class="o">!</span><span class="o">=</span> <span class="n">WHY_NOT</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">f</span><span class="o">-</span><span class="o">&gt;</span><span class="n">f_iblock</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+            <span class="cm">/* Peek at the current block. */</span>
+            <span class="n">PyTryBlock</span> <span class="o">*</span><span class="n">b</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">f</span><span class="o">-</span><span class="o">&gt;</span><span class="n">f_blockstack</span><span class="p">[</span><span class="n">f</span><span class="o">-</span><span class="o">&gt;</span><span class="n">f_iblock</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="p">;</span>
+
+            <span class="n">assert</span><span class="p">(</span><span class="n">why</span> <span class="o">!</span><span class="o">=</span> <span class="n">WHY_YIELD</span><span class="p">)</span><span class="p">;</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">b</span><span class="o">-</span><span class="o">&gt;</span><span class="n">b_type</span> <span class="o">=</span><span class="o">=</span> <span class="n">SETUP_LOOP</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">why</span> <span class="o">=</span><span class="o">=</span> <span class="n">WHY_CONTINUE</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">why</span> <span class="o">=</span> <span class="n">WHY_NOT</span><span class="p">;</span>
+                <span class="n">JUMPTO</span><span class="p">(</span><span class="n">PyInt_AS_LONG</span><span class="p">(</span><span class="n">retval</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
+                <span class="n">Py_DECREF</span><span class="p">(</span><span class="n">retval</span><span class="p">)</span><span class="p">;</span>
+                <span class="k">break</span><span class="p">;</span>
+            <span class="p">}</span>
+
+            <span class="cm">/* Now we have to pop the block. */</span>
+            <span class="n">f</span><span class="o">-</span><span class="o">&gt;</span><span class="n">f_iblock</span><span class="o">-</span><span class="o">-</span><span class="p">;</span>
+
+            <span class="k">while</span> <span class="p">(</span><span class="n">STACK_LEVEL</span><span class="p">(</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">b</span><span class="o">-</span><span class="o">&gt;</span><span class="n">b_level</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="n">POP</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
+                <span class="n">Py_XDECREF</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">b</span><span class="o">-</span><span class="o">&gt;</span><span class="n">b_type</span> <span class="o">=</span><span class="o">=</span> <span class="n">SETUP_LOOP</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">why</span> <span class="o">=</span><span class="o">=</span> <span class="n">WHY_BREAK</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">why</span> <span class="o">=</span> <span class="n">WHY_NOT</span><span class="p">;</span>
+                <span class="n">JUMPTO</span><span class="p">(</span><span class="n">b</span><span class="o">-</span><span class="o">&gt;</span><span class="n">b_handler</span><span class="p">)</span><span class="p">;</span>
+                <span class="k">break</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">b</span><span class="o">-</span><span class="o">&gt;</span><span class="n">b_type</span> <span class="o">=</span><span class="o">=</span> <span class="n">SETUP_FINALLY</span> <span class="o">|</span><span class="o">|</span>
+                <span class="p">(</span><span class="n">b</span><span class="o">-</span><span class="o">&gt;</span><span class="n">b_type</span> <span class="o">=</span><span class="o">=</span> <span class="n">SETUP_EXCEPT</span> <span class="o">&amp;</span><span class="o">&amp;</span>
+                 <span class="n">why</span> <span class="o">=</span><span class="o">=</span> <span class="n">WHY_EXCEPTION</span><span class="p">)</span> <span class="o">|</span><span class="o">|</span>
+                <span class="n">b</span><span class="o">-</span><span class="o">&gt;</span><span class="n">b_type</span> <span class="o">=</span><span class="o">=</span> <span class="n">SETUP_WITH</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">why</span> <span class="o">=</span><span class="o">=</span> <span class="n">WHY_EXCEPTION</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="n">PyObject</span> <span class="o">*</span><span class="n">exc</span><span class="p">,</span> <span class="o">*</span><span class="n">val</span><span class="p">,</span> <span class="o">*</span><span class="n">tb</span><span class="p">;</span>
+                    <span class="n">PyErr_Fetch</span><span class="p">(</span><span class="o">&amp;</span><span class="n">exc</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">val</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">tb</span><span class="p">)</span><span class="p">;</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">val</span> <span class="o">=</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+                        <span class="n">val</span> <span class="o">=</span> <span class="n">Py_None</span><span class="p">;</span>
+                        <span class="n">Py_INCREF</span><span class="p">(</span><span class="n">val</span><span class="p">)</span><span class="p">;</span>
+                    <span class="p">}</span>
+                    <span class="cm">/* Make the raw exception data
+</span><span class="cm">                       available to the handler,
+</span><span class="cm">                       so a program can emulate the
+</span><span class="cm">                       Python main loop.  Don&#39;t do
+</span><span class="cm">                       this for &#39;finally&#39;. */</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">b</span><span class="o">-</span><span class="o">&gt;</span><span class="n">b_type</span> <span class="o">=</span><span class="o">=</span> <span class="n">SETUP_EXCEPT</span> <span class="o">|</span><span class="o">|</span>
+                        <span class="n">b</span><span class="o">-</span><span class="o">&gt;</span><span class="n">b_type</span> <span class="o">=</span><span class="o">=</span> <span class="n">SETUP_WITH</span><span class="p">)</span> <span class="p">{</span>
+                        <span class="n">PyErr_NormalizeException</span><span class="p">(</span>
+                            <span class="o">&amp;</span><span class="n">exc</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">val</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">tb</span><span class="p">)</span><span class="p">;</span>
+                        <span class="n">set_exc_info</span><span class="p">(</span><span class="n">tstate</span><span class="p">,</span>
+                                     <span class="n">exc</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">tb</span><span class="p">)</span><span class="p">;</span>
+                    <span class="p">}</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">tb</span> <span class="o">=</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+                        <span class="n">Py_INCREF</span><span class="p">(</span><span class="n">Py_None</span><span class="p">)</span><span class="p">;</span>
+                        <span class="n">PUSH</span><span class="p">(</span><span class="n">Py_None</span><span class="p">)</span><span class="p">;</span>
+                    <span class="p">}</span> <span class="k">else</span>
+                        <span class="n">PUSH</span><span class="p">(</span><span class="n">tb</span><span class="p">)</span><span class="p">;</span>
+                    <span class="n">PUSH</span><span class="p">(</span><span class="n">val</span><span class="p">)</span><span class="p">;</span>
+                    <span class="n">PUSH</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="p">;</span>
+                <span class="p">}</span>
+                <span class="k">else</span> <span class="p">{</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">why</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">WHY_RETURN</span> <span class="o">|</span> <span class="n">WHY_CONTINUE</span><span class="p">)</span><span class="p">)</span>
+                        <span class="n">PUSH</span><span class="p">(</span><span class="n">retval</span><span class="p">)</span><span class="p">;</span>
+                    <span class="n">v</span> <span class="o">=</span> <span class="n">PyInt_FromLong</span><span class="p">(</span><span class="p">(</span><span class="kt">long</span><span class="p">)</span><span class="n">why</span><span class="p">)</span><span class="p">;</span>
+                    <span class="n">PUSH</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="p">;</span>
+                <span class="p">}</span>
+                <span class="n">why</span> <span class="o">=</span> <span class="n">WHY_NOT</span><span class="p">;</span>
+                <span class="n">JUMPTO</span><span class="p">(</span><span class="n">b</span><span class="o">-</span><span class="o">&gt;</span><span class="n">b_handler</span><span class="p">)</span><span class="p">;</span>
+                <span class="k">break</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span> <span class="cm">/* unwind stack */</span>
+
+        <span class="cm">/* End the loop if we still have an error (or return) */</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">why</span> <span class="o">!</span><span class="o">=</span> <span class="n">WHY_NOT</span><span class="p">)</span>
+            <span class="k">break</span><span class="p">;</span>
+        <span class="n">READ_TIMESTAMP</span><span class="p">(</span><span class="n">loop1</span><span class="p">)</span><span class="p">;</span>
+
+    <span class="p">}</span> <span class="cm">/* main loop */</span>
+
+    <span class="n">assert</span><span class="p">(</span><span class="n">why</span> <span class="o">!</span><span class="o">=</span> <span class="n">WHY_YIELD</span><span class="p">)</span><span class="p">;</span>
+    <span class="cm">/* Pop remaining stack entries. */</span>
+    <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">EMPTY</span><span class="p">(</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">POP</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
+        <span class="n">Py_XDECREF</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">why</span> <span class="o">!</span><span class="o">=</span> <span class="n">WHY_RETURN</span><span class="p">)</span>
+        <span class="n">retval</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+
+</code></pre></td></tr></table>
+</div>
+</div><p><code>RETURN_VALUE</code> does not return really, it simply assgins popped value from stack to <code>retval</code>, set <code>why</code> to <code>WHY_RETURN</code>, then go to <code>fast_block_end</code>. This pathetic scapegoat would push <code>retval</code> from <code>RETURN_VALUE</code> into stack, convert <code>why</code> to <code>Long</code> and push it into stack too, then jump to <code>b-&gt;b_handler</code>. Well, what&rsquo;s <code>b_handler</code> pointing to?</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c">
+<span class="c1">// ceval.c
+</span><span class="c1"></span>        <span class="c1">// SETUP_FINALLY
+</span><span class="c1"></span>        <span class="n">TARGET_WITH_IMPL</span><span class="p">(</span><span class="n">SETUP_LOOP</span><span class="p">,</span> <span class="n">_setup_finally</span><span class="p">)</span>
+        <span class="n">TARGET_WITH_IMPL</span><span class="p">(</span><span class="n">SETUP_EXCEPT</span><span class="p">,</span> <span class="n">_setup_finally</span><span class="p">)</span>
+        <span class="n">TARGET</span><span class="p">(</span><span class="n">SETUP_FINALLY</span><span class="p">)</span>
+        <span class="nl">_setup_finally</span><span class="p">:</span>
+        <span class="p">{</span>
+            <span class="cm">/* NOTE: If you add any new block-setup opcodes that
+</span><span class="cm">               are not try/except/finally handlers, you may need
+</span><span class="cm">               to update the PyGen_NeedsFinalizing() function.
+</span><span class="cm">               */</span>
+
+            <span class="n">PyFrame_BlockSetup</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">opcode</span><span class="p">,</span> <span class="n">INSTR_OFFSET</span><span class="p">(</span><span class="p">)</span> <span class="o">+</span> <span class="n">oparg</span><span class="p">,</span>
+                               <span class="n">STACK_LEVEL</span><span class="p">(</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
+            <span class="n">DISPATCH</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="c1">// END_FINALLY
+</span><span class="c1"></span>        <span class="n">PREDICTED</span><span class="p">(</span><span class="n">END_FINALLY</span><span class="p">)</span><span class="p">;</span>
+        <span class="n">TARGET_NOARG</span><span class="p">(</span><span class="n">END_FINALLY</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">POP</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">PyInt_Check</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">why</span> <span class="o">=</span> <span class="p">(</span><span class="k">enum</span> <span class="n">why_code</span><span class="p">)</span> <span class="n">PyInt_AS_LONG</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="p">;</span>
+                <span class="n">assert</span><span class="p">(</span><span class="n">why</span> <span class="o">!</span><span class="o">=</span> <span class="n">WHY_YIELD</span><span class="p">)</span><span class="p">;</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">why</span> <span class="o">=</span><span class="o">=</span> <span class="n">WHY_RETURN</span> <span class="o">|</span><span class="o">|</span>
+                    <span class="n">why</span> <span class="o">=</span><span class="o">=</span> <span class="n">WHY_CONTINUE</span><span class="p">)</span>
+                    <span class="n">retval</span> <span class="o">=</span> <span class="n">POP</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">PyExceptionClass_Check</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">|</span><span class="o">|</span>
+                     <span class="n">PyString_Check</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">w</span> <span class="o">=</span> <span class="n">POP</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
+                <span class="n">u</span> <span class="o">=</span> <span class="n">POP</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
+                <span class="n">PyErr_Restore</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span><span class="p">;</span>
+                <span class="n">why</span> <span class="o">=</span> <span class="n">WHY_RERAISE</span><span class="p">;</span>
+                <span class="k">break</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">v</span> <span class="o">!</span><span class="o">=</span> <span class="n">Py_None</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">PyErr_SetString</span><span class="p">(</span><span class="n">PyExc_SystemError</span><span class="p">,</span>
+                    <span class="sa"></span><span class="s">&#34;</span><span class="s">&#39;finally&#39; pops bad exception</span><span class="s">&#34;</span><span class="p">)</span><span class="p">;</span>
+                <span class="n">why</span> <span class="o">=</span> <span class="n">WHY_EXCEPTION</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="n">Py_DECREF</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="p">;</span>
+            <span class="k">break</span><span class="p">;</span>
+        <span class="p">}</span>
+
+<span class="c1">// frameobject.c
+</span><span class="c1"></span>
+<span class="cm">/* Block management */</span>
+<span class="kt">void</span>
+<span class="n">PyFrame_BlockSetup</span><span class="p">(</span><span class="n">PyFrameObject</span> <span class="o">*</span><span class="n">f</span><span class="p">,</span> <span class="kt">int</span> <span class="n">type</span><span class="p">,</span> <span class="kt">int</span> <span class="n">handler</span><span class="p">,</span> <span class="kt">int</span> <span class="n">level</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">PyTryBlock</span> <span class="o">*</span><span class="n">b</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">f</span><span class="o">-</span><span class="o">&gt;</span><span class="n">f_iblock</span> <span class="o">&gt;</span><span class="o">=</span> <span class="n">CO_MAXBLOCKS</span><span class="p">)</span>
+        <span class="n">Py_FatalError</span><span class="p">(</span><span class="sa"></span><span class="s">&#34;</span><span class="s">XXX block stack overflow</span><span class="s">&#34;</span><span class="p">)</span><span class="p">;</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">f</span><span class="o">-</span><span class="o">&gt;</span><span class="n">f_blockstack</span><span class="p">[</span><span class="n">f</span><span class="o">-</span><span class="o">&gt;</span><span class="n">f_iblock</span><span class="o">+</span><span class="o">+</span><span class="p">]</span><span class="p">;</span>
+    <span class="n">b</span><span class="o">-</span><span class="o">&gt;</span><span class="n">b_type</span> <span class="o">=</span> <span class="n">type</span><span class="p">;</span>
+    <span class="n">b</span><span class="o">-</span><span class="o">&gt;</span><span class="n">b_level</span> <span class="o">=</span> <span class="n">level</span><span class="p">;</span>
+    <span class="n">b</span><span class="o">-</span><span class="o">&gt;</span><span class="n">b_handler</span> <span class="o">=</span> <span class="n">handler</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><code>SETUP_FINALLY</code> calls <code>PyFrame_BlockSetup</code> to setup a block with type, level, handler. From the output of <code>dis</code>(notice the arrows before <code>END_FINALLY</code>), we can guess this handler is <code>END_FINALLY</code>. <code>END_FINALLY</code> gets <code>retval</code> and <code>why</code>, pushed by <code>RETURN_VALUE</code>, from stack, and returns.</p>
+<p>Now we can articulate  all the scratch:</p>
+<ul>
+<li>return doesn&rsquo;t really return, it pushs value to stack, then jumps to finally, which was set up by <code>SETUP_FINALLY</code> before.</li>
+<li>after executing finally, <code>END_FINALLY</code> returns.</li>
+</ul>
+<p><strong>Reference</strong></p>
+<ul>
+<li><a href="http://mp.weixin.qq.com/s?__biz=MzA4MjEyNTA5Mw==&amp;mid=2652566146&amp;idx=2&amp;sn=8f3258c0d6a06f6370e104db89a6d3b5&amp;chksm=8464dac8b31353def4d8a0939b1bbb0409f2567b79805b9aab95d41b1403a4726292fd87fa96&amp;mpshare=1&amp;scene=1&amp;srcid=0903h2p9HDv0NeZqLkXll9Xs#rd">Python :浅析 return 和 finally 共同挖的坑</a></li>
+</ul>
+    </div>
+
+    
+<footer class="post-footer">
+      
+      <nav class="post-nav">
+        <a class="prev" href="/post/lucene-directory/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">Directory in Lucene</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        <a class="next" href="/post/exit-options-in-python/">
+            <span class="next-text nav-default">Exit Options in Python</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        <div id="disqus_thread"></div>
+    <script type="text/javascript">
+    (function() {
+      
+      
+      if (window.location.hostname === 'localhost') return;
+
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      var disqus_shortname = 'guoqing';
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+  <a href="https://hellokangning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2016 - 
+    2020
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Guoqing Geng</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  <script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-105833321-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>

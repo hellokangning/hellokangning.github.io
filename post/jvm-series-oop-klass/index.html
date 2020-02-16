@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>JVM Series: Oop and Klass - Qing&#39;s Landing</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Guoqing Geng" /><meta name="description" content="As a part of JVM Series, this post tries to explore the object model in JVM.
+" /><meta name="keywords" content="JVM, Java" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.64.1 with theme even" />
+
+
+<link rel="canonical" href="https://hellokangning.github.io/post/jvm-series-oop-klass/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+
+<meta property="og:title" content="JVM Series: Oop and Klass" />
+<meta property="og:description" content="As a part of JVM Series, this post tries to explore the object model in JVM." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hellokangning.github.io/post/jvm-series-oop-klass/" />
+<meta property="article:published_time" content="2018-04-10T14:46:26+08:00" />
+<meta property="article:modified_time" content="2018-04-10T14:46:26+08:00" />
+<meta itemprop="name" content="JVM Series: Oop and Klass">
+<meta itemprop="description" content="As a part of JVM Series, this post tries to explore the object model in JVM.">
+<meta itemprop="datePublished" content="2018-04-10T14:46:26&#43;08:00" />
+<meta itemprop="dateModified" content="2018-04-10T14:46:26&#43;08:00" />
+<meta itemprop="wordCount" content="1033">
+
+
+
+<meta itemprop="keywords" content="JVM," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="JVM Series: Oop and Klass"/>
+<meta name="twitter:description" content="As a part of JVM Series, this post tries to explore the object model in JVM."/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Qing&#39;s Landing</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/en/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/zh/">
+        <li class="mobile-menu-item">中文</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Qing&#39;s Landing</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/en/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/zh/">中文</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">JVM Series: Oop and Klass</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> Apr 10, 2018 </span>
+        <div class="post-category">
+            <a href="/categories/java/"> Java </a>
+            </div>
+          <span class="more-meta"> 1033 words </span>
+          <span class="more-meta"> 3 mins read </span>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents"></nav>
+  </div>
+</div>
+    <div class="post-content">
+      <p>As a part of <a href="https://hellokangning.github.io/en/tags/jvm/">JVM Series</a>, this post tries to explore the object model in JVM.</p>
+<blockquote>
+<p>All codes in this post are based on jdk9-b94.</p>
+</blockquote>
+<h1 id="what-does-the-new-keyword-actually-do">What does the <code>new</code> keyword actually do</h1>
+<p>When you new a object in Java, you need to know what actually happens beneath this statement. <code>_new</code> method in <code>InterpreterRuntime</code> will be invoked.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="c1">// InterpreterRuntime.cpp
+</span><span class="c1"></span>
+<span class="n">IRT_ENTRY</span><span class="p">(</span><span class="kt">void</span><span class="p">,</span> <span class="n">InterpreterRuntime</span><span class="o">:</span><span class="o">:</span><span class="n">_new</span><span class="p">(</span><span class="n">JavaThread</span><span class="o">*</span> <span class="kr">thread</span><span class="p">,</span> <span class="n">ConstantPool</span><span class="o">*</span> <span class="n">pool</span><span class="p">,</span> <span class="kt">int</span> <span class="n">index</span><span class="p">)</span><span class="p">)</span>
+  <span class="n">Klass</span><span class="o">*</span> <span class="n">k</span> <span class="o">=</span> <span class="n">pool</span><span class="o">-</span><span class="o">&gt;</span><span class="n">klass_at</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">CHECK</span><span class="p">)</span><span class="p">;</span>
+  <span class="n">InstanceKlass</span><span class="o">*</span> <span class="n">klass</span> <span class="o">=</span> <span class="n">InstanceKlass</span><span class="o">:</span><span class="o">:</span><span class="n">cast</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="p">;</span>
+
+  <span class="c1">// Make sure we are not instantiating an abstract klass
+</span><span class="c1"></span>  <span class="n">klass</span><span class="o">-</span><span class="o">&gt;</span><span class="n">check_valid_for_instantiation</span><span class="p">(</span><span class="nb">true</span><span class="p">,</span> <span class="n">CHECK</span><span class="p">)</span><span class="p">;</span>
+
+  <span class="c1">// Make sure klass is initialized
+</span><span class="c1"></span>  <span class="n">klass</span><span class="o">-</span><span class="o">&gt;</span><span class="n">initialize</span><span class="p">(</span><span class="n">CHECK</span><span class="p">)</span><span class="p">;</span>
+
+  <span class="c1">// At this point the class may not be fully initialized
+</span><span class="c1"></span>  <span class="c1">// because of recursive initialization. If it is fully
+</span><span class="c1"></span>  <span class="c1">// initialized &amp; has_finalized is not set, we rewrite
+</span><span class="c1"></span>  <span class="c1">// it into its fast version (Note: no locking is needed
+</span><span class="c1"></span>  <span class="c1">// here since this is an atomic byte write and can be
+</span><span class="c1"></span>  <span class="c1">// done more than once).
+</span><span class="c1"></span>  <span class="c1">//
+</span><span class="c1"></span>  <span class="c1">// Note: In case of classes with has_finalized we don&#39;t
+</span><span class="c1"></span>  <span class="c1">//       rewrite since that saves us an extra check in
+</span><span class="c1"></span>  <span class="c1">//       the fast version which then would call the
+</span><span class="c1"></span>  <span class="c1">//       slow version anyway (and do a call back into
+</span><span class="c1"></span>  <span class="c1">//       Java).
+</span><span class="c1"></span>  <span class="c1">//       If we have a breakpoint, then we don&#39;t rewrite
+</span><span class="c1"></span>  <span class="c1">//       because the _breakpoint bytecode would be lost.
+</span><span class="c1"></span>  <span class="n">oop</span> <span class="n">obj</span> <span class="o">=</span> <span class="n">klass</span><span class="o">-</span><span class="o">&gt;</span><span class="n">allocate_instance</span><span class="p">(</span><span class="n">CHECK</span><span class="p">)</span><span class="p">;</span>
+  <span class="kr">thread</span><span class="o">-</span><span class="o">&gt;</span><span class="n">set_vm_result</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="p">;</span>
+<span class="n">IRT_END</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>It seems like the <code>klass</code> takes the most responsibilities to allocate instance. We will penetrate into it of course, but later on. After allocation, constructor will be called to initilized the raw object.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="c1">// jvm.cpp
+</span><span class="c1"></span>
+<span class="n">JVM_ENTRY</span><span class="p">(</span><span class="n">jobject</span><span class="p">,</span> <span class="n">JVM_NewInstanceFromConstructor</span><span class="p">(</span><span class="n">JNIEnv</span> <span class="o">*</span><span class="n">env</span><span class="p">,</span> <span class="n">jobject</span> <span class="n">c</span><span class="p">,</span> <span class="n">jobjectArray</span> <span class="n">args0</span><span class="p">)</span><span class="p">)</span>
+  <span class="n">JVMWrapper</span><span class="p">(</span><span class="sa"></span><span class="s">&#34;</span><span class="s">JVM_NewInstanceFromConstructor</span><span class="s">&#34;</span><span class="p">)</span><span class="p">;</span>
+  <span class="n">oop</span> <span class="n">constructor_mirror</span> <span class="o">=</span> <span class="n">JNIHandles</span><span class="o">:</span><span class="o">:</span><span class="n">resolve</span><span class="p">(</span><span class="n">c</span><span class="p">)</span><span class="p">;</span>
+  <span class="n">objArrayHandle</span> <span class="nf">args</span><span class="p">(</span><span class="n">THREAD</span><span class="p">,</span> <span class="n">objArrayOop</span><span class="p">(</span><span class="n">JNIHandles</span><span class="o">:</span><span class="o">:</span><span class="n">resolve</span><span class="p">(</span><span class="n">args0</span><span class="p">)</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
+  <span class="n">oop</span> <span class="n">result</span> <span class="o">=</span> <span class="n">Reflection</span><span class="o">:</span><span class="o">:</span><span class="n">invoke_constructor</span><span class="p">(</span><span class="n">constructor_mirror</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">CHECK_NULL</span><span class="p">)</span><span class="p">;</span>
+  <span class="n">jobject</span> <span class="n">res</span> <span class="o">=</span> <span class="n">JNIHandles</span><span class="o">:</span><span class="o">:</span><span class="n">make_local</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">JvmtiExport</span><span class="o">:</span><span class="o">:</span><span class="n">should_post_vm_object_alloc</span><span class="p">(</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">JvmtiExport</span><span class="o">:</span><span class="o">:</span><span class="n">post_vm_object_alloc</span><span class="p">(</span><span class="n">JavaThread</span><span class="o">:</span><span class="o">:</span><span class="n">current</span><span class="p">(</span><span class="p">)</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="n">res</span><span class="p">;</span>
+<span class="n">JVM_END</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><code>JVM_NewInstanceFromConstructor</code> resorts to <code>Reflection</code>, let&rsquo;s what the latter does.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="c1">// reflection.cpp
+</span><span class="c1"></span>
+<span class="n">oop</span> <span class="n">Reflection</span><span class="o">:</span><span class="o">:</span><span class="n">invoke_constructor</span><span class="p">(</span><span class="n">oop</span> <span class="n">constructor_mirror</span><span class="p">,</span> <span class="n">objArrayHandle</span> <span class="n">args</span><span class="p">,</span> <span class="n">TRAPS</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">oop</span> <span class="n">mirror</span>             <span class="o">=</span> <span class="n">java_lang_reflect_Constructor</span><span class="o">:</span><span class="o">:</span><span class="n">clazz</span><span class="p">(</span><span class="n">constructor_mirror</span><span class="p">)</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">slot</span>               <span class="o">=</span> <span class="n">java_lang_reflect_Constructor</span><span class="o">:</span><span class="o">:</span><span class="n">slot</span><span class="p">(</span><span class="n">constructor_mirror</span><span class="p">)</span><span class="p">;</span>
+  <span class="kt">bool</span> <span class="k">override</span>          <span class="o">=</span> <span class="n">java_lang_reflect_Constructor</span><span class="o">:</span><span class="o">:</span><span class="k">override</span><span class="p">(</span><span class="n">constructor_mirror</span><span class="p">)</span> <span class="o">!</span><span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="n">objArrayHandle</span> <span class="nf">ptypes</span><span class="p">(</span><span class="n">THREAD</span><span class="p">,</span> <span class="n">objArrayOop</span><span class="p">(</span><span class="n">java_lang_reflect_Constructor</span><span class="o">:</span><span class="o">:</span><span class="n">parameter_types</span><span class="p">(</span><span class="n">constructor_mirror</span><span class="p">)</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
+
+  <span class="n">InstanceKlass</span><span class="o">*</span> <span class="n">klass</span> <span class="o">=</span> <span class="n">InstanceKlass</span><span class="o">:</span><span class="o">:</span><span class="n">cast</span><span class="p">(</span><span class="n">java_lang_Class</span><span class="o">:</span><span class="o">:</span><span class="n">as_Klass</span><span class="p">(</span><span class="n">mirror</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
+  <span class="n">Method</span><span class="o">*</span> <span class="n">m</span> <span class="o">=</span> <span class="n">klass</span><span class="o">-</span><span class="o">&gt;</span><span class="n">method_with_idnum</span><span class="p">(</span><span class="n">slot</span><span class="p">)</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">m</span> <span class="o">=</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">THROW_MSG_0</span><span class="p">(</span><span class="n">vmSymbols</span><span class="o">:</span><span class="o">:</span><span class="n">java_lang_InternalError</span><span class="p">(</span><span class="p">)</span><span class="p">,</span> <span class="sa"></span><span class="s">&#34;</span><span class="s">invoke</span><span class="s">&#34;</span><span class="p">)</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="n">methodHandle</span> <span class="nf">method</span><span class="p">(</span><span class="n">THREAD</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span><span class="p">;</span>
+  <span class="n">assert</span><span class="p">(</span><span class="n">method</span><span class="o">-</span><span class="o">&gt;</span><span class="n">name</span><span class="p">(</span><span class="p">)</span> <span class="o">=</span><span class="o">=</span> <span class="n">vmSymbols</span><span class="o">:</span><span class="o">:</span><span class="n">object_initializer_name</span><span class="p">(</span><span class="p">)</span><span class="p">,</span> <span class="sa"></span><span class="s">&#34;</span><span class="s">invalid constructor</span><span class="s">&#34;</span><span class="p">)</span><span class="p">;</span>
+
+  <span class="c1">// Make sure klass gets initialize
+</span><span class="c1"></span>  <span class="n">klass</span><span class="o">-</span><span class="o">&gt;</span><span class="n">initialize</span><span class="p">(</span><span class="n">CHECK_NULL</span><span class="p">)</span><span class="p">;</span>
+
+  <span class="c1">// Create new instance (the receiver)
+</span><span class="c1"></span>  <span class="n">klass</span><span class="o">-</span><span class="o">&gt;</span><span class="n">check_valid_for_instantiation</span><span class="p">(</span><span class="nb">false</span><span class="p">,</span> <span class="n">CHECK_NULL</span><span class="p">)</span><span class="p">;</span>
+  <span class="n">Handle</span> <span class="n">receiver</span> <span class="o">=</span> <span class="n">klass</span><span class="o">-</span><span class="o">&gt;</span><span class="n">allocate_instance_handle</span><span class="p">(</span><span class="n">CHECK_NULL</span><span class="p">)</span><span class="p">;</span>
+
+  <span class="c1">// Ignore result from call and return receiver
+</span><span class="c1"></span>  <span class="n">invoke</span><span class="p">(</span><span class="n">klass</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">receiver</span><span class="p">,</span> <span class="k">override</span><span class="p">,</span> <span class="n">ptypes</span><span class="p">,</span> <span class="n">T_VOID</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="nb">false</span><span class="p">,</span> <span class="n">CHECK_NULL</span><span class="p">)</span><span class="p">;</span>
+  <span class="k">return</span> <span class="nf">receiver</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>And <code>klass</code> appears, yes, again. a <code>oop</code> will be returnd after constructor, apparently, it is a managed pointer to an object.</p>
+<h1 id="oop"><code>oop</code></h1>
+<p><code>oop</code> is a type alias to <code>oopDesc*</code> which we can see in <code>oopHierarchy.hpp</code>.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="c1">// oopsHierarchy.hpp
+</span><span class="c1"></span>
+<span class="k">typedef</span> <span class="k">class</span> <span class="nc">oopDesc</span><span class="o">*</span>                            <span class="n">oop</span><span class="p">;</span>
+<span class="k">typedef</span> <span class="k">class</span>   <span class="nc">instanceOopDesc</span><span class="o">*</span>            <span class="n">instanceOop</span><span class="p">;</span>
+<span class="k">typedef</span> <span class="k">class</span>   <span class="nc">arrayOopDesc</span><span class="o">*</span>                    <span class="n">arrayOop</span><span class="p">;</span>
+<span class="k">typedef</span> <span class="k">class</span>     <span class="nc">objArrayOopDesc</span><span class="o">*</span>            <span class="n">objArrayOop</span><span class="p">;</span>
+<span class="k">typedef</span> <span class="k">class</span>     <span class="nc">typeArrayOopDesc</span><span class="o">*</span>            <span class="n">typeArrayOop</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>Here comes <code>oopDesc</code>, which is the top baseclass for objects classes. The <code>{name}Desc</code> classes describe the format of Java objects so the fields can be accessed from C++. NO virtual functions allowed.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="k">class</span> <span class="nc">oopDesc</span> <span class="p">{</span>
+ <span class="k">private</span><span class="o">:</span>
+  <span class="k">volatile</span> <span class="n">markOop</span> <span class="n">_mark</span><span class="p">;</span>
+  <span class="k">union</span> <span class="nc">_metadata</span> <span class="p">{</span>
+    <span class="n">Klass</span><span class="o">*</span>      <span class="n">_klass</span><span class="p">;</span>
+    <span class="n">narrowKlass</span> <span class="n">_compressed_klass</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>So far, <code>oop</code> and <code>Klass</code> are linked together. Unsatisfied, we still want to figure what is the usage of these fields.</p>
+<ul>
+<li><code>_mark</code>, used for GC, lock etc.</li>
+<li><code>_metadata</code>, a union for compressed pointer in 64-bit OS.</li>
+</ul>
+<p>Other methods includes,</p>
+<ul>
+<li><code>inline void* oopDesc::field_base(int offset) const { return (void*)&amp;((char*)this)[offset]; }</code> get the offset where data area starts.</li>
+<li><code>inline jint* oopDesc::int_field_addr(int offset) const { return (jint*)field_base(offset); }</code> return the address of int field.</li>
+<li><code>inline jint oopDesc::int_field(int offset) const  { return *int_field_addr(offset);}</code> get the int value.</li>
+<li><code>inline jint oopDesc::int_field_acquire(int offset) const { return OrderAccess::load_acquire(int_field_addr(offset));}</code> acquire int field with one lock.</li>
+</ul>
+<p>The hierarchy of <code>oop</code> shows in the following,</p>
+<p><img src="/images/oop-klass-class-diagram.png" alt=""></p>
+<p>and the layout in memory.</p>
+<p><img src="/images/opp-memory-layout" alt=""></p>
+<h1 id="klass"><code>Klass</code></h1>
+<p>A <code>Klass</code> provides:</p>
+<ol>
+<li>language level class object (method dictionary etc.)</li>
+<li>provide vm dispatch behavior for the object</li>
+</ol>
+<p>Both functions are combined into one C++ class.</p>
+<p>Remember <code>allocate_instance</code> of <code>InstanceKlass</code> is called for returning <code>oop</code> object in <code>invoke_constructor</code>?</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="c1">// instanceKlass.cpp
+</span><span class="c1"></span>
+<span class="n">instanceOop</span> <span class="n">InstanceKlass</span><span class="o">:</span><span class="o">:</span><span class="n">allocate_instance</span><span class="p">(</span><span class="n">TRAPS</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kt">bool</span> <span class="n">has_finalizer_flag</span> <span class="o">=</span> <span class="n">has_finalizer</span><span class="p">(</span><span class="p">)</span><span class="p">;</span> <span class="c1">// Query before possible GC
+</span><span class="c1"></span>  <span class="kt">int</span> <span class="n">size</span> <span class="o">=</span> <span class="n">size_helper</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>  <span class="c1">// Query before forming handle.
+</span><span class="c1"></span>
+  <span class="n">instanceOop</span> <span class="n">i</span><span class="p">;</span>
+
+  <span class="n">i</span> <span class="o">=</span> <span class="p">(</span><span class="n">instanceOop</span><span class="p">)</span><span class="n">CollectedHeap</span><span class="o">:</span><span class="o">:</span><span class="n">obj_allocate</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">CHECK_NULL</span><span class="p">)</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">has_finalizer_flag</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="o">!</span><span class="n">RegisterFinalizersAtInit</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">register_finalizer</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">CHECK_NULL</span><span class="p">)</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="n">i</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><code>CollectedHeap</code>, the name of this class implies it will allocate this object in heap. Yes it does.</p>
+<p>A <code>CollectedHeap</code> is an implementation of a java heap for HotSpot. This is an abstract class: there may be many different kinds of heaps.  This class defines the functions that a heap must implement, and contains infrastructure common to all heaps.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="c1">// CollectedHeap.inline.hpp
+</span><span class="c1"></span>
+<span class="n">oop</span> <span class="n">CollectedHeap</span><span class="o">:</span><span class="o">:</span><span class="n">obj_allocate</span><span class="p">(</span><span class="n">Klass</span><span class="o">*</span> <span class="n">klass</span><span class="p">,</span> <span class="kt">int</span> <span class="n">size</span><span class="p">,</span> <span class="n">TRAPS</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">debug_only</span><span class="p">(</span><span class="n">check_for_valid_allocation_state</span><span class="p">(</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
+  <span class="n">assert</span><span class="p">(</span><span class="o">!</span><span class="n">Universe</span><span class="o">:</span><span class="o">:</span><span class="n">heap</span><span class="p">(</span><span class="p">)</span><span class="o">-</span><span class="o">&gt;</span><span class="n">is_gc_active</span><span class="p">(</span><span class="p">)</span><span class="p">,</span> <span class="sa"></span><span class="s">&#34;</span><span class="s">Allocation during gc not allowed</span><span class="s">&#34;</span><span class="p">)</span><span class="p">;</span>
+  <span class="n">assert</span><span class="p">(</span><span class="n">size</span> <span class="o">&gt;</span><span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="sa"></span><span class="s">&#34;</span><span class="s">int won&#39;t convert to size_t</span><span class="s">&#34;</span><span class="p">)</span><span class="p">;</span>
+  <span class="n">HeapWord</span><span class="o">*</span> <span class="n">obj</span> <span class="o">=</span> <span class="n">common_mem_allocate_init</span><span class="p">(</span><span class="n">klass</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">CHECK_NULL</span><span class="p">)</span><span class="p">;</span>
+  <span class="n">post_allocation_setup_obj</span><span class="p">(</span><span class="n">klass</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span><span class="p">;</span>
+  <span class="n">NOT_PRODUCT</span><span class="p">(</span><span class="n">Universe</span><span class="o">:</span><span class="o">:</span><span class="n">heap</span><span class="p">(</span><span class="p">)</span><span class="o">-</span><span class="o">&gt;</span><span class="n">check_for_bad_heap_word_value</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
+  <span class="k">return</span> <span class="p">(</span><span class="n">oop</span><span class="p">)</span><span class="n">obj</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>Why bother dividing <code>oop</code> and &lsquo;Klass&rsquo; while both for metadata? As the official said,</p>
+<blockquote>
+<p>One reason for the oop/klass dichotomy in the implementation is that <strong>we don&rsquo;t want a C++ vtbl pointer in every object</strong>. Thus, normal oops don&rsquo;t have any virtual functions. Instead, they forward all &ldquo;virtual&rdquo; functions to their klass, which does have a vtbl and does the C++ dispatch depending on the object&rsquo;s actual type.</p>
+</blockquote>
+<p><strong>Reference</strong></p>
+<ul>
+<li><a href="https://yq.aliyun.com/articles/20279">HotSpotVM 对象机制实现浅析#1</a></li>
+<li><a href="https://www.jianshu.com/p/252e27863822">JVM源码分析之Java类的加载过程</a></li>
+<li><a href="http://www.hollischuang.com/archives/1910">深入理解多线程（二）—— Java的对象模型</a></li>
+<li><a href="https://segmentfault.com/a/1190000008355645">OpenJDK9 Hotspot ：oops，klass 与 handle</a></li>
+<li><a href="http://a-ray-of-sunshine.github.io/2016/08/31/JVM-java%E5%AF%B9%E8%B1%A1%E6%A8%A1%E5%9E%8B%E7%9A%84%E5%AE%9E%E7%8E%B0/">JVM-java对象模型的实现</a></li>
+</ul>
+    </div>
+
+    
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/jvm/">JVM</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/jvm-series-class-loader/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">JVM Series: Class Loader</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        <a class="next" href="/post/indexoutput-lucene-index-output/">
+            <span class="next-text nav-default">IndexOutput: Lucene Index Output</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        <div id="disqus_thread"></div>
+    <script type="text/javascript">
+    (function() {
+      
+      
+      if (window.location.hostname === 'localhost') return;
+
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      var disqus_shortname = 'guoqing';
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+  <a href="https://hellokangning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2016 - 
+    2020
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Guoqing Geng</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  <script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-105833321-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>

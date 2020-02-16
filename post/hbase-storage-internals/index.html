@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>HBase Storage Internals - Qing&#39;s Landing</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Guoqing Geng" /><meta name="description" content="Overview
+ An HBase Table consists of multiple rows. Table will be split into Regions based on rows&amp;rsquo; lexicographical order. A Store corresponds to a column family for a table for a given region. A Store hosts a MemStore and 0 or more StoreFiles (HFiles). The MemStore holds in-memory modifications to the Store. StoreFiles are composed of Blocks. " /><meta name="keywords" content="HBase" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.64.1 with theme even" />
+
+
+<link rel="canonical" href="https://hellokangning.github.io/post/hbase-storage-internals/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+
+<meta property="og:title" content="HBase Storage Internals" />
+<meta property="og:description" content="Overview
+
+An HBase Table consists of multiple rows.
+Table will be split into Regions based on rows&rsquo; lexicographical order.
+A Store corresponds to a column family for a table for a given region.
+A Store hosts a MemStore and 0 or more StoreFiles (HFiles).
+The MemStore holds in-memory modifications to the Store.
+StoreFiles are composed of Blocks.
+" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hellokangning.github.io/post/hbase-storage-internals/" />
+<meta property="article:published_time" content="2017-11-16T11:34:49+08:00" />
+<meta property="article:modified_time" content="2017-11-16T11:34:49+08:00" />
+<meta itemprop="name" content="HBase Storage Internals">
+<meta itemprop="description" content="Overview
+
+An HBase Table consists of multiple rows.
+Table will be split into Regions based on rows&rsquo; lexicographical order.
+A Store corresponds to a column family for a table for a given region.
+A Store hosts a MemStore and 0 or more StoreFiles (HFiles).
+The MemStore holds in-memory modifications to the Store.
+StoreFiles are composed of Blocks.
+">
+<meta itemprop="datePublished" content="2017-11-16T11:34:49&#43;08:00" />
+<meta itemprop="dateModified" content="2017-11-16T11:34:49&#43;08:00" />
+<meta itemprop="wordCount" content="1411">
+
+
+
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="HBase Storage Internals"/>
+<meta name="twitter:description" content="Overview
+
+An HBase Table consists of multiple rows.
+Table will be split into Regions based on rows&rsquo; lexicographical order.
+A Store corresponds to a column family for a table for a given region.
+A Store hosts a MemStore and 0 or more StoreFiles (HFiles).
+The MemStore holds in-memory modifications to the Store.
+StoreFiles are composed of Blocks.
+"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Qing&#39;s Landing</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/en/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/zh/">
+        <li class="mobile-menu-item">中文</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Qing&#39;s Landing</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/en/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/zh/">中文</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">HBase Storage Internals</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> Nov 16, 2017 </span>
+        <div class="post-category">
+            <a href="/categories/hbase/"> HBase </a>
+            </div>
+          <span class="more-meta"> 1411 words </span>
+          <span class="more-meta"> 3 mins read </span>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents"></nav>
+  </div>
+</div>
+    <div class="post-content">
+      <p>Overview</p>
+<ul>
+<li>An HBase <code>Table</code> consists of multiple rows.</li>
+<li>Table will be split into <code>Regions</code> based on rows&rsquo; lexicographical order.</li>
+<li>A <code>Store</code> corresponds to a column family for a table for a given region.</li>
+<li>A Store hosts a <code>MemStore</code> and 0 or more <code>StoreFiles (HFiles)</code>.</li>
+<li>The MemStore holds in-memory modifications to the Store.</li>
+<li>StoreFiles are composed of <code>Blocks</code>.</li>
+</ul>
+<p>A widespread graph of HBase architecture lists as following.</p>
+<p><img src="/images/hbase-architecture.jpg" alt="HBase Architecture"></p>
+<p>I drew a simplified version from region&rsquo;s viewpoint.</p>
+<p><img src="/images/hbase-region-structure.png" alt="Region"></p>
+<h1 id="region">Region</h1>
+<p>HBase stores rows of data in tables. For high performance and availability, Tables are split into “regions”.  A region contains a continuous range of rows. Since rows are sorted lexicographically, it&rsquo;s easy to deduce that all rows within the scope of the region&rsquo;s start key and end key are stored in the same region. A single row belongs to exactly one region at any time. A region is only served by one single RegionServer, one RegionServer can hold many regions at the same time. Regions are distributed across the cluster, requests from client can be processed by RegionServer process independently.</p>
+<p>A HBase table can be pre-split into regions when creation. After that, regions split when they reach a configured threshold. You can also force split manually at will, but there are some rules of thumb needs to be respected. On the contrary, regions can be merged if too many regions exists.</p>
+<p>OK, Let source code tell the truth.</p>
+<p><img src="/images/hbase-hregion-class.png" alt=""></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">Region</span> <span class="kd">extends</span> <span class="n">ConfigurationObserver</span> <span class="o">{</span>
+    <span class="cm">/**
+</span><span class="cm">    * @return a list of the Stores managed by this region
+</span><span class="cm">    */</span>
+    <span class="n">List</span><span class="o">&lt;</span><span class="o">?</span> <span class="kd">extends</span> <span class="n">Store</span><span class="o">&gt;</span> <span class="nf">getStores</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+
+    <span class="cm">/**
+</span><span class="cm">    * @return the Store for the given family
+</span><span class="cm">    */</span>
+    <span class="n">Store</span> <span class="nf">getStore</span><span class="o">(</span><span class="kt">byte</span><span class="o">[</span><span class="o">]</span> <span class="n">family</span><span class="o">)</span><span class="o">;</span>
+
+    <span class="cm">/**
+</span><span class="cm">    * Check the region&#39;s underlying store files, open the files that have not
+</span><span class="cm">    * been opened yet, and remove the store file readers for store files no
+</span><span class="cm">    * longer available.
+</span><span class="cm">    * @throws IOException
+</span><span class="cm">    */</span>
+    <span class="kt">boolean</span> <span class="nf">refreshStoreFiles</span><span class="o">(</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
+
+    <span class="cm">/**
+</span><span class="cm">    * @return memstore size for this region, in bytes. It just accounts data size of cells added to
+</span><span class="cm">    *         the memstores of this Region. Means size in bytes for key, value and tags within Cells.
+</span><span class="cm">    *         It wont consider any java heap overhead for the cell objects or any other.
+</span><span class="cm">    */</span>
+    <span class="kt">long</span> <span class="nf">getMemStoreSize</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+
+    <span class="cm">/**
+</span><span class="cm">    * Puts some data in the table.
+</span><span class="cm">    * @param put
+</span><span class="cm">    * @throws IOException
+</span><span class="cm">    */</span>
+    <span class="kt">void</span> <span class="nf">put</span><span class="o">(</span><span class="n">Put</span> <span class="n">put</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
+
+    <span class="cm">/**
+</span><span class="cm">    * Perform one or more increment operations on a row.
+</span><span class="cm">    * @param increment
+</span><span class="cm">    * @return result of the operation
+</span><span class="cm">    * @throws IOException
+</span><span class="cm">    */</span>
+    <span class="n">Result</span> <span class="nf">increment</span><span class="o">(</span><span class="n">Increment</span> <span class="n">increment</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
+
+    <span class="cm">/**
+</span><span class="cm">    * Do a get based on the get parameter.
+</span><span class="cm">    * @param get query parameters
+</span><span class="cm">    * @return result of the operation
+</span><span class="cm">    */</span>
+    <span class="n">Result</span> <span class="nf">get</span><span class="o">(</span><span class="n">Get</span> <span class="n">get</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
+<span class="o">}</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">HRegion</span> <span class="kd">implements</span> <span class="n">HeapSize</span><span class="o">,</span> <span class="n">PropagatingConfigurationObserver</span><span class="o">,</span> <span class="n">Region</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">WAL</span> <span class="n">wal</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">HRegionFileSystem</span> <span class="n">fs</span><span class="o">;</span>
+
+
+    <span class="kd">protected</span> <span class="kd">final</span> <span class="n">Map</span><span class="o">&lt;</span><span class="kt">byte</span><span class="o">[</span><span class="o">]</span><span class="o">,</span> <span class="n">HStore</span><span class="o">&gt;</span> <span class="n">stores</span> <span class="o">=</span>
+     <span class="k">new</span> <span class="n">ConcurrentSkipListMap</span><span class="o">&lt;</span><span class="o">&gt;</span><span class="o">(</span><span class="n">Bytes</span><span class="o">.</span><span class="na">BYTES_RAWCOMPARATOR</span><span class="o">)</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><h1 id="store">Store</h1>
+<p>A Store corresponds to a column family for a table for a given region.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">Store</span> <span class="o">{</span>
+    <span class="n">Collection</span><span class="o">&lt;</span><span class="o">?</span> <span class="kd">extends</span> <span class="n">StoreFile</span><span class="o">&gt;</span> <span class="nf">getStorefiles</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+
+    <span class="n">FileSystem</span> <span class="nf">getFileSystem</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+
+    <span class="cm">/**
+</span><span class="cm">    * @return The size of this store&#39;s memstore.
+</span><span class="cm">    */</span>
+    <span class="n">MemStoreSize</span> <span class="nf">getMemStoreSize</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+<span class="o">}</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">HStore</span> <span class="kd">implements</span> <span class="n">Store</span><span class="o">,</span> <span class="n">HeapSize</span><span class="o">,</span> <span class="n">StoreConfigInformation</span><span class="o">,</span> <span class="n">PropagatingConfigurationObserver</span> <span class="o">{</span>
+    <span class="kd">protected</span> <span class="kd">final</span> <span class="n">MemStore</span> <span class="n">memstore</span><span class="o">;</span>
+    <span class="c1">// This stores directory in the filesystem.
+</span><span class="c1"></span>    <span class="kd">protected</span> <span class="kd">final</span> <span class="n">HRegion</span> <span class="n">region</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">ColumnFamilyDescriptor</span> <span class="n">family</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">HRegionFileSystem</span> <span class="n">fs</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><h1 id="memstore">MemStore</h1>
+<p>A Store hosts a MemStore and 0 or more StoreFiles (HFiles). The MemStore holds in-memory modifications to the Store. Modifications are Cells/KeyValues.</p>
+<p>When the MemStore reaches a given size (<code>hbase.hregion.memstore.flush.size</code>), it flushes its contents to a StoreFile.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">MemStore</span> <span class="o">{</span>
+    <span class="cm">/**
+</span><span class="cm">    * Write the updates
+</span><span class="cm">    * @param cells
+</span><span class="cm">    * @param memstoreSizing The delta in memstore size will be passed back via this.
+</span><span class="cm">    *        This will include both data size and heap overhead delta.
+</span><span class="cm">    */</span>
+    <span class="kt">void</span> <span class="nf">add</span><span class="o">(</span><span class="n">Iterable</span><span class="o">&lt;</span><span class="n">Cell</span><span class="o">&gt;</span> <span class="n">cells</span><span class="o">,</span> <span class="n">MemStoreSizing</span> <span class="n">memstoreSizing</span><span class="o">)</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><h1 id="storefile-hfile">StoreFile (HFile)</h1>
+<p>StoreFiles are where your data lives. The HFile file format is based on the SSTable file described in the BigTable [2006] paper and on Hadoop’s TFile. StoreFile wraps HFile, a file of sorted key/value pairs. Both keys and values are byte arrays.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">StoreFile</span> <span class="o">{</span>
+    <span class="cm">/**
+</span><span class="cm">    * @return True if this is HFile.
+</span><span class="cm">    */</span>
+    <span class="kt">boolean</span> <span class="nf">isHFile</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+
+    <span class="cm">/**
+</span><span class="cm">    * Get the first key in this store file.
+</span><span class="cm">    */</span>
+    <span class="n">Optional</span><span class="o">&lt;</span><span class="n">Cell</span><span class="o">&gt;</span> <span class="nf">getFirstKey</span><span class="o">(</span><span class="o">)</span><span class="o">;</span> 
+<span class="o">}</span>
+
+<span class="cm">/**
+</span><span class="cm"> * A Store data file.  Stores usually have one or more of these files.  They
+</span><span class="cm"> * are produced by flushing the memstore to disk.
+</span><span class="cm"> */</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">HStoreFile</span> <span class="kd">implements</span> <span class="n">StoreFile</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">StoreFileInfo</span> <span class="n">fileInfo</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">FileSystem</span> <span class="n">fs</span><span class="o">;</span>
+
+    <span class="c1">// firstKey, lastkey and cellComparator will be set when openReader.
+</span><span class="c1"></span>    <span class="kd">private</span> <span class="n">Optional</span><span class="o">&lt;</span><span class="n">Cell</span><span class="o">&gt;</span> <span class="n">firstKey</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="n">Optional</span><span class="o">&lt;</span><span class="n">Cell</span><span class="o">&gt;</span> <span class="n">lastKey</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="n">CellComparator</span> <span class="n">comparator</span><span class="o">;</span>
+
+    <span class="cm">/**
+</span><span class="cm">    * Bloom filter type specified in column family configuration. Does not
+</span><span class="cm">    * necessarily correspond to the Bloom filter type present in the HFile.
+</span><span class="cm">    */</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">BloomType</span> <span class="n">cfBloomType</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>The following describes the evolution of the HFile format. It is useful to give a short overview of the original (HFile version 1) format.</p>
+<p><img src="/images/hbase-hfile-v1.png" alt=""></p>
+<p>The block index in version 1 is very straightforward. For each entry, it contains:</p>
+<ul>
+<li>Offset (long)</li>
+<li>Uncompressed size (int)</li>
+<li>Key (a serialized byte array written using Bytes.writeByteArray)</li>
+<li>Key length as a variable-length integer (VInt)</li>
+<li>Key bytes</li>
+</ul>
+<p>The number of entries in the block index is stored in the fixed file trailer, and has to be passed in to the method that reads the block index. One of the limitations of the block index in version 1 is that it does not provide the compressed size of a block, which turns out to be necessary for decompression.</p>
+<p>HFile version 2 fixed this limitation, and was introduced in in HBase 0.92.</p>
+<p><img src="/images/hbase-hfile-v2.png" alt=""></p>
+<p>In the version 2 every block in the data section contains the following fields:</p>
+<ol>
+<li>8 bytes: Block type, a sequence of bytes equivalent to version 1&rsquo;s &ldquo;magic records&rdquo;.</li>
+<li>Compressed size of the block’s data, not including the header (int).
+Can be used for skipping the current data block when scanning HFile data.</li>
+<li>Uncompressed size of the block’s data, not including the header (int)
+This is equal to the compressed size if the compression algorithm is NONE</li>
+<li>File offset of the previous block of the same type (long)
+Can be used for seeking to the previous data/index block</li>
+<li>Compressed data (or uncompressed data if the compression algorithm is NONE).</li>
+</ol>
+<p>The above format of blocks is used in the following HFile sections:</p>
+<ul>
+<li>Scanned block section
+The section is named so because it contains all data blocks that need to be read when an HFile is scanned sequentially. Also contains leaf block index and Bloom chunk blocks.</li>
+<li>Non-scanned block section
+This section still contains unified-format v2 blocks but it does not have to be read when doing a sequential scan. This section contains <strong>&ldquo;meta&rdquo; blocks and intermediate-level index blocks</strong>.</li>
+</ul>
+<p>We are supporting &ldquo;meta&rdquo; blocks in version 2 the same way they were supported in version 1, even though we do not store Bloom filter data in these blocks anymore.</p>
+<h1 id="block">Block</h1>
+<p>StoreFiles are composed of blocks. The blocksize is configured on a per-ColumnFamily basis.</p>
+<p>HFile doesn&rsquo;t know anything about key and value struct/type (row key, qualifier, family, timestamp, …). As Hadoop&rsquo; SequenceFile (Block-Compressed), keys and values are grouped in blocks, and blocks contains records. Each record has two Int Values that contains Key Length and Value Length followed by key and value byte-array <!-- raw HTML omitted -->[8]<!-- raw HTML omitted -->.</p>
+<p><img src="/images/hfile-block-record.png" alt=""></p>
+<p><strong>Reference</strong></p>
+<ol>
+<li><a href="http://blog.javachen.com/2013/06/15/hbase-note-about-data-structure.html">HBase笔记：存储结构</a></li>
+<li><a href="http://hbase.apache.org/book.html#regions.arch">Regions</a></li>
+<li><a href="https://sreejithrpillai.wordpress.com/2015/01/04/hbase-architecture/">HBASE ARCHITECTURE</a></li>
+<li><a href="http://hbasefly.com/2016/03/23/hbase-memstore-flush/">HBase – Memstore Flush深度解析</a></li>
+<li><a href="http://www.binospace.com/index.php/hfile-file-format-to-read-and-write-with-hbase/">HFile文件格式与HBase读写</a></li>
+<li><a href="https://hbase.apache.org/devapidocs/org/apache/hadoop/hbase/io/hfile/HFile.html">HFile</a></li>
+<li><a href="http://cloudepr.blogspot.com/2009/09/hfile-block-indexed-file-format-to.html">HFile: A Block-Indexed File Format to Store Sorted Key-Value Pairs</a></li>
+<li><a href="http://th30z.blogspot.com/2011/02/hbase-io-hfile.html?spref=tw">HBase I/O: HFile</a></li>
+<li><a href="http://hbase.apache.org/book.html#hfilev2">HBase file format with inline blocks (version 2)</a></li>
+<li><a href="https://mapr.com/blog/in-depth-look-hbase-architecture/">An In-Depth Look at the HBase Architecture</a></li>
+</ol>
+    </div>
+
+    
+<footer class="post-footer">
+      
+      <nav class="post-nav">
+        <a class="prev" href="/post/hbase-code-analysis-memstore/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">HBase Code Analysis: MemStore</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        <a class="next" href="/post/variable-scope-rules-in-python/">
+            <span class="next-text nav-default">Variable Scope Rules in Python</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        <div id="disqus_thread"></div>
+    <script type="text/javascript">
+    (function() {
+      
+      
+      if (window.location.hostname === 'localhost') return;
+
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      var disqus_shortname = 'guoqing';
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+  <a href="https://hellokangning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2016 - 
+    2020
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Guoqing Geng</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  <script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-105833321-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>

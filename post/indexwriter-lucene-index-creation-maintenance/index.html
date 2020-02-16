@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>IndexWriter: Lucene Index Creation and Maintenance - Qing&#39;s Landing</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Guoqing Geng" /><meta name="description" content="An IndexWriter creates and maintains an index. It&amp;rsquo;s the basic Class defined in Lucene Core.
+" /><meta name="keywords" content="Lucene" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.64.1 with theme even" />
+
+
+<link rel="canonical" href="https://hellokangning.github.io/post/indexwriter-lucene-index-creation-maintenance/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+
+<meta property="og:title" content="IndexWriter: Lucene Index Creation and Maintenance" />
+<meta property="og:description" content="An IndexWriter creates and maintains an index. It&rsquo;s the basic Class defined in Lucene Core." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hellokangning.github.io/post/indexwriter-lucene-index-creation-maintenance/" />
+<meta property="article:published_time" content="2018-04-03T14:37:02+08:00" />
+<meta property="article:modified_time" content="2018-04-03T14:37:02+08:00" />
+<meta itemprop="name" content="IndexWriter: Lucene Index Creation and Maintenance">
+<meta itemprop="description" content="An IndexWriter creates and maintains an index. It&rsquo;s the basic Class defined in Lucene Core.">
+<meta itemprop="datePublished" content="2018-04-03T14:37:02&#43;08:00" />
+<meta itemprop="dateModified" content="2018-04-03T14:37:02&#43;08:00" />
+<meta itemprop="wordCount" content="1725">
+
+
+
+<meta itemprop="keywords" content="Lucene," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="IndexWriter: Lucene Index Creation and Maintenance"/>
+<meta name="twitter:description" content="An IndexWriter creates and maintains an index. It&rsquo;s the basic Class defined in Lucene Core."/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Qing&#39;s Landing</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/en/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/zh/">
+        <li class="mobile-menu-item">中文</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Qing&#39;s Landing</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/en/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/zh/">中文</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">IndexWriter: Lucene Index Creation and Maintenance</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> Apr 3, 2018 </span>
+        <div class="post-category">
+            <a href="/categories/elasticsearch/"> Elasticsearch </a>
+            </div>
+          <span class="more-meta"> 1725 words </span>
+          <span class="more-meta"> 9 mins read </span>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents"></nav>
+  </div>
+</div>
+    <div class="post-content">
+      <p>An <code>IndexWriter</code> creates and maintains an index. It&rsquo;s the basic Class defined in Lucene Core.</p>
+<blockquote>
+<p>The source code in this post is base Lucene 6.6.0.</p>
+</blockquote>
+<p>A simple demonstration of <code>IndexWriter</code>,</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="n">Directory</span> <span class="n">directory</span> <span class="o">=</span> <span class="n">newDirectory</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+<span class="n">IndexWriter</span> <span class="n">indexWriter</span> <span class="o">=</span> <span class="k">new</span> <span class="n">IndexWriter</span><span class="o">(</span><span class="n">directory</span><span class="o">,</span> <span class="n">newIndexWriterConfig</span><span class="o">(</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
+<span class="n">Document</span> <span class="n">document</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Document</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+<span class="n">document</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="k">new</span> <span class="n">SortedDocValuesField</span><span class="o">(</span><span class="s">&#34;different_field&#34;</span><span class="o">,</span> <span class="k">new</span> <span class="n">BytesRef</span><span class="o">(</span><span class="s">&#34;1&#34;</span><span class="o">)</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
+<span class="n">indexWriter</span><span class="o">.</span><span class="na">addDocument</span><span class="o">(</span><span class="n">document</span><span class="o">)</span><span class="o">;</span>
+<span class="n">indexWriter</span><span class="o">.</span><span class="na">close</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>what the <code>addDocument</code>do is  adding a document to this index, as we can find it in <code>IndexWriter.java</code>.</p>
+<h1 id="indexwriter"><code>IndexWriter</code></h1>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// IndexWriter.java
+</span><span class="c1"></span>
+  <span class="kd">public</span> <span class="kt">long</span> <span class="nf">addDocument</span><span class="o">(</span><span class="n">Iterable</span><span class="o">&lt;</span><span class="o">?</span> <span class="kd">extends</span> <span class="n">IndexableField</span><span class="o">&gt;</span> <span class="n">doc</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">updateDocument</span><span class="o">(</span><span class="kc">null</span><span class="o">,</span> <span class="n">doc</span><span class="o">)</span><span class="o">;</span>
+  <span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// IndexWriter.java
+</span><span class="c1"></span>
+  <span class="kd">private</span> <span class="kd">final</span> <span class="n">DocumentsWriter</span> <span class="n">docWriter</span><span class="o">;</span>
+  <span class="kd">private</span> <span class="kd">final</span> <span class="n">Queue</span><span class="o">&lt;</span><span class="n">Event</span><span class="o">&gt;</span> <span class="n">eventQueue</span><span class="o">;</span>
+
+  <span class="kd">public</span> <span class="kt">long</span> <span class="nf">updateDocument</span><span class="o">(</span><span class="n">Term</span> <span class="n">term</span><span class="o">,</span> <span class="n">Iterable</span><span class="o">&lt;</span><span class="o">?</span> <span class="kd">extends</span> <span class="n">IndexableField</span><span class="o">&gt;</span> <span class="n">doc</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+    <span class="n">ensureOpen</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+    <span class="k">try</span> <span class="o">{</span>
+      <span class="kt">boolean</span> <span class="n">success</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+      <span class="k">try</span> <span class="o">{</span>
+        <span class="kt">long</span> <span class="n">seqNo</span> <span class="o">=</span> <span class="n">docWriter</span><span class="o">.</span><span class="na">updateDocument</span><span class="o">(</span><span class="n">doc</span><span class="o">,</span> <span class="n">analyzer</span><span class="o">,</span> <span class="n">term</span><span class="o">)</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">seqNo</span> <span class="o">&lt;</span> <span class="n">0</span><span class="o">)</span> <span class="o">{</span>
+          <span class="n">seqNo</span> <span class="o">=</span> <span class="o">-</span> <span class="n">seqNo</span><span class="o">;</span>
+          <span class="n">processEvents</span><span class="o">(</span><span class="kc">true</span><span class="o">,</span> <span class="kc">false</span><span class="o">)</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="n">success</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+        <span class="k">return</span> <span class="n">seqNo</span><span class="o">;</span>
+      <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="o">!</span><span class="n">success</span><span class="o">)</span> <span class="o">{</span>
+          <span class="k">if</span> <span class="o">(</span><span class="n">infoStream</span><span class="o">.</span><span class="na">isEnabled</span><span class="o">(</span><span class="s">&#34;IW&#34;</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">infoStream</span><span class="o">.</span><span class="na">message</span><span class="o">(</span><span class="s">&#34;IW&#34;</span><span class="o">,</span> <span class="s">&#34;hit exception updating document&#34;</span><span class="o">)</span><span class="o">;</span>
+          <span class="o">}</span>
+        <span class="o">}</span>
+      <span class="o">}</span>
+    <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">AbortingException</span> <span class="o">|</span> <span class="n">VirtualMachineError</span> <span class="n">tragedy</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">tragicEvent</span><span class="o">(</span><span class="n">tragedy</span><span class="o">,</span> <span class="s">&#34;updateDocument&#34;</span><span class="o">)</span><span class="o">;</span>
+
+      <span class="c1">// dead code but javac disagrees:
+</span><span class="c1"></span>      <span class="k">return</span> <span class="o">-</span><span class="n">1</span><span class="o">;</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><img src="/images/indexwriter-sequence-diagram.png" alt=""></p>
+<p>From the above sequence diagram, it&rsquo;s easily to infer that <code>DocumentsWriter</code> takes over and does the remaining work.</p>
+<p>The class diagram is also necessary, so we can address the relationships between classes.</p>
+<p><img src="/images/indexwriter-class-diagram.png" alt=""></p>
+<h1 id="documentswriter"><code>DocumentsWriter</code></h1>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// DocumentsWriter.java
+</span><span class="c1"></span>
+<span class="kd">final</span> <span class="n">DocumentsWriterFlushControl</span> <span class="n">flushControl</span><span class="o">;</span>
+
+<span class="kt">long</span> <span class="nf">updateDocuments</span><span class="o">(</span><span class="kd">final</span> <span class="n">Iterable</span><span class="o">&lt;</span><span class="o">?</span> <span class="kd">extends</span> <span class="n">Iterable</span><span class="o">&lt;</span><span class="o">?</span> <span class="kd">extends</span> <span class="n">IndexableField</span><span class="o">&gt;</span><span class="o">&gt;</span> <span class="n">docs</span><span class="o">,</span> <span class="kd">final</span> <span class="n">Analyzer</span> <span class="n">analyzer</span><span class="o">,</span>
+                       <span class="kd">final</span> <span class="n">Term</span> <span class="n">delTerm</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">,</span> <span class="n">AbortingException</span> <span class="o">{</span>
+    <span class="kt">boolean</span> <span class="n">hasEvents</span> <span class="o">=</span> <span class="n">preUpdate</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+
+    <span class="kd">final</span> <span class="n">ThreadState</span> <span class="n">perThread</span> <span class="o">=</span> <span class="n">flushControl</span><span class="o">.</span><span class="na">obtainAndLock</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+    <span class="kd">final</span> <span class="n">DocumentsWriterPerThread</span> <span class="n">flushingDWPT</span><span class="o">;</span>
+    <span class="kt">long</span> <span class="n">seqNo</span><span class="o">;</span>
+
+    <span class="k">try</span> <span class="o">{</span>
+      <span class="c1">// This must happen after we&#39;ve pulled the ThreadState because IW.close
+</span><span class="c1"></span>      <span class="c1">// waits for all ThreadStates to be released:
+</span><span class="c1"></span>      <span class="n">ensureOpen</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+      <span class="n">ensureInitialized</span><span class="o">(</span><span class="n">perThread</span><span class="o">)</span><span class="o">;</span>
+      <span class="k">assert</span> <span class="n">perThread</span><span class="o">.</span><span class="na">isInitialized</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+      <span class="kd">final</span> <span class="n">DocumentsWriterPerThread</span> <span class="n">dwpt</span> <span class="o">=</span> <span class="n">perThread</span><span class="o">.</span><span class="na">dwpt</span><span class="o">;</span>
+      <span class="kd">final</span> <span class="kt">int</span> <span class="n">dwptNumDocs</span> <span class="o">=</span> <span class="n">dwpt</span><span class="o">.</span><span class="na">getNumDocsInRAM</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+      <span class="k">try</span> <span class="o">{</span>
+        <span class="n">seqNo</span> <span class="o">=</span> <span class="n">dwpt</span><span class="o">.</span><span class="na">updateDocuments</span><span class="o">(</span><span class="n">docs</span><span class="o">,</span> <span class="n">analyzer</span><span class="o">,</span> <span class="n">delTerm</span><span class="o">)</span><span class="o">;</span>
+      <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">AbortingException</span> <span class="n">ae</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">flushControl</span><span class="o">.</span><span class="na">doOnAbort</span><span class="o">(</span><span class="n">perThread</span><span class="o">)</span><span class="o">;</span>
+        <span class="n">dwpt</span><span class="o">.</span><span class="na">abort</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+        <span class="k">throw</span> <span class="n">ae</span><span class="o">;</span>
+      <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+        <span class="c1">// We don&#39;t know how many documents were actually
+</span><span class="c1"></span>        <span class="c1">// counted as indexed, so we must subtract here to
+</span><span class="c1"></span>        <span class="c1">// accumulate our separate counter:
+</span><span class="c1"></span>        <span class="n">numDocsInRAM</span><span class="o">.</span><span class="na">addAndGet</span><span class="o">(</span><span class="n">dwpt</span><span class="o">.</span><span class="na">getNumDocsInRAM</span><span class="o">(</span><span class="o">)</span> <span class="o">-</span> <span class="n">dwptNumDocs</span><span class="o">)</span><span class="o">;</span>
+      <span class="o">}</span>
+      <span class="kd">final</span> <span class="kt">boolean</span> <span class="n">isUpdate</span> <span class="o">=</span> <span class="n">delTerm</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+      <span class="n">flushingDWPT</span> <span class="o">=</span> <span class="n">flushControl</span><span class="o">.</span><span class="na">doAfterDocument</span><span class="o">(</span><span class="n">perThread</span><span class="o">,</span> <span class="n">isUpdate</span><span class="o">)</span><span class="o">;</span>
+
+      <span class="k">assert</span> <span class="n">seqNo</span> <span class="o">&gt;</span> <span class="n">perThread</span><span class="o">.</span><span class="na">lastSeqNo</span><span class="o">:</span> <span class="s">&#34;seqNo=&#34;</span> <span class="o">+</span> <span class="n">seqNo</span> <span class="o">+</span> <span class="s">&#34; lastSeqNo=&#34;</span> <span class="o">+</span> <span class="n">perThread</span><span class="o">.</span><span class="na">lastSeqNo</span><span class="o">;</span>
+      <span class="n">perThread</span><span class="o">.</span><span class="na">lastSeqNo</span> <span class="o">=</span> <span class="n">seqNo</span><span class="o">;</span>
+
+    <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+      <span class="n">perThreadPool</span><span class="o">.</span><span class="na">release</span><span class="o">(</span><span class="n">perThread</span><span class="o">)</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="k">if</span> <span class="o">(</span><span class="n">postUpdate</span><span class="o">(</span><span class="n">flushingDWPT</span><span class="o">,</span> <span class="n">hasEvents</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">seqNo</span> <span class="o">=</span> <span class="o">-</span><span class="n">seqNo</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="k">return</span> <span class="n">seqNo</span><span class="o">;</span>
+  <span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>In short the <code>updateDocuments</code> in <code>DocumentsWriter</code>,</p>
+<ol>
+<li>obtain one <code>ThreadState</code> from <code>DocumentsWriterFlushControl</code></li>
+<li>send <code>updateDocuments</code> to <code>DocumentsWriterPerThread</code></li>
+<li>do some post work after documenting.</li>
+</ol>
+<h1 id="documentswriterperthread"><code>DocumentsWriterPerThread</code></h1>
+<p><code>DocumentsWriterPerThread</code>, as its name means, is a document writer for each thread. What we focus here is <code>updateDocuments</code> method.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// DocumentsWriterPerThread.java
+</span><span class="c1"></span>
+<span class="kd">final</span> <span class="n">DocState</span> <span class="n">docState</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kt">long</span> <span class="nf">updateDocuments</span><span class="o">(</span><span class="n">Iterable</span><span class="o">&lt;</span><span class="o">?</span> <span class="kd">extends</span> <span class="n">Iterable</span><span class="o">&lt;</span><span class="o">?</span> <span class="kd">extends</span> <span class="n">IndexableField</span><span class="o">&gt;</span><span class="o">&gt;</span> <span class="n">docs</span><span class="o">,</span> <span class="n">Analyzer</span> <span class="n">analyzer</span><span class="o">,</span> <span class="n">Term</span> <span class="n">delTerm</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">,</span> <span class="n">AbortingException</span> <span class="o">{</span>
+    <span class="n">testPoint</span><span class="o">(</span><span class="s">&#34;DocumentsWriterPerThread addDocuments start&#34;</span><span class="o">)</span><span class="o">;</span>
+    <span class="k">assert</span> <span class="n">deleteQueue</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="n">docState</span><span class="o">.</span><span class="na">analyzer</span> <span class="o">=</span> <span class="n">analyzer</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">INFO_VERBOSE</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">infoStream</span><span class="o">.</span><span class="na">isEnabled</span><span class="o">(</span><span class="s">&#34;DWPT&#34;</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">infoStream</span><span class="o">.</span><span class="na">message</span><span class="o">(</span><span class="s">&#34;DWPT&#34;</span><span class="o">,</span> <span class="n">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">(</span><span class="o">)</span><span class="o">.</span><span class="na">getName</span><span class="o">(</span><span class="o">)</span> <span class="o">+</span> <span class="s">&#34; update delTerm=&#34;</span> <span class="o">+</span> <span class="n">delTerm</span> <span class="o">+</span> <span class="s">&#34; docID=&#34;</span> <span class="o">+</span> <span class="n">docState</span><span class="o">.</span><span class="na">docID</span> <span class="o">+</span> <span class="s">&#34; seg=&#34;</span> <span class="o">+</span> <span class="n">segmentInfo</span><span class="o">.</span><span class="na">name</span><span class="o">)</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="kt">int</span> <span class="n">docCount</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span>
+    <span class="kt">boolean</span> <span class="n">allDocsIndexed</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+    <span class="k">try</span> <span class="o">{</span>
+      
+      <span class="k">for</span><span class="o">(</span><span class="n">Iterable</span><span class="o">&lt;</span><span class="o">?</span> <span class="kd">extends</span> <span class="n">IndexableField</span><span class="o">&gt;</span> <span class="n">doc</span> <span class="o">:</span> <span class="n">docs</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// Even on exception, the document is still added (but marked
+</span><span class="c1"></span>        <span class="c1">// deleted), so we don&#39;t need to un-reserve at that point.
+</span><span class="c1"></span>        <span class="c1">// Aborting exceptions will actually &#34;lose&#34; more than one
+</span><span class="c1"></span>        <span class="c1">// document, so the counter will be &#34;wrong&#34; in that case, but
+</span><span class="c1"></span>        <span class="c1">// it&#39;s very hard to fix (we can&#39;t easily distinguish aborting
+</span><span class="c1"></span>        <span class="c1">// vs non-aborting exceptions):
+</span><span class="c1"></span>        <span class="n">reserveOneDoc</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+        <span class="n">docState</span><span class="o">.</span><span class="na">doc</span> <span class="o">=</span> <span class="n">doc</span><span class="o">;</span>
+        <span class="n">docState</span><span class="o">.</span><span class="na">docID</span> <span class="o">=</span> <span class="n">numDocsInRAM</span><span class="o">;</span>
+        <span class="n">docCount</span><span class="o">+</span><span class="o">+</span><span class="o">;</span>
+
+        <span class="kt">boolean</span> <span class="n">success</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+        <span class="k">try</span> <span class="o">{</span>
+          <span class="n">consumer</span><span class="o">.</span><span class="na">processDocument</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+          <span class="n">success</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+        <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+          <span class="k">if</span> <span class="o">(</span><span class="o">!</span><span class="n">success</span><span class="o">)</span> <span class="o">{</span>
+            <span class="c1">// Incr here because finishDocument will not
+</span><span class="c1"></span>            <span class="c1">// be called (because an exc is being thrown):
+</span><span class="c1"></span>            <span class="n">numDocsInRAM</span><span class="o">+</span><span class="o">+</span><span class="o">;</span>
+          <span class="o">}</span>
+        <span class="o">}</span>
+
+        <span class="n">numDocsInRAM</span><span class="o">+</span><span class="o">+</span><span class="o">;</span>
+      <span class="o">}</span>
+      <span class="n">allDocsIndexed</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+
+      <span class="c1">// Apply delTerm only after all indexing has
+</span><span class="c1"></span>      <span class="c1">// succeeded, but apply it only to docs prior to when
+</span><span class="c1"></span>      <span class="c1">// this batch started:
+</span><span class="c1"></span>      <span class="kt">long</span> <span class="n">seqNo</span><span class="o">;</span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">delTerm</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">seqNo</span> <span class="o">=</span> <span class="n">deleteQueue</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">delTerm</span><span class="o">,</span> <span class="n">deleteSlice</span><span class="o">)</span><span class="o">;</span>
+        <span class="k">assert</span> <span class="n">deleteSlice</span><span class="o">.</span><span class="na">isTailItem</span><span class="o">(</span><span class="n">delTerm</span><span class="o">)</span> <span class="o">:</span> <span class="s">&#34;expected the delete term as the tail item&#34;</span><span class="o">;</span>
+        <span class="n">deleteSlice</span><span class="o">.</span><span class="na">apply</span><span class="o">(</span><span class="n">pendingUpdates</span><span class="o">,</span> <span class="n">numDocsInRAM</span><span class="o">-</span><span class="n">docCount</span><span class="o">)</span><span class="o">;</span>
+        <span class="k">return</span> <span class="n">seqNo</span><span class="o">;</span>
+      <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+        <span class="n">seqNo</span> <span class="o">=</span> <span class="n">deleteQueue</span><span class="o">.</span><span class="na">updateSlice</span><span class="o">(</span><span class="n">deleteSlice</span><span class="o">)</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">seqNo</span> <span class="o">&lt;</span> <span class="n">0</span><span class="o">)</span> <span class="o">{</span>
+          <span class="n">seqNo</span> <span class="o">=</span> <span class="o">-</span><span class="n">seqNo</span><span class="o">;</span>
+          <span class="n">deleteSlice</span><span class="o">.</span><span class="na">apply</span><span class="o">(</span><span class="n">pendingUpdates</span><span class="o">,</span> <span class="n">numDocsInRAM</span><span class="o">-</span><span class="n">docCount</span><span class="o">)</span><span class="o">;</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+          <span class="n">deleteSlice</span><span class="o">.</span><span class="na">reset</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+        <span class="o">}</span>
+      <span class="o">}</span>
+
+      <span class="k">return</span> <span class="n">seqNo</span><span class="o">;</span>
+
+    <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+      <span class="k">if</span> <span class="o">(</span><span class="o">!</span><span class="n">allDocsIndexed</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="o">!</span><span class="n">aborted</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// the iterator threw an exception that is not aborting 
+</span><span class="c1"></span>        <span class="c1">// go and mark all docs from this block as deleted
+</span><span class="c1"></span>        <span class="kt">int</span> <span class="n">docID</span> <span class="o">=</span> <span class="n">numDocsInRAM</span><span class="o">-</span><span class="n">1</span><span class="o">;</span>
+        <span class="kd">final</span> <span class="kt">int</span> <span class="n">endDocID</span> <span class="o">=</span> <span class="n">docID</span> <span class="o">-</span> <span class="n">docCount</span><span class="o">;</span>
+        <span class="k">while</span> <span class="o">(</span><span class="n">docID</span> <span class="o">&gt;</span> <span class="n">endDocID</span><span class="o">)</span> <span class="o">{</span>
+          <span class="n">deleteDocID</span><span class="o">(</span><span class="n">docID</span><span class="o">)</span><span class="o">;</span>
+          <span class="n">docID</span><span class="o">-</span><span class="o">-</span><span class="o">;</span>
+        <span class="o">}</span>
+      <span class="o">}</span>
+      <span class="n">docState</span><span class="o">.</span><span class="na">clear</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><ol>
+<li>fill <code>DocState</code></li>
+<li>call the <code>processDocument</code> of <code>DocConsumer</code></li>
+<li>update and apply a <code>deleteQueue</code></li>
+</ol>
+<h1 id="docconsumer"><code>DocConsumer</code></h1>
+<p>~[](/images/docconsumer-class-diagram.png)</p>
+<p><code>DefaultIndexingChain</code>, the child of <code>DocConsumer</code>, is the default general purpose indexing chain, which handles indexing all types of fields. It doesn&rsquo;t do that all by itself, but with the help of two fields,</p>
+<ul>
+<li><code>TermsHash</code>: writes postings and term vectors</li>
+<li><code>StoredFieldsConsumer</code>: Writes stored fields</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// DefaultIndexingChain.java
+</span><span class="c1"></span>
+<span class="kd">final</span> <span class="kd">class</span> <span class="nc">DefaultIndexingChain</span> <span class="kd">extends</span> <span class="n">DocConsumer</span> <span class="o">{</span>
+  <span class="kd">final</span> <span class="n">TermsHash</span> <span class="n">termsHash</span><span class="o">;</span>
+  <span class="kd">final</span> <span class="n">StoredFieldsConsumer</span> <span class="n">storedFieldsConsumer</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>Let&rsquo;s see how they accomplish that.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// DefaultIndexingChain.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">processDocument</span><span class="o">(</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">,</span> <span class="n">AbortingException</span> <span class="o">{</span>
+
+  <span class="c1">// How many indexed field names we&#39;ve seen (collapses
+</span><span class="c1"></span>  <span class="c1">// multiple field instances by the same name):
+</span><span class="c1"></span>  <span class="kt">int</span> <span class="n">fieldCount</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span>
+
+  <span class="kt">long</span> <span class="n">fieldGen</span> <span class="o">=</span> <span class="n">nextFieldGen</span><span class="o">+</span><span class="o">+</span><span class="o">;</span>
+
+  <span class="c1">// NOTE: we need two passes here, in case there are
+</span><span class="c1"></span>  <span class="c1">// multi-valued fields, because we must process all
+</span><span class="c1"></span>  <span class="c1">// instances of a given field at once, since the
+</span><span class="c1"></span>  <span class="c1">// analyzer is free to reuse TokenStream across fields
+</span><span class="c1"></span>  <span class="c1">// (i.e., we cannot have more than one TokenStream
+</span><span class="c1"></span>  <span class="c1">// running &#34;at once&#34;):
+</span><span class="c1"></span>
+  <span class="n">termsHash</span><span class="o">.</span><span class="na">startDocument</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+
+  <span class="n">startStoredFields</span><span class="o">(</span><span class="n">docState</span><span class="o">.</span><span class="na">docID</span><span class="o">)</span><span class="o">;</span>
+
+  <span class="kt">boolean</span> <span class="n">aborting</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+  <span class="k">try</span> <span class="o">{</span>
+    <span class="k">for</span> <span class="o">(</span><span class="n">IndexableField</span> <span class="n">field</span> <span class="o">:</span> <span class="n">docState</span><span class="o">.</span><span class="na">doc</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">fieldCount</span> <span class="o">=</span> <span class="n">processField</span><span class="o">(</span><span class="n">field</span><span class="o">,</span> <span class="n">fieldGen</span><span class="o">,</span> <span class="n">fieldCount</span><span class="o">)</span><span class="o">;</span>
+    <span class="o">}</span>
+  <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">AbortingException</span> <span class="n">ae</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">aborting</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+    <span class="k">throw</span> <span class="n">ae</span><span class="o">;</span>
+  <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">aborting</span> <span class="o">=</span><span class="o">=</span> <span class="kc">false</span><span class="o">)</span> <span class="o">{</span>
+      <span class="c1">// Finish each indexed field name seen in the document:
+</span><span class="c1"></span>      <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="n">0</span><span class="o">;</span><span class="n">i</span><span class="o">&lt;</span><span class="n">fieldCount</span><span class="o">;</span><span class="n">i</span><span class="o">+</span><span class="o">+</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">fields</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="o">.</span><span class="na">finish</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+      <span class="o">}</span>
+      <span class="n">finishStoredFields</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+
+  <span class="k">try</span> <span class="o">{</span>
+    <span class="n">termsHash</span><span class="o">.</span><span class="na">finishDocument</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+  <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Throwable</span> <span class="n">th</span><span class="o">)</span> <span class="o">{</span>
+    <span class="c1">// Must abort, on the possibility that on-disk term
+</span><span class="c1"></span>    <span class="c1">// vectors are now corrupt:
+</span><span class="c1"></span>    <span class="k">throw</span> <span class="n">AbortingException</span><span class="o">.</span><span class="na">wrap</span><span class="o">(</span><span class="n">th</span><span class="o">)</span><span class="o">;</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="c1">// lite version
+</span><span class="c1"></span><span class="kd">private</span> <span class="kt">int</span> <span class="nf">processField</span><span class="o">(</span><span class="n">IndexableField</span> <span class="n">field</span><span class="o">,</span> <span class="kt">long</span> <span class="n">fieldGen</span><span class="o">,</span> <span class="kt">int</span> <span class="n">fieldCount</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">,</span> <span class="n">AbortingException</span> <span class="o">{</span>
+  <span class="n">String</span> <span class="n">fieldName</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="na">name</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+  <span class="n">IndexableFieldType</span> <span class="n">fieldType</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="na">fieldType</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+
+  <span class="n">PerField</span> <span class="n">fp</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+
+  <span class="c1">// Invert indexed fields:
+</span><span class="c1"></span>  <span class="k">if</span> <span class="o">(</span><span class="n">fieldType</span><span class="o">.</span><span class="na">indexOptions</span><span class="o">(</span><span class="o">)</span> <span class="o">!</span><span class="o">=</span> <span class="n">IndexOptions</span><span class="o">.</span><span class="na">NONE</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">fp</span> <span class="o">=</span> <span class="n">getOrAddField</span><span class="o">(</span><span class="n">fieldName</span><span class="o">,</span> <span class="n">fieldType</span><span class="o">,</span> <span class="kc">true</span><span class="o">)</span><span class="o">;</span>
+    <span class="kt">boolean</span> <span class="n">first</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="na">fieldGen</span> <span class="o">!</span><span class="o">=</span> <span class="n">fieldGen</span><span class="o">;</span>
+    <span class="n">fp</span><span class="o">.</span><span class="na">invert</span><span class="o">(</span><span class="n">field</span><span class="o">,</span> <span class="n">first</span><span class="o">)</span><span class="o">;</span>
+
+    <span class="k">if</span> <span class="o">(</span><span class="n">first</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">fields</span><span class="o">[</span><span class="n">fieldCount</span><span class="o">+</span><span class="o">+</span><span class="o">]</span> <span class="o">=</span> <span class="n">fp</span><span class="o">;</span>
+      <span class="n">fp</span><span class="o">.</span><span class="na">fieldGen</span> <span class="o">=</span> <span class="n">fieldGen</span><span class="o">;</span>
+    <span class="o">}</span>
+  <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+    <span class="n">verifyUnIndexedFieldType</span><span class="o">(</span><span class="n">fieldName</span><span class="o">,</span> <span class="n">fieldType</span><span class="o">)</span><span class="o">;</span>
+  <span class="o">}</span>
+
+  <span class="c1">// Add stored fields:
+</span><span class="c1"></span>  <span class="k">if</span> <span class="o">(</span><span class="n">fieldType</span><span class="o">.</span><span class="na">stored</span><span class="o">(</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">fp</span> <span class="o">=</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">fp</span> <span class="o">=</span> <span class="n">getOrAddField</span><span class="o">(</span><span class="n">fieldName</span><span class="o">,</span> <span class="n">fieldType</span><span class="o">,</span> <span class="kc">false</span><span class="o">)</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">fieldType</span><span class="o">.</span><span class="na">stored</span><span class="o">(</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">String</span> <span class="n">value</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="na">stringValue</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+      <span class="k">try</span> <span class="o">{</span>
+        <span class="n">storedFieldsConsumer</span><span class="o">.</span><span class="na">writeField</span><span class="o">(</span><span class="n">fp</span><span class="o">.</span><span class="na">fieldInfo</span><span class="o">,</span> <span class="n">field</span><span class="o">)</span><span class="o">;</span>
+      <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Throwable</span> <span class="n">th</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">throw</span> <span class="n">AbortingException</span><span class="o">.</span><span class="na">wrap</span><span class="o">(</span><span class="n">th</span><span class="o">)</span><span class="o">;</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+
+  <span class="n">DocValuesType</span> <span class="n">dvType</span> <span class="o">=</span> <span class="n">fieldType</span><span class="o">.</span><span class="na">docValuesType</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+  <span class="k">if</span> <span class="o">(</span><span class="n">dvType</span> <span class="o">!</span><span class="o">=</span> <span class="n">DocValuesType</span><span class="o">.</span><span class="na">NONE</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">fp</span> <span class="o">=</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">fp</span> <span class="o">=</span> <span class="n">getOrAddField</span><span class="o">(</span><span class="n">fieldName</span><span class="o">,</span> <span class="n">fieldType</span><span class="o">,</span> <span class="kc">false</span><span class="o">)</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="n">indexDocValue</span><span class="o">(</span><span class="n">fp</span><span class="o">,</span> <span class="n">dvType</span><span class="o">,</span> <span class="n">field</span><span class="o">)</span><span class="o">;</span>
+  <span class="o">}</span>
+  <span class="k">if</span> <span class="o">(</span><span class="n">fieldType</span><span class="o">.</span><span class="na">pointDimensionCount</span><span class="o">(</span><span class="o">)</span> <span class="o">!</span><span class="o">=</span> <span class="n">0</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">fp</span> <span class="o">=</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">fp</span> <span class="o">=</span> <span class="n">getOrAddField</span><span class="o">(</span><span class="n">fieldName</span><span class="o">,</span> <span class="n">fieldType</span><span class="o">,</span> <span class="kc">false</span><span class="o">)</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="n">indexPoint</span><span class="o">(</span><span class="n">fp</span><span class="o">,</span> <span class="n">field</span><span class="o">)</span><span class="o">;</span>
+  <span class="o">}</span>
+  
+  <span class="k">return</span> <span class="n">fieldCount</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>Then, it is <code>StoredFieldsConsumer</code>'s turn write field with <code>writeField</code>.</p>
+<h1 id="storedfieldsconsumer"><code>StoredFieldsConsumer</code></h1>
+<p>We we unfold the code of <code>StoredFieldsWriter</code>, it seems that just a wrapper of <code>StoredFieldsWriter</code>, the underneath handler.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// StoredFieldsConsumer.java
+</span><span class="c1"></span>
+<span class="kd">class</span> <span class="nc">StoredFieldsConsumer</span> <span class="o">{</span>
+  <span class="kd">final</span> <span class="n">DocumentsWriterPerThread</span> <span class="n">docWriter</span><span class="o">;</span>
+  <span class="n">StoredFieldsWriter</span> <span class="n">writer</span><span class="o">;</span>
+
+  <span class="kt">void</span> <span class="nf">writeField</span><span class="o">(</span><span class="n">FieldInfo</span> <span class="n">info</span><span class="o">,</span> <span class="n">IndexableField</span> <span class="n">field</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+    <span class="n">writer</span><span class="o">.</span><span class="na">writeField</span><span class="o">(</span><span class="n">info</span><span class="o">,</span> <span class="n">field</span><span class="o">)</span><span class="o">;</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><h1 id="storedfieldswriter"><code>StoredFieldsWriter</code></h1>
+<p><code>StoredFieldsWriter</code> provides <code>Codec</code> API for writing stored fields:</p>
+<ol>
+<li>For every document, <code>startDocument()</code> is called, informing the <code>Codec</code> that a new document has started.</li>
+<li><code>writeField(FieldInfo, IndexableField)</code> is called for each field in the document.</li>
+<li>After all documents have been written, <code>finish(FieldInfos, int)</code> is called for verification/sanity-checks.</li>
+<li>Finally the writer is closed <code>close()</code>.</li>
+</ol>
+<p>Take <code>SimpleTextStoredFieldsWriter</code>, derived class of <code>StoredFieldsWriter</code>, for example, whivh writes plain-text stored fields.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// SimpleTextStoredFieldsWriter.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">SimpleTextStoredFieldsWriter</span> <span class="kd">extends</span> <span class="n">StoredFieldsWriter</span> <span class="o">{</span>
+  <span class="nd">@Override</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">startDocument</span><span class="o">(</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+    <span class="n">write</span><span class="o">(</span><span class="n">DOC</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">write</span><span class="o">(</span><span class="n">Integer</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="n">numDocsWritten</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">newLine</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+    
+    <span class="n">numDocsWritten</span><span class="o">+</span><span class="o">+</span><span class="o">;</span>
+  <span class="o">}</span>
+
+  <span class="nd">@Override</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">writeField</span><span class="o">(</span><span class="n">FieldInfo</span> <span class="n">info</span><span class="o">,</span> <span class="n">IndexableField</span> <span class="n">field</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+    <span class="n">write</span><span class="o">(</span><span class="n">FIELD</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">write</span><span class="o">(</span><span class="n">Integer</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="n">info</span><span class="o">.</span><span class="na">number</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">newLine</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+
+    <span class="n">write</span><span class="o">(</span><span class="n">NAME</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">write</span><span class="o">(</span><span class="n">field</span><span class="o">.</span><span class="na">name</span><span class="o">(</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">newLine</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+    
+    <span class="n">write</span><span class="o">(</span><span class="n">TYPE</span><span class="o">)</span><span class="o">;</span>
+    <span class="kd">final</span> <span class="n">Number</span> <span class="n">n</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="na">numericValue</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+
+    <span class="n">write</span><span class="o">(</span><span class="n">VALUE</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">write</span><span class="o">(</span><span class="n">Integer</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="n">n</span><span class="o">.</span><span class="na">intValue</span><span class="o">(</span><span class="o">)</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">newLine</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+  <span class="o">}</span>
+
+  <span class="nd">@Override</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">finish</span><span class="o">(</span><span class="n">FieldInfos</span> <span class="n">fis</span><span class="o">,</span> <span class="kt">int</span> <span class="n">numDocs</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">numDocsWritten</span> <span class="o">!</span><span class="o">=</span> <span class="n">numDocs</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">throw</span> <span class="k">new</span> <span class="n">RuntimeException</span><span class="o">(</span><span class="s">&#34;mergeFields produced an invalid result: docCount is &#34;</span> <span class="o">+</span> <span class="n">numDocs</span> 
+          <span class="o">+</span> <span class="s">&#34; but only saw &#34;</span> <span class="o">+</span> <span class="n">numDocsWritten</span> <span class="o">+</span> <span class="s">&#34; file=&#34;</span> <span class="o">+</span> <span class="n">out</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="o">)</span> <span class="o">+</span> <span class="s">&#34;; now aborting this merge to prevent index corruption&#34;</span><span class="o">)</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="n">write</span><span class="o">(</span><span class="n">END</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">newLine</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">SimpleTextUtil</span><span class="o">.</span><span class="na">writeChecksum</span><span class="o">(</span><span class="n">out</span><span class="o">,</span> <span class="n">scratch</span><span class="o">)</span><span class="o">;</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>No matter in <code>startDocument</code>, <code>writeField</code> or <code>finish</code>, the private <code>write</code> method is called.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// SimpleTextStoredFieldsWriter.java
+</span><span class="c1"></span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">SimpleTextStoredFieldsWriter</span> <span class="kd">extends</span> <span class="n">StoredFieldsWriter</span> <span class="o">{</span>
+  <span class="kd">private</span> <span class="n">IndexOutput</span> <span class="n">out</span><span class="o">;</span>
+
+  <span class="kd">private</span> <span class="kt">void</span> <span class="nf">write</span><span class="o">(</span><span class="n">BytesRef</span> <span class="n">bytes</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+    <span class="n">SimpleTextUtil</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="n">out</span><span class="o">,</span> <span class="n">bytes</span><span class="o">)</span><span class="o">;</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>Allow me to finish this post when it comes <code>IndexOuput</code>, which should be discussed in another new post.</p>
+<p><strong>Reference</strong></p>
+<ul>
+<li><a href="https://www.tutorialspoint.com/lucene/lucene_indexing_process.htm">Lucene - Indexing Process</a></li>
+<li><a href="http://blog.architexa.com/2010/11/getting-started-with-lucene-creating-an-index/">Getting started with Lucene: Creating an Index</a></li>
+<li><a href="https://lucene.apache.org/core/6_6_0/core/org/apache/lucene/index/IndexWriter.html">Class IndexWriter</a></li>
+</ul>
+    </div>
+
+    
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/lucene/">Lucene</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/indexoutput-lucene-index-output/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">IndexOutput: Lucene Index Output</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        <a class="next" href="/post/troubleshooting-for-threads-explosion-in-hbase-client/">
+            <span class="next-text nav-default">A Troubleshooting for Threads Explosion in HBase Client</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        <div id="disqus_thread"></div>
+    <script type="text/javascript">
+    (function() {
+      
+      
+      if (window.location.hostname === 'localhost') return;
+
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      var disqus_shortname = 'guoqing';
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+  <a href="https://hellokangning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2016 - 
+    2020
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Guoqing Geng</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  <script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-105833321-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>

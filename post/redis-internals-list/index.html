@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Redis Internals: List - Qing&#39;s Landing</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Guoqing Geng" /><meta name="description" content="Redis provides a generic doubly linked list implementation, which is widely used in Redis. If a list key involves two many elements or there are many long strings in the list, Redis will apply linked list for it. Publish-subscribe, slow query, monitor also make use of linked list. Redis keeps the states of clients in linked list, and client&amp;rsquo;s output buffer use it too.
+This post will plough into the implementation of doubly linked list.
+" /><meta name="keywords" content="Linked List, Redis" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.64.1 with theme even" />
+
+
+<link rel="canonical" href="https://hellokangning.github.io/post/redis-internals-list/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+
+<meta property="og:title" content="Redis Internals: List" />
+<meta property="og:description" content="Redis provides a generic doubly linked list implementation, which is widely used in Redis. If a list key involves two many elements or there are many long strings in the list, Redis will apply linked list for it.  Publish-subscribe, slow query, monitor also make use of linked list. Redis keeps the states of clients in linked list, and client&rsquo;s output buffer use it too.
+This post will plough into the implementation of doubly linked list." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hellokangning.github.io/post/redis-internals-list/" />
+<meta property="article:published_time" content="2018-11-06T09:38:12+08:00" />
+<meta property="article:modified_time" content="2018-11-06T09:38:12+08:00" />
+<meta itemprop="name" content="Redis Internals: List">
+<meta itemprop="description" content="Redis provides a generic doubly linked list implementation, which is widely used in Redis. If a list key involves two many elements or there are many long strings in the list, Redis will apply linked list for it.  Publish-subscribe, slow query, monitor also make use of linked list. Redis keeps the states of clients in linked list, and client&rsquo;s output buffer use it too.
+This post will plough into the implementation of doubly linked list.">
+<meta itemprop="datePublished" content="2018-11-06T09:38:12&#43;08:00" />
+<meta itemprop="dateModified" content="2018-11-06T09:38:12&#43;08:00" />
+<meta itemprop="wordCount" content="1276">
+
+
+
+<meta itemprop="keywords" content="Data Structure," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Redis Internals: List"/>
+<meta name="twitter:description" content="Redis provides a generic doubly linked list implementation, which is widely used in Redis. If a list key involves two many elements or there are many long strings in the list, Redis will apply linked list for it.  Publish-subscribe, slow query, monitor also make use of linked list. Redis keeps the states of clients in linked list, and client&rsquo;s output buffer use it too.
+This post will plough into the implementation of doubly linked list."/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Qing&#39;s Landing</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/en/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/zh/">
+        <li class="mobile-menu-item">中文</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Qing&#39;s Landing</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/en/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/zh/">中文</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Redis Internals: List</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> Nov 6, 2018 </span>
+        <div class="post-category">
+            <a href="/categories/redis/"> Redis </a>
+            </div>
+          <span class="more-meta"> 1276 words </span>
+          <span class="more-meta"> 6 mins read </span>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents"></nav>
+  </div>
+</div>
+    <div class="post-content">
+      <p>Redis provides a generic doubly linked list implementation, which is widely used in Redis. If a list key involves two many elements or there are many long strings in the list, Redis will apply linked list for it.  Publish-subscribe, slow query, monitor also make use of linked list. Redis keeps the states of clients in linked list, and client&rsquo;s output buffer use it too.</p>
+<p>This post will plough into the implementation of doubly linked list.</p>
+<blockquote>
+<p>The code analyzed in this post is based on 5.0.0</p>
+</blockquote>
+<h1 id="node-and-list">Node and List</h1>
+<p>Each node in the doubly list is represented by a <code>listNode</code> in <code>adlist.h</code>.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">listNode</span> <span class="p">{</span>
+    <span class="k">struct</span> <span class="n">listNode</span> <span class="o">*</span><span class="n">prev</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="n">listNode</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>
+    <span class="kt">void</span> <span class="o">*</span><span class="n">value</span><span class="p">;</span>
+<span class="p">}</span> <span class="n">listNode</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>Multiple nodes can constitute a linked list with <code>next</code> pointing to their next nodes and <code>prev</code> pointing to the previous nodes.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">list</span> <span class="p">{</span>
+    <span class="n">listNode</span> <span class="o">*</span><span class="n">head</span><span class="p">;</span>
+    <span class="n">listNode</span> <span class="o">*</span><span class="n">tail</span><span class="p">;</span>
+    <span class="kt">void</span> <span class="o">*</span><span class="p">(</span><span class="o">*</span><span class="n">dup</span><span class="p">)</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">ptr</span><span class="p">)</span><span class="p">;</span>
+    <span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">free</span><span class="p">)</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">ptr</span><span class="p">)</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="p">(</span><span class="o">*</span><span class="n">match</span><span class="p">)</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">ptr</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">key</span><span class="p">)</span><span class="p">;</span>
+    <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">len</span><span class="p">;</span>
+<span class="p">}</span> <span class="n">list</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><img src="/images/redis-list-example.png" alt=""></p>
+<p>The features of this linked list can be concluded as following:</p>
+<ul>
+<li>Doubly with <code>prev</code> and <code>next</code> pointer. It&rsquo;s easy to get the previous or next node of a specified node.</li>
+<li>No cycle. The <code>prev</code> of head and <code>next</code> of tail point to <code>None</code>.</li>
+<li>Two pointers making it effortless to get the head or tail.</li>
+<li>Node counter. <code>len</code> attribute is updated every times when the length changes.</li>
+<li>Polymorphism. The value of node is stored in <code>void*</code>, and <code>dup</code>, <code>free</code>, <code>match</code> can change its value to a different type.</li>
+</ul>
+<h1 id="functions-implemented-as-macros">Functions Implemented as Macros</h1>
+<p>The time complexity of these functions is O(1).</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="cp">#</span><span class="cp">define listLength(l) ((l)-&gt;len)</span><span class="cp">
+</span><span class="cp"></span><span class="cp">#</span><span class="cp">define listFirst(l) ((l)-&gt;head)</span><span class="cp">
+</span><span class="cp"></span><span class="cp">#</span><span class="cp">define listLast(l) ((l)-&gt;tail)</span><span class="cp">
+</span><span class="cp"></span><span class="cp">#</span><span class="cp">define listPrevNode(n) ((n)-&gt;prev)</span><span class="cp">
+</span><span class="cp"></span><span class="cp">#</span><span class="cp">define listNextNode(n) ((n)-&gt;next)</span><span class="cp">
+</span><span class="cp"></span><span class="cp">#</span><span class="cp">define listNodeValue(n) ((n)-&gt;value)</span><span class="cp">
+</span><span class="cp"></span>
+<span class="cp">#</span><span class="cp">define listSetDupMethod(l,m) ((l)-&gt;dup = (m))</span><span class="cp">
+</span><span class="cp"></span><span class="cp">#</span><span class="cp">define listSetFreeMethod(l,m) ((l)-&gt;free = (m))</span><span class="cp">
+</span><span class="cp"></span><span class="cp">#</span><span class="cp">define listSetMatchMethod(l,m) ((l)-&gt;match = (m))</span><span class="cp">
+</span><span class="cp"></span>
+<span class="cp">#</span><span class="cp">define listGetDupMethod(l) ((l)-&gt;dup)</span><span class="cp">
+</span><span class="cp"></span><span class="cp">#</span><span class="cp">define listGetFree(l) ((l)-&gt;free)</span><span class="cp">
+</span><span class="cp"></span><span class="cp">#</span><span class="cp">define listGetMatchMethod(l) ((l)-&gt;match)</span><span class="cp">
+</span></code></pre></td></tr></table>
+</div>
+</div><h1 id="create-a-list">Create a List</h1>
+<p>When creating a new list, only the header of <code>list</code> is allocated, the other member variables are assigned to <code>NULL</code> or 0.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="c1">// Time complexity: O(1)
+</span><span class="c1"></span>
+<span class="n">list</span> <span class="o">*</span><span class="nf">listCreate</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">struct</span> <span class="n">list</span> <span class="o">*</span><span class="n">list</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="p">(</span><span class="n">list</span> <span class="o">=</span> <span class="n">zmalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="o">*</span><span class="n">list</span><span class="p">)</span><span class="p">)</span><span class="p">)</span> <span class="o">=</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">head</span> <span class="o">=</span> <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">tail</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">len</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">dup</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">free</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">match</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="k">return</span> <span class="n">list</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>The created list can be freed with <code>AlFreeList()</code>, but private value of every node need to be freed by the user before to call <code>AlFreeList()</code>.</p>
+<h1 id="remove-all-elements">Remove All Elements</h1>
+<p><code>listEmpty(list*)</code> is called to remove all the elements from the list but not destroy the list itself.</p>
+<p>It costs O(n) time complexity because it frees each node in a traversal. if <code>free</code> function is available, it will be used to release the value of every node. After that, the memory of the node will be collected.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="c1">// Time complexity: O(n)
+</span><span class="c1"></span>
+<span class="kt">void</span> <span class="nf">listEmpty</span><span class="p">(</span><span class="n">list</span> <span class="o">*</span><span class="n">list</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">len</span><span class="p">;</span>
+    <span class="n">listNode</span> <span class="o">*</span><span class="n">current</span><span class="p">,</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>
+
+    <span class="n">current</span> <span class="o">=</span> <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">head</span><span class="p">;</span>
+    <span class="n">len</span> <span class="o">=</span> <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">len</span><span class="p">;</span>
+    <span class="k">while</span><span class="p">(</span><span class="n">len</span><span class="o">-</span><span class="o">-</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">next</span> <span class="o">=</span> <span class="n">current</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">free</span><span class="p">)</span> <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">free</span><span class="p">(</span><span class="n">current</span><span class="o">-</span><span class="o">&gt;</span><span class="n">value</span><span class="p">)</span><span class="p">;</span>
+        <span class="n">zfree</span><span class="p">(</span><span class="n">current</span><span class="p">)</span><span class="p">;</span>
+        <span class="n">current</span> <span class="o">=</span> <span class="n">next</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">head</span> <span class="o">=</span> <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">tail</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">len</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>While <code>listRelease(list*)</code> free the whole list including the header.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">void</span> <span class="nf">listRelease</span><span class="p">(</span><span class="n">list</span> <span class="o">*</span><span class="n">list</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">listEmpty</span><span class="p">(</span><span class="n">list</span><span class="p">)</span><span class="p">;</span>
+    <span class="n">zfree</span><span class="p">(</span><span class="n">list</span><span class="p">)</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><h1 id="add-a-new-head">Add a New Head</h1>
+<p><code>listAddNodeHead</code> add a new node to the list as the new head. If the list is empty (<code>list-&gt;len == 0</code>), the new node will be the only node with <code>head</code> and <code>tail</code> pointing to it. Or, the old head will be moved after the new node and pointers should be updated too.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="c1">// Time complexity: O(1)
+</span><span class="c1"></span>
+<span class="n">list</span> <span class="o">*</span><span class="nf">listAddNodeHead</span><span class="p">(</span><span class="n">list</span> <span class="o">*</span><span class="n">list</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">value</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">listNode</span> <span class="o">*</span><span class="n">node</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="p">(</span><span class="n">node</span> <span class="o">=</span> <span class="n">zmalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="o">*</span><span class="n">node</span><span class="p">)</span><span class="p">)</span><span class="p">)</span> <span class="o">=</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">len</span> <span class="o">=</span><span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">head</span> <span class="o">=</span> <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">tail</span> <span class="o">=</span> <span class="n">node</span><span class="p">;</span>
+        <span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">prev</span> <span class="o">=</span> <span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">prev</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+        <span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">head</span><span class="p">;</span>
+        <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">head</span><span class="o">-</span><span class="o">&gt;</span><span class="n">prev</span> <span class="o">=</span> <span class="n">node</span><span class="p">;</span>
+        <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">head</span> <span class="o">=</span> <span class="n">node</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">len</span><span class="o">+</span><span class="o">+</span><span class="p">;</span>
+    <span class="k">return</span> <span class="n">list</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><h1 id="insert-a-node">Insert a Node</h1>
+<p>The situation becomes more complicated if you want to insert a new node. Note that <code>after</code> is indicator whether the new node is inserted before or after <code>old_node</code>.</p>
+<p>If you insert a node before <code>old_node</code>, you may update the <code>head</code> of the list. Whereas the <code>tail</code> of the list may be modified if you insert after <code>old_node</code>.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="c1">// Time complexity: O(1)
+</span><span class="c1"></span>
+<span class="n">list</span> <span class="o">*</span><span class="nf">listInsertNode</span><span class="p">(</span><span class="n">list</span> <span class="o">*</span><span class="n">list</span><span class="p">,</span> <span class="n">listNode</span> <span class="o">*</span><span class="n">old_node</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">value</span><span class="p">,</span> <span class="kt">int</span> <span class="n">after</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">listNode</span> <span class="o">*</span><span class="n">node</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="p">(</span><span class="n">node</span> <span class="o">=</span> <span class="n">zmalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="o">*</span><span class="n">node</span><span class="p">)</span><span class="p">)</span><span class="p">)</span> <span class="o">=</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">after</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">prev</span> <span class="o">=</span> <span class="n">old_node</span><span class="p">;</span>
+        <span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">old_node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">tail</span> <span class="o">=</span><span class="o">=</span> <span class="n">old_node</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">tail</span> <span class="o">=</span> <span class="n">node</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">old_node</span><span class="p">;</span>
+        <span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">prev</span> <span class="o">=</span> <span class="n">old_node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">prev</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">head</span> <span class="o">=</span><span class="o">=</span> <span class="n">old_node</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">head</span> <span class="o">=</span> <span class="n">node</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">prev</span> <span class="o">!</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">prev</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">node</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span> <span class="o">!</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span><span class="o">-</span><span class="o">&gt;</span><span class="n">prev</span> <span class="o">=</span> <span class="n">node</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">len</span><span class="o">+</span><span class="o">+</span><span class="p">;</span>
+    <span class="k">return</span> <span class="n">list</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><h1 id="remove-a-node">Remove a Node</h1>
+<p>If you remove the specified node from the specified list, you need to call <code>listDelNode</code> function. Before freeing the value and memory space of the node, you must change the pointers of its previous and next nodes. And the length also should be updated after your deletion.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="c1">// Time complexity: O(1)
+</span><span class="c1"></span>
+<span class="kt">void</span> <span class="nf">listDelNode</span><span class="p">(</span><span class="n">list</span> <span class="o">*</span><span class="n">list</span><span class="p">,</span> <span class="n">listNode</span> <span class="o">*</span><span class="n">node</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">prev</span><span class="p">)</span>
+        <span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">prev</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span><span class="p">;</span>
+    <span class="k">else</span>
+        <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">head</span> <span class="o">=</span> <span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span><span class="p">)</span>
+        <span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span><span class="o">-</span><span class="o">&gt;</span><span class="n">prev</span> <span class="o">=</span> <span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">prev</span><span class="p">;</span>
+    <span class="k">else</span>
+        <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">tail</span> <span class="o">=</span> <span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">prev</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">free</span><span class="p">)</span> <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">free</span><span class="p">(</span><span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">value</span><span class="p">)</span><span class="p">;</span>
+    <span class="n">zfree</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="p">;</span>
+    <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">len</span><span class="o">-</span><span class="o">-</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><h1 id="returns-a-list-iterator">Returns a List Iterator</h1>
+<p><code>listGetIterator</code> returns a list iterator <code>iter</code>. After the initialization every call to <code>listNext()</code> will return the next element of the list.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">listIter</span> <span class="p">{</span>
+    <span class="n">listNode</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">direction</span><span class="p">;</span>
+<span class="p">}</span> <span class="n">listIter</span><span class="p">;</span>
+
+<span class="n">listIter</span> <span class="o">*</span><span class="nf">listGetIterator</span><span class="p">(</span><span class="n">list</span> <span class="o">*</span><span class="n">list</span><span class="p">,</span> <span class="kt">int</span> <span class="n">direction</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">listIter</span> <span class="o">*</span><span class="n">iter</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="p">(</span><span class="n">iter</span> <span class="o">=</span> <span class="n">zmalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="o">*</span><span class="n">iter</span><span class="p">)</span><span class="p">)</span><span class="p">)</span> <span class="o">=</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">direction</span> <span class="o">=</span><span class="o">=</span> <span class="n">AL_START_HEAD</span><span class="p">)</span>
+        <span class="n">iter</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">head</span><span class="p">;</span>
+    <span class="k">else</span>
+        <span class="n">iter</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">tail</span><span class="p">;</span>
+    <span class="n">iter</span><span class="o">-</span><span class="o">&gt;</span><span class="n">direction</span> <span class="o">=</span> <span class="n">direction</span><span class="p">;</span>
+    <span class="k">return</span> <span class="n">iter</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">listNode</span> <span class="o">*</span><span class="nf">listNext</span><span class="p">(</span><span class="n">listIter</span> <span class="o">*</span><span class="n">iter</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">listNode</span> <span class="o">*</span><span class="n">current</span> <span class="o">=</span> <span class="n">iter</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">current</span> <span class="o">!</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">iter</span><span class="o">-</span><span class="o">&gt;</span><span class="n">direction</span> <span class="o">=</span><span class="o">=</span> <span class="n">AL_START_HEAD</span><span class="p">)</span>
+            <span class="n">iter</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">current</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span><span class="p">;</span>
+        <span class="k">else</span>
+            <span class="n">iter</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">current</span><span class="o">-</span><span class="o">&gt;</span><span class="n">prev</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">current</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><h1 id="rotate-the-list">Rotate the List</h1>
+<p>Rotating the list means removing the tail node and inserting it to the head.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="c1">// Time complexity: O(1)
+</span><span class="c1"></span>
+<span class="kt">void</span> <span class="nf">listRotate</span><span class="p">(</span><span class="n">list</span> <span class="o">*</span><span class="n">list</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">listNode</span> <span class="o">*</span><span class="n">tail</span> <span class="o">=</span> <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">tail</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">listLength</span><span class="p">(</span><span class="n">list</span><span class="p">)</span> <span class="o">&lt;</span><span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="k">return</span><span class="p">;</span>
+
+    <span class="cm">/* Detach current tail */</span>
+    <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">tail</span> <span class="o">=</span> <span class="n">tail</span><span class="o">-</span><span class="o">&gt;</span><span class="n">prev</span><span class="p">;</span>
+    <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">tail</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="cm">/* Move it as head */</span>
+    <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">head</span><span class="o">-</span><span class="o">&gt;</span><span class="n">prev</span> <span class="o">=</span> <span class="n">tail</span><span class="p">;</span>
+    <span class="n">tail</span><span class="o">-</span><span class="o">&gt;</span><span class="n">prev</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="n">tail</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">head</span><span class="p">;</span>
+    <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">head</span> <span class="o">=</span> <span class="n">tail</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><h1 id="join-two-lists">Join Two Lists</h1>
+<p><code>listJoin(list *l, list *o)</code> adds all the elements of the list <code>o</code> at the end of the list <code>l</code>. The list <code>o</code> remains empty but otherwise valid.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="c1">// Time complexity: O(1)
+</span><span class="c1"></span>
+<span class="kt">void</span> <span class="nf">listJoin</span><span class="p">(</span><span class="n">list</span> <span class="o">*</span><span class="n">l</span><span class="p">,</span> <span class="n">list</span> <span class="o">*</span><span class="n">o</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">o</span><span class="o">-</span><span class="o">&gt;</span><span class="n">head</span><span class="p">)</span>
+        <span class="n">o</span><span class="o">-</span><span class="o">&gt;</span><span class="n">head</span><span class="o">-</span><span class="o">&gt;</span><span class="n">prev</span> <span class="o">=</span> <span class="n">l</span><span class="o">-</span><span class="o">&gt;</span><span class="n">tail</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">l</span><span class="o">-</span><span class="o">&gt;</span><span class="n">tail</span><span class="p">)</span>
+        <span class="n">l</span><span class="o">-</span><span class="o">&gt;</span><span class="n">tail</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">o</span><span class="o">-</span><span class="o">&gt;</span><span class="n">head</span><span class="p">;</span>
+    <span class="k">else</span>
+        <span class="n">l</span><span class="o">-</span><span class="o">&gt;</span><span class="n">head</span> <span class="o">=</span> <span class="n">o</span><span class="o">-</span><span class="o">&gt;</span><span class="n">head</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">o</span><span class="o">-</span><span class="o">&gt;</span><span class="n">tail</span><span class="p">)</span> <span class="n">l</span><span class="o">-</span><span class="o">&gt;</span><span class="n">tail</span> <span class="o">=</span> <span class="n">o</span><span class="o">-</span><span class="o">&gt;</span><span class="n">tail</span><span class="p">;</span>
+    <span class="n">l</span><span class="o">-</span><span class="o">&gt;</span><span class="n">len</span> <span class="o">+</span><span class="o">=</span> <span class="n">o</span><span class="o">-</span><span class="o">&gt;</span><span class="n">len</span><span class="p">;</span>
+
+    <span class="cm">/* Setup other as an empty list. */</span>
+    <span class="n">o</span><span class="o">-</span><span class="o">&gt;</span><span class="n">head</span> <span class="o">=</span> <span class="n">o</span><span class="o">-</span><span class="o">&gt;</span><span class="n">tail</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="n">o</span><span class="o">-</span><span class="o">&gt;</span><span class="n">len</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div>
+    </div>
+
+    
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/data-structure/">Data Structure</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/redis-internals-dict/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">Redis Internals: Dict</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        <a class="next" href="/post/weak-references-in-python/">
+            <span class="next-text nav-default">Weak References</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        <div id="disqus_thread"></div>
+    <script type="text/javascript">
+    (function() {
+      
+      
+      if (window.location.hostname === 'localhost') return;
+
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      var disqus_shortname = 'guoqing';
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+  <a href="https://hellokangning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2016 - 
+    2020
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Guoqing Geng</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  <script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-105833321-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>

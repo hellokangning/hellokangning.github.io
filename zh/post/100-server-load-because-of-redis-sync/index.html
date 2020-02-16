@@ -132,29 +132,30 @@
         <div class="post-category">
             <a href="/zh/categories/redis/"> Redis </a>
             </div>
-          <span class="more-meta"> 约 3104 字 </span>
-          <span class="more-meta"> 预计阅读 7 分钟 </span>
+          <span class="more-meta"> 3104 words </span>
+          <span class="more-meta"> 7 mins read </span>
         
       </div>
     </header>
 
     <div class="post-toc" id="post-toc">
-  <h2 class="post-toc-title">文章目录</h2>
+  <h2 class="post-toc-title">Contents</h2>
   <div class="post-toc-content always-active">
     <nav id="TableOfContents">
   <ul>
-    <li><a href="#全量同步">全量同步</a></li>
-  </ul>
-
-  <ul>
-    <li><a href="#为什么要复制">为什么要复制</a></li>
-    <li><a href="#单个-leader">单个 Leader</a>
+    <li><a href="#redis-的副本同步">Redis 的副本同步</a>
       <ul>
-        <li><a href="#复制日志的实现">复制日志的实现</a></li>
+        <li><a href="#全量同步">全量同步</a></li>
       </ul>
     </li>
-    <li><a href="#多个-leader">多个 Leader</a></li>
-    <li><a href="#无-leader">无 Leader</a></li>
+    <li><a href="#常见的复制模型">常见的复制模型</a>
+      <ul>
+        <li><a href="#为什么要复制">为什么要复制</a></li>
+        <li><a href="#单个-leader">单个 Leader</a></li>
+        <li><a href="#多个-leader">多个 Leader</a></li>
+        <li><a href="#无-leader">无 Leader</a></li>
+      </ul>
+    </li>
   </ul>
 </nav>
   </div>
@@ -163,10 +164,8 @@
       <p>今天一早，就有客户来报说机器负载 100%。从日志中看到的现象是，Slave 向 Master 请求部分同步，Master 却要求 Slave 做个全套：全量同步，因为 Slave 发过来的 replication ID 太老了。Slave 说好吧，整个全的，然后消费成功。接着，Slave 还想来个部分同步，上述的过程连续发生 3 次。Master 有点强买强卖的意思了，这样一来两边的 CPU 不干了，这不是加班嘛！二者之间的网络带宽也是突增，从下图可以看出：</p>
 <p><img src="/images/redis-network-bandwidth-spiking.png" alt=""></p>
 <p>为啥 Master 这么不讲理呢, 简单来说：</p>
-<!-- raw HTML omitted -->
 <p>我们发现客户端的请求包含很多超过 4MB 的对象。这些对象挤占了 Master 的 buffer。Master 会将 Slave 发来的 replication ID 都存在 buffer 里，现在却被挤出去了。这样，Slave 再发来 SYNC 请求，Master 在 buffer 里找不到对应的 replication ID，就毫不吝啬地开启全量同步。</p>
-<!-- raw HTML omitted -->
-<h1 id="redis-的副本同步">Redis 的副本同步</h1>
+<h2 id="redis-的副本同步">Redis 的副本同步</h2>
 <p>除了 Redis Cluster 和 Redis Sentinel 提供的 HA 方案，Redis 还自带基本的主从备份。Slave 会自动连接 Master 并获取它的数据副本。</p>
 <ol>
 <li>Master 和 Slave 都运行良好的情况下，Master 会定期向 Slave 发送命令流，其中包括客户端写，key 过期或逐出等更新操作。</li>
@@ -182,16 +181,16 @@
 </ul>
 <p>每个 Master 都有一个 replication ID，并维护着每个 Slave 的 offset。这个 offset 是递增的。<code>(replication ID, offset)</code> 元组标识了 Master 上唯一版本的数据集。Slave 使用 <code>PSYNC</code> 命令将已处理的 replication ID 和 offset 发送给 Master。Master 这边就可以偷点懒，只将该版本之后的增量部分发给 Slave 就完事了。重点来了，Master 是将 backlog 存在 buffer 里的，如果 buffer 空间不足，或者 Slave 发来的版本找不着，那就只能执行全量同步了。</p>
 <p>到这里肯定有会问，为什么不把同步的 backlog 持久化呢？当然可以这么做，确实能避免开头提出的问题。这就是权衡的问题了，replication ID 和 offset 才多大，保存在内存中快速读取岂不更好。而且同步操作这么频繁，每次刷磁盘不也是一种损耗吗？</p>
-<h2 id="全量同步">全量同步</h2>
+<h3 id="全量同步">全量同步</h3>
 <ol>
 <li>Master 会启动一个后台进程，用来生成 RDB 文件。</li>
 <li>同时，Master 将客户端发来的请求都放在 buffer 里。</li>
 <li>RDB 生成后，Master 将其加载到内存，发送给 Slave。</li>
 <li>最后 Master 将 buffer 里的命令也发给 Slave。</li>
 </ol>
-<h1 id="常见的复制模型">常见的复制模型</h1>
+<h2 id="常见的复制模型">常见的复制模型</h2>
 <p>既然说了 Redis 的复制，那就不妨展开一点，说说分布式系统的复制模型。如果觉得下段说得不好，建议直接看 <a href="https://book.douban.com/subject/26197294/">Designing Data-Intensive Applications</a> 第5章。如果时间还有充裕，建议把这本书从头到尾仔细读完。</p>
-<h2 id="为什么要复制">为什么要复制</h2>
+<h3 id="为什么要复制">为什么要复制</h3>
 <p>Replication 可译为复制，意味着在多台互联的机器上保存同一份数据，带来的好处也是显而易见的：</p>
 <ul>
 <li>数据的局部性使得客户端访问更小延迟。</li>
@@ -204,7 +203,7 @@
 <li>多个 Leader</li>
 <li>无 Leader</li>
 </ul>
-<h2 id="单个-leader">单个 Leader</h2>
+<h3 id="单个-leader">单个 Leader</h3>
 <p>系统中有多个副本带来的一个问题：怎么保证最后的副本是相同的呢？要保证相同，每个更新操作必须到达所有副本并被执行。单个 Leader 模型，又叫 active-passive 或者 master-slave 模型，是这么干的：</p>
 <ol>
 <li>指定一个副本为 leader（master/primary），接收客户端的写请求。</li>
@@ -235,7 +234,7 @@
 <li>选择一个新 leader，这时候需要引入共识算法。</li>
 <li>重配置系统使得新 leader 进入角色。客户端将写请求发给新的 leader。</li>
 </ol>
-<h3 id="复制日志的实现">复制日志的实现</h3>
+<h4 id="复制日志的实现">复制日志的实现</h4>
 <p>Leader 发给 follower 的日志，实现的方式也多种多样。</p>
 <p>一种是基于执行语句（statement）。Leader 记录了每个写请求的 statement，然后发给 follower。比如对一个关系型数据库来说，可能就是一些 <code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code> 之类的。这个方法不少弊端。首先就是类似 <code>NOW()</code> 这种非确定性的函数，会引发歧义。其次，一些表达式会有副作用，比如 trigger、存储过程、自定义函数等。</p>
 <p>另一种方式是 WAL（Write-ahead Log），这种日志就是二进制的字节序列，包含了所有的写入。它的限制只能在尾部 append。目前 PostgreSQL、Oracle 等数据库都采用这种方式。这种日志非常 low level，与存储引擎极度耦合。</p>
@@ -246,12 +245,12 @@
 <li>如果是修改行，日志中包含该行的 ID 和所有列的最新值。</li>
 </ol>
 <p>最后提到一种基于触发器的做法。借助触发器，客户端可以注册一些函数到服务端，如果数据发生变化，触发器就可以将变化写到另一张表里。</p>
-<h2 id="多个-leader">多个 Leader</h2>
+<h3 id="多个-leader">多个 Leader</h3>
 <p>多个 Leader 的情况常见跨机房，每个机房一个 Leader。每个 Leader 都能接收读写请求。每个机房里，还是和单 Leader 的情况相同。</p>
 <p>多个 Leader 可能会引起写冲突，怎么办呢？</p>
 <p>最直接的做法是同步检测冲突，每个写操作传播到其他 Leader 之后才宣告写成功。这种做法就牺牲了多 Leader 带来的好处。</p>
 <p>另一种较简单的做法，是客户端做处理。由客户端来保证每条记录的操只会发给某个特定的 Leader。</p>
-<h2 id="无-leader">无 Leader</h2>
+<h3 id="无-leader">无 Leader</h3>
 <p>无 Leader 的系统中，用户可以将写操作发给任一个副本。假设现在有 n 个副本，每个写操作需要得到 w 个副本的确认，每个读请求需要至少 r 个节点的相应。一旦 w + r &gt; n，我们就能读到至少一份最新的数据。</p>
 <p><img src="/images/distributed-w-r-n-replica.jpg" alt=""></p>
 <p>这种 Quorum 的做法也并非十全十美：</p>
@@ -276,11 +275,11 @@
         <a class="prev" href="/zh/post/redis-as-an-lru-cache/">
             <i class="iconfont icon-left"></i>
             <span class="prev-text nav-default">Redis 用作 LRU 缓存</span>
-            <span class="prev-text nav-mobile">上一篇</span>
+            <span class="prev-text nav-mobile">Prev</span>
           </a>
         <a class="next" href="/zh/post/weekly-daily-goals/">
             <span class="next-text nav-default">每周/每日目标法</span>
-            <span class="next-text nav-mobile">下一篇</span>
+            <span class="next-text nav-mobile">Next</span>
             <i class="iconfont icon-right"></i>
           </a>
       </nav>
@@ -311,21 +310,16 @@
 
     <footer id="footer" class="footer">
       <div class="social-links">
-      <a href="mailto:hellokangning@hotmail.com" class="iconfont icon-email" title="email"></a>
-      <a href="https://www.linkedin.com/in/guoqing-geng-9032b820/" class="iconfont icon-linkedin" title="linkedin"></a>
-      <a href="https://github.com/hellokangning" class="iconfont icon-github" title="github"></a>
-      <a href="https://www.douban.com/people/hellokangning/" class="iconfont icon-douban" title="douban"></a>
-      <a href="https://www.instagram.com/hellokangning/" class="iconfont icon-instagram" title="instagram"></a>
   <a href="https://hellokangning.github.io/zh/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
 </div>
 
 <div class="copyright">
   <span class="power-by">
-    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
   </span>
   <span class="division">|</span>
   <span class="theme-info">
-    主题 - 
+    Theme - 
     <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
   </span>
 

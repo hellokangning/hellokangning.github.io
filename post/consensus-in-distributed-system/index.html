@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Consensus in Distributed System - Qing&#39;s Landing</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Guoqing Geng" /><meta name="description" content="The distributed consensus problem deals with reaching an agreement on a single data value among a group of process connected by an unreliable network. The processes must put forth their candidate values, communicate with one another, and agree on a single consensus value in presence of failures of some processes.
+Examples of applications of consensus include:
+ Leader election / Mutable Exclusion Commit or Abort in distributed transactions Reaching agreement about which process has failed Clock phase synchronization Load balancing  A visual diagram of this problem unfolds in the following. Each process pk with an input value uk runs a program to exchange its value. Finally the output of all non-faulty processes become identical. It is permissive that one or more processes may fail at any time, but the output v must be equal to the value of at least one process.
+" /><meta name="keywords" content="Consensus, Distributed System" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.64.1 with theme even" />
+
+
+<link rel="canonical" href="https://hellokangning.github.io/post/consensus-in-distributed-system/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+
+<meta property="og:title" content="Consensus in Distributed System" />
+<meta property="og:description" content="The distributed consensus problem deals with reaching an agreement on a single data value among a group of process connected by an unreliable network. The processes must put forth their candidate values, communicate with one another, and agree on a single consensus value in presence of failures of some processes.
+Examples of applications of consensus include:
+
+Leader election / Mutable Exclusion
+Commit or Abort in distributed transactions
+Reaching agreement about which process has failed
+Clock phase synchronization
+Load balancing
+
+A visual diagram of this problem unfolds in the following. Each process pk with an input value uk runs a program to exchange its value. Finally the output of all non-faulty processes become identical. It is permissive that one or more processes may fail at any time, but the output v must be equal to the value of at least one process.
+" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hellokangning.github.io/post/consensus-in-distributed-system/" />
+<meta property="article:published_time" content="2018-08-19T16:07:16+08:00" />
+<meta property="article:modified_time" content="2018-08-22T14:05:16+08:00" />
+<meta itemprop="name" content="Consensus in Distributed System">
+<meta itemprop="description" content="The distributed consensus problem deals with reaching an agreement on a single data value among a group of process connected by an unreliable network. The processes must put forth their candidate values, communicate with one another, and agree on a single consensus value in presence of failures of some processes.
+Examples of applications of consensus include:
+
+Leader election / Mutable Exclusion
+Commit or Abort in distributed transactions
+Reaching agreement about which process has failed
+Clock phase synchronization
+Load balancing
+
+A visual diagram of this problem unfolds in the following. Each process pk with an input value uk runs a program to exchange its value. Finally the output of all non-faulty processes become identical. It is permissive that one or more processes may fail at any time, but the output v must be equal to the value of at least one process.
+">
+<meta itemprop="datePublished" content="2018-08-19T16:07:16&#43;08:00" />
+<meta itemprop="dateModified" content="2018-08-22T14:05:16&#43;08:00" />
+<meta itemprop="wordCount" content="2343">
+
+
+
+<meta itemprop="keywords" content="Mind Map," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Consensus in Distributed System"/>
+<meta name="twitter:description" content="The distributed consensus problem deals with reaching an agreement on a single data value among a group of process connected by an unreliable network. The processes must put forth their candidate values, communicate with one another, and agree on a single consensus value in presence of failures of some processes.
+Examples of applications of consensus include:
+
+Leader election / Mutable Exclusion
+Commit or Abort in distributed transactions
+Reaching agreement about which process has failed
+Clock phase synchronization
+Load balancing
+
+A visual diagram of this problem unfolds in the following. Each process pk with an input value uk runs a program to exchange its value. Finally the output of all non-faulty processes become identical. It is permissive that one or more processes may fail at any time, but the output v must be equal to the value of at least one process.
+"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Qing&#39;s Landing</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/en/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/zh/">
+        <li class="mobile-menu-item">中文</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Qing&#39;s Landing</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/en/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/zh/">中文</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Consensus in Distributed System</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> Aug 19, 2018 </span>
+        <div class="post-category">
+            <a href="/categories/distributed-system/"> Distributed System </a>
+            </div>
+          <span class="more-meta"> 2343 words </span>
+          <span class="more-meta"> 11 mins read </span>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#2pc">2PC</a>
+      <ul>
+        <li><a href="#voting-phase">Voting Phase</a></li>
+        <li><a href="#commit-phase">Commit Phase</a></li>
+      </ul>
+    </li>
+    <li><a href="#3pc">3PC</a></li>
+    <li><a href="#paxos">Paxos</a>
+      <ul>
+        <li><a href="#roles">Roles</a></li>
+        <li><a href="#basic-paxos">Basic Paxos</a></li>
+      </ul>
+    </li>
+    <li><a href="#raft">Raft</a>
+      <ul>
+        <li><a href="#leader-election">Leader Election</a></li>
+        <li><a href="#log-replication">Log Replication</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <p>The distributed consensus problem deals with reaching an agreement on a single data value among a group of process connected by an unreliable network. The processes must put forth their candidate values, communicate with one another, and agree on a single consensus value in presence of failures of some processes.</p>
+<p>Examples of applications of consensus include:</p>
+<ul>
+<li>Leader election / Mutable Exclusion</li>
+<li>Commit or Abort in distributed transactions</li>
+<li>Reaching agreement about which process has failed</li>
+<li>Clock phase synchronization</li>
+<li>Load balancing</li>
+</ul>
+<p>A visual diagram of this problem unfolds in the following. Each process <strong>p<!-- raw HTML omitted -->k<!-- raw HTML omitted --></strong> with an input value <strong>u<!-- raw HTML omitted -->k<!-- raw HTML omitted --></strong> runs a program to exchange its value. Finally the output of all non-faulty processes become identical. It is permissive that one or more processes may fail at any time, but the output <strong>v</strong> must be equal to the value of at least one process.</p>
+<p><img src="/images/distributed-consensus-problem.png" alt=""></p>
+<p>A global view of distributed system is here, from which you can know what kind of role consensus plays.</p>
+<p><img src="/images/distributed-overview.png" alt=""></p>
+<p>Protocols that solve consensus problems are designed to deal with limited numbers of faulty processes. A consensus protocol tolerating halting failures must satisfy the following properties.</p>
+<ul>
+<li>Termination. Every non-faulty process must eventually decide.</li>
+<li>Agreement. The final decision of every non-faulty process must be identical.</li>
+<li>Validity. If every non-faulty process begins with the same initial value <strong>v</strong>, then their final decision must be <strong>v</strong>.</li>
+</ul>
+<h1 id="the-byzantine-generals-problem">The Byzantine Generals&rsquo; Problem</h1>
+<p>The Byzantine Generals&rsquo; Problem proposed by Leslie Lamport is a fault-tolerant problem in the distributed system, which is the most complex and rigorous fault-tolerant model.</p>
+<p>In this model, the system does not impose any restrictions on the nodes in the cluster meaning they can send random data, even error data to other nodes, or choose not to respond to the requests from other nodes. These unpredictable behaviors make fault-tolerance more complicated.</p>
+<p>This problem describes a scenario in which a group of generals leads a part of the army. Each general does not know whether the other generals are reliable or not, but they need to choose between attack and retreat.</p>
+<p>It will be a serious problem if one of the generals tells that some of the generals attack and the others retreat. Because of a traitor or interception in the transmission, some generals choose to attack while the rest retreat. They all believe that their choices are approved by the majority.</p>
+<p>The Byzantine Generals&rsquo; Problem is the highest requirement for fault tolerance in distributed system, not a problem in most distributed systems used in daily work. The most frequent problems we encounter cover node down and failure to respond, which is much simpler.</p>
+<h1 id="flp">FLP</h1>
+<p>FLP is one of the most significant theorems in distributed domain offering a proved conclusion.</p>
+<blockquote>
+<p>In a purely asynchronous distributed system, the consensus problem is impossible to solve if even a single process crashes.</p>
+</blockquote>
+<h1 id="consensus-protocols">Consensus Protocols</h1>
+<h2 id="2pc">2PC</h2>
+<p>In a distributed system, all nodes can know their own state after performing an operation, but it is impossible to know the state of other nodes. Two-phase Commit (commonly known as 2PC) introduces a coordinator to uniformly control all nodes and guide them to commit the operation result or not.</p>
+<p>The execution of 2PC is divided into two phases, the voting phase and the commit phase.</p>
+<p><img src="/images/distributed-2pc-sequence.jpg" alt=""></p>
+<h3 id="voting-phase">Voting Phase</h3>
+<p>In the voting phase, the coordinator asks the cohorts whether the operation can be executed. The cohorts will perform the corresponding operation and record the redo and rollback logs, all participants will send an COMMIT or ABORT to the coordinator indicating the result of the operation.</p>
+<h3 id="commit-phase">Commit Phase</h3>
+<p>If all cohorts say yes, the coordinator sends a COMMIT request to the participant, and the participant returns a completion message to the coordinator after finishing the operation and releasing the resource. The entire transaction is ended after coordinator receives the completion message.</p>
+<p>In contrast, when a participant decides on ABORT current transaction, the coordinator sends a ROLLBACK request to all participants telling them rollback the operation based on the previous log.</p>
+<p>One obvious drawback of 2PC is that it&rsquo;s a <strong>blocking protocol</strong>, that is to say, if the coordinator is permanently down or network issue happens, a part of the participants of the transaction will never be able to complete the transaction because of no COMMIT message is received.</p>
+<h2 id="3pc">3PC</h2>
+<p>Three-phase Commit protocol solves the above problem by:</p>
+<ol>
+<li>introducing timeout,</li>
+<li>adding a prepare phase between. If the cohort cannot receiver COMMIT or ROLLBACK, it still release the resource.</li>
+</ol>
+<p><img src="/images/distributed-3pc-sequence.jpg" alt=""></p>
+<p>The main disadvantage to this protocol is that it cannot recover in the event the network is segmented in any manner. The original 3PC assumes a fail-stop model, where processes fail by crashing and crashes can be accurately detected, and does not work with network partitions or asynchronous communication.</p>
+<h2 id="paxos">Paxos</h2>
+<p>Paxos is a family of protocols for solving consensus in a network of unreliable processors.</p>
+<h3 id="roles">Roles</h3>
+<p>Paxos describes the actions of the processors by their roles in the protocol: <em>acceptor</em>, <em>proposer</em>, <em>learner</em>, and <em>leader</em>. In typical implementations, a single processor may play one or more roles at the same time, not affecting the correctness of the protocol.</p>
+<ul>
+<li><strong>Proposer</strong>. A Proposer advocates a client request, attempting to convince the Acceptors to agree on it, and acting as a coordinator to move the protocol forward when conflicts occur.</li>
+<li><strong>Acceptor (Voters)</strong>. The Acceptors act as the fault-tolerant &ldquo;memory&rdquo; of the protocol. Acceptors are collected into groups called Quorums. Any message sent to an Acceptor must be sent to a Quorum of Acceptors. Any message received from an Acceptor is ignored unless a copy is received from each Acceptor in a Quorum.</li>
+<li><strong>Learner</strong>. Learners act as the replication factor for the protocol. Once a client request has been agreed on by the Acceptors, the Learner may take action (i.e.: execute the request and send a response to the client). To improve availability of processing, additional Learners can be added.</li>
+<li><strong>Leader</strong>. Paxos requires a distinguished Proposer (called the leader) to make progress. Many processes may believe they are leaders, but the protocol only guarantees progress if one of them is eventually chosen. If two processes believe they are leaders, they may stall the protocol by continuously proposing conflicting updates. However, the safety properties are still preserved in that case.</li>
+</ul>
+<h3 id="basic-paxos">Basic Paxos</h3>
+<p>This protocol is the most basic of the Paxos family. Each instance of the Basic Paxos protocol decides on a single output value. The protocol proceeds over several rounds ending until a successful one with two phases. A Proposer should not initiate Paxos if it cannot communicate with at least a Quorum of Acceptors.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">Client   Proposer      Acceptor     Learner
+   |         |          |  |  |       |  |
+   X--------&gt;|          |  |  |       |  |  Request
+   |         X---------&gt;|-&gt;|-&gt;|       |  |  Prepare(1)
+   |         |&lt;---------X--X--X       |  |  Promise(1,{Va,Vb,Vc})
+   |         X---------&gt;|-&gt;|-&gt;|       |  |  Accept!(1,Vn)
+   |         |&lt;---------X--X--X------&gt;|-&gt;|  Accepted(1,Vn)
+   |&lt;---------------------------------X--X  Response
+   |         |          |  |  |       |  |
+</code></pre></td></tr></table>
+</div>
+</div><p><strong>Phase 1a: Prepare</strong></p>
+<p>A Proposer (Leader) creates a proposal identified with a number N. This number must be greater than any previous <em>proposal number</em> used by this Proposer. Then, it sends a <em>Prepare</em> message containing this proposal to a Quorum of Acceptors. The Proposer decides who is in the Quorum.</p>
+<p><strong>Phase 1b: Promise</strong></p>
+<p>If the proposal&rsquo;s number N is higher than any previous proposal number received from any Proposer by the Acceptor, then the Acceptor must return a promise to ignore all future proposals having a number less than N.</p>
+<p>If the Acceptor accepted a proposal at some point in the past, it must include the previous proposal number and previous value in its response to the Proposer.</p>
+<p>Otherwise, the Acceptor can ignore the received proposal. It does not have to answer in this case for Paxos to work. However, for the sake of optimization, sending a denial (Nack) response would tell the Proposer that it can stop its attempt to create consensus with proposal N.</p>
+<p><strong>Phase 2a: Accept Request</strong></p>
+<p>If a Proposer receives enough promises from a Quorum of Acceptors, it needs to set a value to its proposal.</p>
+<p>If any Acceptors had previously accepted any proposal, then they&rsquo;ll have sent their values to the Proposer, who now must set the value of its proposal to the value associated with the highest proposal number reported by the Acceptors.</p>
+<p>If none of the Acceptors had accepted a proposal up to this point, then the Proposer may choose the value it originally chose &lsquo;N&rsquo;.</p>
+<p>The Proposer sends an Accept Request message to a Quorum of Acceptors with the chosen value for its proposal.</p>
+<p><strong>Phase 2b: Accepted</strong></p>
+<p>If an Acceptor receives an Accept Request message for a proposal N, it must accept it if and only if it has not already promised to only consider proposals having an identifier greater than N. In this case, it should register the corresponding value v and send an Accepted message to the Proposer and every Learner. Else, it can ignore the Accept Request.</p>
+<p>Note that an Acceptor can accept multiple proposals. These proposals may even have different values in the presence of certain failures. However, the Paxos protocol will guarantee that the Acceptors will ultimately agree on a single value.</p>
+<p>Rounds fail when multiple Proposers send conflicting Prepare messages, or when the Proposer does not receive a Quorum of responses (Promise or Accepted). In these cases, another round must be started with a higher proposal number.
+Notice that when Acceptors accept a request, they also acknowledge the leadership of the Proposer. Hence, Paxos can be used to select a leader in a cluster of nodes.</p>
+<p><strong>Examples of failure</strong></p>
+<p>Failure of Acceptor (Quorum size = 2 Acceptors) is demonstrated in the following graphic representation.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">Client   Proposer      Acceptor     Learner
+   |         |          |  |  |       |  |
+   X--------&gt;|          |  |  |       |  |  Request
+   |         X---------&gt;|-&gt;|-&gt;|       |  |  Prepare(1)
+   |         |          |  |  !       |  |  !! FAIL !!
+   |         |&lt;---------X--X          |  |  Promise(1,{Va, Vb, null})
+   |         X---------&gt;|-&gt;|          |  |  Accept!(1,V)
+   |         |&lt;---------X--X---------&gt;|-&gt;|  Accepted(1,V)
+   |&lt;---------------------------------X--X  Response
+   |         |          |  |          |  |
+</code></pre></td></tr></table>
+</div>
+</div><p>Here is a graph for failure of redundant Learner.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">Client   Proposer      Acceptor     Learner
+   |         |          |  |  |       |  |
+   X--------&gt;|          |  |  |       |  |  Request
+   |         X---------&gt;|-&gt;|-&gt;|       |  |  Prepare(1)
+   |         |&lt;---------X--X--X       |  |  Promise(1,{null,null,null})
+   |         X---------&gt;|-&gt;|-&gt;|       |  |  Accept!(1,V)
+   |         |&lt;---------X--X--X------&gt;|-&gt;|  Accepted(1,V)
+   |         |          |  |  |       |  !  !! FAIL !!
+   |&lt;---------------------------------X     Response
+   |         |          |  |  |       |
+</code></pre></td></tr></table>
+</div>
+</div><p>The next failure case is when a Proposer fails after proposing a value, but before agreement is reached.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">Client  Proposer        Acceptor     Learner
+   |      |             |  |  |       |  |
+   X-----&gt;|             |  |  |       |  |  Request
+   |      X------------&gt;|-&gt;|-&gt;|       |  |  Prepare(1)
+   |      |&lt;------------X--X--X       |  |  Promise(1,{null, null, null})
+   |      |             |  |  |       |  |
+   |      |             |  |  |       |  |  !! Leader fails during broadcast !!
+   |      X------------&gt;|  |  |       |  |  Accept!(1,V)
+   |      !             |  |  |       |  |
+   |         |          |  |  |       |  |  !! NEW LEADER !!
+   |         X---------&gt;|-&gt;|-&gt;|       |  |  Prepare(2)
+   |         |&lt;---------X--X--X       |  |  Promise(2,{V, null, null})
+   |         X---------&gt;|-&gt;|-&gt;|       |  |  Accept!(2,V)
+   |         |&lt;---------X--X--X------&gt;|-&gt;|  Accepted(2,V)
+   |&lt;---------------------------------X--X  Response
+   |         |          |  |  |       |  |
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="raft">Raft</h2>
+<p>Raft is a consensus algorithm designed as an alternative to Paxos, which is more understandable by means of separation of logic.</p>
+<p>Raft achieves consensus via an elected leader. A server in a raft cluster is either a <em>leader</em> or a <em>follower</em>, and can be a <em>candidate</em> in the precise case of an election (leader unavailable).</p>
+<p>The leader regularly informs the followers of its existence by sending a <strong>heartbeat</strong> message. Each follower has a timeout in which it expects the heartbeat from the leader. The timeout is reset on receiving the heartbeat.</p>
+<h3 id="leader-election">Leader Election</h3>
+<p>If no heartbeat is received, the follower changes its status to candidate and starts a leader election.</p>
+<p>In this case, a new <em>term</em> starts in the cluster. A term is an arbitrary period of time on the server during which a new leader needs to be elected. Each term starts with a leader election. If the election is completed successfully (i.e. a single leader is elected) the term keeps going with normal operations orchestrated by the new leader. If the election is a failure, a new term starts, with a new election.</p>
+<p>A leader election is started by a candidate server. A server becomes a candidate if it receives no communication by the leader over a period called the election timeout, so it assumes there is no acting leader anymore. It starts the election by increasing the term counter, voting for itself as new leader, and sending a message to all other servers requesting their vote.</p>
+<p>A server will vote <strong>only once per term</strong>, on a first-come-first-served basis. If a candidate receives a message from another server with a term number at least as large as the candidate&rsquo;s current term, then the candidate&rsquo;s election is defeated and the candidate changes into a follower and recognizes the leader as legitimate. If a candidate receives a majority of votes, then it becomes the new leader. If neither happens, e.g., because of a split vote, then a new term starts, and a new election begins.</p>
+<h3 id="log-replication">Log Replication</h3>
+<p>The leader is responsible for the log replication and also accepts client requests. Each client request consists of a command to be executed by the replicated state machines in the cluster.</p>
+<p>After being appended to the leader&rsquo;s log as a new entry, each of the requests is forwarded to the followers as AppendEntries messages. In case of unavailability of the followers, the leader retries AppendEntries messages indefinitely, until the log entry is eventually stored by all of the followers.</p>
+<p>Once the leader receives confirmation from the majority of its followers that the entry has been replicated, the leader applies the entry to its local state machine, and the request is considered committed.</p>
+<p><strong>Reference</strong></p>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Consensus_(computer_science)">Consensus (computer science)</a></li>
+<li><a href="homepage.divms.uiowa.edu/~ghosh/16612.week11.pdf">Distributed Consensus</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Paxos_(computer_science)">Paxos (computer science)</a></li>
+<li><a href="https://raft.github.io/">The Raft Consensus Algorithm</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Raft_(computer_science)">Raft (computer science)</a></li>
+<li><a href="http://dancres.github.io/Pages/">A Distributed Systems Reading List</a></li>
+</ul>
+    </div>
+
+    
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/mind-map/">Mind Map</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/handling-missing-keys-in-python/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">Handling Missing Keys in Python</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        <a class="next" href="/post/python-unpacking/">
+            <span class="next-text nav-default">Unpacking in Python</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        <div id="disqus_thread"></div>
+    <script type="text/javascript">
+    (function() {
+      
+      
+      if (window.location.hostname === 'localhost') return;
+
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      var disqus_shortname = 'guoqing';
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+  <a href="https://hellokangning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2016 - 
+    2020
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Guoqing Geng</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  <script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-105833321-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>
