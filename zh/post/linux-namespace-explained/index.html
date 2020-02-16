@@ -155,9 +155,22 @@ Container 哪些地方用到了 Linux Namespace
   <div class="post-toc-content">
     <nav id="TableOfContents">
   <ul>
-    <li><a href="#clone-创建新-namespace">clone() 创建新 namespace</a></li>
-    <li><a href="#setns-加入已有-namespace">setns() 加入已有 namespace</a></li>
+    <li><a href="#英雄诞生">英雄诞生</a></li>
+    <li><a href="#实现">实现</a></li>
+    <li><a href="#namespace-的-api">Namespace 的 API</a>
+      <ul>
+        <li><a href="#clone-创建新-namespace">clone() 创建新 namespace</a></li>
+        <li><a href="#setns-加入已有-namespace">setns() 加入已有 namespace</a></li>
+      </ul>
+    </li>
     <li><a href="#unshare-离开-namespace">unshare() 离开 namespace</a></li>
+    <li><a href="#procpidns-目录">/proc/[pid]/ns/ 目录</a></li>
+    <li><a href="#pid-namespace">PID Namespace</a></li>
+    <li><a href="#mount-namespace">Mount Namespace</a></li>
+    <li><a href="#user-namespace">User Namespace</a></li>
+    <li><a href="#network-namespace">Network Namespace</a></li>
+    <li><a href="#uts-namespace">UTS Namespace</a></li>
+    <li><a href="#ipc-namespace">IPC Namespace</a></li>
   </ul>
 </nav>
   </div>
@@ -169,11 +182,11 @@ Container 哪些地方用到了 Linux Namespace
 <li>Linux 下哪些资源可以按照 Namespace 组织，如何组织</li>
 <li>Container 哪些地方用到了 Linux Namespace</li>
 </ul>
-<h1 id="英雄诞生">英雄诞生</h1>
+<h2 id="英雄诞生">英雄诞生</h2>
 <p>传统的 Linux 及其衍生的 UNIX 变体中，许多资源是全局管理的。例如，系统中的所有进程按照惯例是通过 PID 标识的，这意味着内核必须管理一个全局的 PID 列表。而且，所有调用者通过 <code>uname</code> 系统调用返回的系统相关信息（包括系统名称和有关内核的一些信息）都是相同的。用户 ID 的管理方式类似，即各个用户是通过一个全局唯一的 UID 号标识。</p>
 <p>全局 ID 给内核极大的选择权，可以通过 ID 来允许或拒绝某些权限。UID 为 0 的 root 用户可以做人和事，但其他 UID 会受限。例如 UID 为 n 的用户，不允许杀死属于用户 m 的进程（m ≠ n ）。但这不能防止用户看到彼此，即用户 n 可以看到另一个用户 m 也在计算机上活动。这种效果在某些情况下是不可取的。</p>
 <p>Namespace 提供了虚拟化的一种轻量级形式，它只使用一个内核在一台物理机上运行，就可以将上述的全局资源组织起来。这使得可以将一组进程放置到容器中，各个容器彼此隔离。隔离可以使容器的成员与其他容器毫无关系。但也可以通过允许容器进行一定的共享，来降低容器之间的分隔。例如，容器可以设置为使用自身的 PID 集合，但仍然与其他容器共享部分文件系统。</p>
-<h1 id="实现">实现</h1>
+<h2 id="实现">实现</h2>
 <p>Namespace 的实现需要两个部分：</p>
 <ol>
 <li>每个子系统的 namespace 结构，将此前所有的全局组件包装到 namespace 中</li>
@@ -294,14 +307,14 @@ Container 哪些地方用到了 Linux Namespace
 <li>User namespace 没有直接出现在 <code>nsproxy</code> 中，但 <code>**_namespace</code> 都有包含 user namespace 的指针。</li>
 <li>实际上，内核从 4.6 开始引入了 cgroup namespace，本文就先掠过不表，留待以后探索。</li>
 </ul>
-<h1 id="namespace-的-api">Namespace 的 API</h1>
+<h2 id="namespace-的-api">Namespace 的 API</h2>
 <p>有两种方法创建 namespace:</p>
 <ol>
 <li>在用 <code>fork</code> 或 <code>clone</code> 系统调用创建新进程时，有特定的选项可以控制是与父进程共享 namespace，还是建立新的 namespace。</li>
 <li><code>unshare</code> 系统调用将进程的某些部分从父进程分离，其中也包括 namespace。</li>
 </ol>
 <p>这底下用到三个函数 <code>clone()</code>、<code>setns()</code> 以及 <code>unshare()</code>，让我们逐个解析。</p>
-<h2 id="clone-创建新-namespace"><code>clone()</code> 创建新 namespace</h2>
+<h3 id="clone-创建新-namespace"><code>clone()</code> 创建新 namespace</h3>
 <p><code>clone()</code> 函数的 manual 在 <a href="http://man7.org/linux/man-pages/man2/clone.2.html">CLONE(2)</a></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -323,7 +336,7 @@ Container 哪些地方用到了 Linux Namespace
 <li><code>flags</code> 表示使用哪些 <code>CLONE_*</code> 标志位</li>
 <li><code>arg</code> 即传入 <code>fn</code> 函数的参数</li>
 </ul>
-<h2 id="setns-加入已有-namespace"><code>setns()</code> 加入已有 namespace</h2>
+<h3 id="setns-加入已有-namespace"><code>setns()</code> 加入已有 namespace</h3>
 <p>通过 <a href="http://man7.org/linux/man-pages/man2/setns.2.html"><code>setns()</code></a> 可以加入一个已经存在的 namespace。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -348,7 +361,7 @@ Container 哪些地方用到了 Linux Namespace
 </code></pre></td></tr></table>
 </div>
 </div><p><code>unshare()</code> 将进程（线程）从它被其他进程（线程）共享的执行上下文中分离出来。<code>flags</code> 参数是 <code>CLONE_*</code> 的位掩码。</p>
-<h1 id="procpidns-目录">/proc/[pid]/ns/ 目录</h1>
+<h2 id="procpidns-目录">/proc/[pid]/ns/ 目录</h2>
 <p>前文说到了 /proc/[pid]/ns/ 目录，每个进程在该目录下都有一个子目录，标识着所属的 namespace。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -377,7 +390,7 @@ rwxrwxrwx. 1 mtk mtk 0 Apr 28 12:46 uts -&gt; uts:[4026531838]
 </code></pre></td></tr></table>
 </div>
 </div><p>下面，我们对 6 种 namespace 一一拆解。</p>
-<h1 id="pid-namespace">PID Namespace</h1>
+<h2 id="pid-namespace">PID Namespace</h2>
 <p>每个进程都有一个 PID，PID namespace 将 PID 隔离开来。这意味着在不同 PID namespace 下的进程可以有相同的 PID。Container 可以依靠 PID namespace 来 suspend 或 resume 一个 namespace 下的进程集合，而不影响其他 namespace 的进程。</p>
 <p><code>fork</code> 和 <code>clone</code> 创建的进程，带有两个 PID，其中一个是 namespace 中唯一 PID，另一个是 host 系统上的 PID。PID namespace 的 PID 从 2 开始分配，1 这个位置留给 init 进程，它是所有孤儿进程的父进程。如果 init 进程终止了，那么内核会通过 <strong>SIGKILL</strong> 来终止该 namespace 下的所有进程。</p>
 <p>PID namespace 可以组织为层次，也可以为非层次。内核为所有的 PID namespace 维护了一个树状结构，最顶层的是系统初始时创建的 root namespace。在层次组织的 namespace 中，父 namespace 能够看到子 namespace 的所有进程，因为后者进程的 PID 会映射到父 namespace 中。</p>
@@ -411,7 +424,7 @@ rwxrwxrwx. 1 mtk mtk 0 Apr 28 12:46 uts -&gt; uts:[4026531838]
 <li>父 PID namespace 的指针</li>
 <li>所属 User namespace 的指针</li>
 </ul>
-<h1 id="mount-namespace">Mount Namespace</h1>
+<h2 id="mount-namespace">Mount Namespace</h2>
 <p>Mount namespace 隔离的是挂载点，也就是说不同 namesapce 下的进程看到不同的文件系统视图。因此，Mount namespace 用来实现容器中文件系统的隔离。引入 Mount namespace 之后，mount 和 umount 这两个系统调用就不会在 global 的 挂载点上执行了。</p>
 <p>Mount namespace 是内核 2.4.19 时引进的，代表常量是 CLONE_NEWNS，是没有考虑到之后的扩展性。</p>
 <div class="highlight"><div class="chroma">
@@ -451,7 +464,7 @@ rwxrwxrwx. 1 mtk mtk 0 Apr 28 12:46 uts -&gt; uts:[4026531838]
 <li>User namespace 的指针</li>
 <li>所有 mount 的文件树的 root 指针</li>
 </ul>
-<h1 id="user-namespace">User Namespace</h1>
+<h2 id="user-namespace">User Namespace</h2>
 <p>User namespace 隔离了 UID 和 GID。换句话说，进程的 UID 和 GID 在 namespace 内外可以不同。这意味着，一个进程可以在 user namespace 之外有一个 unprivileged UID，同时在一个 user namespace 内有为 0 的 privileged UID。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -494,7 +507,7 @@ rwxrwxrwx. 1 mtk mtk 0 Apr 28 12:46 uts -&gt; uts:[4026531838]
 <li>父 user namespace 的指针</li>
 <li>UID 和 GID 的 map</li>
 </ul>
-<h1 id="network-namespace">Network Namespace</h1>
+<h2 id="network-namespace">Network Namespace</h2>
 <p>Network namespace 隔离了网络资源，包括网络设备、IP 地址、IP 路由表、／proc／net 目录、端口号等等。</p>
 <p>对容器来说，每个容器就可以有自己的网络设备，containerized app 也可以绑定到自己的端口空间。Host 机器上的路由规则也可以把数据包传送给指定的容器（关联到某个网络设备）。</p>
 <div class="highlight"><div class="chroma">
@@ -531,7 +544,7 @@ rwxrwxrwx. 1 mtk mtk 0 Apr 28 12:46 uts -&gt; uts:[4026531838]
 <li>所属的 user namespace</li>
 <li>Network namespace 的列表</li>
 </ul>
-<h1 id="uts-namespace">UTS Namespace</h1>
+<h2 id="uts-namespace">UTS Namespace</h2>
 <p>UTS 隔离 <code>nodename</code> 和 <code>domainname</code> 系统标识符。通过 uname 调用可以看到这两个标识符的值。借助 UTS namespace，容器可以有自己的 hostname 和 NIS domain name。UTS 是 &ldquo;UNIX Time-sharing System&rdquo; 的缩写。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -554,7 +567,7 @@ rwxrwxrwx. 1 mtk mtk 0 Apr 28 12:46 uts -&gt; uts:[4026531838]
 </code></pre></td></tr></table>
 </div>
 </div><p><code>uts_namespace</code> 结构体也是最简单的，只有所属的 user namespace。</p>
-<h1 id="ipc-namespace">IPC Namespace</h1>
+<h2 id="ipc-namespace">IPC Namespace</h2>
 <p>IPC namespace 隔离了 System V IPC 和 POSIX 消息队列。这两个都是进程通信的资源。只有在一个 IPC namespace 下的进程才能够通信。所以在同一个 IPC namespace 下的进程彼此可见，而与其他的 IPC namespace 下的进程则互相不可见。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
