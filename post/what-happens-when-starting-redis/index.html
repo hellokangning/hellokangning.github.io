@@ -25,7 +25,7 @@ It&amp;rsquo;s my habit to start from the entry when meeting a big project. In R
 
 
 
-<meta name="generator" content="Hugo 0.64.1 with theme even" />
+<meta name="generator" content="Hugo 0.68.3 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/post/what-happens-when-starting-redis/" />
@@ -144,7 +144,7 @@ It&rsquo;s my habit to start from the entry when meeting a big project. In Redis
   <div class="post-toc-content">
     <nav id="TableOfContents">
   <ul>
-    <li><a href="#init-redisserver-struct">Init redisServer struct</a></li>
+    <li><a href="#init-redisserver-struct">Init <code>redisServer</code> struct</a></li>
     <li><a href="#parsing-configuration-file">Parsing configuration file</a></li>
     <li><a href="#init-the-state-of-server">Init the state of server</a></li>
     <li><a href="#load-aofrdb-file">Load AOF/RDB file</a></li>
@@ -194,7 +194,7 @@ It&rsquo;s my habit to start from the entry when meeting a big project. In Redis
 <pre class="chroma"><code class="language-c" data-lang="c"><span class="k">struct</span> <span class="n">redisServer</span> <span class="p">{</span>
     <span class="kt">char</span> <span class="o">*</span><span class="n">configfile</span><span class="p">;</span>           <span class="cm">/* Absolute config file path, or NULL */</span>
     <span class="kt">char</span> <span class="o">*</span><span class="n">executable</span><span class="p">;</span>           <span class="cm">/* Absolute executable file path. */</span>
-    <span class="kt">char</span> <span class="o">*</span><span class="o">*</span><span class="n">exec_argv</span><span class="p">;</span>           <span class="cm">/* Executable argv vector (copy). */</span>
+    <span class="kt">char</span> <span class="o">**</span><span class="n">exec_argv</span><span class="p">;</span>           <span class="cm">/* Executable argv vector (copy). */</span>
 
     <span class="n">redisDb</span> <span class="o">*</span><span class="n">db</span><span class="p">;</span>
     <span class="n">dict</span> <span class="o">*</span><span class="n">commands</span><span class="p">;</span>             <span class="cm">/* Command table */</span>
@@ -202,7 +202,7 @@ It&rsquo;s my habit to start from the entry when meeting a big project. In Redis
 
     <span class="kt">int</span> <span class="n">port</span><span class="p">;</span>                   <span class="cm">/* TCP listening port */</span>
 
-    <span class="kt">char</span> <span class="n">runid</span><span class="p">[</span><span class="n">CONFIG_RUN_ID_SIZE</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="p">;</span>  <span class="cm">/* ID always different at every exec. */</span>
+    <span class="kt">char</span> <span class="n">runid</span><span class="p">[</span><span class="n">CONFIG_RUN_ID_SIZE</span><span class="o">+</span><span class="mi">1</span><span class="p">];</span>  <span class="cm">/* ID always different at every exec. */</span>
 
     <span class="kt">char</span> <span class="o">*</span><span class="n">masterhost</span><span class="p">;</span>               <span class="cm">/* Hostname of master */</span>
     <span class="kt">int</span> <span class="n">masterport</span><span class="p">;</span>                 <span class="cm">/* Port of master */</span>
@@ -264,22 +264,22 @@ It&rsquo;s my habit to start from the entry when meeting a big project. In Redis
 <pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">void</span> <span class="nf">initServerConfig</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
 
     <span class="c1">// mutex
-</span><span class="c1"></span>    <span class="n">pthread_mutex_init</span><span class="p">(</span><span class="o">&amp;</span><span class="n">server</span><span class="p">.</span><span class="n">next_client_id_mutex</span><span class="p">,</span><span class="nb">NULL</span><span class="p">)</span><span class="p">;</span>
-    <span class="n">pthread_mutex_init</span><span class="p">(</span><span class="o">&amp;</span><span class="n">server</span><span class="p">.</span><span class="n">lruclock_mutex</span><span class="p">,</span><span class="nb">NULL</span><span class="p">)</span><span class="p">;</span>
-    <span class="n">pthread_mutex_init</span><span class="p">(</span><span class="o">&amp;</span><span class="n">server</span><span class="p">.</span><span class="n">unixtime_mutex</span><span class="p">,</span><span class="nb">NULL</span><span class="p">)</span><span class="p">;</span>
+</span><span class="c1"></span>    <span class="n">pthread_mutex_init</span><span class="p">(</span><span class="o">&amp;</span><span class="n">server</span><span class="p">.</span><span class="n">next_client_id_mutex</span><span class="p">,</span><span class="nb">NULL</span><span class="p">);</span>
+    <span class="n">pthread_mutex_init</span><span class="p">(</span><span class="o">&amp;</span><span class="n">server</span><span class="p">.</span><span class="n">lruclock_mutex</span><span class="p">,</span><span class="nb">NULL</span><span class="p">);</span>
+    <span class="n">pthread_mutex_init</span><span class="p">(</span><span class="o">&amp;</span><span class="n">server</span><span class="p">.</span><span class="n">unixtime_mutex</span><span class="p">,</span><span class="nb">NULL</span><span class="p">);</span>
 
 
     <span class="c1">// run id
-</span><span class="c1"></span>    <span class="n">getRandomHexChars</span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">runid</span><span class="p">,</span><span class="n">CONFIG_RUN_ID_SIZE</span><span class="p">)</span><span class="p">;</span>
-    <span class="n">server</span><span class="p">.</span><span class="n">runid</span><span class="p">[</span><span class="n">CONFIG_RUN_ID_SIZE</span><span class="p">]</span> <span class="o">=</span> <span class="sa"></span><span class="sc">&#39;</span><span class="sc">\0</span><span class="sc">&#39;</span><span class="p">;</span>
+</span><span class="c1"></span>    <span class="n">getRandomHexChars</span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">runid</span><span class="p">,</span><span class="n">CONFIG_RUN_ID_SIZE</span><span class="p">);</span>
+    <span class="n">server</span><span class="p">.</span><span class="n">runid</span><span class="p">[</span><span class="n">CONFIG_RUN_ID_SIZE</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39;\0&#39;</span><span class="p">;</span>
 
     <span class="c1">// default port, 9379
 </span><span class="c1"></span>    <span class="n">server</span><span class="p">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">CONFIG_DEFAULT_SERVER_PORT</span><span class="p">;</span>    
 
     <span class="c1">// LRU clock
-</span><span class="c1"></span>    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">lruclock</span> <span class="o">=</span> <span class="n">getLRUClock</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
-    <span class="n">atomicSet</span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">lruclock</span><span class="p">,</span><span class="n">lruclock</span><span class="p">)</span><span class="p">;</span>
-    <span class="n">resetServerSaveParams</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
+</span><span class="c1"></span>    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">lruclock</span> <span class="o">=</span> <span class="n">getLRUClock</span><span class="p">();</span>
+    <span class="n">atomicSet</span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">lruclock</span><span class="p">,</span><span class="n">lruclock</span><span class="p">);</span>
+    <span class="n">resetServerSaveParams</span><span class="p">();</span>
 
     <span class="c1">// replication
 </span><span class="c1"></span>    <span class="n">server</span><span class="p">.</span><span class="n">masterhost</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
@@ -289,9 +289,9 @@ It&rsquo;s my habit to start from the entry when meeting a big project. In Redis
 
 
     <span class="c1">// command table
-</span><span class="c1"></span>    <span class="n">server</span><span class="p">.</span><span class="n">commands</span> <span class="o">=</span> <span class="n">dictCreate</span><span class="p">(</span><span class="o">&amp;</span><span class="n">commandTableDictType</span><span class="p">,</span><span class="nb">NULL</span><span class="p">)</span><span class="p">;</span>
-    <span class="n">server</span><span class="p">.</span><span class="n">orig_commands</span> <span class="o">=</span> <span class="n">dictCreate</span><span class="p">(</span><span class="o">&amp;</span><span class="n">commandTableDictType</span><span class="p">,</span><span class="nb">NULL</span><span class="p">)</span><span class="p">;</span>
-    <span class="n">populateCommandTable</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
+</span><span class="c1"></span>    <span class="n">server</span><span class="p">.</span><span class="n">commands</span> <span class="o">=</span> <span class="n">dictCreate</span><span class="p">(</span><span class="o">&amp;</span><span class="n">commandTableDictType</span><span class="p">,</span><span class="nb">NULL</span><span class="p">);</span>
+    <span class="n">server</span><span class="p">.</span><span class="n">orig_commands</span> <span class="o">=</span> <span class="n">dictCreate</span><span class="p">(</span><span class="o">&amp;</span><span class="n">commandTableDictType</span><span class="p">,</span><span class="nb">NULL</span><span class="p">);</span>
+    <span class="n">populateCommandTable</span><span class="p">();</span>
 
     <span class="c1">// slow log
 </span><span class="c1"></span>    <span class="n">server</span><span class="p">.</span><span class="n">slowlog_log_slower_than</span> <span class="o">=</span> <span class="n">CONFIG_DEFAULT_SLOWLOG_LOG_SLOWER_THAN</span><span class="p">;</span>
@@ -308,10 +308,10 @@ It&rsquo;s my habit to start from the entry when meeting a big project. In Redis
 </span><span class="lnt">4
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="n">server</span><span class="p">.</span><span class="n">executable</span> <span class="o">=</span> <span class="n">getAbsolutePath</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="p">)</span><span class="p">;</span>
-<span class="n">server</span><span class="p">.</span><span class="n">exec_argv</span> <span class="o">=</span> <span class="n">zmalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">argc</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="n">server</span><span class="p">.</span><span class="n">executable</span> <span class="o">=</span> <span class="n">getAbsolutePath</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+<span class="n">server</span><span class="p">.</span><span class="n">exec_argv</span> <span class="o">=</span> <span class="n">zmalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">argc</span><span class="o">+</span><span class="mi">1</span><span class="p">));</span>
 <span class="n">server</span><span class="p">.</span><span class="n">exec_argv</span><span class="p">[</span><span class="n">argc</span><span class="p">]</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
-<span class="k">for</span> <span class="p">(</span><span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">argc</span><span class="p">;</span> <span class="n">j</span><span class="o">+</span><span class="o">+</span><span class="p">)</span> <span class="n">server</span><span class="p">.</span><span class="n">exec_argv</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">zstrdup</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="p">)</span><span class="p">;</span>
+<span class="k">for</span> <span class="p">(</span><span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">argc</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span> <span class="n">server</span><span class="p">.</span><span class="n">exec_argv</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">zstrdup</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="n">j</span><span class="p">]);</span>
 </code></pre></td></tr></table>
 </div>
 </div><p>If Sentinel model is enabled, the following operations will be performed.</p>
@@ -324,8 +324,8 @@ It&rsquo;s my habit to start from the entry when meeting a big project. In Redis
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-c" data-lang="c"><span class="k">if</span> <span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">sentinel_mode</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">initSentinelConfig</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
-    <span class="n">initSentinel</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
+    <span class="n">initSentinelConfig</span><span class="p">();</span>
+    <span class="n">initSentinel</span><span class="p">();</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
@@ -348,14 +348,14 @@ It&rsquo;s my habit to start from the entry when meeting a big project. In Redis
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">void</span> <span class="nf">loadServerConfig</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">filename</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">options</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">sds</span> <span class="n">config</span> <span class="o">=</span> <span class="n">sdsempty</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
-    <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="n">CONFIG_MAX_LINE</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="p">;</span>
+    <span class="n">sds</span> <span class="n">config</span> <span class="o">=</span> <span class="n">sdsempty</span><span class="p">();</span>
+    <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="n">CONFIG_MAX_LINE</span><span class="o">+</span><span class="mi">1</span><span class="p">];</span>
 
-    <span class="k">while</span><span class="p">(</span><span class="n">fgets</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span><span class="n">CONFIG_MAX_LINE</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">fp</span><span class="p">)</span> <span class="o">!</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span>
-            <span class="n">config</span> <span class="o">=</span> <span class="n">sdscat</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">buf</span><span class="p">)</span><span class="p">;</span>
+    <span class="k">while</span><span class="p">(</span><span class="n">fgets</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span><span class="n">CONFIG_MAX_LINE</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">fp</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span>
+            <span class="n">config</span> <span class="o">=</span> <span class="n">sdscat</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">buf</span><span class="p">);</span>
 
-   <span class="n">loadServerConfigFromString</span><span class="p">(</span><span class="n">config</span><span class="p">)</span><span class="p">;</span>
-    <span class="n">sdsfree</span><span class="p">(</span><span class="n">config</span><span class="p">)</span><span class="p">;</span>    
+   <span class="n">loadServerConfigFromString</span><span class="p">(</span><span class="n">config</span><span class="p">);</span>
+    <span class="n">sdsfree</span><span class="p">(</span><span class="n">config</span><span class="p">);</span>    
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
@@ -422,51 +422,51 @@ It&rsquo;s my habit to start from the entry when meeting a big project. In Redis
 <td class="lntd">
 <pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">void</span> <span class="nf">initServer</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
     <span class="c1">// process id
-</span><span class="c1"></span>    <span class="n">server</span><span class="p">.</span><span class="n">pid</span> <span class="o">=</span> <span class="n">getpid</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
+</span><span class="c1"></span>    <span class="n">server</span><span class="p">.</span><span class="n">pid</span> <span class="o">=</span> <span class="n">getpid</span><span class="p">();</span>
 
     <span class="c1">// clients list
-</span><span class="c1"></span>    <span class="n">server</span><span class="p">.</span><span class="n">clients</span> <span class="o">=</span> <span class="n">listCreate</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
+</span><span class="c1"></span>    <span class="n">server</span><span class="p">.</span><span class="n">clients</span> <span class="o">=</span> <span class="n">listCreate</span><span class="p">();</span>
 
     <span class="c1">// slaves list
-</span><span class="c1"></span>    <span class="n">server</span><span class="p">.</span><span class="n">slaves</span> <span class="o">=</span> <span class="n">listCreate</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
+</span><span class="c1"></span>    <span class="n">server</span><span class="p">.</span><span class="n">slaves</span> <span class="o">=</span> <span class="n">listCreate</span><span class="p">();</span>
 
     <span class="c1">// shared objects for common values
-</span><span class="c1"></span>    <span class="n">createSharedObjects</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
+</span><span class="c1"></span>    <span class="n">createSharedObjects</span><span class="p">();</span>
 
     <span class="c1">// event loop
-</span><span class="c1"></span>    <span class="n">server</span><span class="p">.</span><span class="n">el</span> <span class="o">=</span> <span class="n">aeCreateEventLoop</span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">maxclients</span><span class="o">+</span><span class="n">CONFIG_FDSET_INCR</span><span class="p">)</span><span class="p">;</span>
+</span><span class="c1"></span>    <span class="n">server</span><span class="p">.</span><span class="n">el</span> <span class="o">=</span> <span class="n">aeCreateEventLoop</span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">maxclients</span><span class="o">+</span><span class="n">CONFIG_FDSET_INCR</span><span class="p">);</span>
 
     <span class="c1">// open TCP listening socket for user
-</span><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">port</span> <span class="o">!</span><span class="o">=</span> <span class="mi">0</span> <span class="o">&amp;</span><span class="o">&amp;</span>
-        <span class="n">listenToPort</span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">port</span><span class="p">,</span><span class="n">server</span><span class="p">.</span><span class="n">ipfd</span><span class="p">,</span><span class="o">&amp;</span><span class="n">server</span><span class="p">.</span><span class="n">ipfd_count</span><span class="p">)</span> <span class="o">=</span><span class="o">=</span> <span class="n">C_ERR</span><span class="p">)</span>
-        <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="p">;</span>
+</span><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">port</span> <span class="o">!=</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span>
+        <span class="n">listenToPort</span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">port</span><span class="p">,</span><span class="n">server</span><span class="p">.</span><span class="n">ipfd</span><span class="p">,</span><span class="o">&amp;</span><span class="n">server</span><span class="p">.</span><span class="n">ipfd_count</span><span class="p">)</span> <span class="o">==</span> <span class="n">C_ERR</span><span class="p">)</span>
+        <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
 
     <span class="c1">// create and init databases
-</span><span class="c1"></span>    <span class="n">server</span><span class="p">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">zmalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">redisDb</span><span class="p">)</span><span class="o">*</span><span class="n">server</span><span class="p">.</span><span class="n">dbnum</span><span class="p">)</span><span class="p">;</span>
-    <span class="k">for</span> <span class="p">(</span><span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">server</span><span class="p">.</span><span class="n">dbnum</span><span class="p">;</span> <span class="n">j</span><span class="o">+</span><span class="o">+</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">server</span><span class="p">.</span><span class="n">db</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="p">.</span><span class="n">dict</span> <span class="o">=</span> <span class="n">dictCreate</span><span class="p">(</span><span class="o">&amp;</span><span class="n">dbDictType</span><span class="p">,</span><span class="nb">NULL</span><span class="p">)</span><span class="p">;</span>
-        <span class="n">server</span><span class="p">.</span><span class="n">db</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="p">.</span><span class="n">expires</span> <span class="o">=</span> <span class="n">dictCreate</span><span class="p">(</span><span class="o">&amp;</span><span class="n">keyptrDictType</span><span class="p">,</span><span class="nb">NULL</span><span class="p">)</span><span class="p">;</span>
-        <span class="n">server</span><span class="p">.</span><span class="n">db</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="p">.</span><span class="n">blocking_keys</span> <span class="o">=</span> <span class="n">dictCreate</span><span class="p">(</span><span class="o">&amp;</span><span class="n">keylistDictType</span><span class="p">,</span><span class="nb">NULL</span><span class="p">)</span><span class="p">;</span>
-        <span class="n">server</span><span class="p">.</span><span class="n">db</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="p">.</span><span class="n">ready_keys</span> <span class="o">=</span> <span class="n">dictCreate</span><span class="p">(</span><span class="o">&amp;</span><span class="n">objectKeyPointerValueDictType</span><span class="p">,</span><span class="nb">NULL</span><span class="p">)</span><span class="p">;</span>
-        <span class="n">server</span><span class="p">.</span><span class="n">db</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="p">.</span><span class="n">watched_keys</span> <span class="o">=</span> <span class="n">dictCreate</span><span class="p">(</span><span class="o">&amp;</span><span class="n">keylistDictType</span><span class="p">,</span><span class="nb">NULL</span><span class="p">)</span><span class="p">;</span>
-        <span class="n">server</span><span class="p">.</span><span class="n">db</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="p">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">j</span><span class="p">;</span>
+</span><span class="c1"></span>    <span class="n">server</span><span class="p">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">zmalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">redisDb</span><span class="p">)</span><span class="o">*</span><span class="n">server</span><span class="p">.</span><span class="n">dbnum</span><span class="p">);</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">server</span><span class="p">.</span><span class="n">dbnum</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">server</span><span class="p">.</span><span class="n">db</span><span class="p">[</span><span class="n">j</span><span class="p">].</span><span class="n">dict</span> <span class="o">=</span> <span class="n">dictCreate</span><span class="p">(</span><span class="o">&amp;</span><span class="n">dbDictType</span><span class="p">,</span><span class="nb">NULL</span><span class="p">);</span>
+        <span class="n">server</span><span class="p">.</span><span class="n">db</span><span class="p">[</span><span class="n">j</span><span class="p">].</span><span class="n">expires</span> <span class="o">=</span> <span class="n">dictCreate</span><span class="p">(</span><span class="o">&amp;</span><span class="n">keyptrDictType</span><span class="p">,</span><span class="nb">NULL</span><span class="p">);</span>
+        <span class="n">server</span><span class="p">.</span><span class="n">db</span><span class="p">[</span><span class="n">j</span><span class="p">].</span><span class="n">blocking_keys</span> <span class="o">=</span> <span class="n">dictCreate</span><span class="p">(</span><span class="o">&amp;</span><span class="n">keylistDictType</span><span class="p">,</span><span class="nb">NULL</span><span class="p">);</span>
+        <span class="n">server</span><span class="p">.</span><span class="n">db</span><span class="p">[</span><span class="n">j</span><span class="p">].</span><span class="n">ready_keys</span> <span class="o">=</span> <span class="n">dictCreate</span><span class="p">(</span><span class="o">&amp;</span><span class="n">objectKeyPointerValueDictType</span><span class="p">,</span><span class="nb">NULL</span><span class="p">);</span>
+        <span class="n">server</span><span class="p">.</span><span class="n">db</span><span class="p">[</span><span class="n">j</span><span class="p">].</span><span class="n">watched_keys</span> <span class="o">=</span> <span class="n">dictCreate</span><span class="p">(</span><span class="o">&amp;</span><span class="n">keylistDictType</span><span class="p">,</span><span class="nb">NULL</span><span class="p">);</span>
+        <span class="n">server</span><span class="p">.</span><span class="n">db</span><span class="p">[</span><span class="n">j</span><span class="p">].</span><span class="n">id</span> <span class="o">=</span> <span class="n">j</span><span class="p">;</span>
     <span class="p">}</span>
 
     <span class="c1">// create timers for serverCron
-</span><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="n">aeCreateTimeEvent</span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">el</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">serverCron</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">)</span> <span class="o">=</span><span class="o">=</span> <span class="n">AE_ERR</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">serverPanic</span><span class="p">(</span><span class="sa"></span><span class="s">&#34;</span><span class="s">Can&#39;t create event loop timers.</span><span class="s">&#34;</span><span class="p">)</span><span class="p">;</span>
-        <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="p">;</span>
+</span><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="n">aeCreateTimeEvent</span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">el</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">serverCron</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">)</span> <span class="o">==</span> <span class="n">AE_ERR</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">serverPanic</span><span class="p">(</span><span class="s">&#34;Can&#39;t create event loop timers.&#34;</span><span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
     <span class="p">}</span>
 
     <span class="c1">// Open the AOF file
 </span><span class="c1"></span>    <span class="n">server</span><span class="p">.</span><span class="n">aof_fd</span> <span class="o">=</span> <span class="n">open</span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">aof_filename</span><span class="p">,</span>
-                               <span class="n">O_WRONLY</span><span class="o">|</span><span class="n">O_APPEND</span><span class="o">|</span><span class="n">O_CREAT</span><span class="p">,</span><span class="mo">0644</span><span class="p">)</span><span class="p">;</span>
+                               <span class="n">O_WRONLY</span><span class="o">|</span><span class="n">O_APPEND</span><span class="o">|</span><span class="n">O_CREAT</span><span class="p">,</span><span class="mo">0644</span><span class="p">);</span>
 
     <span class="c1">// slow log
-</span><span class="c1"></span>    <span class="n">slowlogInit</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
+</span><span class="c1"></span>    <span class="n">slowlogInit</span><span class="p">();</span>
 
     <span class="c1">// background system, spawning the thread
-</span><span class="c1"></span>    <span class="n">bioInit</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
+</span><span class="c1"></span>    <span class="n">bioInit</span><span class="p">();</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
@@ -487,7 +487,7 @@ It&rsquo;s my habit to start from the entry when meeting a big project. In Redis
 <td class="lntd">
 <pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">void</span> <span class="nf">loadDataFromDisk</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
     <span class="c1">// if AOF is on
-</span><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">aof_state</span> <span class="o">=</span><span class="o">=</span> <span class="n">AOF_ON</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">aof_state</span> <span class="o">==</span> <span class="n">AOF_ON</span><span class="p">)</span> <span class="p">{</span>
         <span class="n">loadAppendOnlyFile</span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">aof_filename</span><span class="p">)</span>
     <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
         <span class="c1">// if RDF is on
@@ -516,17 +516,17 @@ It&rsquo;s my habit to start from the entry when meeting a big project. In Redis
 </span><span class="lnt">13
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="n">aeSetBeforeSleepProc</span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">el</span><span class="p">,</span><span class="n">beforeSleep</span><span class="p">)</span><span class="p">;</span>
-<span class="n">aeSetAfterSleepProc</span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">el</span><span class="p">,</span><span class="n">afterSleep</span><span class="p">)</span><span class="p">;</span>
-<span class="n">aeMain</span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">el</span><span class="p">)</span><span class="p">;</span>
-<span class="n">aeDeleteEventLoop</span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">el</span><span class="p">)</span><span class="p">;</span>
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="n">aeSetBeforeSleepProc</span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">el</span><span class="p">,</span><span class="n">beforeSleep</span><span class="p">);</span>
+<span class="n">aeSetAfterSleepProc</span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">el</span><span class="p">,</span><span class="n">afterSleep</span><span class="p">);</span>
+<span class="n">aeMain</span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">el</span><span class="p">);</span>
+<span class="n">aeDeleteEventLoop</span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">el</span><span class="p">);</span>
 
 <span class="kt">void</span> <span class="nf">aeMain</span><span class="p">(</span><span class="n">aeEventLoop</span> <span class="o">*</span><span class="n">eventLoop</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">eventLoop</span><span class="o">-</span><span class="o">&gt;</span><span class="n">stop</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-    <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">eventLoop</span><span class="o">-</span><span class="o">&gt;</span><span class="n">stop</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">eventLoop</span><span class="o">-</span><span class="o">&gt;</span><span class="n">beforesleep</span> <span class="o">!</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span>
-            <span class="n">eventLoop</span><span class="o">-</span><span class="o">&gt;</span><span class="n">beforesleep</span><span class="p">(</span><span class="n">eventLoop</span><span class="p">)</span><span class="p">;</span>
-        <span class="n">aeProcessEvents</span><span class="p">(</span><span class="n">eventLoop</span><span class="p">,</span> <span class="n">AE_ALL_EVENTS</span><span class="o">|</span><span class="n">AE_CALL_AFTER_SLEEP</span><span class="p">)</span><span class="p">;</span>
+    <span class="n">eventLoop</span><span class="o">-&gt;</span><span class="n">stop</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">eventLoop</span><span class="o">-&gt;</span><span class="n">stop</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">eventLoop</span><span class="o">-&gt;</span><span class="n">beforesleep</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span>
+            <span class="n">eventLoop</span><span class="o">-&gt;</span><span class="n">beforesleep</span><span class="p">(</span><span class="n">eventLoop</span><span class="p">);</span>
+        <span class="n">aeProcessEvents</span><span class="p">(</span><span class="n">eventLoop</span><span class="p">,</span> <span class="n">AE_ALL_EVENTS</span><span class="o">|</span><span class="n">AE_CALL_AFTER_SLEEP</span><span class="p">);</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>

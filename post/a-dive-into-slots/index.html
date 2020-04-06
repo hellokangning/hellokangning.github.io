@@ -24,7 +24,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.64.1 with theme even" />
+<meta name="generator" content="Hugo 0.68.3 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/post/a-dive-into-slots/" />
@@ -157,9 +157,9 @@
 </span><span class="lnt">14
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Bird</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span><span class="p">:</span>
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Bird</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="n">fly</span> <span class="o">=</span> <span class="bp">True</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">age</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">age</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">age</span> <span class="o">=</span> <span class="n">age</span>
 
 <span class="k">print</span> <span class="n">Bird</span><span class="o">.</span><span class="n">__dict</span> <span class="c1"># {&#39;fly&#39;: True, &#39;__module__&#39;: &#39;__main__&#39;, &#39;__dict__&#39;: &lt;attribute &#39;__dict__&#39; of &#39;Bird&#39; objects&gt;, &#39;__weakref__&#39;: &lt;attribute &#39;__weakref__&#39; of &#39;Bird&#39; objects&gt;, &#39;__doc__&#39;: None, &#39;__init__&#39;: &lt;function __init__ at 0x1052cbf50&gt;}</span>
@@ -167,10 +167,10 @@
 <span class="n">larry</span> <span class="o">=</span> <span class="n">Bird</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 <span class="k">print</span> <span class="n">larry</span><span class="o">.</span><span class="vm">__dict__</span> <span class="c1"># {&#39;age&#39;: 2}</span>
 
-<span class="n">larry</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">shoot</span><span class="s1">&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="n">larry</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;shoot&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
 <span class="k">print</span> <span class="n">larry</span><span class="o">.</span><span class="vm">__dict__</span> <span class="c1"># {&#39;age&#39;: 2, &#39;shoot&#39;: True}</span>
 
-<span class="n">Bird</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">three</span><span class="s1">&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="sa"></span><span class="s1">&#39;</span><span class="s1">excellent</span><span class="s1">&#39;</span>  <span class="c1"># TypeError: &#39;dictproxy&#39; object does not support item assignment</span>
+<span class="n">Bird</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;three&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;excellent&#39;</span>  <span class="c1"># TypeError: &#39;dictproxy&#39; object does not support item assignment</span>
 </code></pre></td></tr></table>
 </div>
 </div><p>Nevertheless, the <code>__dict__</code> is not versatile, it wastes memory. Python can&rsquo;t just allocate a static amount of memory at object creation to store all the attributes, since more may be added. <code>__slots__</code> tells interpreter not to use a dict, and only allocate space for a fixed set of attributes.</p>
@@ -190,16 +190,16 @@
 </span><span class="lnt">12
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Penny</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span><span class="p">:</span>
-    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">shoot</span><span class="s1">&#39;</span><span class="p">,</span> <span class="sa"></span><span class="s1">&#39;</span><span class="s1">assist</span><span class="s1">&#39;</span><span class="p">]</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shoot</span><span class="p">,</span> <span class="n">assist</span><span class="p">)</span><span class="p">:</span>
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Penny</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;shoot&#39;</span><span class="p">,</span> <span class="s1">&#39;assist&#39;</span><span class="p">]</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shoot</span><span class="p">,</span> <span class="n">assist</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">shoot</span> <span class="o">=</span> <span class="n">shoot</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assist</span> <span class="o">=</span> <span class="n">assist</span>
 
 <span class="c1"># {&#39;shoot&#39;: &lt;member &#39;shoot&#39; of &#39;Penny&#39; objects&gt;, &#39;__module__&#39;: &#39;__main__&#39;, &#39;assist&#39;: &lt;member &#39;assist&#39; of &#39;Penny&#39; objects&gt;, &#39;__slots__&#39;: [&#39;shoot&#39;, &#39;assist&#39;], &#39;__doc__&#39;: None, &#39;__init__&#39;: &lt;function __init__ at 0x105376c08&gt;}</span>
 <span class="k">print</span> <span class="n">Penny</span><span class="o">.</span><span class="vm">__dict__</span>
 
-<span class="n">p</span> <span class="o">=</span> <span class="n">Penny</span><span class="p">(</span><span class="bp">True</span><span class="p">,</span> <span class="sa"></span><span class="s1">&#39;</span><span class="s1">top</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">Penny</span><span class="p">(</span><span class="bp">True</span><span class="p">,</span> <span class="s1">&#39;top&#39;</span><span class="p">)</span>
 <span class="k">print</span> <span class="n">p</span><span class="o">.</span><span class="vm">__dict__</span> <span class="c1"># AttributeError: &#39;Penny&#39; object has no attribute &#39;__dict__&#39;</span>
 
 </code></pre></td></tr></table>
@@ -231,21 +231,21 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">weakref</span> <span class="kn">import</span> <span class="n">ref</span>
 
-<span class="k">class</span> <span class="nc">A</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span><span class="p">:</span>
-    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">b</span><span class="s1">&#39;</span><span class="p">]</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">A</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">]</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="mi">1</span>
 
 
-<span class="k">class</span> <span class="nc">B</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span><span class="p">:</span>
-    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">b</span><span class="s1">&#39;</span><span class="p">,</span> <span class="sa"></span><span class="s1">&#39;</span><span class="s1">__weakref__</span><span class="s1">&#39;</span><span class="p">]</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">B</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;__weakref__&#39;</span><span class="p">]</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="mi">1</span>
 
-<span class="n">a</span> <span class="o">=</span> <span class="n">A</span><span class="p">(</span><span class="p">)</span>
+<span class="n">a</span> <span class="o">=</span> <span class="n">A</span><span class="p">()</span>
 <span class="n">r</span> <span class="o">=</span> <span class="n">ref</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="c1"># TypeError: cannot create weak reference to &#39;A&#39; object</span>
 
-<span class="n">b</span> <span class="o">=</span> <span class="n">B</span><span class="p">(</span><span class="p">)</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">B</span><span class="p">()</span>
 <span class="n">r</span> <span class="o">=</span> <span class="n">ref</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> 
 <span class="n">r</span> <span class="c1"># &lt;weakref at 0x10468ff70; to &#39;type&#39; at 0x7fde5d978430 (B)&gt;</span>
 </code></pre></td></tr></table>
@@ -267,16 +267,16 @@
 </span><span class="lnt">12
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Base</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span><span class="p">:</span>
-    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">desc</span><span class="s1">&#39;</span><span class="p">]</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">desc</span> <span class="o">=</span> <span class="sa"></span><span class="s2">&#34;</span><span class="s2">Base</span><span class="s2">&#34;</span>
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Base</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;desc&#39;</span><span class="p">]</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">desc</span> <span class="o">=</span> <span class="s2">&#34;Base&#34;</span>
 
-<span class="k">class</span> <span class="nc">Derived</span><span class="p">(</span><span class="n">Base</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">Derived</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
-<span class="n">d</span> <span class="o">=</span> <span class="n">Derived</span><span class="p">(</span><span class="p">)</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">Derived</span><span class="p">()</span>
 <span class="n">d</span><span class="o">.</span><span class="vm">__dict__</span> <span class="c1"># {}</span>
 <span class="n">d</span><span class="o">.</span><span class="vm">__slots__</span> <span class="c1"># [&#39;desc&#39;]</span>
 </code></pre></td></tr></table>
@@ -293,12 +293,12 @@
 </span><span class="lnt">6
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">BaseA</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span><span class="p">:</span> <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">a</span><span class="s1">&#39;</span><span class="p">]</span>
-<span class="k">class</span> <span class="nc">BaseB</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span><span class="p">:</span> <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">b</span><span class="s1">&#39;</span><span class="p">]</span>
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">BaseA</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span> <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">]</span>
+<span class="k">class</span> <span class="nc">BaseB</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span> <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">]</span>
 
 <span class="c1"># TypeError: Error when calling the metaclass bases</span>
 <span class="c1">#    multiple bases have instance lay-out conflict</span>
-<span class="k">class</span> <span class="nc">Derived</span><span class="p">(</span><span class="n">BaseA</span><span class="p">,</span> <span class="n">BaseB</span><span class="p">)</span><span class="p">:</span> <span class="k">pass</span>
+<span class="k">class</span> <span class="nc">Derived</span><span class="p">(</span><span class="n">BaseA</span><span class="p">,</span> <span class="n">BaseB</span><span class="p">):</span> <span class="k">pass</span>
 </code></pre></td></tr></table>
 </div>
 </div><p>Using an empty <code>__slots__</code> in the parent seems to provide the most flexibility, allowing the child to choose to prevent or allow (by adding <code>__dict__</code> to get dynamic assignment, see section above) the creation of a <code>__dict__</code>.</p>
@@ -309,9 +309,9 @@
 </span><span class="lnt">3
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">BaseA</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span><span class="p">:</span> <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="p">]</span>
-<span class="k">class</span> <span class="nc">BaseB</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span><span class="p">:</span> <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="p">]</span>
-<span class="k">class</span> <span class="nc">Derived</span><span class="p">(</span><span class="n">BaseA</span><span class="p">,</span> <span class="n">BaseB</span><span class="p">)</span><span class="p">:</span> <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">a</span><span class="s1">&#39;</span><span class="p">,</span> <span class="sa"></span><span class="s1">&#39;</span><span class="s1">b</span><span class="s1">&#39;</span><span class="p">]</span>
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">BaseA</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span> <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">class</span> <span class="nc">BaseB</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span> <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">class</span> <span class="nc">Derived</span><span class="p">(</span><span class="n">BaseA</span><span class="p">,</span> <span class="n">BaseB</span><span class="p">):</span> <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">]</span>
 </code></pre></td></tr></table>
 </div>
 </div>

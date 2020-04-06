@@ -24,7 +24,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.64.1 with theme even" />
+<meta name="generator" content="Hugo 0.68.3 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/zh/post/redis-ssl/" />
@@ -283,17 +283,17 @@ except Exception as ex:
 
 <span class="k">try</span><span class="p">:</span>
     <span class="n">conn</span> <span class="o">=</span> <span class="n">redis</span><span class="o">.</span><span class="n">StrictRedis</span><span class="p">(</span>
-        <span class="n">host</span><span class="o">=</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">&lt;cache-name&gt;.redis.cache.windows.net</span><span class="s1">&#39;</span><span class="p">,</span>
+        <span class="n">host</span><span class="o">=</span><span class="s1">&#39;&lt;cache-name&gt;.redis.cache.windows.net&#39;</span><span class="p">,</span>
         <span class="n">port</span><span class="o">=</span><span class="mi">6380</span><span class="p">,</span>
-        <span class="n">password</span><span class="o">=</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">your password here</span><span class="s1">&#39;</span><span class="p">,</span>
+        <span class="n">password</span><span class="o">=</span><span class="s1">&#39;your password here&#39;</span><span class="p">,</span>
         <span class="n">ssl</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-        <span class="n">ssl_ca_certs</span><span class="o">=</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">path to cert</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">ssl_ca_certs</span><span class="o">=</span><span class="s1">&#39;path to cert&#39;</span><span class="p">)</span>
     <span class="k">print</span> <span class="p">(</span><span class="n">conn</span><span class="p">)</span>
-    <span class="n">conn</span><span class="o">.</span><span class="n">ping</span><span class="p">(</span><span class="p">)</span>
-    <span class="k">print</span> <span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">Connected!</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">conn</span><span class="o">.</span><span class="n">ping</span><span class="p">()</span>
+    <span class="k">print</span> <span class="p">(</span><span class="s1">&#39;Connected!&#39;</span><span class="p">)</span>
 <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
-    <span class="k">print</span> <span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">Error:</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">ex</span><span class="p">)</span>
-    <span class="nb">exit</span><span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">Failed to connect, terminating.</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">print</span> <span class="p">(</span><span class="s1">&#39;Error:&#39;</span><span class="p">,</span> <span class="n">ex</span><span class="p">)</span>
+    <span class="nb">exit</span><span class="p">(</span><span class="s1">&#39;Failed to connect, terminating.&#39;</span><span class="p">)</span>
 </code></pre></td></tr></table>
 </div>
 </div><p>在 Azure 的<a href="https://docs.microsoft.com/en-us/azure/azure-cache-for-redis/cache-faq">官方文档</a>上，有这么一句：</p>
@@ -314,10 +314,10 @@ except Exception as ex:
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">redis</span>
-<span class="n">r</span> <span class="o">=</span> <span class="n">redis</span><span class="o">.</span><span class="n">StrictRedis</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">&lt;Your Host Name&gt;.redis.cache.windows.net</span><span class="s1">&#39;</span><span class="p">,</span>
-        <span class="n">port</span><span class="o">=</span><span class="mi">6380</span><span class="p">,</span> <span class="n">db</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">&lt;Your Access Key&gt;</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">ssl</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-<span class="n">r</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">foo</span><span class="s1">&#39;</span><span class="p">,</span> <span class="sa"></span><span class="s1">&#39;</span><span class="s1">bar</span><span class="s1">&#39;</span><span class="p">)</span> <span class="c1"># True</span>
-<span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">foo</span><span class="s1">&#39;</span><span class="p">)</span> <span class="c1">#b&#39;bar&#39;</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">redis</span><span class="o">.</span><span class="n">StrictRedis</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="s1">&#39;&lt;Your Host Name&gt;.redis.cache.windows.net&#39;</span><span class="p">,</span>
+        <span class="n">port</span><span class="o">=</span><span class="mi">6380</span><span class="p">,</span> <span class="n">db</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s1">&#39;&lt;Your Access Key&gt;&#39;</span><span class="p">,</span> <span class="n">ssl</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">r</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">)</span> <span class="c1"># True</span>
+<span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">)</span> <span class="c1">#b&#39;bar&#39;</span>
 </code></pre></td></tr></table>
 </div>
 </div><p>既然 <code>ssl = True</code> 已经开启了 SSL，那 <code>ssl_ca_certs</code> 这个参数是做什么的呢？</p>
@@ -387,56 +387,56 @@ except Exception as ex:
 </span><span class="lnt">51
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Redis</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">localhost</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">6379</span><span class="p">,</span>
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Redis</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="s1">&#39;localhost&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">6379</span><span class="p">,</span>
                  <span class="n">db</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">socket_timeout</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                  <span class="n">socket_connect_timeout</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                  <span class="n">socket_keepalive</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">socket_keepalive_options</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                  <span class="n">connection_pool</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">unix_socket_path</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                 <span class="n">encoding</span><span class="o">=</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">utf-8</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">encoding_errors</span><span class="o">=</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">strict</span><span class="s1">&#39;</span><span class="p">,</span>
+                 <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="n">encoding_errors</span><span class="o">=</span><span class="s1">&#39;strict&#39;</span><span class="p">,</span>
                  <span class="n">charset</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                  <span class="n">decode_responses</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">retry_on_timeout</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
                  <span class="n">ssl</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">ssl_keyfile</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">ssl_certfile</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                 <span class="n">ssl_cert_reqs</span><span class="o">=</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">required</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">ssl_ca_certs</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                 <span class="n">max_connections</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="p">:</span>
+                 <span class="n">ssl_cert_reqs</span><span class="o">=</span><span class="s1">&#39;required&#39;</span><span class="p">,</span> <span class="n">ssl_ca_certs</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">max_connections</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">connection_pool</span><span class="p">:</span>
             <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="sa"></span><span class="s1">&#39;</span><span class="s1">db</span><span class="s1">&#39;</span><span class="p">:</span> <span class="n">db</span><span class="p">,</span>
-                <span class="sa"></span><span class="s1">&#39;</span><span class="s1">password</span><span class="s1">&#39;</span><span class="p">:</span> <span class="n">password</span><span class="p">,</span>
-                <span class="sa"></span><span class="s1">&#39;</span><span class="s1">socket_timeout</span><span class="s1">&#39;</span><span class="p">:</span> <span class="n">socket_timeout</span><span class="p">,</span>
-                <span class="sa"></span><span class="s1">&#39;</span><span class="s1">encoding</span><span class="s1">&#39;</span><span class="p">:</span> <span class="n">encoding</span><span class="p">,</span>
-                <span class="sa"></span><span class="s1">&#39;</span><span class="s1">encoding_errors</span><span class="s1">&#39;</span><span class="p">:</span> <span class="n">encoding_errors</span><span class="p">,</span>
-                <span class="sa"></span><span class="s1">&#39;</span><span class="s1">decode_responses</span><span class="s1">&#39;</span><span class="p">:</span> <span class="n">decode_responses</span><span class="p">,</span>
-                <span class="sa"></span><span class="s1">&#39;</span><span class="s1">retry_on_timeout</span><span class="s1">&#39;</span><span class="p">:</span> <span class="n">retry_on_timeout</span><span class="p">,</span>
-                <span class="sa"></span><span class="s1">&#39;</span><span class="s1">max_connections</span><span class="s1">&#39;</span><span class="p">:</span> <span class="n">max_connections</span>
+                <span class="s1">&#39;db&#39;</span><span class="p">:</span> <span class="n">db</span><span class="p">,</span>
+                <span class="s1">&#39;password&#39;</span><span class="p">:</span> <span class="n">password</span><span class="p">,</span>
+                <span class="s1">&#39;socket_timeout&#39;</span><span class="p">:</span> <span class="n">socket_timeout</span><span class="p">,</span>
+                <span class="s1">&#39;encoding&#39;</span><span class="p">:</span> <span class="n">encoding</span><span class="p">,</span>
+                <span class="s1">&#39;encoding_errors&#39;</span><span class="p">:</span> <span class="n">encoding_errors</span><span class="p">,</span>
+                <span class="s1">&#39;decode_responses&#39;</span><span class="p">:</span> <span class="n">decode_responses</span><span class="p">,</span>
+                <span class="s1">&#39;retry_on_timeout&#39;</span><span class="p">:</span> <span class="n">retry_on_timeout</span><span class="p">,</span>
+                <span class="s1">&#39;max_connections&#39;</span><span class="p">:</span> <span class="n">max_connections</span>
             <span class="p">}</span>
 
             <span class="k">if</span> <span class="n">unix_socket_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-                <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="p">{</span>
-                    <span class="sa"></span><span class="s1">&#39;</span><span class="s1">path</span><span class="s1">&#39;</span><span class="p">:</span> <span class="n">unix_socket_path</span><span class="p">,</span>
-                    <span class="sa"></span><span class="s1">&#39;</span><span class="s1">connection_class</span><span class="s1">&#39;</span><span class="p">:</span> <span class="n">UnixDomainSocketConnection</span>
-                <span class="p">}</span><span class="p">)</span>
+                <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+                    <span class="s1">&#39;path&#39;</span><span class="p">:</span> <span class="n">unix_socket_path</span><span class="p">,</span>
+                    <span class="s1">&#39;connection_class&#39;</span><span class="p">:</span> <span class="n">UnixDomainSocketConnection</span>
+                <span class="p">})</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># TCP specific options</span>
-                <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="p">{</span>
-                    <span class="sa"></span><span class="s1">&#39;</span><span class="s1">host</span><span class="s1">&#39;</span><span class="p">:</span> <span class="n">host</span><span class="p">,</span>
-                    <span class="sa"></span><span class="s1">&#39;</span><span class="s1">port</span><span class="s1">&#39;</span><span class="p">:</span> <span class="n">port</span><span class="p">,</span>
-                    <span class="sa"></span><span class="s1">&#39;</span><span class="s1">socket_connect_timeout</span><span class="s1">&#39;</span><span class="p">:</span> <span class="n">socket_connect_timeout</span><span class="p">,</span>
-                    <span class="sa"></span><span class="s1">&#39;</span><span class="s1">socket_keepalive</span><span class="s1">&#39;</span><span class="p">:</span> <span class="n">socket_keepalive</span><span class="p">,</span>
-                    <span class="sa"></span><span class="s1">&#39;</span><span class="s1">socket_keepalive_options</span><span class="s1">&#39;</span><span class="p">:</span> <span class="n">socket_keepalive_options</span><span class="p">,</span>
-                <span class="p">}</span><span class="p">)</span>
+                <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+                    <span class="s1">&#39;host&#39;</span><span class="p">:</span> <span class="n">host</span><span class="p">,</span>
+                    <span class="s1">&#39;port&#39;</span><span class="p">:</span> <span class="n">port</span><span class="p">,</span>
+                    <span class="s1">&#39;socket_connect_timeout&#39;</span><span class="p">:</span> <span class="n">socket_connect_timeout</span><span class="p">,</span>
+                    <span class="s1">&#39;socket_keepalive&#39;</span><span class="p">:</span> <span class="n">socket_keepalive</span><span class="p">,</span>
+                    <span class="s1">&#39;socket_keepalive_options&#39;</span><span class="p">:</span> <span class="n">socket_keepalive_options</span><span class="p">,</span>
+                <span class="p">})</span>
 
                 <span class="k">if</span> <span class="n">ssl</span><span class="p">:</span>
-                    <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="p">{</span>
-                        <span class="sa"></span><span class="s1">&#39;</span><span class="s1">connection_class</span><span class="s1">&#39;</span><span class="p">:</span> <span class="n">SSLConnection</span><span class="p">,</span>
-                        <span class="sa"></span><span class="s1">&#39;</span><span class="s1">ssl_keyfile</span><span class="s1">&#39;</span><span class="p">:</span> <span class="n">ssl_keyfile</span><span class="p">,</span>
-                        <span class="sa"></span><span class="s1">&#39;</span><span class="s1">ssl_certfile</span><span class="s1">&#39;</span><span class="p">:</span> <span class="n">ssl_certfile</span><span class="p">,</span>
-                        <span class="sa"></span><span class="s1">&#39;</span><span class="s1">ssl_cert_reqs</span><span class="s1">&#39;</span><span class="p">:</span> <span class="n">ssl_cert_reqs</span><span class="p">,</span>
-                        <span class="sa"></span><span class="s1">&#39;</span><span class="s1">ssl_ca_certs</span><span class="s1">&#39;</span><span class="p">:</span> <span class="n">ssl_ca_certs</span><span class="p">,</span>
-                    <span class="p">}</span><span class="p">)</span>
+                    <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+                        <span class="s1">&#39;connection_class&#39;</span><span class="p">:</span> <span class="n">SSLConnection</span><span class="p">,</span>
+                        <span class="s1">&#39;ssl_keyfile&#39;</span><span class="p">:</span> <span class="n">ssl_keyfile</span><span class="p">,</span>
+                        <span class="s1">&#39;ssl_certfile&#39;</span><span class="p">:</span> <span class="n">ssl_certfile</span><span class="p">,</span>
+                        <span class="s1">&#39;ssl_cert_reqs&#39;</span><span class="p">:</span> <span class="n">ssl_cert_reqs</span><span class="p">,</span>
+                        <span class="s1">&#39;ssl_ca_certs&#39;</span><span class="p">:</span> <span class="n">ssl_ca_certs</span><span class="p">,</span>
+                    <span class="p">})</span>
 
-             <span class="n">connection_pool</span> <span class="o">=</span> <span class="n">ConnectionPool</span><span class="p">(</span><span class="o">*</span><span class="o">*</span><span class="n">kwargs</span><span class="p">)</span>
+             <span class="n">connection_pool</span> <span class="o">=</span> <span class="n">ConnectionPool</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">connection_pool</span> <span class="o">=</span> <span class="n">connection_pool</span>
 </code></pre></td></tr></table>
 </div>
@@ -480,13 +480,13 @@ except Exception as ex:
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">ssl_available</span> <span class="o">=</span> <span class="bp">False</span>
 
-<span class="k">class</span> <span class="nc">SSLConnection</span><span class="p">(</span><span class="n">Connection</span><span class="p">)</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">SSLConnection</span><span class="p">(</span><span class="n">Connection</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ssl_keyfile</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">ssl_certfile</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                 <span class="n">ssl_cert_reqs</span><span class="o">=</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">required</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">ssl_ca_certs</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">*</span><span class="o">*</span><span class="n">kwargs</span><span class="p">)</span><span class="p">:</span>
+                 <span class="n">ssl_cert_reqs</span><span class="o">=</span><span class="s1">&#39;required&#39;</span><span class="p">,</span> <span class="n">ssl_ca_certs</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">ssl_available</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">RedisError</span><span class="p">(</span><span class="sa"></span><span class="s2">&#34;</span><span class="s2">Python wasn</span><span class="s2">&#39;</span><span class="s2">t built with SSL support</span><span class="s2">&#34;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">RedisError</span><span class="p">(</span><span class="s2">&#34;Python wasn&#39;t built with SSL support&#34;</span><span class="p">)</span>
 
-        <span class="nb">super</span><span class="p">(</span><span class="n">SSLConnection</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="o">*</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SSLConnection</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">keyfile</span> <span class="o">=</span> <span class="n">ssl_keyfile</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">certfile</span> <span class="o">=</span> <span class="n">ssl_certfile</span>
@@ -494,9 +494,9 @@ except Exception as ex:
         <span class="bp">self</span><span class="o">.</span><span class="n">cert_reqs</span> <span class="o">=</span> <span class="n">ssl_cert_reqs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ca_certs</span> <span class="o">=</span> <span class="n">ssl_ca_certs</span>
 
-    <span class="k">def</span> <span class="nf">_connect</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
-        <span class="sa"></span><span class="s2">&#34;</span><span class="s2">Wrap the socket with SSL support</span><span class="s2">&#34;</span>
-        <span class="n">sock</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">SSLConnection</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_connect</span><span class="p">(</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_connect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s2">&#34;Wrap the socket with SSL support&#34;</span>
+        <span class="n">sock</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">SSLConnection</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_connect</span><span class="p">()</span>
         <span class="n">sock</span> <span class="o">=</span> <span class="n">ssl</span><span class="o">.</span><span class="n">wrap_socket</span><span class="p">(</span><span class="n">sock</span><span class="p">,</span>
                                <span class="n">cert_reqs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cert_reqs</span><span class="p">,</span>
                                <span class="n">keyfile</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">keyfile</span><span class="p">,</span>
@@ -546,11 +546,11 @@ except Exception as ex:
 </span><span class="lnt">36
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Connection</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">_connect</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Connection</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_connect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">err</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">socket</span><span class="o">.</span><span class="n">getaddrinfo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">socket_type</span><span class="p">,</span>
-                                      <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_STREAM</span><span class="p">)</span><span class="p">:</span>
+                                      <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_STREAM</span><span class="p">):</span>
             <span class="n">family</span><span class="p">,</span> <span class="n">socktype</span><span class="p">,</span> <span class="n">proto</span><span class="p">,</span> <span class="n">canonname</span><span class="p">,</span> <span class="n">socket_address</span> <span class="o">=</span> <span class="n">res</span>
             <span class="n">sock</span> <span class="o">=</span> <span class="bp">None</span>
             <span class="k">try</span><span class="p">:</span>
@@ -561,7 +561,7 @@ except Exception as ex:
                 <span class="c1"># TCP_KEEPALIVE</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">socket_keepalive</span><span class="p">:</span>
                     <span class="n">sock</span><span class="o">.</span><span class="n">setsockopt</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">SOL_SOCKET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SO_KEEPALIVE</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-                    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">socket_keepalive_options</span><span class="p">)</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">socket_keepalive_options</span><span class="p">):</span>
                         <span class="n">sock</span><span class="o">.</span><span class="n">setsockopt</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">SOL_TCP</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
 
                 <span class="c1"># set the socket_connect_timeout before we connect</span>
@@ -577,11 +577,11 @@ except Exception as ex:
             <span class="k">except</span> <span class="n">socket</span><span class="o">.</span><span class="n">error</span> <span class="k">as</span> <span class="n">_</span><span class="p">:</span>
                 <span class="n">err</span> <span class="o">=</span> <span class="n">_</span>
                 <span class="k">if</span> <span class="n">sock</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-                    <span class="n">sock</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="p">)</span>
+                    <span class="n">sock</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">err</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">err</span>
-        <span class="k">raise</span> <span class="n">socket</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa"></span><span class="s2">&#34;</span><span class="s2">socket.getaddrinfo returned an empty list</span><span class="s2">&#34;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">socket</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&#34;socket.getaddrinfo returned an empty list&#34;</span><span class="p">)</span>
 </code></pre></td></tr></table>
 </div>
 </div><p><code>wrap_socket</code> 给这个 Socket 包了一层 SSL 协议。这个函数已经到达 Python 内置库，咱们继续。</p>
@@ -621,13 +621,13 @@ except Exception as ex:
                 <span class="n">ssl_version</span><span class="o">=</span><span class="n">PROTOCOL_TLS</span><span class="p">,</span> <span class="n">ca_certs</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                 <span class="n">do_handshake_on_connect</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
                 <span class="n">suppress_ragged_eofs</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-                <span class="n">ciphers</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="p">:</span>
+                <span class="n">ciphers</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
 
     <span class="k">if</span> <span class="n">server_side</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">certfile</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa"></span><span class="s2">&#34;</span><span class="s2">certfile must be specified for server-side </span><span class="s2">&#34;</span>
-                         <span class="sa"></span><span class="s2">&#34;</span><span class="s2">operations</span><span class="s2">&#34;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&#34;certfile must be specified for server-side &#34;</span>
+                         <span class="s2">&#34;operations&#34;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">keyfile</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">certfile</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa"></span><span class="s2">&#34;</span><span class="s2">certfile must be specified</span><span class="s2">&#34;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&#34;certfile must be specified&#34;</span><span class="p">)</span>
     <span class="n">context</span> <span class="o">=</span> <span class="n">SSLContext</span><span class="p">(</span><span class="n">ssl_version</span><span class="p">)</span>
     <span class="n">context</span><span class="o">.</span><span class="n">verify_mode</span> <span class="o">=</span> <span class="n">cert_reqs</span>
     <span class="k">if</span> <span class="n">ca_certs</span><span class="p">:</span>
@@ -664,11 +664,11 @@ except Exception as ex:
 </span><span class="lnt">16
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">SSLContext</span><span class="p">(</span><span class="n">_SSLContext</span><span class="p">)</span><span class="p">:</span>
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">SSLContext</span><span class="p">(</span><span class="n">_SSLContext</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">wrap_socket</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sock</span><span class="p">,</span> <span class="n">server_side</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
                     <span class="n">do_handshake_on_connect</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
                     <span class="n">suppress_ragged_eofs</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-                    <span class="n">server_hostname</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">session</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="p">:</span>
+                    <span class="n">server_hostname</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">session</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="c1"># SSLSocket class handles server_hostname encoding before it calls</span>
         <span class="c1"># ctx._wrap_socket()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sslsocket_class</span><span class="o">.</span><span class="n">_create</span><span class="p">(</span>

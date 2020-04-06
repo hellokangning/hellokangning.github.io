@@ -26,7 +26,7 @@ With the help of HashMap, HashSet offers constant time performance for the basic
 
 
 
-<meta name="generator" content="Hugo 0.64.1 with theme even" />
+<meta name="generator" content="Hugo 0.68.3 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/post/java-hashset/" />
@@ -149,10 +149,10 @@ With the help of HashMap, HashSet offers constant time performance for the basic
     <nav id="TableOfContents">
   <ul>
     <li><a href="#hashmap-underneath">HashMap Underneath</a></li>
-    <li><a href="#add">add</a></li>
-    <li><a href="#remove">remove</a></li>
-    <li><a href="#contains">contains</a></li>
-    <li><a href="#size">size</a></li>
+    <li><a href="#add"><code>add</code></a></li>
+    <li><a href="#remove"><code>remove</code></a></li>
+    <li><a href="#contains"><code>contains</code></a></li>
+    <li><a href="#size"><code>size</code></a></li>
   </ul>
 </nav>
   </div>
@@ -187,15 +187,15 @@ With the help of HashMap, HashSet offers constant time performance for the basic
 </span><span class="c1"></span>
 <span class="kd">public</span> <span class="kd">class</span> <span class="nc">HashSet</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span>
     <span class="kd">extends</span> <span class="n">AbstractSet</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span>
-    <span class="kd">implements</span> <span class="n">Set</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span><span class="o">,</span> <span class="n">Cloneable</span><span class="o">,</span> <span class="n">java</span><span class="o">.</span><span class="na">io</span><span class="o">.</span><span class="na">Serializable</span>
+    <span class="kd">implements</span> <span class="n">Set</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;,</span> <span class="n">Cloneable</span><span class="o">,</span> <span class="n">java</span><span class="o">.</span><span class="na">io</span><span class="o">.</span><span class="na">Serializable</span>
 <span class="o">{</span>
     <span class="kd">private</span> <span class="kd">transient</span> <span class="n">HashMap</span><span class="o">&lt;</span><span class="n">E</span><span class="o">,</span><span class="n">Object</span><span class="o">&gt;</span> <span class="n">map</span><span class="o">;</span>
-    <span class="kd">public</span> <span class="nf">HashSet</span><span class="o">(</span><span class="o">)</span> <span class="o">{</span>
-        <span class="n">map</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&lt;</span><span class="o">&gt;</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+    <span class="kd">public</span> <span class="nf">HashSet</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">map</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&lt;&gt;();</span>
     <span class="o">}</span>
 
      <span class="kd">public</span> <span class="nf">HashSet</span><span class="o">(</span><span class="kt">int</span> <span class="n">initialCapacity</span><span class="o">,</span> <span class="kt">float</span> <span class="n">loadFactor</span><span class="o">)</span> <span class="o">{</span>
-        <span class="n">map</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&lt;</span><span class="o">&gt;</span><span class="o">(</span><span class="n">initialCapacity</span><span class="o">,</span> <span class="n">loadFactor</span><span class="o">)</span><span class="o">;</span>
+        <span class="n">map</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&lt;&gt;(</span><span class="n">initialCapacity</span><span class="o">,</span> <span class="n">loadFactor</span><span class="o">);</span>
     <span class="o">}</span>
 <span class="o">}</span>
 </code></pre></td></tr></table>
@@ -214,7 +214,7 @@ With the help of HashMap, HashSet offers constant time performance for the basic
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// HashSet.java
 </span><span class="c1"></span>
 <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">add</span><span class="o">(</span><span class="n">E</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
-    <span class="k">return</span> <span class="n">map</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">e</span><span class="o">,</span> <span class="n">PRESENT</span><span class="o">)</span><span class="o">=</span><span class="o">=</span><span class="kc">null</span><span class="o">;</span>
+    <span class="k">return</span> <span class="n">map</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">e</span><span class="o">,</span> <span class="n">PRESENT</span><span class="o">)==</span><span class="kc">null</span><span class="o">;</span>
 <span class="o">}</span>
 </code></pre></td></tr></table>
 </div>
@@ -234,7 +234,7 @@ With the help of HashMap, HashSet offers constant time performance for the basic
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// HashSet.java
 </span><span class="c1"></span>
 <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">remove</span><span class="o">(</span><span class="n">Object</span> <span class="n">o</span><span class="o">)</span> <span class="o">{</span>
-    <span class="k">return</span> <span class="n">map</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="n">o</span><span class="o">)</span><span class="o">=</span><span class="o">=</span><span class="n">PRESENT</span><span class="o">;</span>
+    <span class="k">return</span> <span class="n">map</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="n">o</span><span class="o">)==</span><span class="n">PRESENT</span><span class="o">;</span>
 <span class="o">}</span>
 </code></pre></td></tr></table>
 </div>
@@ -252,7 +252,7 @@ With the help of HashMap, HashSet offers constant time performance for the basic
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// HashSet.java
 </span><span class="c1"></span>
 <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">contains</span><span class="o">(</span><span class="n">Object</span> <span class="n">o</span><span class="o">)</span> <span class="o">{</span>
-    <span class="k">return</span> <span class="n">map</span><span class="o">.</span><span class="na">containsKey</span><span class="o">(</span><span class="n">o</span><span class="o">)</span><span class="o">;</span>
+    <span class="k">return</span> <span class="n">map</span><span class="o">.</span><span class="na">containsKey</span><span class="o">(</span><span class="n">o</span><span class="o">);</span>
 <span class="o">}</span>
 </code></pre></td></tr></table>
 </div>
@@ -270,8 +270,8 @@ With the help of HashMap, HashSet offers constant time performance for the basic
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// HashSet.java
 </span><span class="c1"></span>
-<span class="kd">public</span> <span class="kt">int</span> <span class="nf">size</span><span class="o">(</span><span class="o">)</span> <span class="o">{</span>
-    <span class="k">return</span> <span class="n">map</span><span class="o">.</span><span class="na">size</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+<span class="kd">public</span> <span class="kt">int</span> <span class="nf">size</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">map</span><span class="o">.</span><span class="na">size</span><span class="o">();</span>
 <span class="o">}</span>
 </code></pre></td></tr></table>
 </div>

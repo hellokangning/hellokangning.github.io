@@ -24,7 +24,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.64.1 with theme even" />
+<meta name="generator" content="Hugo 0.68.3 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/post/indexoutput-lucene-index-output/" />
@@ -145,11 +145,11 @@ Indexwriter: Lucene Index Creation and Maintenance, IndexOutput, a random-access
   <ul>
     <li>
       <ul>
-        <li><a href="#dataoutput">DataOutput</a></li>
+        <li><a href="#dataoutput"><code>DataOutput</code></a></li>
       </ul>
     </li>
-    <li><a href="#indexoutput">IndexOutput</a></li>
-    <li><a href="#outputstreamindexoutput">OutputStreamIndexOutput</a></li>
+    <li><a href="#indexoutput"><code>IndexOutput</code></a></li>
+    <li><a href="#outputstreamindexoutput"><code>OutputStreamIndexOutput</code></a></li>
   </ul>
 </nav>
   </div>
@@ -200,14 +200,14 @@ Indexwriter: Lucene Index Creation and Maintenance</a>, <code>IndexOutput</code>
 
   <span class="nd">@Override</span>
   <span class="kd">public</span> <span class="n">StoredFieldsWriter</span> <span class="nf">fieldsWriter</span><span class="o">(</span><span class="n">Directory</span> <span class="n">directory</span><span class="o">,</span> <span class="n">SegmentInfo</span> <span class="n">si</span><span class="o">,</span> <span class="n">IOContext</span> <span class="n">context</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
-    <span class="k">return</span> <span class="k">new</span> <span class="n">SimpleTextStoredFieldsWriter</span><span class="o">(</span><span class="n">directory</span><span class="o">,</span> <span class="n">si</span><span class="o">.</span><span class="na">name</span><span class="o">,</span> <span class="n">context</span><span class="o">)</span><span class="o">;</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="n">SimpleTextStoredFieldsWriter</span><span class="o">(</span><span class="n">directory</span><span class="o">,</span> <span class="n">si</span><span class="o">.</span><span class="na">name</span><span class="o">,</span> <span class="n">context</span><span class="o">);</span>
   <span class="o">}</span>
 <span class="o">}</span>
 </code></pre></td></tr></table>
 </div>
 </div><p>Put <code>Directory</code> aside, let&rsquo;s focus on <code>IndexOutput</code>.</p>
 <h2 id="dataoutput"><code>DataOutput</code></h2>
-<p><code>DataOutput</code> is abstract base class for performing write operations of Lucene&rsquo;s low-level data types. The instrument of method can be infered from its name:</p>
+<p><code>DataOutput</code> is abstract base class for performing write operations of Lucene&rsquo;s low-level data types. The instrument of method can be inferred from its name:</p>
 <ul>
 <li><code>writeInt</code></li>
 <li><code>writeInt</code></li>
@@ -250,17 +250,17 @@ Indexwriter: Lucene Index Creation and Maintenance</a>, <code>IndexOutput</code>
 
   <span class="c1">// Writes an int as for bytes
 </span><span class="c1"></span>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">writeInt</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
-    <span class="n">writeByte</span><span class="o">(</span><span class="o">(</span><span class="kt">byte</span><span class="o">)</span><span class="o">(</span><span class="n">i</span> <span class="o">&gt;</span><span class="o">&gt;</span> <span class="n">24</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
-    <span class="n">writeByte</span><span class="o">(</span><span class="o">(</span><span class="kt">byte</span><span class="o">)</span><span class="o">(</span><span class="n">i</span> <span class="o">&gt;</span><span class="o">&gt;</span> <span class="n">16</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
-    <span class="n">writeByte</span><span class="o">(</span><span class="o">(</span><span class="kt">byte</span><span class="o">)</span><span class="o">(</span><span class="n">i</span> <span class="o">&gt;</span><span class="o">&gt;</span>  <span class="n">8</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
-    <span class="n">writeByte</span><span class="o">(</span><span class="o">(</span><span class="kt">byte</span><span class="o">)</span> <span class="n">i</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">writeByte</span><span class="o">((</span><span class="kt">byte</span><span class="o">)(</span><span class="n">i</span> <span class="o">&gt;&gt;</span> <span class="n">24</span><span class="o">));</span>
+    <span class="n">writeByte</span><span class="o">((</span><span class="kt">byte</span><span class="o">)(</span><span class="n">i</span> <span class="o">&gt;&gt;</span> <span class="n">16</span><span class="o">));</span>
+    <span class="n">writeByte</span><span class="o">((</span><span class="kt">byte</span><span class="o">)(</span><span class="n">i</span> <span class="o">&gt;&gt;</span>  <span class="n">8</span><span class="o">));</span>
+    <span class="n">writeByte</span><span class="o">((</span><span class="kt">byte</span><span class="o">)</span> <span class="n">i</span><span class="o">);</span>
   <span class="o">}</span>
 
   <span class="c1">// Writes a string
 </span><span class="c1"></span>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">writeString</span><span class="o">(</span><span class="n">String</span> <span class="n">s</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
-    <span class="kd">final</span> <span class="n">BytesRef</span> <span class="n">utf8Result</span> <span class="o">=</span> <span class="k">new</span> <span class="n">BytesRef</span><span class="o">(</span><span class="n">s</span><span class="o">)</span><span class="o">;</span>
-    <span class="n">writeVInt</span><span class="o">(</span><span class="n">utf8Result</span><span class="o">.</span><span class="na">length</span><span class="o">)</span><span class="o">;</span>
-    <span class="n">writeBytes</span><span class="o">(</span><span class="n">utf8Result</span><span class="o">.</span><span class="na">bytes</span><span class="o">,</span> <span class="n">utf8Result</span><span class="o">.</span><span class="na">offset</span><span class="o">,</span> <span class="n">utf8Result</span><span class="o">.</span><span class="na">length</span><span class="o">)</span><span class="o">;</span>
+    <span class="kd">final</span> <span class="n">BytesRef</span> <span class="n">utf8Result</span> <span class="o">=</span> <span class="k">new</span> <span class="n">BytesRef</span><span class="o">(</span><span class="n">s</span><span class="o">);</span>
+    <span class="n">writeVInt</span><span class="o">(</span><span class="n">utf8Result</span><span class="o">.</span><span class="na">length</span><span class="o">);</span>
+    <span class="n">writeBytes</span><span class="o">(</span><span class="n">utf8Result</span><span class="o">.</span><span class="na">bytes</span><span class="o">,</span> <span class="n">utf8Result</span><span class="o">.</span><span class="na">offset</span><span class="o">,</span> <span class="n">utf8Result</span><span class="o">.</span><span class="na">length</span><span class="o">);</span>
   <span class="o">}</span>
 <span class="o">}</span>
 </code></pre></td></tr></table>
@@ -293,7 +293,7 @@ Indexwriter: Lucene Index Creation and Maintenance</a>, <code>IndexOutput</code>
   <span class="kd">private</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">name</span><span class="o">;</span>
 
   <span class="nd">@Override</span>
-  <span class="kd">public</span> <span class="kd">abstract</span> <span class="kt">void</span> <span class="nf">close</span><span class="o">(</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
+  <span class="kd">public</span> <span class="kd">abstract</span> <span class="kt">void</span> <span class="nf">close</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
 <span class="o">}</span>
 </code></pre></td></tr></table>
 </div>
@@ -337,12 +337,12 @@ Indexwriter: Lucene Index Creation and Maintenance</a>, <code>IndexOutput</code>
 
   <span class="nd">@Override</span>
   <span class="kd">public</span> <span class="kd">final</span> <span class="kt">void</span> <span class="nf">writeByte</span><span class="o">(</span><span class="kt">byte</span> <span class="n">b</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
-    <span class="n">os</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="n">b</span><span class="o">)</span><span class="o">;</span>
-    <span class="n">bytesWritten</span><span class="o">+</span><span class="o">+</span><span class="o">;</span>
+    <span class="n">os</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="n">b</span><span class="o">);</span>
+    <span class="n">bytesWritten</span><span class="o">++;</span>
   <span class="o">}</span>
 
   <span class="nd">@Override</span>
-  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">close</span><span class="o">(</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">close</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
     <span class="k">try</span> <span class="o">(</span><span class="kd">final</span> <span class="n">OutputStream</span> <span class="n">o</span> <span class="o">=</span> <span class="n">os</span><span class="o">)</span> <span class="o">{</span>
       <span class="c1">// We want to make sure that os.flush() was running before close:
 </span><span class="c1"></span>      <span class="c1">// BufferedOutputStream may ignore IOExceptions while flushing on close().
@@ -350,9 +350,9 @@ Indexwriter: Lucene Index Creation and Maintenance</a>, <code>IndexOutput</code>
 </span><span class="c1"></span>      <span class="c1">// because there are more bugs around this! See:
 </span><span class="c1"></span>      <span class="c1">// # https://bugs.openjdk.java.net/browse/JDK-7015589
 </span><span class="c1"></span>      <span class="c1">// # https://bugs.openjdk.java.net/browse/JDK-8054565
-</span><span class="c1"></span>      <span class="k">if</span> <span class="o">(</span><span class="o">!</span><span class="n">flushedOnClose</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="c1"></span>      <span class="k">if</span> <span class="o">(!</span><span class="n">flushedOnClose</span><span class="o">)</span> <span class="o">{</span>
         <span class="n">flushedOnClose</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span> <span class="c1">// set this BEFORE calling flush!
-</span><span class="c1"></span>        <span class="n">o</span><span class="o">.</span><span class="na">flush</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+</span><span class="c1"></span>        <span class="n">o</span><span class="o">.</span><span class="na">flush</span><span class="o">();</span>
       <span class="o">}</span>
     <span class="o">}</span>
   <span class="o">}</span>

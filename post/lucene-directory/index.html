@@ -24,7 +24,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.64.1 with theme even" />
+<meta name="generator" content="Hugo 0.68.3 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/post/lucene-directory/" />
@@ -268,7 +268,7 @@
 
   
   <span class="c1">// Returns an array of strings, one for each entry in the directory, in sorted (UTF16, java&#39;s String.compare) order.
-</span><span class="c1"></span>  <span class="kd">public</span> <span class="kd">abstract</span> <span class="n">String</span><span class="o">[</span><span class="o">]</span> <span class="nf">listAll</span><span class="o">(</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
+</span><span class="c1"></span>  <span class="kd">public</span> <span class="kd">abstract</span> <span class="n">String</span><span class="o">[]</span> <span class="nf">listAll</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
 
   <span class="c1">// Removes an existing file in the directory. 
 </span><span class="c1"></span>  <span class="kd">public</span> <span class="kd">abstract</span> <span class="kt">void</span> <span class="nf">deleteFile</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
@@ -309,14 +309,14 @@
 </span><span class="cm">   * Ensure that directory metadata, such as recent file renames, are made
 </span><span class="cm">   * durable.
 </span><span class="cm">   */</span>
-  <span class="kd">public</span> <span class="kd">abstract</span> <span class="kt">void</span> <span class="nf">syncMetaData</span><span class="o">(</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
+  <span class="kd">public</span> <span class="kd">abstract</span> <span class="kt">void</span> <span class="nf">syncMetaData</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
   
   <span class="cm">/** Returns a stream reading an existing file. */</span>
   <span class="kd">public</span> <span class="kd">abstract</span> <span class="n">IndexInput</span> <span class="nf">openInput</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">,</span> <span class="n">IOContext</span> <span class="n">context</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
   
   <span class="cm">/** Returns a stream reading an existing file, computing checksum as it reads */</span>
   <span class="kd">public</span> <span class="n">ChecksumIndexInput</span> <span class="nf">openChecksumInput</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">,</span> <span class="n">IOContext</span> <span class="n">context</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
-    <span class="k">return</span> <span class="k">new</span> <span class="n">BufferedChecksumIndexInput</span><span class="o">(</span><span class="n">openInput</span><span class="o">(</span><span class="n">name</span><span class="o">,</span> <span class="n">context</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="n">BufferedChecksumIndexInput</span><span class="o">(</span><span class="n">openInput</span><span class="o">(</span><span class="n">name</span><span class="o">,</span> <span class="n">context</span><span class="o">));</span>
   <span class="o">}</span>
   
   <span class="cm">/** 
@@ -327,11 +327,11 @@
 
   <span class="cm">/** Closes the store. */</span>
   <span class="nd">@Override</span>
-  <span class="kd">public</span> <span class="kd">abstract</span> <span class="kt">void</span> <span class="nf">close</span><span class="o">(</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
+  <span class="kd">public</span> <span class="kd">abstract</span> <span class="kt">void</span> <span class="nf">close</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
 
   <span class="nd">@Override</span>
-  <span class="kd">public</span> <span class="n">String</span> <span class="nf">toString</span><span class="o">(</span><span class="o">)</span> <span class="o">{</span>
-    <span class="k">return</span> <span class="n">getClass</span><span class="o">(</span><span class="o">)</span><span class="o">.</span><span class="na">getSimpleName</span><span class="o">(</span><span class="o">)</span> <span class="o">+</span> <span class="sc">&#39;@&#39;</span> <span class="o">+</span> <span class="n">Integer</span><span class="o">.</span><span class="na">toHexString</span><span class="o">(</span><span class="n">hashCode</span><span class="o">(</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
+  <span class="kd">public</span> <span class="n">String</span> <span class="nf">toString</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">getClass</span><span class="o">().</span><span class="na">getSimpleName</span><span class="o">()</span> <span class="o">+</span> <span class="sc">&#39;@&#39;</span> <span class="o">+</span> <span class="n">Integer</span><span class="o">.</span><span class="na">toHexString</span><span class="o">(</span><span class="n">hashCode</span><span class="o">());</span>
   <span class="o">}</span>
 
   <span class="cm">/**
@@ -340,18 +340,18 @@
 </span><span class="cm">   */</span>
   <span class="kd">public</span> <span class="kt">void</span> <span class="nf">copyFrom</span><span class="o">(</span><span class="n">Directory</span> <span class="n">from</span><span class="o">,</span> <span class="n">String</span> <span class="n">src</span><span class="o">,</span> <span class="n">String</span> <span class="n">dest</span><span class="o">,</span> <span class="n">IOContext</span> <span class="n">context</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
     <span class="kt">boolean</span> <span class="n">success</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
-    <span class="k">try</span> <span class="o">(</span><span class="n">IndexInput</span> <span class="n">is</span> <span class="o">=</span> <span class="n">from</span><span class="o">.</span><span class="na">openInput</span><span class="o">(</span><span class="n">src</span><span class="o">,</span> <span class="n">context</span><span class="o">)</span><span class="o">;</span>
-         <span class="n">IndexOutput</span> <span class="n">os</span> <span class="o">=</span> <span class="n">createOutput</span><span class="o">(</span><span class="n">dest</span><span class="o">,</span> <span class="n">context</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
-      <span class="n">os</span><span class="o">.</span><span class="na">copyBytes</span><span class="o">(</span><span class="n">is</span><span class="o">,</span> <span class="n">is</span><span class="o">.</span><span class="na">length</span><span class="o">(</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
+    <span class="k">try</span> <span class="o">(</span><span class="n">IndexInput</span> <span class="n">is</span> <span class="o">=</span> <span class="n">from</span><span class="o">.</span><span class="na">openInput</span><span class="o">(</span><span class="n">src</span><span class="o">,</span> <span class="n">context</span><span class="o">);</span>
+         <span class="n">IndexOutput</span> <span class="n">os</span> <span class="o">=</span> <span class="n">createOutput</span><span class="o">(</span><span class="n">dest</span><span class="o">,</span> <span class="n">context</span><span class="o">))</span> <span class="o">{</span>
+      <span class="n">os</span><span class="o">.</span><span class="na">copyBytes</span><span class="o">(</span><span class="n">is</span><span class="o">,</span> <span class="n">is</span><span class="o">.</span><span class="na">length</span><span class="o">());</span>
       <span class="n">success</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
     <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
-      <span class="k">if</span> <span class="o">(</span><span class="o">!</span><span class="n">success</span><span class="o">)</span> <span class="o">{</span>
-        <span class="n">IOUtils</span><span class="o">.</span><span class="na">deleteFilesIgnoringExceptions</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">dest</span><span class="o">)</span><span class="o">;</span>
+      <span class="k">if</span> <span class="o">(!</span><span class="n">success</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">IOUtils</span><span class="o">.</span><span class="na">deleteFilesIgnoringExceptions</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">dest</span><span class="o">);</span>
       <span class="o">}</span>
     <span class="o">}</span>
   <span class="o">}</span>
 
-  <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">ensureOpen</span><span class="o">(</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">AlreadyClosedException</span> <span class="o">{</span><span class="o">}</span>
+  <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">ensureOpen</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">AlreadyClosedException</span> <span class="o">{}</span>
 <span class="o">}</span>
 </code></pre></td></tr></table>
 </div>
@@ -400,22 +400,22 @@
 
   <span class="cm">/** Sole constructor. */</span>
   <span class="kd">protected</span> <span class="nf">BaseDirectory</span><span class="o">(</span><span class="n">LockFactory</span> <span class="n">lockFactory</span><span class="o">)</span> <span class="o">{</span>
-    <span class="kd">super</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">lockFactory</span> <span class="o">=</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-      <span class="k">throw</span> <span class="k">new</span> <span class="n">NullPointerException</span><span class="o">(</span><span class="s">&#34;LockFactory must not be null, use an explicit instance!&#34;</span><span class="o">)</span><span class="o">;</span>
+    <span class="kd">super</span><span class="o">();</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">lockFactory</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">throw</span> <span class="k">new</span> <span class="n">NullPointerException</span><span class="o">(</span><span class="s">&#34;LockFactory must not be null, use an explicit instance!&#34;</span><span class="o">);</span>
     <span class="o">}</span>
     <span class="k">this</span><span class="o">.</span><span class="na">lockFactory</span> <span class="o">=</span> <span class="n">lockFactory</span><span class="o">;</span>
   <span class="o">}</span>
 
   <span class="nd">@Override</span>
   <span class="kd">public</span> <span class="kd">final</span> <span class="n">Lock</span> <span class="nf">obtainLock</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
-    <span class="k">return</span> <span class="n">lockFactory</span><span class="o">.</span><span class="na">obtainLock</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">name</span><span class="o">)</span><span class="o">;</span>
+    <span class="k">return</span> <span class="n">lockFactory</span><span class="o">.</span><span class="na">obtainLock</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">name</span><span class="o">);</span>
   <span class="o">}</span>
 
   <span class="nd">@Override</span>
-  <span class="kd">protected</span> <span class="kd">final</span> <span class="kt">void</span> <span class="nf">ensureOpen</span><span class="o">(</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">AlreadyClosedException</span> <span class="o">{</span>
-    <span class="k">if</span> <span class="o">(</span><span class="o">!</span><span class="n">isOpen</span><span class="o">)</span> <span class="o">{</span>
-      <span class="k">throw</span> <span class="k">new</span> <span class="n">AlreadyClosedException</span><span class="o">(</span><span class="s">&#34;this Directory is closed&#34;</span><span class="o">)</span><span class="o">;</span>
+  <span class="kd">protected</span> <span class="kd">final</span> <span class="kt">void</span> <span class="nf">ensureOpen</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">AlreadyClosedException</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(!</span><span class="n">isOpen</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">throw</span> <span class="k">new</span> <span class="n">AlreadyClosedException</span><span class="o">(</span><span class="s">&#34;this Directory is closed&#34;</span><span class="o">);</span>
     <span class="o">}</span>
   <span class="o">}</span>
 <span class="o">}</span>
@@ -603,20 +603,20 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">RAMDirectory</span> <span class="kd">extends</span> <span class="n">BaseDirectory</span> <span class="kd">implements</span> <span class="n">Accountable</span> <span class="o">{</span>
   <span class="c1">// fileName -&gt; RAMFile
-</span><span class="c1"></span>  <span class="kd">protected</span> <span class="kd">final</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span><span class="n">RAMFile</span><span class="o">&gt;</span> <span class="n">fileMap</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ConcurrentHashMap</span><span class="o">&lt;</span><span class="o">&gt;</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
-  <span class="kd">protected</span> <span class="kd">final</span> <span class="n">AtomicLong</span> <span class="n">sizeInBytes</span> <span class="o">=</span> <span class="k">new</span> <span class="n">AtomicLong</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+</span><span class="c1"></span>  <span class="kd">protected</span> <span class="kd">final</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span><span class="n">RAMFile</span><span class="o">&gt;</span> <span class="n">fileMap</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ConcurrentHashMap</span><span class="o">&lt;&gt;();</span>
+  <span class="kd">protected</span> <span class="kd">final</span> <span class="n">AtomicLong</span> <span class="n">sizeInBytes</span> <span class="o">=</span> <span class="k">new</span> <span class="n">AtomicLong</span><span class="o">();</span>
   
   <span class="cm">/** Used to generate temp file names in {@link #createTempOutput}. */</span>
-  <span class="kd">private</span> <span class="kd">final</span> <span class="n">AtomicLong</span> <span class="n">nextTempFileCounter</span> <span class="o">=</span> <span class="k">new</span> <span class="n">AtomicLong</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+  <span class="kd">private</span> <span class="kd">final</span> <span class="n">AtomicLong</span> <span class="n">nextTempFileCounter</span> <span class="o">=</span> <span class="k">new</span> <span class="n">AtomicLong</span><span class="o">();</span>
 
   <span class="cm">/** Constructs an empty {@link Directory}. */</span>
-  <span class="kd">public</span> <span class="nf">RAMDirectory</span><span class="o">(</span><span class="o">)</span> <span class="o">{</span>
-    <span class="k">this</span><span class="o">(</span><span class="k">new</span> <span class="n">SingleInstanceLockFactory</span><span class="o">(</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
+  <span class="kd">public</span> <span class="nf">RAMDirectory</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">this</span><span class="o">(</span><span class="k">new</span> <span class="n">SingleInstanceLockFactory</span><span class="o">());</span>
   <span class="o">}</span>
 
   <span class="cm">/** Constructs an empty {@link Directory} with the given {@link LockFactory}. */</span>
   <span class="kd">public</span> <span class="nf">RAMDirectory</span><span class="o">(</span><span class="n">LockFactory</span> <span class="n">lockFactory</span><span class="o">)</span> <span class="o">{</span>
-    <span class="kd">super</span><span class="o">(</span><span class="n">lockFactory</span><span class="o">)</span><span class="o">;</span>
+    <span class="kd">super</span><span class="o">(</span><span class="n">lockFactory</span><span class="o">);</span>
   <span class="o">}</span>
 
   <span class="cm">/**
@@ -625,49 +625,49 @@
 </span><span class="cm">   * a disk-based index into memory.
 </span><span class="cm">   */</span>
   <span class="kd">public</span> <span class="nf">RAMDirectory</span><span class="o">(</span><span class="n">FSDirectory</span> <span class="n">dir</span><span class="o">,</span> <span class="n">IOContext</span> <span class="n">context</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
-    <span class="k">this</span><span class="o">(</span><span class="n">dir</span><span class="o">,</span> <span class="kc">false</span><span class="o">,</span> <span class="n">context</span><span class="o">)</span><span class="o">;</span>
+    <span class="k">this</span><span class="o">(</span><span class="n">dir</span><span class="o">,</span> <span class="kc">false</span><span class="o">,</span> <span class="n">context</span><span class="o">);</span>
   <span class="o">}</span>
   
   <span class="kd">private</span> <span class="nf">RAMDirectory</span><span class="o">(</span><span class="n">FSDirectory</span> <span class="n">dir</span><span class="o">,</span> <span class="kt">boolean</span> <span class="n">closeDir</span><span class="o">,</span> <span class="n">IOContext</span> <span class="n">context</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
-    <span class="k">this</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
-    <span class="k">for</span> <span class="o">(</span><span class="n">String</span> <span class="n">file</span> <span class="o">:</span> <span class="n">dir</span><span class="o">.</span><span class="na">listAll</span><span class="o">(</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
-      <span class="k">if</span> <span class="o">(</span><span class="o">!</span><span class="n">Files</span><span class="o">.</span><span class="na">isDirectory</span><span class="o">(</span><span class="n">dir</span><span class="o">.</span><span class="na">getDirectory</span><span class="o">(</span><span class="o">)</span><span class="o">.</span><span class="na">resolve</span><span class="o">(</span><span class="n">file</span><span class="o">)</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
-        <span class="n">copyFrom</span><span class="o">(</span><span class="n">dir</span><span class="o">,</span> <span class="n">file</span><span class="o">,</span> <span class="n">file</span><span class="o">,</span> <span class="n">context</span><span class="o">)</span><span class="o">;</span>
+    <span class="k">this</span><span class="o">();</span>
+    <span class="k">for</span> <span class="o">(</span><span class="n">String</span> <span class="n">file</span> <span class="o">:</span> <span class="n">dir</span><span class="o">.</span><span class="na">listAll</span><span class="o">())</span> <span class="o">{</span>
+      <span class="k">if</span> <span class="o">(!</span><span class="n">Files</span><span class="o">.</span><span class="na">isDirectory</span><span class="o">(</span><span class="n">dir</span><span class="o">.</span><span class="na">getDirectory</span><span class="o">().</span><span class="na">resolve</span><span class="o">(</span><span class="n">file</span><span class="o">)))</span> <span class="o">{</span>
+        <span class="n">copyFrom</span><span class="o">(</span><span class="n">dir</span><span class="o">,</span> <span class="n">file</span><span class="o">,</span> <span class="n">file</span><span class="o">,</span> <span class="n">context</span><span class="o">);</span>
       <span class="o">}</span>
     <span class="o">}</span>
     <span class="k">if</span> <span class="o">(</span><span class="n">closeDir</span><span class="o">)</span> <span class="o">{</span>
-      <span class="n">dir</span><span class="o">.</span><span class="na">close</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+      <span class="n">dir</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
     <span class="o">}</span>
   <span class="o">}</span>
 
   <span class="nd">@Override</span>
-  <span class="kd">public</span> <span class="kd">final</span> <span class="n">String</span><span class="o">[</span><span class="o">]</span> <span class="nf">listAll</span><span class="o">(</span><span class="o">)</span> <span class="o">{</span>
-    <span class="n">ensureOpen</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+  <span class="kd">public</span> <span class="kd">final</span> <span class="n">String</span><span class="o">[]</span> <span class="nf">listAll</span><span class="o">()</span> <span class="o">{</span>
+    <span class="n">ensureOpen</span><span class="o">();</span>
 
-    <span class="n">Set</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">fileNames</span> <span class="o">=</span> <span class="n">fileMap</span><span class="o">.</span><span class="na">keySet</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
-    <span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">names</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="o">&gt;</span><span class="o">(</span><span class="n">fileNames</span><span class="o">.</span><span class="na">size</span><span class="o">(</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">Set</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">fileNames</span> <span class="o">=</span> <span class="n">fileMap</span><span class="o">.</span><span class="na">keySet</span><span class="o">();</span>
+    <span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">names</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;(</span><span class="n">fileNames</span><span class="o">.</span><span class="na">size</span><span class="o">());</span>
     <span class="k">for</span> <span class="o">(</span><span class="n">String</span> <span class="n">name</span> <span class="o">:</span> <span class="n">fileNames</span><span class="o">)</span> <span class="o">{</span>
-      <span class="n">names</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">name</span><span class="o">)</span><span class="o">;</span>
+      <span class="n">names</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">name</span><span class="o">);</span>
     <span class="o">}</span>
-    <span class="n">String</span><span class="o">[</span><span class="o">]</span> <span class="n">namesArray</span> <span class="o">=</span> <span class="n">names</span><span class="o">.</span><span class="na">toArray</span><span class="o">(</span><span class="k">new</span> <span class="n">String</span><span class="o">[</span><span class="n">names</span><span class="o">.</span><span class="na">size</span><span class="o">(</span><span class="o">)</span><span class="o">]</span><span class="o">)</span><span class="o">;</span>
-    <span class="n">Arrays</span><span class="o">.</span><span class="na">sort</span><span class="o">(</span><span class="n">namesArray</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">String</span><span class="o">[]</span> <span class="n">namesArray</span> <span class="o">=</span> <span class="n">names</span><span class="o">.</span><span class="na">toArray</span><span class="o">(</span><span class="k">new</span> <span class="n">String</span><span class="o">[</span><span class="n">names</span><span class="o">.</span><span class="na">size</span><span class="o">()]);</span>
+    <span class="n">Arrays</span><span class="o">.</span><span class="na">sort</span><span class="o">(</span><span class="n">namesArray</span><span class="o">);</span>
     <span class="k">return</span> <span class="n">namesArray</span><span class="o">;</span>
   <span class="o">}</span>
 
   <span class="kd">public</span> <span class="kd">final</span> <span class="kt">boolean</span> <span class="nf">fileNameExists</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">)</span> <span class="o">{</span>
-    <span class="n">ensureOpen</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
-    <span class="k">return</span> <span class="n">fileMap</span><span class="o">.</span><span class="na">containsKey</span><span class="o">(</span><span class="n">name</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">ensureOpen</span><span class="o">();</span>
+    <span class="k">return</span> <span class="n">fileMap</span><span class="o">.</span><span class="na">containsKey</span><span class="o">(</span><span class="n">name</span><span class="o">);</span>
   <span class="o">}</span>
 
   <span class="cm">/** Returns the length in bytes of a file in the directory. */</span>
   <span class="nd">@Override</span>
   <span class="kd">public</span> <span class="kd">final</span> <span class="kt">long</span> <span class="nf">fileLength</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
-    <span class="n">ensureOpen</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
-    <span class="n">RAMFile</span> <span class="n">file</span> <span class="o">=</span> <span class="n">fileMap</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">name</span><span class="o">)</span><span class="o">;</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">file</span> <span class="o">=</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-      <span class="k">throw</span> <span class="k">new</span> <span class="n">FileNotFoundException</span><span class="o">(</span><span class="n">name</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">ensureOpen</span><span class="o">();</span>
+    <span class="n">RAMFile</span> <span class="n">file</span> <span class="o">=</span> <span class="n">fileMap</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">name</span><span class="o">);</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">file</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">throw</span> <span class="k">new</span> <span class="n">FileNotFoundException</span><span class="o">(</span><span class="n">name</span><span class="o">);</span>
     <span class="o">}</span>
-    <span class="k">return</span> <span class="n">file</span><span class="o">.</span><span class="na">getLength</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+    <span class="k">return</span> <span class="n">file</span><span class="o">.</span><span class="na">getLength</span><span class="o">();</span>
   <span class="o">}</span>
   
   <span class="cm">/**
@@ -675,50 +675,50 @@
 </span><span class="cm">   * currently quantized to RAMOutputStream.BUFFER_SIZE.
 </span><span class="cm">   */</span>
   <span class="nd">@Override</span>
-  <span class="kd">public</span> <span class="kd">final</span> <span class="kt">long</span> <span class="nf">ramBytesUsed</span><span class="o">(</span><span class="o">)</span> <span class="o">{</span>
-    <span class="n">ensureOpen</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
-    <span class="k">return</span> <span class="n">sizeInBytes</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+  <span class="kd">public</span> <span class="kd">final</span> <span class="kt">long</span> <span class="nf">ramBytesUsed</span><span class="o">()</span> <span class="o">{</span>
+    <span class="n">ensureOpen</span><span class="o">();</span>
+    <span class="k">return</span> <span class="n">sizeInBytes</span><span class="o">.</span><span class="na">get</span><span class="o">();</span>
   <span class="o">}</span>
   
   <span class="nd">@Override</span>
-  <span class="kd">public</span> <span class="n">Collection</span><span class="o">&lt;</span><span class="n">Accountable</span><span class="o">&gt;</span> <span class="nf">getChildResources</span><span class="o">(</span><span class="o">)</span> <span class="o">{</span>
-    <span class="k">return</span> <span class="n">Accountables</span><span class="o">.</span><span class="na">namedAccountables</span><span class="o">(</span><span class="s">&#34;file&#34;</span><span class="o">,</span> <span class="n">fileMap</span><span class="o">)</span><span class="o">;</span>
+  <span class="kd">public</span> <span class="n">Collection</span><span class="o">&lt;</span><span class="n">Accountable</span><span class="o">&gt;</span> <span class="nf">getChildResources</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">Accountables</span><span class="o">.</span><span class="na">namedAccountables</span><span class="o">(</span><span class="s">&#34;file&#34;</span><span class="o">,</span> <span class="n">fileMap</span><span class="o">);</span>
   <span class="o">}</span>
   
   <span class="nd">@Override</span>
   <span class="kd">public</span> <span class="kt">void</span> <span class="nf">deleteFile</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
-    <span class="n">ensureOpen</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
-    <span class="n">RAMFile</span> <span class="n">file</span> <span class="o">=</span> <span class="n">fileMap</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="n">name</span><span class="o">)</span><span class="o">;</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">file</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">ensureOpen</span><span class="o">();</span>
+    <span class="n">RAMFile</span> <span class="n">file</span> <span class="o">=</span> <span class="n">fileMap</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="n">name</span><span class="o">);</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">file</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
       <span class="n">file</span><span class="o">.</span><span class="na">directory</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
-      <span class="n">sizeInBytes</span><span class="o">.</span><span class="na">addAndGet</span><span class="o">(</span><span class="o">-</span><span class="n">file</span><span class="o">.</span><span class="na">sizeInBytes</span><span class="o">)</span><span class="o">;</span>
+      <span class="n">sizeInBytes</span><span class="o">.</span><span class="na">addAndGet</span><span class="o">(-</span><span class="n">file</span><span class="o">.</span><span class="na">sizeInBytes</span><span class="o">);</span>
     <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
-      <span class="k">throw</span> <span class="k">new</span> <span class="n">FileNotFoundException</span><span class="o">(</span><span class="n">name</span><span class="o">)</span><span class="o">;</span>
+      <span class="k">throw</span> <span class="k">new</span> <span class="n">FileNotFoundException</span><span class="o">(</span><span class="n">name</span><span class="o">);</span>
     <span class="o">}</span>
   <span class="o">}</span>
 
   <span class="nd">@Override</span>
   <span class="kd">public</span> <span class="n">IndexOutput</span> <span class="nf">createOutput</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">,</span> <span class="n">IOContext</span> <span class="n">context</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
-    <span class="n">ensureOpen</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
-    <span class="n">RAMFile</span> <span class="n">file</span> <span class="o">=</span> <span class="n">newRAMFile</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">fileMap</span><span class="o">.</span><span class="na">putIfAbsent</span><span class="o">(</span><span class="n">name</span><span class="o">,</span> <span class="n">file</span><span class="o">)</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-      <span class="k">throw</span> <span class="k">new</span> <span class="n">FileAlreadyExistsException</span><span class="o">(</span><span class="n">name</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">ensureOpen</span><span class="o">();</span>
+    <span class="n">RAMFile</span> <span class="n">file</span> <span class="o">=</span> <span class="n">newRAMFile</span><span class="o">();</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">fileMap</span><span class="o">.</span><span class="na">putIfAbsent</span><span class="o">(</span><span class="n">name</span><span class="o">,</span> <span class="n">file</span><span class="o">)</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">throw</span> <span class="k">new</span> <span class="n">FileAlreadyExistsException</span><span class="o">(</span><span class="n">name</span><span class="o">);</span>
     <span class="o">}</span>
-    <span class="k">return</span> <span class="k">new</span> <span class="n">RAMOutputStream</span><span class="o">(</span><span class="n">name</span><span class="o">,</span> <span class="n">file</span><span class="o">,</span> <span class="kc">true</span><span class="o">)</span><span class="o">;</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="n">RAMOutputStream</span><span class="o">(</span><span class="n">name</span><span class="o">,</span> <span class="n">file</span><span class="o">,</span> <span class="kc">true</span><span class="o">);</span>
   <span class="o">}</span>
 
   <span class="nd">@Override</span>
   <span class="kd">public</span> <span class="n">IndexOutput</span> <span class="nf">createTempOutput</span><span class="o">(</span><span class="n">String</span> <span class="n">prefix</span><span class="o">,</span> <span class="n">String</span> <span class="n">suffix</span><span class="o">,</span> <span class="n">IOContext</span> <span class="n">context</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
-    <span class="n">ensureOpen</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">ensureOpen</span><span class="o">();</span>
 
     <span class="c1">// Make the file first...
-</span><span class="c1"></span>    <span class="n">RAMFile</span> <span class="n">file</span> <span class="o">=</span> <span class="n">newRAMFile</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+</span><span class="c1"></span>    <span class="n">RAMFile</span> <span class="n">file</span> <span class="o">=</span> <span class="n">newRAMFile</span><span class="o">();</span>
 
     <span class="c1">// ... then try to find a unique name for it:
 </span><span class="c1"></span>    <span class="k">while</span> <span class="o">(</span><span class="kc">true</span><span class="o">)</span> <span class="o">{</span>
-      <span class="n">String</span> <span class="n">name</span> <span class="o">=</span> <span class="n">IndexFileNames</span><span class="o">.</span><span class="na">segmentFileName</span><span class="o">(</span><span class="n">prefix</span><span class="o">,</span> <span class="n">suffix</span> <span class="o">+</span> <span class="s">&#34;_&#34;</span> <span class="o">+</span> <span class="n">Long</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="n">nextTempFileCounter</span><span class="o">.</span><span class="na">getAndIncrement</span><span class="o">(</span><span class="o">)</span><span class="o">,</span> <span class="n">Character</span><span class="o">.</span><span class="na">MAX_RADIX</span><span class="o">)</span><span class="o">,</span> <span class="s">&#34;tmp&#34;</span><span class="o">)</span><span class="o">;</span>
-      <span class="k">if</span> <span class="o">(</span><span class="n">fileMap</span><span class="o">.</span><span class="na">putIfAbsent</span><span class="o">(</span><span class="n">name</span><span class="o">,</span> <span class="n">file</span><span class="o">)</span> <span class="o">=</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-        <span class="k">return</span> <span class="k">new</span> <span class="n">RAMOutputStream</span><span class="o">(</span><span class="n">name</span><span class="o">,</span> <span class="n">file</span><span class="o">,</span> <span class="kc">true</span><span class="o">)</span><span class="o">;</span>
+      <span class="n">String</span> <span class="n">name</span> <span class="o">=</span> <span class="n">IndexFileNames</span><span class="o">.</span><span class="na">segmentFileName</span><span class="o">(</span><span class="n">prefix</span><span class="o">,</span> <span class="n">suffix</span> <span class="o">+</span> <span class="s">&#34;_&#34;</span> <span class="o">+</span> <span class="n">Long</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="n">nextTempFileCounter</span><span class="o">.</span><span class="na">getAndIncrement</span><span class="o">(),</span> <span class="n">Character</span><span class="o">.</span><span class="na">MAX_RADIX</span><span class="o">),</span> <span class="s">&#34;tmp&#34;</span><span class="o">);</span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">fileMap</span><span class="o">.</span><span class="na">putIfAbsent</span><span class="o">(</span><span class="n">name</span><span class="o">,</span> <span class="n">file</span><span class="o">)</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="n">RAMOutputStream</span><span class="o">(</span><span class="n">name</span><span class="o">,</span> <span class="n">file</span><span class="o">,</span> <span class="kc">true</span><span class="o">);</span>
       <span class="o">}</span>
     <span class="o">}</span>
   <span class="o">}</span>
@@ -728,8 +728,8 @@
 </span><span class="cm">   * overridden to return different {@link RAMFile} impls, that e.g. override
 </span><span class="cm">   * {@link RAMFile#newBuffer(int)}.
 </span><span class="cm">   */</span>
-  <span class="kd">protected</span> <span class="n">RAMFile</span> <span class="nf">newRAMFile</span><span class="o">(</span><span class="o">)</span> <span class="o">{</span>
-    <span class="k">return</span> <span class="k">new</span> <span class="n">RAMFile</span><span class="o">(</span><span class="k">this</span><span class="o">)</span><span class="o">;</span>
+  <span class="kd">protected</span> <span class="n">RAMFile</span> <span class="nf">newRAMFile</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="n">RAMFile</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
   <span class="o">}</span>
 
   <span class="nd">@Override</span>
@@ -738,41 +738,41 @@
 
   <span class="nd">@Override</span>
   <span class="kd">public</span> <span class="kt">void</span> <span class="nf">rename</span><span class="o">(</span><span class="n">String</span> <span class="n">source</span><span class="o">,</span> <span class="n">String</span> <span class="n">dest</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
-    <span class="n">ensureOpen</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
-    <span class="n">RAMFile</span> <span class="n">file</span> <span class="o">=</span> <span class="n">fileMap</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">source</span><span class="o">)</span><span class="o">;</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">file</span> <span class="o">=</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-      <span class="k">throw</span> <span class="k">new</span> <span class="n">FileNotFoundException</span><span class="o">(</span><span class="n">source</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">ensureOpen</span><span class="o">();</span>
+    <span class="n">RAMFile</span> <span class="n">file</span> <span class="o">=</span> <span class="n">fileMap</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">source</span><span class="o">);</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">file</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">throw</span> <span class="k">new</span> <span class="n">FileNotFoundException</span><span class="o">(</span><span class="n">source</span><span class="o">);</span>
     <span class="o">}</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">fileMap</span><span class="o">.</span><span class="na">putIfAbsent</span><span class="o">(</span><span class="n">dest</span><span class="o">,</span> <span class="n">file</span><span class="o">)</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-      <span class="k">throw</span> <span class="k">new</span> <span class="n">FileAlreadyExistsException</span><span class="o">(</span><span class="n">dest</span><span class="o">)</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">fileMap</span><span class="o">.</span><span class="na">putIfAbsent</span><span class="o">(</span><span class="n">dest</span><span class="o">,</span> <span class="n">file</span><span class="o">)</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">throw</span> <span class="k">new</span> <span class="n">FileAlreadyExistsException</span><span class="o">(</span><span class="n">dest</span><span class="o">);</span>
     <span class="o">}</span>
-    <span class="k">if</span> <span class="o">(</span><span class="o">!</span><span class="n">fileMap</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="n">source</span><span class="o">,</span> <span class="n">file</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
-      <span class="k">throw</span> <span class="k">new</span> <span class="n">IllegalStateException</span><span class="o">(</span><span class="s">&#34;file was unexpectedly replaced: &#34;</span> <span class="o">+</span> <span class="n">source</span><span class="o">)</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(!</span><span class="n">fileMap</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="n">source</span><span class="o">,</span> <span class="n">file</span><span class="o">))</span> <span class="o">{</span>
+      <span class="k">throw</span> <span class="k">new</span> <span class="n">IllegalStateException</span><span class="o">(</span><span class="s">&#34;file was unexpectedly replaced: &#34;</span> <span class="o">+</span> <span class="n">source</span><span class="o">);</span>
     <span class="o">}</span>
-    <span class="n">fileMap</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="n">source</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">fileMap</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="n">source</span><span class="o">);</span>
   <span class="o">}</span>
 
   <span class="nd">@Override</span>
-  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">syncMetaData</span><span class="o">(</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">syncMetaData</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
     <span class="c1">// we are by definition not durable!
 </span><span class="c1"></span>  <span class="o">}</span>
   
   <span class="cm">/** Returns a stream reading an existing file. */</span>
   <span class="nd">@Override</span>
   <span class="kd">public</span> <span class="n">IndexInput</span> <span class="nf">openInput</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">,</span> <span class="n">IOContext</span> <span class="n">context</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
-    <span class="n">ensureOpen</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
-    <span class="n">RAMFile</span> <span class="n">file</span> <span class="o">=</span> <span class="n">fileMap</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">name</span><span class="o">)</span><span class="o">;</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">file</span> <span class="o">=</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-      <span class="k">throw</span> <span class="k">new</span> <span class="n">FileNotFoundException</span><span class="o">(</span><span class="n">name</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">ensureOpen</span><span class="o">();</span>
+    <span class="n">RAMFile</span> <span class="n">file</span> <span class="o">=</span> <span class="n">fileMap</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">name</span><span class="o">);</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">file</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">throw</span> <span class="k">new</span> <span class="n">FileNotFoundException</span><span class="o">(</span><span class="n">name</span><span class="o">);</span>
     <span class="o">}</span>
-    <span class="k">return</span> <span class="k">new</span> <span class="n">RAMInputStream</span><span class="o">(</span><span class="n">name</span><span class="o">,</span> <span class="n">file</span><span class="o">)</span><span class="o">;</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="n">RAMInputStream</span><span class="o">(</span><span class="n">name</span><span class="o">,</span> <span class="n">file</span><span class="o">);</span>
   <span class="o">}</span>
 
   <span class="cm">/** Closes the store to future operations, releasing associated memory. */</span>
   <span class="nd">@Override</span>
-  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">close</span><span class="o">(</span><span class="o">)</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">close</span><span class="o">()</span> <span class="o">{</span>
     <span class="n">isOpen</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
-    <span class="n">fileMap</span><span class="o">.</span><span class="na">clear</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">fileMap</span><span class="o">.</span><span class="na">clear</span><span class="o">();</span>
   <span class="o">}</span>
 <span class="o">}</span>
 </code></pre></td></tr></table>
@@ -822,7 +822,7 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">RAMFile</span> <span class="kd">implements</span> <span class="n">Accountable</span> <span class="o">{</span>
-  <span class="kd">protected</span> <span class="kd">final</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="kt">byte</span><span class="o">[</span><span class="o">]</span><span class="o">&gt;</span> <span class="n">buffers</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="o">&gt;</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+  <span class="kd">protected</span> <span class="kd">final</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="kt">byte</span><span class="o">[]&gt;</span> <span class="n">buffers</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;();</span>
   <span class="kt">long</span> <span class="n">length</span><span class="o">;</span>
   <span class="n">RAMDirectory</span> <span class="n">directory</span><span class="o">;</span>
   <span class="kd">protected</span> <span class="kt">long</span> <span class="n">sizeInBytes</span><span class="o">;</span>
@@ -831,33 +831,33 @@
     <span class="k">this</span><span class="o">.</span><span class="na">directory</span> <span class="o">=</span> <span class="n">directory</span><span class="o">;</span>
   <span class="o">}</span>
   
-  <span class="kd">protected</span> <span class="kd">final</span> <span class="kt">byte</span><span class="o">[</span><span class="o">]</span> <span class="nf">addBuffer</span><span class="o">(</span><span class="kt">int</span> <span class="n">size</span><span class="o">)</span> <span class="o">{</span>
-    <span class="kt">byte</span><span class="o">[</span><span class="o">]</span> <span class="n">buffer</span> <span class="o">=</span> <span class="n">newBuffer</span><span class="o">(</span><span class="n">size</span><span class="o">)</span><span class="o">;</span>
+  <span class="kd">protected</span> <span class="kd">final</span> <span class="kt">byte</span><span class="o">[]</span> <span class="nf">addBuffer</span><span class="o">(</span><span class="kt">int</span> <span class="n">size</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kt">byte</span><span class="o">[]</span> <span class="n">buffer</span> <span class="o">=</span> <span class="n">newBuffer</span><span class="o">(</span><span class="n">size</span><span class="o">);</span>
     <span class="kd">synchronized</span><span class="o">(</span><span class="k">this</span><span class="o">)</span> <span class="o">{</span>
-      <span class="n">buffers</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">buffer</span><span class="o">)</span><span class="o">;</span>
-      <span class="n">sizeInBytes</span> <span class="o">+</span><span class="o">=</span> <span class="n">size</span><span class="o">;</span>
+      <span class="n">buffers</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">buffer</span><span class="o">);</span>
+      <span class="n">sizeInBytes</span> <span class="o">+=</span> <span class="n">size</span><span class="o">;</span>
     <span class="o">}</span>
 
-    <span class="k">if</span> <span class="o">(</span><span class="n">directory</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-      <span class="n">directory</span><span class="o">.</span><span class="na">sizeInBytes</span><span class="o">.</span><span class="na">getAndAdd</span><span class="o">(</span><span class="n">size</span><span class="o">)</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">directory</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">directory</span><span class="o">.</span><span class="na">sizeInBytes</span><span class="o">.</span><span class="na">getAndAdd</span><span class="o">(</span><span class="n">size</span><span class="o">);</span>
     <span class="o">}</span>
     <span class="k">return</span> <span class="n">buffer</span><span class="o">;</span>
   <span class="o">}</span>
 
-  <span class="kd">protected</span> <span class="kd">final</span> <span class="kd">synchronized</span> <span class="kt">byte</span><span class="o">[</span><span class="o">]</span> <span class="nf">getBuffer</span><span class="o">(</span><span class="kt">int</span> <span class="n">index</span><span class="o">)</span> <span class="o">{</span>
-    <span class="k">return</span> <span class="n">buffers</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">index</span><span class="o">)</span><span class="o">;</span>
+  <span class="kd">protected</span> <span class="kd">final</span> <span class="kd">synchronized</span> <span class="kt">byte</span><span class="o">[]</span> <span class="nf">getBuffer</span><span class="o">(</span><span class="kt">int</span> <span class="n">index</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">buffers</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">index</span><span class="o">);</span>
   <span class="o">}</span>
 
-  <span class="kd">protected</span> <span class="kd">final</span> <span class="kd">synchronized</span> <span class="kt">int</span> <span class="nf">numBuffers</span><span class="o">(</span><span class="o">)</span> <span class="o">{</span>
-    <span class="k">return</span> <span class="n">buffers</span><span class="o">.</span><span class="na">size</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+  <span class="kd">protected</span> <span class="kd">final</span> <span class="kd">synchronized</span> <span class="kt">int</span> <span class="nf">numBuffers</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">buffers</span><span class="o">.</span><span class="na">size</span><span class="o">();</span>
   <span class="o">}</span>
 
   <span class="cm">/**
 </span><span class="cm">   * Expert: allocate a new buffer. 
 </span><span class="cm">   * Subclasses can allocate differently. 
 </span><span class="cm">   */</span>
-  <span class="kd">protected</span> <span class="kt">byte</span><span class="o">[</span><span class="o">]</span> <span class="nf">newBuffer</span><span class="o">(</span><span class="kt">int</span> <span class="n">size</span><span class="o">)</span> <span class="o">{</span>
-    <span class="k">return</span> <span class="k">new</span> <span class="kt">byte</span><span class="o">[</span><span class="n">size</span><span class="o">]</span><span class="o">;</span>
+  <span class="kd">protected</span> <span class="kt">byte</span><span class="o">[]</span> <span class="nf">newBuffer</span><span class="o">(</span><span class="kt">int</span> <span class="n">size</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="kt">byte</span><span class="o">[</span><span class="n">size</span><span class="o">];</span>
   <span class="o">}</span>
 <span class="o">}</span>
 </code></pre></td></tr></table>
@@ -915,42 +915,42 @@
   <span class="kd">protected</span> <span class="kd">final</span> <span class="n">Path</span> <span class="n">directory</span><span class="o">;</span> <span class="c1">// The underlying filesystem directory
 </span><span class="c1"></span>
   <span class="kd">protected</span> <span class="nf">FSDirectory</span><span class="o">(</span><span class="n">Path</span> <span class="n">path</span><span class="o">,</span> <span class="n">LockFactory</span> <span class="n">lockFactory</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
-    <span class="kd">super</span><span class="o">(</span><span class="n">lockFactory</span><span class="o">)</span><span class="o">;</span>
+    <span class="kd">super</span><span class="o">(</span><span class="n">lockFactory</span><span class="o">);</span>
     <span class="c1">// If only read access is permitted, createDirectories fails even if the directory already exists.
-</span><span class="c1"></span>    <span class="k">if</span> <span class="o">(</span><span class="o">!</span><span class="n">Files</span><span class="o">.</span><span class="na">isDirectory</span><span class="o">(</span><span class="n">path</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
-      <span class="n">Files</span><span class="o">.</span><span class="na">createDirectories</span><span class="o">(</span><span class="n">path</span><span class="o">)</span><span class="o">;</span>  <span class="c1">// create directory, if it doesn&#39;t exist
+</span><span class="c1"></span>    <span class="k">if</span> <span class="o">(!</span><span class="n">Files</span><span class="o">.</span><span class="na">isDirectory</span><span class="o">(</span><span class="n">path</span><span class="o">))</span> <span class="o">{</span>
+      <span class="n">Files</span><span class="o">.</span><span class="na">createDirectories</span><span class="o">(</span><span class="n">path</span><span class="o">);</span>  <span class="c1">// create directory, if it doesn&#39;t exist
 </span><span class="c1"></span>    <span class="o">}</span>
-    <span class="n">directory</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="na">toRealPath</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">directory</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="na">toRealPath</span><span class="o">();</span>
   <span class="o">}</span>
 
   <span class="cm">/** Just like {@link #open(Path)}, but allows you to
 </span><span class="cm">   *  also specify a custom {@link LockFactory}. */</span>
   <span class="kd">public</span> <span class="kd">static</span> <span class="n">FSDirectory</span> <span class="nf">open</span><span class="o">(</span><span class="n">Path</span> <span class="n">path</span><span class="o">,</span> <span class="n">LockFactory</span> <span class="n">lockFactory</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">Constants</span><span class="o">.</span><span class="na">JRE_IS_64BIT</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">MMapDirectory</span><span class="o">.</span><span class="na">UNMAP_SUPPORTED</span><span class="o">)</span> <span class="o">{</span>
-      <span class="k">return</span> <span class="k">new</span> <span class="n">MMapDirectory</span><span class="o">(</span><span class="n">path</span><span class="o">,</span> <span class="n">lockFactory</span><span class="o">)</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">Constants</span><span class="o">.</span><span class="na">JRE_IS_64BIT</span> <span class="o">&amp;&amp;</span> <span class="n">MMapDirectory</span><span class="o">.</span><span class="na">UNMAP_SUPPORTED</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">return</span> <span class="k">new</span> <span class="n">MMapDirectory</span><span class="o">(</span><span class="n">path</span><span class="o">,</span> <span class="n">lockFactory</span><span class="o">);</span>
     <span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">Constants</span><span class="o">.</span><span class="na">WINDOWS</span><span class="o">)</span> <span class="o">{</span>
-      <span class="k">return</span> <span class="k">new</span> <span class="n">SimpleFSDirectory</span><span class="o">(</span><span class="n">path</span><span class="o">,</span> <span class="n">lockFactory</span><span class="o">)</span><span class="o">;</span>
+      <span class="k">return</span> <span class="k">new</span> <span class="n">SimpleFSDirectory</span><span class="o">(</span><span class="n">path</span><span class="o">,</span> <span class="n">lockFactory</span><span class="o">);</span>
     <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
-      <span class="k">return</span> <span class="k">new</span> <span class="n">NIOFSDirectory</span><span class="o">(</span><span class="n">path</span><span class="o">,</span> <span class="n">lockFactory</span><span class="o">)</span><span class="o">;</span>
+      <span class="k">return</span> <span class="k">new</span> <span class="n">NIOFSDirectory</span><span class="o">(</span><span class="n">path</span><span class="o">,</span> <span class="n">lockFactory</span><span class="o">);</span>
     <span class="o">}</span>
   <span class="o">}</span>
 
-  <span class="kd">private</span> <span class="kd">static</span> <span class="n">String</span><span class="o">[</span><span class="o">]</span> <span class="nf">listAll</span><span class="o">(</span><span class="n">Path</span> <span class="n">dir</span><span class="o">,</span> <span class="n">Set</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">skipNames</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
-    <span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">entries</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="o">&gt;</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+  <span class="kd">private</span> <span class="kd">static</span> <span class="n">String</span><span class="o">[]</span> <span class="nf">listAll</span><span class="o">(</span><span class="n">Path</span> <span class="n">dir</span><span class="o">,</span> <span class="n">Set</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">skipNames</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+    <span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">entries</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;();</span>
     
-    <span class="k">try</span> <span class="o">(</span><span class="n">DirectoryStream</span><span class="o">&lt;</span><span class="n">Path</span><span class="o">&gt;</span> <span class="n">stream</span> <span class="o">=</span> <span class="n">Files</span><span class="o">.</span><span class="na">newDirectoryStream</span><span class="o">(</span><span class="n">dir</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">try</span> <span class="o">(</span><span class="n">DirectoryStream</span><span class="o">&lt;</span><span class="n">Path</span><span class="o">&gt;</span> <span class="n">stream</span> <span class="o">=</span> <span class="n">Files</span><span class="o">.</span><span class="na">newDirectoryStream</span><span class="o">(</span><span class="n">dir</span><span class="o">))</span> <span class="o">{</span>
       <span class="k">for</span> <span class="o">(</span><span class="n">Path</span> <span class="n">path</span> <span class="o">:</span> <span class="n">stream</span><span class="o">)</span> <span class="o">{</span>
-        <span class="n">String</span> <span class="n">name</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="na">getFileName</span><span class="o">(</span><span class="o">)</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
-        <span class="k">if</span> <span class="o">(</span><span class="n">skipNames</span> <span class="o">=</span><span class="o">=</span> <span class="kc">null</span> <span class="o">|</span><span class="o">|</span> <span class="n">skipNames</span><span class="o">.</span><span class="na">contains</span><span class="o">(</span><span class="n">name</span><span class="o">)</span> <span class="o">=</span><span class="o">=</span> <span class="kc">false</span><span class="o">)</span> <span class="o">{</span>
-          <span class="n">entries</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">name</span><span class="o">)</span><span class="o">;</span>
+        <span class="n">String</span> <span class="n">name</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="na">getFileName</span><span class="o">().</span><span class="na">toString</span><span class="o">();</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">skipNames</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">||</span> <span class="n">skipNames</span><span class="o">.</span><span class="na">contains</span><span class="o">(</span><span class="n">name</span><span class="o">)</span> <span class="o">==</span> <span class="kc">false</span><span class="o">)</span> <span class="o">{</span>
+          <span class="n">entries</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">name</span><span class="o">);</span>
         <span class="o">}</span>
       <span class="o">}</span>
     <span class="o">}</span>
 
-    <span class="n">String</span><span class="o">[</span><span class="o">]</span> <span class="n">array</span> <span class="o">=</span> <span class="n">entries</span><span class="o">.</span><span class="na">toArray</span><span class="o">(</span><span class="k">new</span> <span class="n">String</span><span class="o">[</span><span class="n">entries</span><span class="o">.</span><span class="na">size</span><span class="o">(</span><span class="o">)</span><span class="o">]</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">String</span><span class="o">[]</span> <span class="n">array</span> <span class="o">=</span> <span class="n">entries</span><span class="o">.</span><span class="na">toArray</span><span class="o">(</span><span class="k">new</span> <span class="n">String</span><span class="o">[</span><span class="n">entries</span><span class="o">.</span><span class="na">size</span><span class="o">()]);</span>
     <span class="c1">// Directory.listAll javadocs state that we sort the results here, so we don&#39;t let filesystem
 </span><span class="c1"></span>    <span class="c1">// specifics leak out of this abstraction:
-</span><span class="c1"></span>    <span class="n">Arrays</span><span class="o">.</span><span class="na">sort</span><span class="o">(</span><span class="n">array</span><span class="o">)</span><span class="o">;</span>
+</span><span class="c1"></span>    <span class="n">Arrays</span><span class="o">.</span><span class="na">sort</span><span class="o">(</span><span class="n">array</span><span class="o">);</span>
     <span class="k">return</span> <span class="n">array</span><span class="o">;</span>
   <span class="o">}</span>
 <span class="o">}</span>
@@ -982,19 +982,19 @@
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">final</span> <span class="kd">class</span> <span class="nc">FSIndexOutput</span> <span class="kd">extends</span> <span class="n">OutputStreamIndexOutput</span> <span class="o">{</span>
   <span class="kd">static</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">CHUNK_SIZE</span> <span class="o">=</span> <span class="n">8192</span><span class="o">;</span>
   
-  <span class="n">FSIndexOutput</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">,</span> <span class="n">OpenOption</span><span class="o">.</span><span class="o">.</span><span class="o">.</span> <span class="n">options</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
-    <span class="kd">super</span><span class="o">(</span><span class="s">&#34;FSIndexOutput(path=\&#34;&#34;</span> <span class="o">+</span> <span class="n">directory</span><span class="o">.</span><span class="na">resolve</span><span class="o">(</span><span class="n">name</span><span class="o">)</span> <span class="o">+</span> <span class="s">&#34;\&#34;)&#34;</span><span class="o">,</span> <span class="n">name</span><span class="o">,</span> <span class="k">new</span> <span class="n">FilterOutputStream</span><span class="o">(</span><span class="n">Files</span><span class="o">.</span><span class="na">newOutputStream</span><span class="o">(</span><span class="n">directory</span><span class="o">.</span><span class="na">resolve</span><span class="o">(</span><span class="n">name</span><span class="o">)</span><span class="o">,</span> <span class="n">options</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
+  <span class="n">FSIndexOutput</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">,</span> <span class="n">OpenOption</span><span class="o">...</span> <span class="n">options</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+    <span class="kd">super</span><span class="o">(</span><span class="s">&#34;FSIndexOutput(path=\&#34;&#34;</span> <span class="o">+</span> <span class="n">directory</span><span class="o">.</span><span class="na">resolve</span><span class="o">(</span><span class="n">name</span><span class="o">)</span> <span class="o">+</span> <span class="s">&#34;\&#34;)&#34;</span><span class="o">,</span> <span class="n">name</span><span class="o">,</span> <span class="k">new</span> <span class="n">FilterOutputStream</span><span class="o">(</span><span class="n">Files</span><span class="o">.</span><span class="na">newOutputStream</span><span class="o">(</span><span class="n">directory</span><span class="o">.</span><span class="na">resolve</span><span class="o">(</span><span class="n">name</span><span class="o">),</span> <span class="n">options</span><span class="o">))</span> <span class="o">{</span>
       <span class="c1">// This implementation ensures, that we never write more than CHUNK_SIZE bytes:
 </span><span class="c1"></span>      <span class="nd">@Override</span>
-      <span class="kd">public</span> <span class="kt">void</span> <span class="nf">write</span><span class="o">(</span><span class="kt">byte</span><span class="o">[</span><span class="o">]</span> <span class="n">b</span><span class="o">,</span> <span class="kt">int</span> <span class="n">offset</span><span class="o">,</span> <span class="kt">int</span> <span class="n">length</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+      <span class="kd">public</span> <span class="kt">void</span> <span class="nf">write</span><span class="o">(</span><span class="kt">byte</span><span class="o">[]</span> <span class="n">b</span><span class="o">,</span> <span class="kt">int</span> <span class="n">offset</span><span class="o">,</span> <span class="kt">int</span> <span class="n">length</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
         <span class="k">while</span> <span class="o">(</span><span class="n">length</span> <span class="o">&gt;</span> <span class="n">0</span><span class="o">)</span> <span class="o">{</span>
-          <span class="kd">final</span> <span class="kt">int</span> <span class="n">chunk</span> <span class="o">=</span> <span class="n">Math</span><span class="o">.</span><span class="na">min</span><span class="o">(</span><span class="n">length</span><span class="o">,</span> <span class="n">CHUNK_SIZE</span><span class="o">)</span><span class="o">;</span>
-          <span class="n">out</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="n">b</span><span class="o">,</span> <span class="n">offset</span><span class="o">,</span> <span class="n">chunk</span><span class="o">)</span><span class="o">;</span>
-          <span class="n">length</span> <span class="o">-</span><span class="o">=</span> <span class="n">chunk</span><span class="o">;</span>
-          <span class="n">offset</span> <span class="o">+</span><span class="o">=</span> <span class="n">chunk</span><span class="o">;</span>
+          <span class="kd">final</span> <span class="kt">int</span> <span class="n">chunk</span> <span class="o">=</span> <span class="n">Math</span><span class="o">.</span><span class="na">min</span><span class="o">(</span><span class="n">length</span><span class="o">,</span> <span class="n">CHUNK_SIZE</span><span class="o">);</span>
+          <span class="n">out</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="n">b</span><span class="o">,</span> <span class="n">offset</span><span class="o">,</span> <span class="n">chunk</span><span class="o">);</span>
+          <span class="n">length</span> <span class="o">-=</span> <span class="n">chunk</span><span class="o">;</span>
+          <span class="n">offset</span> <span class="o">+=</span> <span class="n">chunk</span><span class="o">;</span>
         <span class="o">}</span>
       <span class="o">}</span>
-    <span class="o">}</span><span class="o">,</span> <span class="n">CHUNK_SIZE</span><span class="o">)</span><span class="o">;</span>
+    <span class="o">},</span> <span class="n">CHUNK_SIZE</span><span class="o">);</span>
   <span class="o">}</span>
 <span class="o">}</span>
 </code></pre></td></tr></table>
@@ -1016,10 +1016,10 @@
 </span><span class="lnt">5
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kt">void</span> <span class="nf">readBytes</span><span class="o">(</span><span class="kt">byte</span><span class="o">[</span><span class="o">]</span> <span class="n">b</span><span class="o">,</span> <span class="kt">int</span> <span class="n">offset</span><span class="o">,</span> <span class="kt">int</span> <span class="n">len</span><span class="o">,</span> <span class="kt">boolean</span> <span class="n">useBuffer</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
-<span class="kd">public</span> <span class="kt">short</span> <span class="nf">readShort</span><span class="o">(</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
-<span class="kd">public</span> <span class="kt">int</span> <span class="nf">readInt</span><span class="o">(</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
-<span class="kd">public</span> <span class="n">String</span> <span class="nf">readString</span><span class="o">(</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kt">void</span> <span class="nf">readBytes</span><span class="o">(</span><span class="kt">byte</span><span class="o">[]</span> <span class="n">b</span><span class="o">,</span> <span class="kt">int</span> <span class="n">offset</span><span class="o">,</span> <span class="kt">int</span> <span class="n">len</span><span class="o">,</span> <span class="kt">boolean</span> <span class="n">useBuffer</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
+<span class="kd">public</span> <span class="kt">short</span> <span class="nf">readShort</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
+<span class="kd">public</span> <span class="kt">int</span> <span class="nf">readInt</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
+<span class="kd">public</span> <span class="n">String</span> <span class="nf">readString</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
 <span class="kd">public</span> <span class="kt">void</span> <span class="nf">skipBytes</span><span class="o">(</span><span class="kd">final</span> <span class="kt">long</span> <span class="n">numBytes</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
 </code></pre></td></tr></table>
 </div>
@@ -1043,7 +1043,7 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">abstract</span> <span class="kd">class</span> <span class="nc">IndexInput</span> <span class="kd">extends</span> <span class="n">DataInput</span> <span class="kd">implements</span> <span class="n">Cloneable</span><span class="o">,</span><span class="n">Closeable</span> <span class="o">{</span>
   <span class="c1">// Returns the current position in this file
-</span><span class="c1"></span>  <span class="kd">public</span> <span class="kd">abstract</span> <span class="kt">long</span> <span class="nf">getFilePointer</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+</span><span class="c1"></span>  <span class="kd">public</span> <span class="kd">abstract</span> <span class="kt">long</span> <span class="nf">getFilePointer</span><span class="o">();</span>
 
   <span class="c1">// Sets current position in this file
 </span><span class="c1"></span>  <span class="kd">public</span> <span class="kd">abstract</span> <span class="kt">void</span> <span class="nf">seek</span><span class="o">(</span><span class="kt">long</span> <span class="n">pos</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
@@ -1186,7 +1186,7 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">abstract</span> <span class="kd">class</span> <span class="nc">BufferedIndexInput</span> <span class="kd">extends</span> <span class="n">IndexInput</span> <span class="kd">implements</span> <span class="n">RandomAccessInput</span> <span class="o">{</span>
-  <span class="kd">protected</span> <span class="kt">byte</span><span class="o">[</span><span class="o">]</span> <span class="n">buffer</span><span class="o">;</span>
+  <span class="kd">protected</span> <span class="kt">byte</span><span class="o">[]</span> <span class="n">buffer</span><span class="o">;</span>
   
   <span class="kd">private</span> <span class="kt">long</span> <span class="n">bufferStart</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span>       <span class="c1">// position in file of buffer
 </span><span class="c1"></span>  <span class="kd">private</span> <span class="kt">int</span> <span class="n">bufferLength</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span>       <span class="c1">// end of valid bytes
@@ -1194,63 +1194,63 @@
 </span><span class="c1"></span>
   <span class="cm">/** Change the buffer size used by this IndexInput */</span>
   <span class="kd">public</span> <span class="kd">final</span> <span class="kt">void</span> <span class="nf">setBufferSize</span><span class="o">(</span><span class="kt">int</span> <span class="n">newSize</span><span class="o">)</span> <span class="o">{</span>
-    <span class="k">assert</span> <span class="n">buffer</span> <span class="o">=</span><span class="o">=</span> <span class="kc">null</span> <span class="o">|</span><span class="o">|</span> <span class="n">bufferSize</span> <span class="o">=</span><span class="o">=</span> <span class="n">buffer</span><span class="o">.</span><span class="na">length</span><span class="o">:</span> <span class="s">&#34;buffer=&#34;</span> <span class="o">+</span> <span class="n">buffer</span> <span class="o">+</span> <span class="s">&#34; bufferSize=&#34;</span> <span class="o">+</span> <span class="n">bufferSize</span> <span class="o">+</span> <span class="s">&#34; buffer.length=&#34;</span> <span class="o">+</span> <span class="o">(</span><span class="n">buffer</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span> <span class="o">?</span> <span class="n">buffer</span><span class="o">.</span><span class="na">length</span> <span class="o">:</span> <span class="n">0</span><span class="o">)</span><span class="o">;</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">newSize</span> <span class="o">!</span><span class="o">=</span> <span class="n">bufferSize</span><span class="o">)</span> <span class="o">{</span>
-      <span class="n">checkBufferSize</span><span class="o">(</span><span class="n">newSize</span><span class="o">)</span><span class="o">;</span>
+    <span class="k">assert</span> <span class="n">buffer</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">||</span> <span class="n">bufferSize</span> <span class="o">==</span> <span class="n">buffer</span><span class="o">.</span><span class="na">length</span><span class="o">:</span> <span class="s">&#34;buffer=&#34;</span> <span class="o">+</span> <span class="n">buffer</span> <span class="o">+</span> <span class="s">&#34; bufferSize=&#34;</span> <span class="o">+</span> <span class="n">bufferSize</span> <span class="o">+</span> <span class="s">&#34; buffer.length=&#34;</span> <span class="o">+</span> <span class="o">(</span><span class="n">buffer</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">?</span> <span class="n">buffer</span><span class="o">.</span><span class="na">length</span> <span class="o">:</span> <span class="n">0</span><span class="o">);</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">newSize</span> <span class="o">!=</span> <span class="n">bufferSize</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">checkBufferSize</span><span class="o">(</span><span class="n">newSize</span><span class="o">);</span>
       <span class="n">bufferSize</span> <span class="o">=</span> <span class="n">newSize</span><span class="o">;</span>
-      <span class="k">if</span> <span class="o">(</span><span class="n">buffer</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">buffer</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
         <span class="c1">// Resize the existing buffer and carefully save as
 </span><span class="c1"></span>        <span class="c1">// many bytes as possible starting from the current
 </span><span class="c1"></span>        <span class="c1">// bufferPosition
-</span><span class="c1"></span>        <span class="kt">byte</span><span class="o">[</span><span class="o">]</span> <span class="n">newBuffer</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">byte</span><span class="o">[</span><span class="n">newSize</span><span class="o">]</span><span class="o">;</span>
+</span><span class="c1"></span>        <span class="kt">byte</span><span class="o">[]</span> <span class="n">newBuffer</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">byte</span><span class="o">[</span><span class="n">newSize</span><span class="o">];</span>
         <span class="kd">final</span> <span class="kt">int</span> <span class="n">leftInBuffer</span> <span class="o">=</span> <span class="n">bufferLength</span><span class="o">-</span><span class="n">bufferPosition</span><span class="o">;</span>
         <span class="kd">final</span> <span class="kt">int</span> <span class="n">numToCopy</span><span class="o">;</span>
         <span class="k">if</span> <span class="o">(</span><span class="n">leftInBuffer</span> <span class="o">&gt;</span> <span class="n">newSize</span><span class="o">)</span>
           <span class="n">numToCopy</span> <span class="o">=</span> <span class="n">newSize</span><span class="o">;</span>
         <span class="k">else</span>
           <span class="n">numToCopy</span> <span class="o">=</span> <span class="n">leftInBuffer</span><span class="o">;</span>
-        <span class="n">System</span><span class="o">.</span><span class="na">arraycopy</span><span class="o">(</span><span class="n">buffer</span><span class="o">,</span> <span class="n">bufferPosition</span><span class="o">,</span> <span class="n">newBuffer</span><span class="o">,</span> <span class="n">0</span><span class="o">,</span> <span class="n">numToCopy</span><span class="o">)</span><span class="o">;</span>
-        <span class="n">bufferStart</span> <span class="o">+</span><span class="o">=</span> <span class="n">bufferPosition</span><span class="o">;</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">arraycopy</span><span class="o">(</span><span class="n">buffer</span><span class="o">,</span> <span class="n">bufferPosition</span><span class="o">,</span> <span class="n">newBuffer</span><span class="o">,</span> <span class="n">0</span><span class="o">,</span> <span class="n">numToCopy</span><span class="o">);</span>
+        <span class="n">bufferStart</span> <span class="o">+=</span> <span class="n">bufferPosition</span><span class="o">;</span>
         <span class="n">bufferPosition</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span>
         <span class="n">bufferLength</span> <span class="o">=</span> <span class="n">numToCopy</span><span class="o">;</span>
-        <span class="n">newBuffer</span><span class="o">(</span><span class="n">newBuffer</span><span class="o">)</span><span class="o">;</span>
+        <span class="n">newBuffer</span><span class="o">(</span><span class="n">newBuffer</span><span class="o">);</span>
       <span class="o">}</span>
     <span class="o">}</span>
   <span class="o">}</span>
 
   <span class="kd">private</span> <span class="kt">void</span> <span class="nf">checkBufferSize</span><span class="o">(</span><span class="kt">int</span> <span class="n">bufferSize</span><span class="o">)</span> <span class="o">{</span>
     <span class="k">if</span> <span class="o">(</span><span class="n">bufferSize</span> <span class="o">&lt;</span> <span class="n">MIN_BUFFER_SIZE</span><span class="o">)</span>
-      <span class="k">throw</span> <span class="k">new</span> <span class="n">IllegalArgumentException</span><span class="o">(</span><span class="s">&#34;bufferSize must be at least MIN_BUFFER_SIZE (got &#34;</span> <span class="o">+</span> <span class="n">bufferSize</span> <span class="o">+</span> <span class="s">&#34;)&#34;</span><span class="o">)</span><span class="o">;</span>
+      <span class="k">throw</span> <span class="k">new</span> <span class="n">IllegalArgumentException</span><span class="o">(</span><span class="s">&#34;bufferSize must be at least MIN_BUFFER_SIZE (got &#34;</span> <span class="o">+</span> <span class="n">bufferSize</span> <span class="o">+</span> <span class="s">&#34;)&#34;</span><span class="o">);</span>
   <span class="o">}</span>
 
   <span class="nd">@Override</span>
-  <span class="kd">public</span> <span class="kd">final</span> <span class="kt">void</span> <span class="nf">readBytes</span><span class="o">(</span><span class="kt">byte</span><span class="o">[</span><span class="o">]</span> <span class="n">b</span><span class="o">,</span> <span class="kt">int</span> <span class="n">offset</span><span class="o">,</span> <span class="kt">int</span> <span class="n">len</span><span class="o">,</span> <span class="kt">boolean</span> <span class="n">useBuffer</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="kd">final</span> <span class="kt">void</span> <span class="nf">readBytes</span><span class="o">(</span><span class="kt">byte</span><span class="o">[]</span> <span class="n">b</span><span class="o">,</span> <span class="kt">int</span> <span class="n">offset</span><span class="o">,</span> <span class="kt">int</span> <span class="n">len</span><span class="o">,</span> <span class="kt">boolean</span> <span class="n">useBuffer</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
     <span class="kt">int</span> <span class="n">available</span> <span class="o">=</span> <span class="n">bufferLength</span> <span class="o">-</span> <span class="n">bufferPosition</span><span class="o">;</span>
-    <span class="k">if</span><span class="o">(</span><span class="n">len</span> <span class="o">&lt;</span><span class="o">=</span> <span class="n">available</span><span class="o">)</span><span class="o">{</span>
+    <span class="k">if</span><span class="o">(</span><span class="n">len</span> <span class="o">&lt;=</span> <span class="n">available</span><span class="o">){</span>
       <span class="c1">// the buffer contains enough data to satisfy this request
 </span><span class="c1"></span>      <span class="k">if</span><span class="o">(</span><span class="n">len</span><span class="o">&gt;</span><span class="n">0</span><span class="o">)</span> <span class="c1">// to allow b to be null if len is 0...
-</span><span class="c1"></span>        <span class="n">System</span><span class="o">.</span><span class="na">arraycopy</span><span class="o">(</span><span class="n">buffer</span><span class="o">,</span> <span class="n">bufferPosition</span><span class="o">,</span> <span class="n">b</span><span class="o">,</span> <span class="n">offset</span><span class="o">,</span> <span class="n">len</span><span class="o">)</span><span class="o">;</span>
-      <span class="n">bufferPosition</span><span class="o">+</span><span class="o">=</span><span class="n">len</span><span class="o">;</span>
+</span><span class="c1"></span>        <span class="n">System</span><span class="o">.</span><span class="na">arraycopy</span><span class="o">(</span><span class="n">buffer</span><span class="o">,</span> <span class="n">bufferPosition</span><span class="o">,</span> <span class="n">b</span><span class="o">,</span> <span class="n">offset</span><span class="o">,</span> <span class="n">len</span><span class="o">);</span>
+      <span class="n">bufferPosition</span><span class="o">+=</span><span class="n">len</span><span class="o">;</span>
     <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
       <span class="c1">// the buffer does not have enough data. First serve all we&#39;ve got.
-</span><span class="c1"></span>      <span class="k">if</span><span class="o">(</span><span class="n">available</span> <span class="o">&gt;</span> <span class="n">0</span><span class="o">)</span><span class="o">{</span>
-        <span class="n">System</span><span class="o">.</span><span class="na">arraycopy</span><span class="o">(</span><span class="n">buffer</span><span class="o">,</span> <span class="n">bufferPosition</span><span class="o">,</span> <span class="n">b</span><span class="o">,</span> <span class="n">offset</span><span class="o">,</span> <span class="n">available</span><span class="o">)</span><span class="o">;</span>
-        <span class="n">offset</span> <span class="o">+</span><span class="o">=</span> <span class="n">available</span><span class="o">;</span>
-        <span class="n">len</span> <span class="o">-</span><span class="o">=</span> <span class="n">available</span><span class="o">;</span>
-        <span class="n">bufferPosition</span> <span class="o">+</span><span class="o">=</span> <span class="n">available</span><span class="o">;</span>
+</span><span class="c1"></span>      <span class="k">if</span><span class="o">(</span><span class="n">available</span> <span class="o">&gt;</span> <span class="n">0</span><span class="o">){</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">arraycopy</span><span class="o">(</span><span class="n">buffer</span><span class="o">,</span> <span class="n">bufferPosition</span><span class="o">,</span> <span class="n">b</span><span class="o">,</span> <span class="n">offset</span><span class="o">,</span> <span class="n">available</span><span class="o">);</span>
+        <span class="n">offset</span> <span class="o">+=</span> <span class="n">available</span><span class="o">;</span>
+        <span class="n">len</span> <span class="o">-=</span> <span class="n">available</span><span class="o">;</span>
+        <span class="n">bufferPosition</span> <span class="o">+=</span> <span class="n">available</span><span class="o">;</span>
       <span class="o">}</span>
       <span class="c1">// and now, read the remaining &#39;len&#39; bytes:
-</span><span class="c1"></span>      <span class="k">if</span> <span class="o">(</span><span class="n">useBuffer</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">len</span><span class="o">&lt;</span><span class="n">bufferSize</span><span class="o">)</span><span class="o">{</span>
+</span><span class="c1"></span>      <span class="k">if</span> <span class="o">(</span><span class="n">useBuffer</span> <span class="o">&amp;&amp;</span> <span class="n">len</span><span class="o">&lt;</span><span class="n">bufferSize</span><span class="o">){</span>
         <span class="c1">// If the amount left to read is small enough, and
 </span><span class="c1"></span>        <span class="c1">// we are allowed to use our buffer, do it in the usual
 </span><span class="c1"></span>        <span class="c1">// buffered way: fill the buffer and copy from it:
-</span><span class="c1"></span>        <span class="n">refill</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
-        <span class="k">if</span><span class="o">(</span><span class="n">bufferLength</span><span class="o">&lt;</span><span class="n">len</span><span class="o">)</span><span class="o">{</span>
+</span><span class="c1"></span>        <span class="n">refill</span><span class="o">();</span>
+        <span class="k">if</span><span class="o">(</span><span class="n">bufferLength</span><span class="o">&lt;</span><span class="n">len</span><span class="o">){</span>
           <span class="c1">// Throw an exception when refill() could not read len bytes:
-</span><span class="c1"></span>          <span class="n">System</span><span class="o">.</span><span class="na">arraycopy</span><span class="o">(</span><span class="n">buffer</span><span class="o">,</span> <span class="n">0</span><span class="o">,</span> <span class="n">b</span><span class="o">,</span> <span class="n">offset</span><span class="o">,</span> <span class="n">bufferLength</span><span class="o">)</span><span class="o">;</span>
-          <span class="k">throw</span> <span class="k">new</span> <span class="n">EOFException</span><span class="o">(</span><span class="s">&#34;read past EOF: &#34;</span> <span class="o">+</span> <span class="k">this</span><span class="o">)</span><span class="o">;</span>
+</span><span class="c1"></span>          <span class="n">System</span><span class="o">.</span><span class="na">arraycopy</span><span class="o">(</span><span class="n">buffer</span><span class="o">,</span> <span class="n">0</span><span class="o">,</span> <span class="n">b</span><span class="o">,</span> <span class="n">offset</span><span class="o">,</span> <span class="n">bufferLength</span><span class="o">);</span>
+          <span class="k">throw</span> <span class="k">new</span> <span class="n">EOFException</span><span class="o">(</span><span class="s">&#34;read past EOF: &#34;</span> <span class="o">+</span> <span class="k">this</span><span class="o">);</span>
         <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
-          <span class="n">System</span><span class="o">.</span><span class="na">arraycopy</span><span class="o">(</span><span class="n">buffer</span><span class="o">,</span> <span class="n">0</span><span class="o">,</span> <span class="n">b</span><span class="o">,</span> <span class="n">offset</span><span class="o">,</span> <span class="n">len</span><span class="o">)</span><span class="o">;</span>
+          <span class="n">System</span><span class="o">.</span><span class="na">arraycopy</span><span class="o">(</span><span class="n">buffer</span><span class="o">,</span> <span class="n">0</span><span class="o">,</span> <span class="n">b</span><span class="o">,</span> <span class="n">offset</span><span class="o">,</span> <span class="n">len</span><span class="o">);</span>
           <span class="n">bufferPosition</span><span class="o">=</span><span class="n">len</span><span class="o">;</span>
         <span class="o">}</span>
       <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
@@ -1262,9 +1262,9 @@
 </span><span class="c1"></span>        <span class="c1">// here, because there&#39;s no need to reread what we
 </span><span class="c1"></span>        <span class="c1">// had in the buffer.
 </span><span class="c1"></span>        <span class="kt">long</span> <span class="n">after</span> <span class="o">=</span> <span class="n">bufferStart</span><span class="o">+</span><span class="n">bufferPosition</span><span class="o">+</span><span class="n">len</span><span class="o">;</span>
-        <span class="k">if</span><span class="o">(</span><span class="n">after</span> <span class="o">&gt;</span> <span class="n">length</span><span class="o">(</span><span class="o">)</span><span class="o">)</span>
-          <span class="k">throw</span> <span class="k">new</span> <span class="n">EOFException</span><span class="o">(</span><span class="s">&#34;read past EOF: &#34;</span> <span class="o">+</span> <span class="k">this</span><span class="o">)</span><span class="o">;</span>
-        <span class="n">readInternal</span><span class="o">(</span><span class="n">b</span><span class="o">,</span> <span class="n">offset</span><span class="o">,</span> <span class="n">len</span><span class="o">)</span><span class="o">;</span>
+        <span class="k">if</span><span class="o">(</span><span class="n">after</span> <span class="o">&gt;</span> <span class="n">length</span><span class="o">())</span>
+          <span class="k">throw</span> <span class="k">new</span> <span class="n">EOFException</span><span class="o">(</span><span class="s">&#34;read past EOF: &#34;</span> <span class="o">+</span> <span class="k">this</span><span class="o">);</span>
+        <span class="n">readInternal</span><span class="o">(</span><span class="n">b</span><span class="o">,</span> <span class="n">offset</span><span class="o">,</span> <span class="n">len</span><span class="o">);</span>
         <span class="n">bufferStart</span> <span class="o">=</span> <span class="n">after</span><span class="o">;</span>
         <span class="n">bufferPosition</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span>
         <span class="n">bufferLength</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span>                    <span class="c1">// trigger refill() on read
@@ -1273,11 +1273,11 @@
   <span class="o">}</span>
 
   <span class="nd">@Override</span>
-  <span class="kd">public</span> <span class="kd">final</span> <span class="kt">short</span> <span class="nf">readShort</span><span class="o">(</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">2</span> <span class="o">&lt;</span><span class="o">=</span> <span class="o">(</span><span class="n">bufferLength</span><span class="o">-</span><span class="n">bufferPosition</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
-      <span class="k">return</span> <span class="o">(</span><span class="kt">short</span><span class="o">)</span> <span class="o">(</span><span class="o">(</span><span class="o">(</span><span class="n">buffer</span><span class="o">[</span><span class="n">bufferPosition</span><span class="o">+</span><span class="o">+</span><span class="o">]</span> <span class="o">&amp;</span> <span class="n">0xFF</span><span class="o">)</span> <span class="o">&lt;</span><span class="o">&lt;</span>  <span class="n">8</span><span class="o">)</span> <span class="o">|</span>  <span class="o">(</span><span class="n">buffer</span><span class="o">[</span><span class="n">bufferPosition</span><span class="o">+</span><span class="o">+</span><span class="o">]</span> <span class="o">&amp;</span> <span class="n">0xFF</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
+  <span class="kd">public</span> <span class="kd">final</span> <span class="kt">short</span> <span class="nf">readShort</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">2</span> <span class="o">&lt;=</span> <span class="o">(</span><span class="n">bufferLength</span><span class="o">-</span><span class="n">bufferPosition</span><span class="o">))</span> <span class="o">{</span>
+      <span class="k">return</span> <span class="o">(</span><span class="kt">short</span><span class="o">)</span> <span class="o">(((</span><span class="n">buffer</span><span class="o">[</span><span class="n">bufferPosition</span><span class="o">++]</span> <span class="o">&amp;</span> <span class="n">0xFF</span><span class="o">)</span> <span class="o">&lt;&lt;</span>  <span class="n">8</span><span class="o">)</span> <span class="o">|</span>  <span class="o">(</span><span class="n">buffer</span><span class="o">[</span><span class="n">bufferPosition</span><span class="o">++]</span> <span class="o">&amp;</span> <span class="n">0xFF</span><span class="o">));</span>
     <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
-      <span class="k">return</span> <span class="kd">super</span><span class="o">.</span><span class="na">readShort</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+      <span class="k">return</span> <span class="kd">super</span><span class="o">.</span><span class="na">readShort</span><span class="o">();</span>
     <span class="o">}</span>
   <span class="o">}</span>
 <span class="o">}</span>
@@ -1302,10 +1302,10 @@
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">abstract</span> <span class="kd">class</span> <span class="nc">DataOutput</span> <span class="o">{</span>
   <span class="kd">public</span> <span class="kd">abstract</span> <span class="kt">void</span> <span class="nf">writeByte</span><span class="o">(</span><span class="kt">byte</span> <span class="n">b</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
   <span class="kd">public</span> <span class="kt">void</span> <span class="nf">writeInt</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
-    <span class="n">writeByte</span><span class="o">(</span><span class="o">(</span><span class="kt">byte</span><span class="o">)</span><span class="o">(</span><span class="n">i</span> <span class="o">&gt;</span><span class="o">&gt;</span> <span class="n">24</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
-    <span class="n">writeByte</span><span class="o">(</span><span class="o">(</span><span class="kt">byte</span><span class="o">)</span><span class="o">(</span><span class="n">i</span> <span class="o">&gt;</span><span class="o">&gt;</span> <span class="n">16</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
-    <span class="n">writeByte</span><span class="o">(</span><span class="o">(</span><span class="kt">byte</span><span class="o">)</span><span class="o">(</span><span class="n">i</span> <span class="o">&gt;</span><span class="o">&gt;</span>  <span class="n">8</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
-    <span class="n">writeByte</span><span class="o">(</span><span class="o">(</span><span class="kt">byte</span><span class="o">)</span> <span class="n">i</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">writeByte</span><span class="o">((</span><span class="kt">byte</span><span class="o">)(</span><span class="n">i</span> <span class="o">&gt;&gt;</span> <span class="n">24</span><span class="o">));</span>
+    <span class="n">writeByte</span><span class="o">((</span><span class="kt">byte</span><span class="o">)(</span><span class="n">i</span> <span class="o">&gt;&gt;</span> <span class="n">16</span><span class="o">));</span>
+    <span class="n">writeByte</span><span class="o">((</span><span class="kt">byte</span><span class="o">)(</span><span class="n">i</span> <span class="o">&gt;&gt;</span>  <span class="n">8</span><span class="o">));</span>
+    <span class="n">writeByte</span><span class="o">((</span><span class="kt">byte</span><span class="o">)</span> <span class="n">i</span><span class="o">);</span>
   <span class="o">}</span>
 <span class="o">}</span>
 </code></pre></td></tr></table>
@@ -1321,7 +1321,7 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">abstract</span> <span class="kd">class</span> <span class="nc">IndexOutput</span> <span class="kd">extends</span> <span class="n">DataOutput</span> <span class="kd">implements</span> <span class="n">Closeable</span> <span class="o">{</span>
   <span class="c1">// Returns the current position in this file, where the next write will occur.
-</span><span class="c1"></span>  <span class="kd">public</span> <span class="kd">abstract</span> <span class="kt">long</span> <span class="nf">getFilePointer</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+</span><span class="c1"></span>  <span class="kd">public</span> <span class="kd">abstract</span> <span class="kt">long</span> <span class="nf">getFilePointer</span><span class="o">();</span>
 <span class="o">}</span>
 </code></pre></td></tr></table>
 </div>
@@ -1378,7 +1378,7 @@
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">RAMOutputStream</span> <span class="kd">extends</span> <span class="n">IndexOutput</span> <span class="kd">implements</span> <span class="n">Accountable</span> <span class="o">{</span>
   <span class="kd">private</span> <span class="kd">final</span> <span class="n">RAMFile</span> <span class="n">file</span><span class="o">;</span>
 
-  <span class="kd">private</span> <span class="kt">byte</span><span class="o">[</span><span class="o">]</span> <span class="n">currentBuffer</span><span class="o">;</span>
+  <span class="kd">private</span> <span class="kt">byte</span><span class="o">[]</span> <span class="n">currentBuffer</span><span class="o">;</span>
   <span class="kd">private</span> <span class="kt">int</span> <span class="n">currentBufferIndex</span><span class="o">;</span>
   
   <span class="kd">private</span> <span class="kt">int</span> <span class="n">bufferPosition</span><span class="o">;</span>
@@ -1387,7 +1387,7 @@
 
   <span class="cm">/** Copy the current contents of this buffer to the provided {@link DataOutput}. */</span>
   <span class="kd">public</span> <span class="kt">void</span> <span class="nf">writeTo</span><span class="o">(</span><span class="n">DataOutput</span> <span class="n">out</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
-    <span class="n">flush</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">flush</span><span class="o">();</span>
     <span class="kd">final</span> <span class="kt">long</span> <span class="n">end</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="na">length</span><span class="o">;</span>
     <span class="kt">long</span> <span class="n">pos</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span>
     <span class="kt">int</span> <span class="n">buffer</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span>
@@ -1395,27 +1395,27 @@
       <span class="kt">int</span> <span class="n">length</span> <span class="o">=</span> <span class="n">BUFFER_SIZE</span><span class="o">;</span>
       <span class="kt">long</span> <span class="n">nextPos</span> <span class="o">=</span> <span class="n">pos</span> <span class="o">+</span> <span class="n">length</span><span class="o">;</span>
       <span class="k">if</span> <span class="o">(</span><span class="n">nextPos</span> <span class="o">&gt;</span> <span class="n">end</span><span class="o">)</span> <span class="o">{</span>                        <span class="c1">// at the last buffer
-</span><span class="c1"></span>        <span class="n">length</span> <span class="o">=</span> <span class="o">(</span><span class="kt">int</span><span class="o">)</span><span class="o">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">pos</span><span class="o">)</span><span class="o">;</span>
+</span><span class="c1"></span>        <span class="n">length</span> <span class="o">=</span> <span class="o">(</span><span class="kt">int</span><span class="o">)(</span><span class="n">end</span> <span class="o">-</span> <span class="n">pos</span><span class="o">);</span>
       <span class="o">}</span>
-      <span class="n">out</span><span class="o">.</span><span class="na">writeBytes</span><span class="o">(</span><span class="n">file</span><span class="o">.</span><span class="na">getBuffer</span><span class="o">(</span><span class="n">buffer</span><span class="o">+</span><span class="o">+</span><span class="o">)</span><span class="o">,</span> <span class="n">length</span><span class="o">)</span><span class="o">;</span>
+      <span class="n">out</span><span class="o">.</span><span class="na">writeBytes</span><span class="o">(</span><span class="n">file</span><span class="o">.</span><span class="na">getBuffer</span><span class="o">(</span><span class="n">buffer</span><span class="o">++),</span> <span class="n">length</span><span class="o">);</span>
       <span class="n">pos</span> <span class="o">=</span> <span class="n">nextPos</span><span class="o">;</span>
     <span class="o">}</span>
   <span class="o">}</span>
 
   <span class="nd">@Override</span>
   <span class="kd">public</span> <span class="kt">void</span> <span class="nf">writeByte</span><span class="o">(</span><span class="kt">byte</span> <span class="n">b</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">bufferPosition</span> <span class="o">=</span><span class="o">=</span> <span class="n">bufferLength</span><span class="o">)</span> <span class="o">{</span>
-      <span class="n">currentBufferIndex</span><span class="o">+</span><span class="o">+</span><span class="o">;</span>
-      <span class="n">switchCurrentBuffer</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">bufferPosition</span> <span class="o">==</span> <span class="n">bufferLength</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">currentBufferIndex</span><span class="o">++;</span>
+      <span class="n">switchCurrentBuffer</span><span class="o">();</span>
     <span class="o">}</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">crc</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-      <span class="n">crc</span><span class="o">.</span><span class="na">update</span><span class="o">(</span><span class="n">b</span><span class="o">)</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">crc</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">crc</span><span class="o">.</span><span class="na">update</span><span class="o">(</span><span class="n">b</span><span class="o">);</span>
     <span class="o">}</span>
-    <span class="n">currentBuffer</span><span class="o">[</span><span class="n">bufferPosition</span><span class="o">+</span><span class="o">+</span><span class="o">]</span> <span class="o">=</span> <span class="n">b</span><span class="o">;</span>
+    <span class="n">currentBuffer</span><span class="o">[</span><span class="n">bufferPosition</span><span class="o">++]</span> <span class="o">=</span> <span class="n">b</span><span class="o">;</span>
   <span class="o">}</span>
 
   <span class="nd">@Override</span>
-  <span class="kd">public</span> <span class="kt">long</span> <span class="nf">getFilePointer</span><span class="o">(</span><span class="o">)</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="kt">long</span> <span class="nf">getFilePointer</span><span class="o">()</span> <span class="o">{</span>
     <span class="k">return</span> <span class="n">currentBufferIndex</span> <span class="o">&lt;</span> <span class="n">0</span> <span class="o">?</span> <span class="n">0</span> <span class="o">:</span> <span class="n">bufferStart</span> <span class="o">+</span> <span class="n">bufferPosition</span><span class="o">;</span>
   <span class="o">}</span>
 <span class="o">}</span>

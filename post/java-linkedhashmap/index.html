@@ -16,7 +16,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
 
-<meta name="author" content="Guoqing Geng" /><meta name="description" content="As its name implies, LinkedHashMap is a hash table and linked list implementation of the Map interface, with predictable iteration order. Different with HashMap, it maintains a doubly-linked list runing through all of its entries, which also defines the iteration ordering, same as the order in which keys were inserted into the map. This order remains if a key is re-inserted into the map.
+<meta name="author" content="Guoqing Geng" /><meta name="description" content="As its name implies, LinkedHashMap is a hash table and linked list implementation of the Map interface, with predictable iteration order. Different with HashMap, it maintains a doubly-linked list running through all of its entries, which also defines the iteration ordering, same as the order in which keys were inserted into the map. This order remains if a key is re-inserted into the map.
 Like HashMap, LinkedHashMap provides constant-time performance for the basic operations add, contains and remove, assuming the hash function disperses elements properly among the buckets. Performance is likely to be just slightly below that of HashMap, due to the added expense of maintaining the linked list,
 Thanks to the linked list, this kind of map is well-suited to building LRU caches. So my questions is how LinkedHashMap preserves the linked list when key changes.
 " /><meta name="keywords" content="Java, HashMap, LinkedHashMap" />
@@ -26,7 +26,7 @@ Thanks to the linked list, this kind of map is well-suited to building LRU cache
 
 
 
-<meta name="generator" content="Hugo 0.64.1 with theme even" />
+<meta name="generator" content="Hugo 0.68.3 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/post/java-linkedhashmap/" />
@@ -42,7 +42,7 @@ Thanks to the linked list, this kind of map is well-suited to building LRU cache
 
 
 <meta property="og:title" content="Java LinkedHashMap" />
-<meta property="og:description" content="As its name implies, LinkedHashMap is a hash table and linked list implementation of the Map interface, with predictable iteration order. Different with HashMap, it maintains a doubly-linked list runing through all of its entries, which also defines the iteration ordering, same as the order in which keys were inserted into the map. This order remains if a key is re-inserted into the map.
+<meta property="og:description" content="As its name implies, LinkedHashMap is a hash table and linked list implementation of the Map interface, with predictable iteration order. Different with HashMap, it maintains a doubly-linked list running through all of its entries, which also defines the iteration ordering, same as the order in which keys were inserted into the map. This order remains if a key is re-inserted into the map.
 Like HashMap, LinkedHashMap provides constant-time performance for the basic operations add, contains and remove, assuming the hash function disperses elements properly among the buckets.  Performance is likely to be just slightly below that of HashMap, due to the added expense of maintaining the linked list,
 Thanks to the linked list, this kind of map is well-suited to building LRU caches. So my questions is how LinkedHashMap preserves the linked list when key changes." />
 <meta property="og:type" content="article" />
@@ -50,7 +50,7 @@ Thanks to the linked list, this kind of map is well-suited to building LRU cache
 <meta property="article:published_time" content="2016-06-10T20:01:59+08:00" />
 <meta property="article:modified_time" content="2018-06-09T10:20:03+08:00" />
 <meta itemprop="name" content="Java LinkedHashMap">
-<meta itemprop="description" content="As its name implies, LinkedHashMap is a hash table and linked list implementation of the Map interface, with predictable iteration order. Different with HashMap, it maintains a doubly-linked list runing through all of its entries, which also defines the iteration ordering, same as the order in which keys were inserted into the map. This order remains if a key is re-inserted into the map.
+<meta itemprop="description" content="As its name implies, LinkedHashMap is a hash table and linked list implementation of the Map interface, with predictable iteration order. Different with HashMap, it maintains a doubly-linked list running through all of its entries, which also defines the iteration ordering, same as the order in which keys were inserted into the map. This order remains if a key is re-inserted into the map.
 Like HashMap, LinkedHashMap provides constant-time performance for the basic operations add, contains and remove, assuming the hash function disperses elements properly among the buckets.  Performance is likely to be just slightly below that of HashMap, due to the added expense of maintaining the linked list,
 Thanks to the linked list, this kind of map is well-suited to building LRU caches. So my questions is how LinkedHashMap preserves the linked list when key changes.">
 <meta itemprop="datePublished" content="2016-06-10T20:01:59&#43;08:00" />
@@ -61,7 +61,7 @@ Thanks to the linked list, this kind of map is well-suited to building LRU cache
 
 <meta itemprop="keywords" content="java.util,Data Structure," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Java LinkedHashMap"/>
-<meta name="twitter:description" content="As its name implies, LinkedHashMap is a hash table and linked list implementation of the Map interface, with predictable iteration order. Different with HashMap, it maintains a doubly-linked list runing through all of its entries, which also defines the iteration ordering, same as the order in which keys were inserted into the map. This order remains if a key is re-inserted into the map.
+<meta name="twitter:description" content="As its name implies, LinkedHashMap is a hash table and linked list implementation of the Map interface, with predictable iteration order. Different with HashMap, it maintains a doubly-linked list running through all of its entries, which also defines the iteration ordering, same as the order in which keys were inserted into the map. This order remains if a key is re-inserted into the map.
 Like HashMap, LinkedHashMap provides constant-time performance for the basic operations add, contains and remove, assuming the hash function disperses elements properly among the buckets.  Performance is likely to be just slightly below that of HashMap, due to the added expense of maintaining the linked list,
 Thanks to the linked list, this kind of map is well-suited to building LRU caches. So my questions is how LinkedHashMap preserves the linked list when key changes."/>
 
@@ -149,20 +149,20 @@ Thanks to the linked list, this kind of map is well-suited to building LRU cache
     <nav id="TableOfContents">
   <ul>
     <li><a href="#data-structure">Data Structure</a></li>
-    <li><a href="#get">get</a></li>
-    <li><a href="#put">put</a>
+    <li><a href="#get"><code>get</code></a></li>
+    <li><a href="#put"><code>put</code></a>
       <ul>
-        <li><a href="#newnode">newNode</a></li>
-        <li><a href="#afternodeinsertion">afterNodeInsertion</a></li>
+        <li><a href="#newnode"><code>newNode</code></a></li>
+        <li><a href="#afternodeinsertion"><code>afterNodeInsertion</code></a></li>
       </ul>
     </li>
-    <li><a href="#remove">remove</a></li>
+    <li><a href="#remove"><code>remove</code></a></li>
   </ul>
 </nav>
   </div>
 </div>
     <div class="post-content">
-      <p>As its name implies, <code>LinkedHashMap</code> is a hash table and linked list implementation of the <code>Map</code> interface, with predictable iteration order. Different with <code>HashMap</code>, it maintains a doubly-linked list runing through all of its entries, which also defines the iteration ordering, same as the order in which keys were inserted into the map. This order remains if a key is re-inserted into the map.</p>
+      <p>As its name implies, <code>LinkedHashMap</code> is a hash table and linked list implementation of the <code>Map</code> interface, with predictable iteration order. Different with <code>HashMap</code>, it maintains a doubly-linked list running through all of its entries, which also defines the iteration ordering, same as the order in which keys were inserted into the map. This order remains if a key is re-inserted into the map.</p>
 <p>Like <code>HashMap</code>, <code>LinkedHashMap</code> provides constant-time performance for the basic operations <code>add</code>, <code>contains</code> and <code>remove</code>, assuming the hash function disperses elements properly among the buckets.  Performance is likely to be just slightly below that of <code>HashMap</code>, due to the added expense of maintaining the linked list,</p>
 <p>Thanks to the linked list, this kind of map is well-suited to building LRU caches. So my questions is how <code>LinkedHashMap</code> preserves the linked list when key changes.</p>
 <p><img src="/images/java-hashmap-class.png" alt=""></p>
@@ -218,7 +218,7 @@ Thanks to the linked list, this kind of map is well-suited to building LRU cache
 <span class="kd">static</span> <span class="kd">class</span> <span class="nc">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="kd">extends</span> <span class="n">HashMap</span><span class="o">.</span><span class="na">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="o">{</span>
     <span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">before</span><span class="o">,</span> <span class="n">after</span><span class="o">;</span>
     <span class="n">Entry</span><span class="o">(</span><span class="kt">int</span> <span class="n">hash</span><span class="o">,</span> <span class="n">K</span> <span class="n">key</span><span class="o">,</span> <span class="n">V</span> <span class="n">value</span><span class="o">,</span> <span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">next</span><span class="o">)</span> <span class="o">{</span>
-        <span class="kd">super</span><span class="o">(</span><span class="n">hash</span><span class="o">,</span> <span class="n">key</span><span class="o">,</span> <span class="n">value</span><span class="o">,</span> <span class="n">next</span><span class="o">)</span><span class="o">;</span>
+        <span class="kd">super</span><span class="o">(</span><span class="n">hash</span><span class="o">,</span> <span class="n">key</span><span class="o">,</span> <span class="n">value</span><span class="o">,</span> <span class="n">next</span><span class="o">);</span>
     <span class="o">}</span>
 <span class="o">}</span>
 </code></pre></td></tr></table>
@@ -243,10 +243,10 @@ Thanks to the linked list, this kind of map is well-suited to building LRU cache
 </span><span class="c1"></span>
 <span class="kd">public</span> <span class="n">V</span> <span class="nf">get</span><span class="o">(</span><span class="n">Object</span> <span class="n">key</span><span class="o">)</span> <span class="o">{</span>
     <span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">e</span><span class="o">;</span>
-    <span class="k">if</span> <span class="o">(</span><span class="o">(</span><span class="n">e</span> <span class="o">=</span> <span class="n">getNode</span><span class="o">(</span><span class="n">hash</span><span class="o">(</span><span class="n">key</span><span class="o">)</span><span class="o">,</span> <span class="n">key</span><span class="o">)</span><span class="o">)</span> <span class="o">=</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span>
+    <span class="k">if</span> <span class="o">((</span><span class="n">e</span> <span class="o">=</span> <span class="n">getNode</span><span class="o">(</span><span class="n">hash</span><span class="o">(</span><span class="n">key</span><span class="o">),</span> <span class="n">key</span><span class="o">))</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span>
         <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
     <span class="k">if</span> <span class="o">(</span><span class="n">accessOrder</span><span class="o">)</span>
-        <span class="n">afterNodeAccess</span><span class="o">(</span><span class="n">e</span><span class="o">)</span><span class="o">;</span>
+        <span class="n">afterNodeAccess</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
     <span class="k">return</span> <span class="n">e</span><span class="o">.</span><span class="na">value</span><span class="o">;</span>
 <span class="o">}</span>
 </code></pre></td></tr></table>
@@ -291,31 +291,31 @@ Thanks to the linked list, this kind of map is well-suited to building LRU cache
 </span><span class="c1"></span>
 <span class="kt">void</span> <span class="nf">afterNodeAccess</span><span class="o">(</span><span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
     <span class="n">LinkedHashMap</span><span class="o">.</span><span class="na">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">last</span><span class="o">;</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">accessOrder</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="o">(</span><span class="n">last</span> <span class="o">=</span> <span class="n">tail</span><span class="o">)</span> <span class="o">!</span><span class="o">=</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">accessOrder</span> <span class="o">&amp;&amp;</span> <span class="o">(</span><span class="n">last</span> <span class="o">=</span> <span class="n">tail</span><span class="o">)</span> <span class="o">!=</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
         <span class="n">LinkedHashMap</span><span class="o">.</span><span class="na">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">p</span> <span class="o">=</span>
-            <span class="o">(</span><span class="n">LinkedHashMap</span><span class="o">.</span><span class="na">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span><span class="o">)</span><span class="n">e</span><span class="o">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="na">before</span><span class="o">,</span> <span class="n">a</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="na">after</span><span class="o">;</span>
+            <span class="o">(</span><span class="n">LinkedHashMap</span><span class="o">.</span><span class="na">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;)</span><span class="n">e</span><span class="o">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="na">before</span><span class="o">,</span> <span class="n">a</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="na">after</span><span class="o">;</span>
         <span class="n">p</span><span class="o">.</span><span class="na">after</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
 
         <span class="c1">// if p is the old head
-</span><span class="c1"></span>        <span class="k">if</span> <span class="o">(</span><span class="n">b</span> <span class="o">=</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span>
+</span><span class="c1"></span>        <span class="k">if</span> <span class="o">(</span><span class="n">b</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span>
             <span class="n">head</span> <span class="o">=</span> <span class="n">a</span><span class="o">;</span> <span class="c1">// update head
 </span><span class="c1"></span>        <span class="k">else</span>
             <span class="n">b</span><span class="o">.</span><span class="na">after</span> <span class="o">=</span> <span class="n">a</span><span class="o">;</span> <span class="c1">// kick p out
 </span><span class="c1"></span>
         <span class="c1">// if p is not the tail    
-</span><span class="c1"></span>        <span class="k">if</span> <span class="o">(</span><span class="n">a</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span>
+</span><span class="c1"></span>        <span class="k">if</span> <span class="o">(</span><span class="n">a</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span>
             <span class="n">a</span><span class="o">.</span><span class="na">before</span> <span class="o">=</span> <span class="n">b</span><span class="o">;</span> <span class="c1">// kick p out
 </span><span class="c1"></span>        <span class="k">else</span>
             <span class="n">last</span> <span class="o">=</span> <span class="n">b</span><span class="o">;</span> <span class="c1">// make b the tail
 </span><span class="c1"></span>
-        <span class="k">if</span> <span class="o">(</span><span class="n">last</span> <span class="o">=</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">last</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span>
             <span class="n">head</span> <span class="o">=</span> <span class="n">p</span><span class="o">;</span>
         <span class="k">else</span> <span class="o">{</span>
             <span class="n">p</span><span class="o">.</span><span class="na">before</span> <span class="o">=</span> <span class="n">last</span><span class="o">;</span>
             <span class="n">last</span><span class="o">.</span><span class="na">after</span> <span class="o">=</span> <span class="n">p</span><span class="o">;</span>
         <span class="o">}</span>
         <span class="n">tail</span> <span class="o">=</span> <span class="n">p</span><span class="o">;</span>
-        <span class="o">+</span><span class="o">+</span><span class="n">modCount</span><span class="o">;</span>
+        <span class="o">++</span><span class="n">modCount</span><span class="o">;</span>
     <span class="o">}</span>
 <span class="o">}</span>
 </code></pre></td></tr></table>
@@ -339,8 +339,8 @@ Thanks to the linked list, this kind of map is well-suited to building LRU cache
 </span><span class="c1"></span>
 <span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="nf">newNode</span><span class="o">(</span><span class="kt">int</span> <span class="n">hash</span><span class="o">,</span> <span class="n">K</span> <span class="n">key</span><span class="o">,</span> <span class="n">V</span> <span class="n">value</span><span class="o">,</span> <span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
     <span class="n">LinkedHashMap</span><span class="o">.</span><span class="na">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">p</span> <span class="o">=</span>
-        <span class="k">new</span> <span class="n">LinkedHashMap</span><span class="o">.</span><span class="na">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span><span class="o">(</span><span class="n">hash</span><span class="o">,</span> <span class="n">key</span><span class="o">,</span> <span class="n">value</span><span class="o">,</span> <span class="n">e</span><span class="o">)</span><span class="o">;</span>
-    <span class="n">linkNodeLast</span><span class="o">(</span><span class="n">p</span><span class="o">)</span><span class="o">;</span>
+        <span class="k">new</span> <span class="n">LinkedHashMap</span><span class="o">.</span><span class="na">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;(</span><span class="n">hash</span><span class="o">,</span> <span class="n">key</span><span class="o">,</span> <span class="n">value</span><span class="o">,</span> <span class="n">e</span><span class="o">);</span>
+    <span class="n">linkNodeLast</span><span class="o">(</span><span class="n">p</span><span class="o">);</span>
     <span class="k">return</span> <span class="n">p</span><span class="o">;</span>
 <span class="o">}</span>
 </code></pre></td></tr></table>
@@ -371,7 +371,7 @@ Thanks to the linked list, this kind of map is well-suited to building LRU cache
     <span class="n">tail</span> <span class="o">=</span> <span class="n">p</span><span class="o">;</span>
 
     <span class="c1">// empty list
-</span><span class="c1"></span>    <span class="k">if</span> <span class="o">(</span><span class="n">last</span> <span class="o">=</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span>
+</span><span class="c1"></span>    <span class="k">if</span> <span class="o">(</span><span class="n">last</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span>
         <span class="n">head</span> <span class="o">=</span> <span class="n">p</span><span class="o">;</span>
     <span class="k">else</span> <span class="o">{</span>
         <span class="n">p</span><span class="o">.</span><span class="na">before</span> <span class="o">=</span> <span class="n">last</span><span class="o">;</span>
@@ -404,9 +404,9 @@ Thanks to the linked list, this kind of map is well-suited to building LRU cache
 </span><span class="c1"></span>
 <span class="kt">void</span> <span class="nf">afterNodeInsertion</span><span class="o">(</span><span class="kt">boolean</span> <span class="n">evict</span><span class="o">)</span> <span class="o">{</span>
     <span class="n">LinkedHashMap</span><span class="o">.</span><span class="na">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">first</span><span class="o">;</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">evict</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="o">(</span><span class="n">first</span> <span class="o">=</span> <span class="n">head</span><span class="o">)</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">removeEldestEntry</span><span class="o">(</span><span class="n">first</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">evict</span> <span class="o">&amp;&amp;</span> <span class="o">(</span><span class="n">first</span> <span class="o">=</span> <span class="n">head</span><span class="o">)</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">removeEldestEntry</span><span class="o">(</span><span class="n">first</span><span class="o">))</span> <span class="o">{</span>
         <span class="n">K</span> <span class="n">key</span> <span class="o">=</span> <span class="n">first</span><span class="o">.</span><span class="na">key</span><span class="o">;</span>
-        <span class="n">removeNode</span><span class="o">(</span><span class="n">hash</span><span class="o">(</span><span class="n">key</span><span class="o">)</span><span class="o">,</span> <span class="n">key</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="kc">false</span><span class="o">,</span> <span class="kc">true</span><span class="o">)</span><span class="o">;</span>
+        <span class="n">removeNode</span><span class="o">(</span><span class="n">hash</span><span class="o">(</span><span class="n">key</span><span class="o">),</span> <span class="n">key</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="kc">false</span><span class="o">,</span> <span class="kc">true</span><span class="o">);</span>
     <span class="o">}</span>
 <span class="o">}</span>
 
@@ -474,45 +474,45 @@ Thanks to the linked list, this kind of map is well-suited to building LRU cache
 </span><span class="c1"></span>
 <span class="kd">public</span> <span class="n">V</span> <span class="nf">remove</span><span class="o">(</span><span class="n">Object</span> <span class="n">key</span><span class="o">)</span> <span class="o">{</span>
     <span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">e</span><span class="o">;</span>
-    <span class="k">return</span> <span class="o">(</span><span class="n">e</span> <span class="o">=</span> <span class="n">removeNode</span><span class="o">(</span><span class="n">hash</span><span class="o">(</span><span class="n">key</span><span class="o">)</span><span class="o">,</span> <span class="n">key</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="kc">false</span><span class="o">,</span> <span class="kc">true</span><span class="o">)</span><span class="o">)</span> <span class="o">=</span><span class="o">=</span> <span class="kc">null</span> <span class="o">?</span>
+    <span class="k">return</span> <span class="o">(</span><span class="n">e</span> <span class="o">=</span> <span class="n">removeNode</span><span class="o">(</span><span class="n">hash</span><span class="o">(</span><span class="n">key</span><span class="o">),</span> <span class="n">key</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="kc">false</span><span class="o">,</span> <span class="kc">true</span><span class="o">))</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">?</span>
         <span class="kc">null</span> <span class="o">:</span> <span class="n">e</span><span class="o">.</span><span class="na">value</span><span class="o">;</span>
 <span class="o">}</span>
 
 <span class="kd">final</span> <span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="nf">removeNode</span><span class="o">(</span><span class="kt">int</span> <span class="n">hash</span><span class="o">,</span> <span class="n">Object</span> <span class="n">key</span><span class="o">,</span> <span class="n">Object</span> <span class="n">value</span><span class="o">,</span>
                            <span class="kt">boolean</span> <span class="n">matchValue</span><span class="o">,</span> <span class="kt">boolean</span> <span class="n">movable</span><span class="o">)</span> <span class="o">{</span>
-    <span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span><span class="o">[</span><span class="o">]</span> <span class="n">tab</span><span class="o">;</span> <span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">p</span><span class="o">;</span> <span class="kt">int</span> <span class="n">n</span><span class="o">,</span> <span class="n">index</span><span class="o">;</span>
-    <span class="k">if</span> <span class="o">(</span><span class="o">(</span><span class="n">tab</span> <span class="o">=</span> <span class="n">table</span><span class="o">)</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="o">(</span><span class="n">n</span> <span class="o">=</span> <span class="n">tab</span><span class="o">.</span><span class="na">length</span><span class="o">)</span> <span class="o">&gt;</span> <span class="n">0</span> <span class="o">&amp;</span><span class="o">&amp;</span>
-        <span class="o">(</span><span class="n">p</span> <span class="o">=</span> <span class="n">tab</span><span class="o">[</span><span class="n">index</span> <span class="o">=</span> <span class="o">(</span><span class="n">n</span> <span class="o">-</span> <span class="n">1</span><span class="o">)</span> <span class="o">&amp;</span> <span class="n">hash</span><span class="o">]</span><span class="o">)</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;[]</span> <span class="n">tab</span><span class="o">;</span> <span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">p</span><span class="o">;</span> <span class="kt">int</span> <span class="n">n</span><span class="o">,</span> <span class="n">index</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">((</span><span class="n">tab</span> <span class="o">=</span> <span class="n">table</span><span class="o">)</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="o">(</span><span class="n">n</span> <span class="o">=</span> <span class="n">tab</span><span class="o">.</span><span class="na">length</span><span class="o">)</span> <span class="o">&gt;</span> <span class="n">0</span> <span class="o">&amp;&amp;</span>
+        <span class="o">(</span><span class="n">p</span> <span class="o">=</span> <span class="n">tab</span><span class="o">[</span><span class="n">index</span> <span class="o">=</span> <span class="o">(</span><span class="n">n</span> <span class="o">-</span> <span class="n">1</span><span class="o">)</span> <span class="o">&amp;</span> <span class="n">hash</span><span class="o">])</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
         <span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">node</span> <span class="o">=</span> <span class="kc">null</span><span class="o">,</span> <span class="n">e</span><span class="o">;</span> <span class="n">K</span> <span class="n">k</span><span class="o">;</span> <span class="n">V</span> <span class="n">v</span><span class="o">;</span>
-        <span class="k">if</span> <span class="o">(</span><span class="n">p</span><span class="o">.</span><span class="na">hash</span> <span class="o">=</span><span class="o">=</span> <span class="n">hash</span> <span class="o">&amp;</span><span class="o">&amp;</span>
-            <span class="o">(</span><span class="o">(</span><span class="n">k</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="na">key</span><span class="o">)</span> <span class="o">=</span><span class="o">=</span> <span class="n">key</span> <span class="o">|</span><span class="o">|</span> <span class="o">(</span><span class="n">key</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">key</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">k</span><span class="o">)</span><span class="o">)</span><span class="o">)</span><span class="o">)</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">p</span><span class="o">.</span><span class="na">hash</span> <span class="o">==</span> <span class="n">hash</span> <span class="o">&amp;&amp;</span>
+            <span class="o">((</span><span class="n">k</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="na">key</span><span class="o">)</span> <span class="o">==</span> <span class="n">key</span> <span class="o">||</span> <span class="o">(</span><span class="n">key</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">key</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">k</span><span class="o">))))</span>
             <span class="n">node</span> <span class="o">=</span> <span class="n">p</span><span class="o">;</span>
-        <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="o">(</span><span class="n">e</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="na">next</span><span class="o">)</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">else</span> <span class="k">if</span> <span class="o">((</span><span class="n">e</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="na">next</span><span class="o">)</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
             <span class="k">if</span> <span class="o">(</span><span class="n">p</span> <span class="k">instanceof</span> <span class="n">TreeNode</span><span class="o">)</span>
-                <span class="n">node</span> <span class="o">=</span> <span class="o">(</span><span class="o">(</span><span class="n">TreeNode</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span><span class="o">)</span><span class="n">p</span><span class="o">)</span><span class="o">.</span><span class="na">getTreeNode</span><span class="o">(</span><span class="n">hash</span><span class="o">,</span> <span class="n">key</span><span class="o">)</span><span class="o">;</span>
+                <span class="n">node</span> <span class="o">=</span> <span class="o">((</span><span class="n">TreeNode</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;)</span><span class="n">p</span><span class="o">).</span><span class="na">getTreeNode</span><span class="o">(</span><span class="n">hash</span><span class="o">,</span> <span class="n">key</span><span class="o">);</span>
             <span class="k">else</span> <span class="o">{</span>
                 <span class="k">do</span> <span class="o">{</span>
-                    <span class="k">if</span> <span class="o">(</span><span class="n">e</span><span class="o">.</span><span class="na">hash</span> <span class="o">=</span><span class="o">=</span> <span class="n">hash</span> <span class="o">&amp;</span><span class="o">&amp;</span>
-                        <span class="o">(</span><span class="o">(</span><span class="n">k</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="na">key</span><span class="o">)</span> <span class="o">=</span><span class="o">=</span> <span class="n">key</span> <span class="o">|</span><span class="o">|</span>
-                         <span class="o">(</span><span class="n">key</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">key</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">k</span><span class="o">)</span><span class="o">)</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="k">if</span> <span class="o">(</span><span class="n">e</span><span class="o">.</span><span class="na">hash</span> <span class="o">==</span> <span class="n">hash</span> <span class="o">&amp;&amp;</span>
+                        <span class="o">((</span><span class="n">k</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="na">key</span><span class="o">)</span> <span class="o">==</span> <span class="n">key</span> <span class="o">||</span>
+                         <span class="o">(</span><span class="n">key</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">key</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">k</span><span class="o">))))</span> <span class="o">{</span>
                         <span class="n">node</span> <span class="o">=</span> <span class="n">e</span><span class="o">;</span>
                         <span class="k">break</span><span class="o">;</span>
                     <span class="o">}</span>
                     <span class="n">p</span> <span class="o">=</span> <span class="n">e</span><span class="o">;</span>
-                <span class="o">}</span> <span class="k">while</span> <span class="o">(</span><span class="o">(</span><span class="n">e</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="na">next</span><span class="o">)</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span><span class="o">;</span>
+                <span class="o">}</span> <span class="k">while</span> <span class="o">((</span><span class="n">e</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="na">next</span><span class="o">)</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">);</span>
             <span class="o">}</span>
         <span class="o">}</span>
-        <span class="k">if</span> <span class="o">(</span><span class="n">node</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="o">(</span><span class="o">!</span><span class="n">matchValue</span> <span class="o">|</span><span class="o">|</span> <span class="o">(</span><span class="n">v</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="na">value</span><span class="o">)</span> <span class="o">=</span><span class="o">=</span> <span class="n">value</span> <span class="o">|</span><span class="o">|</span>
-                             <span class="o">(</span><span class="n">value</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">value</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">v</span><span class="o">)</span><span class="o">)</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">node</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="o">(!</span><span class="n">matchValue</span> <span class="o">||</span> <span class="o">(</span><span class="n">v</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="na">value</span><span class="o">)</span> <span class="o">==</span> <span class="n">value</span> <span class="o">||</span>
+                             <span class="o">(</span><span class="n">value</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">value</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">v</span><span class="o">))))</span> <span class="o">{</span>
             <span class="k">if</span> <span class="o">(</span><span class="n">node</span> <span class="k">instanceof</span> <span class="n">TreeNode</span><span class="o">)</span>
-                <span class="o">(</span><span class="o">(</span><span class="n">TreeNode</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span><span class="o">)</span><span class="n">node</span><span class="o">)</span><span class="o">.</span><span class="na">removeTreeNode</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">tab</span><span class="o">,</span> <span class="n">movable</span><span class="o">)</span><span class="o">;</span>
-            <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">node</span> <span class="o">=</span><span class="o">=</span> <span class="n">p</span><span class="o">)</span>
+                <span class="o">((</span><span class="n">TreeNode</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;)</span><span class="n">node</span><span class="o">).</span><span class="na">removeTreeNode</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">tab</span><span class="o">,</span> <span class="n">movable</span><span class="o">);</span>
+            <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">node</span> <span class="o">==</span> <span class="n">p</span><span class="o">)</span>
                 <span class="n">tab</span><span class="o">[</span><span class="n">index</span><span class="o">]</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="na">next</span><span class="o">;</span>
             <span class="k">else</span>
                 <span class="n">p</span><span class="o">.</span><span class="na">next</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="na">next</span><span class="o">;</span>
-            <span class="o">+</span><span class="o">+</span><span class="n">modCount</span><span class="o">;</span>
-            <span class="o">-</span><span class="o">-</span><span class="n">size</span><span class="o">;</span>
-            <span class="n">afterNodeRemoval</span><span class="o">(</span><span class="n">node</span><span class="o">)</span><span class="o">;</span>
+            <span class="o">++</span><span class="n">modCount</span><span class="o">;</span>
+            <span class="o">--</span><span class="n">size</span><span class="o">;</span>
+            <span class="n">afterNodeRemoval</span><span class="o">(</span><span class="n">node</span><span class="o">);</span>
             <span class="k">return</span> <span class="n">node</span><span class="o">;</span>
         <span class="o">}</span>
     <span class="o">}</span>
@@ -555,18 +555,18 @@ Thanks to the linked list, this kind of map is well-suited to building LRU cache
 </span><span class="c1"></span>
 <span class="kt">void</span> <span class="nf">afterNodeRemoval</span><span class="o">(</span><span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
     <span class="n">LinkedHashMap</span><span class="o">.</span><span class="na">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">p</span> <span class="o">=</span>
-        <span class="o">(</span><span class="n">LinkedHashMap</span><span class="o">.</span><span class="na">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span><span class="o">)</span><span class="n">e</span><span class="o">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="na">before</span><span class="o">,</span> <span class="n">a</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="na">after</span><span class="o">;</span>
+        <span class="o">(</span><span class="n">LinkedHashMap</span><span class="o">.</span><span class="na">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;)</span><span class="n">e</span><span class="o">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="na">before</span><span class="o">,</span> <span class="n">a</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="na">after</span><span class="o">;</span>
     <span class="c1">// isolate the node    
 </span><span class="c1"></span>    <span class="n">p</span><span class="o">.</span><span class="na">before</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="na">after</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
 
     <span class="c1">// if it is head
-</span><span class="c1"></span>    <span class="k">if</span> <span class="o">(</span><span class="n">b</span> <span class="o">=</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span>
+</span><span class="c1"></span>    <span class="k">if</span> <span class="o">(</span><span class="n">b</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span>
         <span class="n">head</span> <span class="o">=</span> <span class="n">a</span><span class="o">;</span>
     <span class="k">else</span>
         <span class="n">b</span><span class="o">.</span><span class="na">after</span> <span class="o">=</span> <span class="n">a</span><span class="o">;</span>
 
     <span class="c1">// if it is tail    
-</span><span class="c1"></span>    <span class="k">if</span> <span class="o">(</span><span class="n">a</span> <span class="o">=</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span>
+</span><span class="c1"></span>    <span class="k">if</span> <span class="o">(</span><span class="n">a</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span>
         <span class="n">tail</span> <span class="o">=</span> <span class="n">b</span><span class="o">;</span>
     <span class="k">else</span>
         <span class="n">a</span><span class="o">.</span><span class="na">before</span> <span class="o">=</span> <span class="n">b</span><span class="o">;</span>

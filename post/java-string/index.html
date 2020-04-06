@@ -25,7 +25,7 @@ This post introduces the basic of Java string, includes methods for examining in
 
 
 
-<meta name="generator" content="Hugo 0.64.1 with theme even" />
+<meta name="generator" content="Hugo 0.68.3 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/post/java-string/" />
@@ -148,15 +148,15 @@ This post introduces the basic of Java string, includes methods for examining in
     <li><a href="#member-functions">Member Functions</a>
       <ul>
         <li><a href="#constructor">Constructor</a></li>
-        <li><a href="#length">length()</a></li>
-        <li><a href="#isempty">isEmpty()</a></li>
-        <li><a href="#charatint">charAt(int)</a></li>
-        <li><a href="#equalsobject">equals(Object)</a></li>
-        <li><a href="#startswithstring-int">startsWith(String, int)</a></li>
-        <li><a href="#indexofint-int">indexOf(int, int)</a></li>
-        <li><a href="#indexofstring">indexOf(String)</a></li>
-        <li><a href="#substringint-int">substring(int, int)</a></li>
-        <li><a href="#concatstring">concat(String)</a></li>
+        <li><a href="#length"><code>length()</code></a></li>
+        <li><a href="#isempty"><code>isEmpty()</code></a></li>
+        <li><a href="#charatint"><code>charAt(int)</code></a></li>
+        <li><a href="#equalsobject"><code>equals(Object)</code></a></li>
+        <li><a href="#startswithstring-int"><code>startsWith(String, int)</code></a></li>
+        <li><a href="#indexofint-int"><code>indexOf(int, int)</code></a></li>
+        <li><a href="#indexofstring"><code>indexOf(String)</code></a></li>
+        <li><a href="#substringint-int"><code>substring(int, int)</code></a></li>
+        <li><a href="#concatstring"><code>concat(String)</code></a></li>
       </ul>
     </li>
   </ul>
@@ -189,9 +189,9 @@ This post introduces the basic of Java string, includes methods for examining in
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="nc">String</span>
-    <span class="kd">implements</span> <span class="n">java</span><span class="o">.</span><span class="na">io</span><span class="o">.</span><span class="na">Serializable</span><span class="o">,</span> <span class="n">Comparable</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="o">,</span> <span class="n">CharSequence</span> <span class="o">{</span>
+    <span class="kd">implements</span> <span class="n">java</span><span class="o">.</span><span class="na">io</span><span class="o">.</span><span class="na">Serializable</span><span class="o">,</span> <span class="n">Comparable</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;,</span> <span class="n">CharSequence</span> <span class="o">{</span>
     <span class="nd">@Stable</span>
-    <span class="kd">private</span> <span class="kd">final</span> <span class="kt">byte</span><span class="o">[</span><span class="o">]</span> <span class="n">value</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="kt">byte</span><span class="o">[]</span> <span class="n">value</span><span class="o">;</span>
 
     <span class="kd">private</span> <span class="kd">final</span> <span class="kt">byte</span> <span class="n">coder</span><span class="o">;</span>
     <span class="kd">private</span> <span class="kt">int</span> <span class="n">hash</span><span class="o">;</span> 
@@ -281,23 +281,23 @@ This post introduces the basic of Java string, includes methods for examining in
 </span><span class="cm">    Constructs a new String by decoding the specified subarray of
 </span><span class="cm">    bytes using the specified charset. 
 </span><span class="cm"> */</span>
-<span class="kd">public</span> <span class="nf">String</span><span class="o">(</span><span class="kt">byte</span> <span class="n">bytes</span><span class="o">[</span><span class="o">]</span><span class="o">,</span> <span class="kt">int</span> <span class="n">offset</span><span class="o">,</span> <span class="kt">int</span> <span class="n">length</span><span class="o">,</span> <span class="n">String</span> <span class="n">charsetName</span><span class="o">)</span>
+<span class="kd">public</span> <span class="nf">String</span><span class="o">(</span><span class="kt">byte</span> <span class="n">bytes</span><span class="o">[],</span> <span class="kt">int</span> <span class="n">offset</span><span class="o">,</span> <span class="kt">int</span> <span class="n">length</span><span class="o">,</span> <span class="n">String</span> <span class="n">charsetName</span><span class="o">)</span>
         <span class="kd">throws</span> <span class="n">UnsupportedEncodingException</span> <span class="o">{</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">charsetName</span> <span class="o">=</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span>
-        <span class="k">throw</span> <span class="k">new</span> <span class="n">NullPointerException</span><span class="o">(</span><span class="s">&#34;charsetName&#34;</span><span class="o">)</span><span class="o">;</span>
-    <span class="n">checkBoundsOffCount</span><span class="o">(</span><span class="n">offset</span><span class="o">,</span> <span class="n">length</span><span class="o">,</span> <span class="n">bytes</span><span class="o">.</span><span class="na">length</span><span class="o">)</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">charsetName</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="n">NullPointerException</span><span class="o">(</span><span class="s">&#34;charsetName&#34;</span><span class="o">);</span>
+    <span class="n">checkBoundsOffCount</span><span class="o">(</span><span class="n">offset</span><span class="o">,</span> <span class="n">length</span><span class="o">,</span> <span class="n">bytes</span><span class="o">.</span><span class="na">length</span><span class="o">);</span>
     <span class="n">StringCoding</span><span class="o">.</span><span class="na">Result</span> <span class="n">ret</span> <span class="o">=</span>
-        <span class="n">StringCoding</span><span class="o">.</span><span class="na">decode</span><span class="o">(</span><span class="n">charsetName</span><span class="o">,</span> <span class="n">bytes</span><span class="o">,</span> <span class="n">offset</span><span class="o">,</span> <span class="n">length</span><span class="o">)</span><span class="o">;</span>
+        <span class="n">StringCoding</span><span class="o">.</span><span class="na">decode</span><span class="o">(</span><span class="n">charsetName</span><span class="o">,</span> <span class="n">bytes</span><span class="o">,</span> <span class="n">offset</span><span class="o">,</span> <span class="n">length</span><span class="o">);</span>
     <span class="k">this</span><span class="o">.</span><span class="na">value</span> <span class="o">=</span> <span class="n">ret</span><span class="o">.</span><span class="na">value</span><span class="o">;</span>
     <span class="k">this</span><span class="o">.</span><span class="na">coder</span> <span class="o">=</span> <span class="n">ret</span><span class="o">.</span><span class="na">coder</span><span class="o">;</span>
 <span class="o">}</span>
 
 <span class="c1">// StringEncoding.java
-</span><span class="c1"></span><span class="kd">static</span> <span class="n">Result</span> <span class="nf">decode</span><span class="o">(</span><span class="n">String</span> <span class="n">charsetName</span><span class="o">,</span> <span class="kt">byte</span><span class="o">[</span><span class="o">]</span> <span class="n">ba</span><span class="o">,</span> <span class="kt">int</span> <span class="n">off</span><span class="o">,</span> <span class="kt">int</span> <span class="n">len</span><span class="o">)</span>
+</span><span class="c1"></span><span class="kd">static</span> <span class="n">Result</span> <span class="nf">decode</span><span class="o">(</span><span class="n">String</span> <span class="n">charsetName</span><span class="o">,</span> <span class="kt">byte</span><span class="o">[]</span> <span class="n">ba</span><span class="o">,</span> <span class="kt">int</span> <span class="n">off</span><span class="o">,</span> <span class="kt">int</span> <span class="n">len</span><span class="o">)</span>
         <span class="kd">throws</span> <span class="n">UnsupportedEncodingException</span> <span class="o">{</span>
-    <span class="n">Charset</span> <span class="n">cs</span> <span class="o">=</span> <span class="n">lookupCharset</span><span class="o">(</span><span class="n">csn</span><span class="o">)</span><span class="o">;</span>        
-    <span class="k">if</span> <span class="o">(</span><span class="n">cs</span> <span class="o">=</span><span class="o">=</span> <span class="n">ISO_8859_1</span><span class="o">)</span> <span class="o">{</span>
-        <span class="k">return</span> <span class="n">decodeLatin1</span><span class="o">(</span><span class="n">ba</span><span class="o">,</span> <span class="n">off</span><span class="o">,</span> <span class="n">len</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">Charset</span> <span class="n">cs</span> <span class="o">=</span> <span class="n">lookupCharset</span><span class="o">(</span><span class="n">csn</span><span class="o">);</span>        
+    <span class="k">if</span> <span class="o">(</span><span class="n">cs</span> <span class="o">==</span> <span class="n">ISO_8859_1</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">decodeLatin1</span><span class="o">(</span><span class="n">ba</span><span class="o">,</span> <span class="n">off</span><span class="o">,</span> <span class="n">len</span><span class="o">);</span>
     <span class="o">}</span>
 
     <span class="c1">// ...
@@ -305,12 +305,12 @@ This post introduces the basic of Java string, includes methods for examining in
 
 
 <span class="c1">// If a String is constructed from byte[], Arrays.copyOfRange copies the specified range of the specified array into a new array.
-</span><span class="c1"></span><span class="kd">private</span> <span class="kd">static</span> <span class="n">Result</span> <span class="nf">decodeLatin1</span><span class="o">(</span><span class="kt">byte</span><span class="o">[</span><span class="o">]</span> <span class="n">ba</span><span class="o">,</span> <span class="kt">int</span> <span class="n">off</span><span class="o">,</span> <span class="kt">int</span> <span class="n">len</span><span class="o">)</span> <span class="o">{</span>
-       <span class="n">Result</span> <span class="n">result</span> <span class="o">=</span> <span class="n">resultCached</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+</span><span class="c1"></span><span class="kd">private</span> <span class="kd">static</span> <span class="n">Result</span> <span class="nf">decodeLatin1</span><span class="o">(</span><span class="kt">byte</span><span class="o">[]</span> <span class="n">ba</span><span class="o">,</span> <span class="kt">int</span> <span class="n">off</span><span class="o">,</span> <span class="kt">int</span> <span class="n">len</span><span class="o">)</span> <span class="o">{</span>
+       <span class="n">Result</span> <span class="n">result</span> <span class="o">=</span> <span class="n">resultCached</span><span class="o">.</span><span class="na">get</span><span class="o">();</span>
        <span class="k">if</span> <span class="o">(</span><span class="n">COMPACT_STRINGS</span><span class="o">)</span> <span class="o">{</span>
-           <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="na">with</span><span class="o">(</span><span class="n">Arrays</span><span class="o">.</span><span class="na">copyOfRange</span><span class="o">(</span><span class="n">ba</span><span class="o">,</span> <span class="n">off</span><span class="o">,</span> <span class="n">off</span> <span class="o">+</span> <span class="n">len</span><span class="o">)</span><span class="o">,</span> <span class="n">LATIN1</span><span class="o">)</span><span class="o">;</span>
+           <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="na">with</span><span class="o">(</span><span class="n">Arrays</span><span class="o">.</span><span class="na">copyOfRange</span><span class="o">(</span><span class="n">ba</span><span class="o">,</span> <span class="n">off</span><span class="o">,</span> <span class="n">off</span> <span class="o">+</span> <span class="n">len</span><span class="o">),</span> <span class="n">LATIN1</span><span class="o">);</span>
        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
-           <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="na">with</span><span class="o">(</span><span class="n">StringLatin1</span><span class="o">.</span><span class="na">inflate</span><span class="o">(</span><span class="n">ba</span><span class="o">,</span> <span class="n">off</span><span class="o">,</span> <span class="n">len</span><span class="o">)</span><span class="o">,</span> <span class="n">UTF16</span><span class="o">)</span><span class="o">;</span>
+           <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="na">with</span><span class="o">(</span><span class="n">StringLatin1</span><span class="o">.</span><span class="na">inflate</span><span class="o">(</span><span class="n">ba</span><span class="o">,</span> <span class="n">off</span><span class="o">,</span> <span class="n">len</span><span class="o">),</span> <span class="n">UTF16</span><span class="o">);</span>
        <span class="o">}</span>
     <span class="o">}</span>
 <span class="o">}</span>    
@@ -331,13 +331,13 @@ This post introduces the basic of Java string, includes methods for examining in
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// String.java
-</span><span class="c1"></span><span class="kt">byte</span> <span class="nf">coder</span><span class="o">(</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="c1"></span><span class="kt">byte</span> <span class="nf">coder</span><span class="o">()</span> <span class="o">{</span>
     <span class="k">return</span> <span class="n">COMPACT_STRINGS</span> <span class="o">?</span> <span class="n">coder</span> <span class="o">:</span> <span class="n">UTF16</span><span class="o">;</span>
 <span class="o">}</span>
 
 <span class="c1">// for LATIN1, coder is 0
-</span><span class="c1"></span><span class="kd">public</span> <span class="kt">int</span> <span class="nf">length</span><span class="o">(</span><span class="o">)</span> <span class="o">{</span>
-    <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="na">length</span> <span class="o">&gt;</span><span class="o">&gt;</span> <span class="n">coder</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+</span><span class="c1"></span><span class="kd">public</span> <span class="kt">int</span> <span class="nf">length</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="na">length</span> <span class="o">&gt;&gt;</span> <span class="n">coder</span><span class="o">();</span>
 <span class="o">}</span>
 </code></pre></td></tr></table>
 </div>
@@ -352,8 +352,8 @@ This post introduces the basic of Java string, includes methods for examining in
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// String.java
-</span><span class="c1"></span><span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">isEmpty</span><span class="o">(</span><span class="o">)</span> <span class="o">{</span>
-    <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="na">length</span> <span class="o">=</span><span class="o">=</span> <span class="n">0</span><span class="o">;</span>
+</span><span class="c1"></span><span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">isEmpty</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="na">length</span> <span class="o">==</span> <span class="n">0</span><span class="o">;</span>
 <span class="o">}</span>
 </code></pre></td></tr></table>
 </div>
@@ -381,19 +381,19 @@ This post introduces the basic of Java string, includes methods for examining in
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// String.java
 </span><span class="c1"></span><span class="kd">public</span> <span class="kt">char</span> <span class="nf">charAt</span><span class="o">(</span><span class="kt">int</span> <span class="n">index</span><span class="o">)</span> <span class="o">{</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">isLatin1</span><span class="o">(</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
-        <span class="k">return</span> <span class="n">StringLatin1</span><span class="o">.</span><span class="na">charAt</span><span class="o">(</span><span class="n">value</span><span class="o">,</span> <span class="n">index</span><span class="o">)</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">isLatin1</span><span class="o">())</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">StringLatin1</span><span class="o">.</span><span class="na">charAt</span><span class="o">(</span><span class="n">value</span><span class="o">,</span> <span class="n">index</span><span class="o">);</span>
     <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
-        <span class="k">return</span> <span class="n">StringUTF16</span><span class="o">.</span><span class="na">charAt</span><span class="o">(</span><span class="n">value</span><span class="o">,</span> <span class="n">index</span><span class="o">)</span><span class="o">;</span>
+        <span class="k">return</span> <span class="n">StringUTF16</span><span class="o">.</span><span class="na">charAt</span><span class="o">(</span><span class="n">value</span><span class="o">,</span> <span class="n">index</span><span class="o">);</span>
     <span class="o">}</span>
 <span class="o">}</span>
 
 <span class="c1">// StringLatin1.java
-</span><span class="c1"></span><span class="kd">public</span> <span class="kd">static</span> <span class="kt">char</span> <span class="nf">charAt</span><span class="o">(</span><span class="kt">byte</span><span class="o">[</span><span class="o">]</span> <span class="n">value</span><span class="o">,</span> <span class="kt">int</span> <span class="n">index</span><span class="o">)</span> <span class="o">{</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">index</span> <span class="o">&lt;</span> <span class="n">0</span> <span class="o">|</span><span class="o">|</span> <span class="n">index</span> <span class="o">&gt;</span><span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="na">length</span><span class="o">)</span> <span class="o">{</span>
-        <span class="k">throw</span> <span class="k">new</span> <span class="n">StringIndexOutOfBoundsException</span><span class="o">(</span><span class="n">index</span><span class="o">)</span><span class="o">;</span>
+</span><span class="c1"></span><span class="kd">public</span> <span class="kd">static</span> <span class="kt">char</span> <span class="nf">charAt</span><span class="o">(</span><span class="kt">byte</span><span class="o">[]</span> <span class="n">value</span><span class="o">,</span> <span class="kt">int</span> <span class="n">index</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">index</span> <span class="o">&lt;</span> <span class="n">0</span> <span class="o">||</span> <span class="n">index</span> <span class="o">&gt;=</span> <span class="n">value</span><span class="o">.</span><span class="na">length</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="n">StringIndexOutOfBoundsException</span><span class="o">(</span><span class="n">index</span><span class="o">);</span>
     <span class="o">}</span>
-    <span class="k">return</span> <span class="o">(</span><span class="kt">char</span><span class="o">)</span><span class="o">(</span><span class="n">value</span><span class="o">[</span><span class="n">index</span><span class="o">]</span> <span class="o">&amp;</span> <span class="n">0xff</span><span class="o">)</span><span class="o">;</span>
+    <span class="k">return</span> <span class="o">(</span><span class="kt">char</span><span class="o">)(</span><span class="n">value</span><span class="o">[</span><span class="n">index</span><span class="o">]</span> <span class="o">&amp;</span> <span class="n">0xff</span><span class="o">);</span>
 <span class="o">}</span>
 </code></pre></td></tr></table>
 </div>
@@ -433,24 +433,24 @@ This post introduces the basic of Java string, includes methods for examining in
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// String.java
 </span><span class="c1"></span><span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">equals</span><span class="o">(</span><span class="n">Object</span> <span class="n">anObject</span><span class="o">)</span> <span class="o">{</span>
-    <span class="k">if</span> <span class="o">(</span><span class="k">this</span> <span class="o">=</span><span class="o">=</span> <span class="n">anObject</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="k">this</span> <span class="o">==</span> <span class="n">anObject</span><span class="o">)</span> <span class="o">{</span>
         <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
     <span class="o">}</span>
     <span class="k">if</span> <span class="o">(</span><span class="n">anObject</span> <span class="k">instanceof</span> <span class="n">String</span><span class="o">)</span> <span class="o">{</span>
         <span class="n">String</span> <span class="n">aString</span> <span class="o">=</span> <span class="o">(</span><span class="n">String</span><span class="o">)</span><span class="n">anObject</span><span class="o">;</span>
-        <span class="k">if</span> <span class="o">(</span><span class="n">coder</span><span class="o">(</span><span class="o">)</span> <span class="o">=</span><span class="o">=</span> <span class="n">aString</span><span class="o">.</span><span class="na">coder</span><span class="o">(</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
-            <span class="k">return</span> <span class="n">isLatin1</span><span class="o">(</span><span class="o">)</span> <span class="o">?</span> <span class="n">StringLatin1</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">value</span><span class="o">,</span> <span class="n">aString</span><span class="o">.</span><span class="na">value</span><span class="o">)</span>
-                              <span class="o">:</span> <span class="n">StringUTF16</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">value</span><span class="o">,</span> <span class="n">aString</span><span class="o">.</span><span class="na">value</span><span class="o">)</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">coder</span><span class="o">()</span> <span class="o">==</span> <span class="n">aString</span><span class="o">.</span><span class="na">coder</span><span class="o">())</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="n">isLatin1</span><span class="o">()</span> <span class="o">?</span> <span class="n">StringLatin1</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">value</span><span class="o">,</span> <span class="n">aString</span><span class="o">.</span><span class="na">value</span><span class="o">)</span>
+                              <span class="o">:</span> <span class="n">StringUTF16</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">value</span><span class="o">,</span> <span class="n">aString</span><span class="o">.</span><span class="na">value</span><span class="o">);</span>
         <span class="o">}</span>
     <span class="o">}</span>
     <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
 <span class="o">}</span>
 
 <span class="c1">// StringLatin1.java
-</span><span class="c1"></span><span class="kd">public</span> <span class="kd">static</span> <span class="kt">boolean</span> <span class="nf">equals</span><span class="o">(</span><span class="kt">byte</span><span class="o">[</span><span class="o">]</span> <span class="n">value</span><span class="o">,</span> <span class="kt">byte</span><span class="o">[</span><span class="o">]</span> <span class="n">other</span><span class="o">)</span> <span class="o">{</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">value</span><span class="o">.</span><span class="na">length</span> <span class="o">=</span><span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="na">length</span><span class="o">)</span> <span class="o">{</span>
-        <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">value</span><span class="o">.</span><span class="na">length</span><span class="o">;</span> <span class="n">i</span><span class="o">+</span><span class="o">+</span><span class="o">)</span> <span class="o">{</span>
-            <span class="k">if</span> <span class="o">(</span><span class="n">value</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">!</span><span class="o">=</span> <span class="n">other</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="c1"></span><span class="kd">public</span> <span class="kd">static</span> <span class="kt">boolean</span> <span class="nf">equals</span><span class="o">(</span><span class="kt">byte</span><span class="o">[]</span> <span class="n">value</span><span class="o">,</span> <span class="kt">byte</span><span class="o">[]</span> <span class="n">other</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">value</span><span class="o">.</span><span class="na">length</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="na">length</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">value</span><span class="o">.</span><span class="na">length</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">value</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">!=</span> <span class="n">other</span><span class="o">[</span><span class="n">i</span><span class="o">])</span> <span class="o">{</span>
                 <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
             <span class="o">}</span>
         <span class="o">}</span>
@@ -505,27 +505,27 @@ This post introduces the basic of Java string, includes methods for examining in
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// String.java
 </span><span class="c1"></span><span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">startsWith</span><span class="o">(</span><span class="n">String</span> <span class="n">prefix</span><span class="o">,</span> <span class="kt">int</span> <span class="n">toffset</span><span class="o">)</span> <span class="o">{</span>
     <span class="c1">// Note: toffset might be near -1&gt;&gt;&gt;1.
-</span><span class="c1"></span>    <span class="k">if</span> <span class="o">(</span><span class="n">toffset</span> <span class="o">&lt;</span> <span class="n">0</span> <span class="o">|</span><span class="o">|</span> <span class="n">toffset</span> <span class="o">&gt;</span> <span class="n">length</span><span class="o">(</span><span class="o">)</span> <span class="o">-</span> <span class="n">prefix</span><span class="o">.</span><span class="na">length</span><span class="o">(</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="c1"></span>    <span class="k">if</span> <span class="o">(</span><span class="n">toffset</span> <span class="o">&lt;</span> <span class="n">0</span> <span class="o">||</span> <span class="n">toffset</span> <span class="o">&gt;</span> <span class="n">length</span><span class="o">()</span> <span class="o">-</span> <span class="n">prefix</span><span class="o">.</span><span class="na">length</span><span class="o">())</span> <span class="o">{</span>
         <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
     <span class="o">}</span>
-    <span class="kt">byte</span> <span class="n">ta</span><span class="o">[</span><span class="o">]</span> <span class="o">=</span> <span class="n">value</span><span class="o">;</span>
-    <span class="kt">byte</span> <span class="n">pa</span><span class="o">[</span><span class="o">]</span> <span class="o">=</span> <span class="n">prefix</span><span class="o">.</span><span class="na">value</span><span class="o">;</span>
+    <span class="kt">byte</span> <span class="n">ta</span><span class="o">[]</span> <span class="o">=</span> <span class="n">value</span><span class="o">;</span>
+    <span class="kt">byte</span> <span class="n">pa</span><span class="o">[]</span> <span class="o">=</span> <span class="n">prefix</span><span class="o">.</span><span class="na">value</span><span class="o">;</span>
     <span class="kt">int</span> <span class="n">po</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span>
     <span class="kt">int</span> <span class="n">pc</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="na">length</span><span class="o">;</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">coder</span><span class="o">(</span><span class="o">)</span> <span class="o">=</span><span class="o">=</span> <span class="n">prefix</span><span class="o">.</span><span class="na">coder</span><span class="o">(</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
-        <span class="kt">int</span> <span class="n">to</span> <span class="o">=</span> <span class="n">isLatin1</span><span class="o">(</span><span class="o">)</span> <span class="o">?</span> <span class="n">toffset</span> <span class="o">:</span> <span class="n">toffset</span> <span class="o">&lt;</span><span class="o">&lt;</span> <span class="n">1</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">coder</span><span class="o">()</span> <span class="o">==</span> <span class="n">prefix</span><span class="o">.</span><span class="na">coder</span><span class="o">())</span> <span class="o">{</span>
+        <span class="kt">int</span> <span class="n">to</span> <span class="o">=</span> <span class="n">isLatin1</span><span class="o">()</span> <span class="o">?</span> <span class="n">toffset</span> <span class="o">:</span> <span class="n">toffset</span> <span class="o">&lt;&lt;</span> <span class="n">1</span><span class="o">;</span>
         <span class="k">while</span> <span class="o">(</span><span class="n">po</span> <span class="o">&lt;</span> <span class="n">pc</span><span class="o">)</span> <span class="o">{</span>
-            <span class="k">if</span> <span class="o">(</span><span class="n">ta</span><span class="o">[</span><span class="n">to</span><span class="o">+</span><span class="o">+</span><span class="o">]</span> <span class="o">!</span><span class="o">=</span> <span class="n">pa</span><span class="o">[</span><span class="n">po</span><span class="o">+</span><span class="o">+</span><span class="o">]</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">ta</span><span class="o">[</span><span class="n">to</span><span class="o">++]</span> <span class="o">!=</span> <span class="n">pa</span><span class="o">[</span><span class="n">po</span><span class="o">++])</span> <span class="o">{</span>
                 <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
             <span class="o">}</span>
         <span class="o">}</span>
     <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
-        <span class="k">if</span> <span class="o">(</span><span class="n">isLatin1</span><span class="o">(</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>  <span class="c1">// &amp;&amp; pcoder == UTF16
+        <span class="k">if</span> <span class="o">(</span><span class="n">isLatin1</span><span class="o">())</span> <span class="o">{</span>  <span class="c1">// &amp;&amp; pcoder == UTF16
 </span><span class="c1"></span>            <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
         <span class="o">}</span>
         <span class="c1">// coder == UTF16 &amp;&amp; pcoder == LATIN1)
 </span><span class="c1"></span>        <span class="k">while</span> <span class="o">(</span><span class="n">po</span> <span class="o">&lt;</span> <span class="n">pc</span><span class="o">)</span> <span class="o">{</span>
-            <span class="k">if</span> <span class="o">(</span><span class="n">StringUTF16</span><span class="o">.</span><span class="na">getChar</span><span class="o">(</span><span class="n">ta</span><span class="o">,</span> <span class="n">toffset</span><span class="o">+</span><span class="o">+</span><span class="o">)</span> <span class="o">!</span><span class="o">=</span> <span class="o">(</span><span class="n">pa</span><span class="o">[</span><span class="n">po</span><span class="o">+</span><span class="o">+</span><span class="o">]</span> <span class="o">&amp;</span> <span class="n">0xff</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">StringUTF16</span><span class="o">.</span><span class="na">getChar</span><span class="o">(</span><span class="n">ta</span><span class="o">,</span> <span class="n">toffset</span><span class="o">++)</span> <span class="o">!=</span> <span class="o">(</span><span class="n">pa</span><span class="o">[</span><span class="n">po</span><span class="o">++]</span> <span class="o">&amp;</span> <span class="n">0xff</span><span class="o">))</span> <span class="o">{</span>
                 <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
            <span class="o">}</span>
         <span class="o">}</span>
@@ -571,25 +571,25 @@ This post introduces the basic of Java string, includes methods for examining in
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// String.java
 </span><span class="c1"></span>
 <span class="kd">public</span> <span class="kt">int</span> <span class="nf">indexOf</span><span class="o">(</span><span class="kt">int</span> <span class="n">ch</span><span class="o">,</span> <span class="kt">int</span> <span class="n">fromIndex</span><span class="o">)</span> <span class="o">{</span>
-    <span class="k">return</span> <span class="n">isLatin1</span><span class="o">(</span><span class="o">)</span> <span class="o">?</span> <span class="n">StringLatin1</span><span class="o">.</span><span class="na">indexOf</span><span class="o">(</span><span class="n">value</span><span class="o">,</span> <span class="n">ch</span><span class="o">,</span> <span class="n">fromIndex</span><span class="o">)</span>
-                     <span class="o">:</span> <span class="n">StringUTF16</span><span class="o">.</span><span class="na">indexOf</span><span class="o">(</span><span class="n">value</span><span class="o">,</span> <span class="n">ch</span><span class="o">,</span> <span class="n">fromIndex</span><span class="o">)</span><span class="o">;</span>
+    <span class="k">return</span> <span class="n">isLatin1</span><span class="o">()</span> <span class="o">?</span> <span class="n">StringLatin1</span><span class="o">.</span><span class="na">indexOf</span><span class="o">(</span><span class="n">value</span><span class="o">,</span> <span class="n">ch</span><span class="o">,</span> <span class="n">fromIndex</span><span class="o">)</span>
+                     <span class="o">:</span> <span class="n">StringUTF16</span><span class="o">.</span><span class="na">indexOf</span><span class="o">(</span><span class="n">value</span><span class="o">,</span> <span class="n">ch</span><span class="o">,</span> <span class="n">fromIndex</span><span class="o">);</span>
 <span class="o">}</span>
 
 <span class="c1">// StringLatin1.java
-</span><span class="c1"></span><span class="kd">public</span> <span class="kd">static</span> <span class="kt">int</span> <span class="nf">indexOf</span><span class="o">(</span><span class="kt">byte</span><span class="o">[</span><span class="o">]</span> <span class="n">value</span><span class="o">,</span> <span class="kt">int</span> <span class="n">ch</span><span class="o">,</span> <span class="kt">int</span> <span class="n">fromIndex</span><span class="o">)</span> <span class="o">{</span>
-    <span class="k">if</span> <span class="o">(</span><span class="o">!</span><span class="n">canEncode</span><span class="o">(</span><span class="n">ch</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="c1"></span><span class="kd">public</span> <span class="kd">static</span> <span class="kt">int</span> <span class="nf">indexOf</span><span class="o">(</span><span class="kt">byte</span><span class="o">[]</span> <span class="n">value</span><span class="o">,</span> <span class="kt">int</span> <span class="n">ch</span><span class="o">,</span> <span class="kt">int</span> <span class="n">fromIndex</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(!</span><span class="n">canEncode</span><span class="o">(</span><span class="n">ch</span><span class="o">))</span> <span class="o">{</span>
         <span class="k">return</span> <span class="o">-</span><span class="n">1</span><span class="o">;</span>
     <span class="o">}</span>
     <span class="kt">int</span> <span class="n">max</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="na">length</span><span class="o">;</span>
     <span class="k">if</span> <span class="o">(</span><span class="n">fromIndex</span> <span class="o">&lt;</span> <span class="n">0</span><span class="o">)</span> <span class="o">{</span>
         <span class="n">fromIndex</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span>
-    <span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">fromIndex</span> <span class="o">&gt;</span><span class="o">=</span> <span class="n">max</span><span class="o">)</span> <span class="o">{</span>
+    <span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">fromIndex</span> <span class="o">&gt;=</span> <span class="n">max</span><span class="o">)</span> <span class="o">{</span>
         <span class="c1">// Note: fromIndex might be near -1&gt;&gt;&gt;1.
 </span><span class="c1"></span>        <span class="k">return</span> <span class="o">-</span><span class="n">1</span><span class="o">;</span>
     <span class="o">}</span>
     <span class="kt">byte</span> <span class="n">c</span> <span class="o">=</span> <span class="o">(</span><span class="kt">byte</span><span class="o">)</span><span class="n">ch</span><span class="o">;</span>
-    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">fromIndex</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">max</span><span class="o">;</span> <span class="n">i</span><span class="o">+</span><span class="o">+</span><span class="o">)</span> <span class="o">{</span>
-        <span class="k">if</span> <span class="o">(</span><span class="n">value</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">=</span><span class="o">=</span> <span class="n">c</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">fromIndex</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">max</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">value</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">==</span> <span class="n">c</span><span class="o">)</span> <span class="o">{</span>
            <span class="k">return</span> <span class="n">i</span><span class="o">;</span>
         <span class="o">}</span>
     <span class="o">}</span>
@@ -642,31 +642,31 @@ This post introduces the basic of Java string, includes methods for examining in
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// String.java
 </span><span class="c1"></span>
 <span class="kd">public</span> <span class="kt">int</span> <span class="nf">indexOf</span><span class="o">(</span><span class="n">String</span> <span class="n">str</span><span class="o">)</span> <span class="o">{</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">coder</span><span class="o">(</span><span class="o">)</span> <span class="o">=</span><span class="o">=</span> <span class="n">str</span><span class="o">.</span><span class="na">coder</span><span class="o">(</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
-        <span class="k">return</span> <span class="n">isLatin1</span><span class="o">(</span><span class="o">)</span> <span class="o">?</span> <span class="n">StringLatin1</span><span class="o">.</span><span class="na">indexOf</span><span class="o">(</span><span class="n">value</span><span class="o">,</span> <span class="n">str</span><span class="o">.</span><span class="na">value</span><span class="o">)</span>
-                          <span class="o">:</span> <span class="n">StringUTF16</span><span class="o">.</span><span class="na">indexOf</span><span class="o">(</span><span class="n">value</span><span class="o">,</span> <span class="n">str</span><span class="o">.</span><span class="na">value</span><span class="o">)</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">coder</span><span class="o">()</span> <span class="o">==</span> <span class="n">str</span><span class="o">.</span><span class="na">coder</span><span class="o">())</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">isLatin1</span><span class="o">()</span> <span class="o">?</span> <span class="n">StringLatin1</span><span class="o">.</span><span class="na">indexOf</span><span class="o">(</span><span class="n">value</span><span class="o">,</span> <span class="n">str</span><span class="o">.</span><span class="na">value</span><span class="o">)</span>
+                          <span class="o">:</span> <span class="n">StringUTF16</span><span class="o">.</span><span class="na">indexOf</span><span class="o">(</span><span class="n">value</span><span class="o">,</span> <span class="n">str</span><span class="o">.</span><span class="na">value</span><span class="o">);</span>
     <span class="o">}</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">coder</span><span class="o">(</span><span class="o">)</span> <span class="o">=</span><span class="o">=</span> <span class="n">LATIN1</span><span class="o">)</span> <span class="o">{</span>  <span class="c1">// str.coder == UTF16
+    <span class="k">if</span> <span class="o">(</span><span class="n">coder</span><span class="o">()</span> <span class="o">==</span> <span class="n">LATIN1</span><span class="o">)</span> <span class="o">{</span>  <span class="c1">// str.coder == UTF16
 </span><span class="c1"></span>        <span class="k">return</span> <span class="o">-</span><span class="n">1</span><span class="o">;</span>
     <span class="o">}</span>
-    <span class="k">return</span> <span class="n">StringUTF16</span><span class="o">.</span><span class="na">indexOfLatin1</span><span class="o">(</span><span class="n">value</span><span class="o">,</span> <span class="n">str</span><span class="o">.</span><span class="na">value</span><span class="o">)</span><span class="o">;</span>
+    <span class="k">return</span> <span class="n">StringUTF16</span><span class="o">.</span><span class="na">indexOfLatin1</span><span class="o">(</span><span class="n">value</span><span class="o">,</span> <span class="n">str</span><span class="o">.</span><span class="na">value</span><span class="o">);</span>
 <span class="o">}</span>
 
 <span class="c1">// StringLatin1.java
-</span><span class="c1"></span><span class="kd">public</span> <span class="kd">static</span> <span class="kt">int</span> <span class="nf">indexOf</span><span class="o">(</span><span class="kt">byte</span><span class="o">[</span><span class="o">]</span> <span class="n">value</span><span class="o">,</span> <span class="kt">int</span> <span class="n">valueCount</span><span class="o">,</span> <span class="kt">byte</span><span class="o">[</span><span class="o">]</span> <span class="n">str</span><span class="o">,</span> <span class="kt">int</span> <span class="n">strCount</span><span class="o">,</span> <span class="kt">int</span> <span class="n">fromIndex</span><span class="o">)</span> <span class="o">{</span>
-    <span class="kt">byte</span> <span class="n">first</span> <span class="o">=</span> <span class="n">str</span><span class="o">[</span><span class="n">0</span><span class="o">]</span><span class="o">;</span>
-    <span class="kt">int</span> <span class="n">max</span> <span class="o">=</span> <span class="o">(</span><span class="n">valueCount</span> <span class="o">-</span> <span class="n">strCount</span><span class="o">)</span><span class="o">;</span>
-    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">fromIndex</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span><span class="o">=</span> <span class="n">max</span><span class="o">;</span> <span class="n">i</span><span class="o">+</span><span class="o">+</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="c1"></span><span class="kd">public</span> <span class="kd">static</span> <span class="kt">int</span> <span class="nf">indexOf</span><span class="o">(</span><span class="kt">byte</span><span class="o">[]</span> <span class="n">value</span><span class="o">,</span> <span class="kt">int</span> <span class="n">valueCount</span><span class="o">,</span> <span class="kt">byte</span><span class="o">[]</span> <span class="n">str</span><span class="o">,</span> <span class="kt">int</span> <span class="n">strCount</span><span class="o">,</span> <span class="kt">int</span> <span class="n">fromIndex</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kt">byte</span> <span class="n">first</span> <span class="o">=</span> <span class="n">str</span><span class="o">[</span><span class="n">0</span><span class="o">];</span>
+    <span class="kt">int</span> <span class="n">max</span> <span class="o">=</span> <span class="o">(</span><span class="n">valueCount</span> <span class="o">-</span> <span class="n">strCount</span><span class="o">);</span>
+    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">fromIndex</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">max</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
         <span class="c1">// Look for first character.
-</span><span class="c1"></span>        <span class="k">if</span> <span class="o">(</span><span class="n">value</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">!</span><span class="o">=</span> <span class="n">first</span><span class="o">)</span> <span class="o">{</span>
-            <span class="k">while</span> <span class="o">(</span><span class="o">+</span><span class="o">+</span><span class="n">i</span> <span class="o">&lt;</span><span class="o">=</span> <span class="n">max</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">value</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">!</span><span class="o">=</span> <span class="n">first</span><span class="o">)</span><span class="o">;</span>
+</span><span class="c1"></span>        <span class="k">if</span> <span class="o">(</span><span class="n">value</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">!=</span> <span class="n">first</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">while</span> <span class="o">(++</span><span class="n">i</span> <span class="o">&lt;=</span> <span class="n">max</span> <span class="o">&amp;&amp;</span> <span class="n">value</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">!=</span> <span class="n">first</span><span class="o">);</span>
         <span class="o">}</span>
         <span class="c1">// Found first character, now look at the rest of value
-</span><span class="c1"></span>        <span class="k">if</span> <span class="o">(</span><span class="n">i</span> <span class="o">&lt;</span><span class="o">=</span> <span class="n">max</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="c1"></span>        <span class="k">if</span> <span class="o">(</span><span class="n">i</span> <span class="o">&lt;=</span> <span class="n">max</span><span class="o">)</span> <span class="o">{</span>
             <span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="n">1</span><span class="o">;</span>
             <span class="kt">int</span> <span class="n">end</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="n">strCount</span> <span class="o">-</span> <span class="n">1</span><span class="o">;</span>
-            <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">k</span> <span class="o">=</span> <span class="n">1</span><span class="o">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">end</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">value</span><span class="o">[</span><span class="n">j</span><span class="o">]</span> <span class="o">=</span><span class="o">=</span> <span class="n">str</span><span class="o">[</span><span class="n">k</span><span class="o">]</span><span class="o">;</span> <span class="n">j</span><span class="o">+</span><span class="o">+</span><span class="o">,</span> <span class="n">k</span><span class="o">+</span><span class="o">+</span><span class="o">)</span><span class="o">;</span>
-            <span class="k">if</span> <span class="o">(</span><span class="n">j</span> <span class="o">=</span><span class="o">=</span> <span class="n">end</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">k</span> <span class="o">=</span> <span class="n">1</span><span class="o">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">end</span> <span class="o">&amp;&amp;</span> <span class="n">value</span><span class="o">[</span><span class="n">j</span><span class="o">]</span> <span class="o">==</span> <span class="n">str</span><span class="o">[</span><span class="n">k</span><span class="o">];</span> <span class="n">j</span><span class="o">++,</span> <span class="n">k</span><span class="o">++);</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">j</span> <span class="o">==</span> <span class="n">end</span><span class="o">)</span> <span class="o">{</span>
                 <span class="c1">// Found whole string.
 </span><span class="c1"></span>                <span class="k">return</span> <span class="n">i</span><span class="o">;</span>
             <span class="o">}</span>
@@ -702,20 +702,20 @@ This post introduces the basic of Java string, includes methods for examining in
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// String.java
 </span><span class="c1"></span><span class="kd">public</span> <span class="n">String</span> <span class="nf">substring</span><span class="o">(</span><span class="kt">int</span> <span class="n">beginIndex</span><span class="o">,</span> <span class="kt">int</span> <span class="n">endIndex</span><span class="o">)</span> <span class="o">{</span>
-    <span class="kt">int</span> <span class="n">length</span> <span class="o">=</span> <span class="n">length</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
-    <span class="n">checkBoundsBeginEnd</span><span class="o">(</span><span class="n">beginIndex</span><span class="o">,</span> <span class="n">endIndex</span><span class="o">,</span> <span class="n">length</span><span class="o">)</span><span class="o">;</span>
+    <span class="kt">int</span> <span class="n">length</span> <span class="o">=</span> <span class="n">length</span><span class="o">();</span>
+    <span class="n">checkBoundsBeginEnd</span><span class="o">(</span><span class="n">beginIndex</span><span class="o">,</span> <span class="n">endIndex</span><span class="o">,</span> <span class="n">length</span><span class="o">);</span>
     <span class="kt">int</span> <span class="n">subLen</span> <span class="o">=</span> <span class="n">endIndex</span> <span class="o">-</span> <span class="n">beginIndex</span><span class="o">;</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">beginIndex</span> <span class="o">=</span><span class="o">=</span> <span class="n">0</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">endIndex</span> <span class="o">=</span><span class="o">=</span> <span class="n">length</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">beginIndex</span> <span class="o">==</span> <span class="n">0</span> <span class="o">&amp;&amp;</span> <span class="n">endIndex</span> <span class="o">==</span> <span class="n">length</span><span class="o">)</span> <span class="o">{</span>
         <span class="k">return</span> <span class="k">this</span><span class="o">;</span>
     <span class="o">}</span>
-    <span class="k">return</span> <span class="n">isLatin1</span><span class="o">(</span><span class="o">)</span> <span class="o">?</span> <span class="n">StringLatin1</span><span class="o">.</span><span class="na">newString</span><span class="o">(</span><span class="n">value</span><span class="o">,</span> <span class="n">beginIndex</span><span class="o">,</span> <span class="n">subLen</span><span class="o">)</span>
-                      <span class="o">:</span> <span class="n">StringUTF16</span><span class="o">.</span><span class="na">newString</span><span class="o">(</span><span class="n">value</span><span class="o">,</span> <span class="n">beginIndex</span><span class="o">,</span> <span class="n">subLen</span><span class="o">)</span><span class="o">;</span>
+    <span class="k">return</span> <span class="n">isLatin1</span><span class="o">()</span> <span class="o">?</span> <span class="n">StringLatin1</span><span class="o">.</span><span class="na">newString</span><span class="o">(</span><span class="n">value</span><span class="o">,</span> <span class="n">beginIndex</span><span class="o">,</span> <span class="n">subLen</span><span class="o">)</span>
+                      <span class="o">:</span> <span class="n">StringUTF16</span><span class="o">.</span><span class="na">newString</span><span class="o">(</span><span class="n">value</span><span class="o">,</span> <span class="n">beginIndex</span><span class="o">,</span> <span class="n">subLen</span><span class="o">);</span>
 <span class="o">}</span>
 
 <span class="c1">// StringLatin1.java
-</span><span class="c1"></span><span class="kd">public</span> <span class="kd">static</span> <span class="n">String</span> <span class="nf">newString</span><span class="o">(</span><span class="kt">byte</span><span class="o">[</span><span class="o">]</span> <span class="n">val</span><span class="o">,</span> <span class="kt">int</span> <span class="n">index</span><span class="o">,</span> <span class="kt">int</span> <span class="n">len</span><span class="o">)</span> <span class="o">{</span>
-    <span class="k">return</span> <span class="k">new</span> <span class="n">String</span><span class="o">(</span><span class="n">Arrays</span><span class="o">.</span><span class="na">copyOfRange</span><span class="o">(</span><span class="n">val</span><span class="o">,</span> <span class="n">index</span><span class="o">,</span> <span class="n">index</span> <span class="o">+</span> <span class="n">len</span><span class="o">)</span><span class="o">,</span>
-                      <span class="n">LATIN1</span><span class="o">)</span><span class="o">;</span>
+</span><span class="c1"></span><span class="kd">public</span> <span class="kd">static</span> <span class="n">String</span> <span class="nf">newString</span><span class="o">(</span><span class="kt">byte</span><span class="o">[]</span> <span class="n">val</span><span class="o">,</span> <span class="kt">int</span> <span class="n">index</span><span class="o">,</span> <span class="kt">int</span> <span class="n">len</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="n">String</span><span class="o">(</span><span class="n">Arrays</span><span class="o">.</span><span class="na">copyOfRange</span><span class="o">(</span><span class="n">val</span><span class="o">,</span> <span class="n">index</span><span class="o">,</span> <span class="n">index</span> <span class="o">+</span> <span class="n">len</span><span class="o">),</span>
+                      <span class="n">LATIN1</span><span class="o">);</span>
 <span class="o">}</span>
 </code></pre></td></tr></table>
 </div>
@@ -750,23 +750,23 @@ This post introduces the basic of Java string, includes methods for examining in
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// String.java
 </span><span class="c1"></span>
 <span class="kd">public</span> <span class="n">String</span> <span class="nf">concat</span><span class="o">(</span><span class="n">String</span> <span class="n">str</span><span class="o">)</span> <span class="o">{</span>
-    <span class="kt">int</span> <span class="n">olen</span> <span class="o">=</span> <span class="n">str</span><span class="o">.</span><span class="na">length</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">olen</span> <span class="o">=</span><span class="o">=</span> <span class="n">0</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kt">int</span> <span class="n">olen</span> <span class="o">=</span> <span class="n">str</span><span class="o">.</span><span class="na">length</span><span class="o">();</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">olen</span> <span class="o">==</span> <span class="n">0</span><span class="o">)</span> <span class="o">{</span>
         <span class="k">return</span> <span class="k">this</span><span class="o">;</span>
     <span class="o">}</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">coder</span><span class="o">(</span><span class="o">)</span> <span class="o">=</span><span class="o">=</span> <span class="n">str</span><span class="o">.</span><span class="na">coder</span><span class="o">(</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
-        <span class="kt">byte</span><span class="o">[</span><span class="o">]</span> <span class="n">val</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">value</span><span class="o">;</span>
-        <span class="kt">byte</span><span class="o">[</span><span class="o">]</span> <span class="n">oval</span> <span class="o">=</span> <span class="n">str</span><span class="o">.</span><span class="na">value</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">coder</span><span class="o">()</span> <span class="o">==</span> <span class="n">str</span><span class="o">.</span><span class="na">coder</span><span class="o">())</span> <span class="o">{</span>
+        <span class="kt">byte</span><span class="o">[]</span> <span class="n">val</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">value</span><span class="o">;</span>
+        <span class="kt">byte</span><span class="o">[]</span> <span class="n">oval</span> <span class="o">=</span> <span class="n">str</span><span class="o">.</span><span class="na">value</span><span class="o">;</span>
         <span class="kt">int</span> <span class="n">len</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="na">length</span> <span class="o">+</span> <span class="n">oval</span><span class="o">.</span><span class="na">length</span><span class="o">;</span>
-        <span class="kt">byte</span><span class="o">[</span><span class="o">]</span> <span class="n">buf</span> <span class="o">=</span> <span class="n">Arrays</span><span class="o">.</span><span class="na">copyOf</span><span class="o">(</span><span class="n">val</span><span class="o">,</span> <span class="n">len</span><span class="o">)</span><span class="o">;</span>
-        <span class="n">System</span><span class="o">.</span><span class="na">arraycopy</span><span class="o">(</span><span class="n">oval</span><span class="o">,</span> <span class="n">0</span><span class="o">,</span> <span class="n">buf</span><span class="o">,</span> <span class="n">val</span><span class="o">.</span><span class="na">length</span><span class="o">,</span> <span class="n">oval</span><span class="o">.</span><span class="na">length</span><span class="o">)</span><span class="o">;</span>
-        <span class="k">return</span> <span class="k">new</span> <span class="n">String</span><span class="o">(</span><span class="n">buf</span><span class="o">,</span> <span class="n">coder</span><span class="o">)</span><span class="o">;</span>
+        <span class="kt">byte</span><span class="o">[]</span> <span class="n">buf</span> <span class="o">=</span> <span class="n">Arrays</span><span class="o">.</span><span class="na">copyOf</span><span class="o">(</span><span class="n">val</span><span class="o">,</span> <span class="n">len</span><span class="o">);</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">arraycopy</span><span class="o">(</span><span class="n">oval</span><span class="o">,</span> <span class="n">0</span><span class="o">,</span> <span class="n">buf</span><span class="o">,</span> <span class="n">val</span><span class="o">.</span><span class="na">length</span><span class="o">,</span> <span class="n">oval</span><span class="o">.</span><span class="na">length</span><span class="o">);</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="n">String</span><span class="o">(</span><span class="n">buf</span><span class="o">,</span> <span class="n">coder</span><span class="o">);</span>
     <span class="o">}</span>
-    <span class="kt">int</span> <span class="n">len</span> <span class="o">=</span> <span class="n">length</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
-    <span class="kt">byte</span><span class="o">[</span><span class="o">]</span> <span class="n">buf</span> <span class="o">=</span> <span class="n">StringUTF16</span><span class="o">.</span><span class="na">newBytesFor</span><span class="o">(</span><span class="n">len</span> <span class="o">+</span> <span class="n">olen</span><span class="o">)</span><span class="o">;</span>
-    <span class="n">getBytes</span><span class="o">(</span><span class="n">buf</span><span class="o">,</span> <span class="n">0</span><span class="o">,</span> <span class="n">UTF16</span><span class="o">)</span><span class="o">;</span>
-    <span class="n">str</span><span class="o">.</span><span class="na">getBytes</span><span class="o">(</span><span class="n">buf</span><span class="o">,</span> <span class="n">len</span><span class="o">,</span> <span class="n">UTF16</span><span class="o">)</span><span class="o">;</span>
-    <span class="k">return</span> <span class="k">new</span> <span class="n">String</span><span class="o">(</span><span class="n">buf</span><span class="o">,</span> <span class="n">UTF16</span><span class="o">)</span><span class="o">;</span>
+    <span class="kt">int</span> <span class="n">len</span> <span class="o">=</span> <span class="n">length</span><span class="o">();</span>
+    <span class="kt">byte</span><span class="o">[]</span> <span class="n">buf</span> <span class="o">=</span> <span class="n">StringUTF16</span><span class="o">.</span><span class="na">newBytesFor</span><span class="o">(</span><span class="n">len</span> <span class="o">+</span> <span class="n">olen</span><span class="o">);</span>
+    <span class="n">getBytes</span><span class="o">(</span><span class="n">buf</span><span class="o">,</span> <span class="n">0</span><span class="o">,</span> <span class="n">UTF16</span><span class="o">);</span>
+    <span class="n">str</span><span class="o">.</span><span class="na">getBytes</span><span class="o">(</span><span class="n">buf</span><span class="o">,</span> <span class="n">len</span><span class="o">,</span> <span class="n">UTF16</span><span class="o">);</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="n">String</span><span class="o">(</span><span class="n">buf</span><span class="o">,</span> <span class="n">UTF16</span><span class="o">);</span>
 <span class="o">}</span>
 </code></pre></td></tr></table>
 </div>

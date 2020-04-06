@@ -25,7 +25,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.64.1 with theme even" />
+<meta name="generator" content="Hugo 0.68.3 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/post/a-lifecycle-of-hbase-put-client-side/" />
@@ -156,11 +156,11 @@ In view of the limitation of one single post, the client-side is discussed only.
   <div class="post-toc-content">
     <nav id="TableOfContents">
   <ul>
-    <li><a href="#table">Table</a></li>
-    <li><a href="#rpcretryingcaller">RpcRetryingCaller</a></li>
-    <li><a href="#servercallable">ServerCallable</a></li>
-    <li><a href="#rpccontroller">RpcController</a></li>
-    <li><a href="#connection">Connection</a></li>
+    <li><a href="#table"><code>Table</code></a></li>
+    <li><a href="#rpcretryingcaller"><code>RpcRetryingCaller</code></a></li>
+    <li><a href="#servercallable"><code>ServerCallable</code></a></li>
+    <li><a href="#rpccontroller"><code>RpcController</code></a></li>
+    <li><a href="#connection"><code>Connection</code></a></li>
   </ul>
 </nav>
   </div>
@@ -279,32 +279,32 @@ In view of the limitation of one single post, the client-side is discussed only.
 
   <span class="nd">@Override</span>
   <span class="kd">public</span> <span class="kt">void</span> <span class="nf">put</span><span class="o">(</span><span class="kd">final</span> <span class="n">Put</span> <span class="n">put</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
-    <span class="n">validatePut</span><span class="o">(</span><span class="n">put</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">validatePut</span><span class="o">(</span><span class="n">put</span><span class="o">);</span>
     <span class="n">ClientServiceCallable</span><span class="o">&lt;</span><span class="n">Void</span><span class="o">&gt;</span> <span class="n">callable</span> <span class="o">=</span>
-        <span class="k">new</span> <span class="n">ClientServiceCallable</span><span class="o">&lt;</span><span class="n">Void</span><span class="o">&gt;</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">connection</span><span class="o">,</span> <span class="n">getName</span><span class="o">(</span><span class="o">)</span><span class="o">,</span> <span class="n">put</span><span class="o">.</span><span class="na">getRow</span><span class="o">(</span><span class="o">)</span><span class="o">,</span>
-            <span class="k">this</span><span class="o">.</span><span class="na">rpcControllerFactory</span><span class="o">.</span><span class="na">newController</span><span class="o">(</span><span class="o">)</span><span class="o">,</span> <span class="n">put</span><span class="o">.</span><span class="na">getPriority</span><span class="o">(</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">new</span> <span class="n">ClientServiceCallable</span><span class="o">&lt;</span><span class="n">Void</span><span class="o">&gt;(</span><span class="k">this</span><span class="o">.</span><span class="na">connection</span><span class="o">,</span> <span class="n">getName</span><span class="o">(),</span> <span class="n">put</span><span class="o">.</span><span class="na">getRow</span><span class="o">(),</span>
+            <span class="k">this</span><span class="o">.</span><span class="na">rpcControllerFactory</span><span class="o">.</span><span class="na">newController</span><span class="o">(),</span> <span class="n">put</span><span class="o">.</span><span class="na">getPriority</span><span class="o">())</span> <span class="o">{</span>
           <span class="nd">@Override</span>
-          <span class="kd">protected</span> <span class="n">Void</span> <span class="nf">rpcCall</span><span class="o">(</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+          <span class="kd">protected</span> <span class="n">Void</span> <span class="nf">rpcCall</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
             <span class="n">MutateRequest</span> <span class="n">request</span> <span class="o">=</span>
-                <span class="n">RequestConverter</span><span class="o">.</span><span class="na">buildMutateRequest</span><span class="o">(</span><span class="n">getLocation</span><span class="o">(</span><span class="o">)</span><span class="o">.</span><span class="na">getRegionInfo</span><span class="o">(</span><span class="o">)</span><span class="o">.</span><span class="na">getRegionName</span><span class="o">(</span><span class="o">)</span><span class="o">,</span>
-                  <span class="n">put</span><span class="o">)</span><span class="o">;</span>
-            <span class="n">doMutate</span><span class="o">(</span><span class="n">request</span><span class="o">)</span><span class="o">;</span>
+                <span class="n">RequestConverter</span><span class="o">.</span><span class="na">buildMutateRequest</span><span class="o">(</span><span class="n">getLocation</span><span class="o">().</span><span class="na">getRegionInfo</span><span class="o">().</span><span class="na">getRegionName</span><span class="o">(),</span>
+                  <span class="n">put</span><span class="o">);</span>
+            <span class="n">doMutate</span><span class="o">(</span><span class="n">request</span><span class="o">);</span>
             <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
           <span class="o">}</span>
-        <span class="o">}</span><span class="o">;</span>
-    <span class="n">rpcCallerFactory</span><span class="o">.</span><span class="o">&lt;</span><span class="n">Void</span><span class="o">&gt;</span> <span class="nf">newCaller</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">writeRpcTimeoutMs</span><span class="o">)</span><span class="o">.</span><span class="na">callWithRetries</span><span class="o">(</span><span class="n">callable</span><span class="o">,</span>
-      <span class="k">this</span><span class="o">.</span><span class="na">operationTimeoutMs</span><span class="o">)</span><span class="o">;</span>
+        <span class="o">};</span>
+    <span class="n">rpcCallerFactory</span><span class="o">.&lt;</span><span class="n">Void</span><span class="o">&gt;</span> <span class="nf">newCaller</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">writeRpcTimeoutMs</span><span class="o">).</span><span class="na">callWithRetries</span><span class="o">(</span><span class="n">callable</span><span class="o">,</span>
+      <span class="k">this</span><span class="o">.</span><span class="na">operationTimeoutMs</span><span class="o">);</span>
   <span class="o">}</span>
 
   <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">validatePut</span><span class="o">(</span><span class="n">Put</span> <span class="n">put</span><span class="o">,</span> <span class="kt">int</span> <span class="n">maxKeyValueSize</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IllegalArgumentException</span> <span class="o">{</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">put</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">(</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
-      <span class="k">throw</span> <span class="k">new</span> <span class="n">IllegalArgumentException</span><span class="o">(</span><span class="s">&#34;No columns to insert&#34;</span><span class="o">)</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">put</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">())</span> <span class="o">{</span>
+      <span class="k">throw</span> <span class="k">new</span> <span class="n">IllegalArgumentException</span><span class="o">(</span><span class="s">&#34;No columns to insert&#34;</span><span class="o">);</span>
     <span class="o">}</span>
     <span class="k">if</span> <span class="o">(</span><span class="n">maxKeyValueSize</span> <span class="o">&gt;</span> <span class="n">0</span><span class="o">)</span> <span class="o">{</span>
-      <span class="k">for</span> <span class="o">(</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Cell</span><span class="o">&gt;</span> <span class="n">list</span> <span class="o">:</span> <span class="n">put</span><span class="o">.</span><span class="na">getFamilyCellMap</span><span class="o">(</span><span class="o">)</span><span class="o">.</span><span class="na">values</span><span class="o">(</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">for</span> <span class="o">(</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Cell</span><span class="o">&gt;</span> <span class="n">list</span> <span class="o">:</span> <span class="n">put</span><span class="o">.</span><span class="na">getFamilyCellMap</span><span class="o">().</span><span class="na">values</span><span class="o">())</span> <span class="o">{</span>
         <span class="k">for</span> <span class="o">(</span><span class="n">Cell</span> <span class="n">cell</span> <span class="o">:</span> <span class="n">list</span><span class="o">)</span> <span class="o">{</span>
           <span class="k">if</span> <span class="o">(</span><span class="n">KeyValueUtil</span><span class="o">.</span><span class="na">length</span><span class="o">(</span><span class="n">cell</span><span class="o">)</span> <span class="o">&gt;</span> <span class="n">maxKeyValueSize</span><span class="o">)</span> <span class="o">{</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="n">IllegalArgumentException</span><span class="o">(</span><span class="s">&#34;KeyValue size too large&#34;</span><span class="o">)</span><span class="o">;</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="n">IllegalArgumentException</span><span class="o">(</span><span class="s">&#34;KeyValue size too large&#34;</span><span class="o">);</span>
           <span class="o">}</span>
         <span class="o">}</span>
       <span class="o">}</span>
@@ -435,73 +435,73 @@ In view of the limitation of one single post, the client-side is discussed only.
   <span class="nd">@Override</span>
   <span class="kd">public</span> <span class="n">T</span> <span class="nf">callWithRetries</span><span class="o">(</span><span class="n">RetryingCallable</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">callable</span><span class="o">,</span> <span class="kt">int</span> <span class="n">callTimeout</span><span class="o">)</span>
   <span class="kd">throws</span> <span class="n">IOException</span><span class="o">,</span> <span class="n">RuntimeException</span> <span class="o">{</span>
-    <span class="n">List</span><span class="o">&lt;</span><span class="n">RetriesExhaustedException</span><span class="o">.</span><span class="na">ThrowableWithExtraContext</span><span class="o">&gt;</span> <span class="n">exceptions</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="o">&gt;</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
-    <span class="n">tracker</span><span class="o">.</span><span class="na">start</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
-    <span class="n">context</span><span class="o">.</span><span class="na">clear</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
-    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">tries</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span><span class="o">;</span> <span class="n">tries</span><span class="o">+</span><span class="o">+</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">List</span><span class="o">&lt;</span><span class="n">RetriesExhaustedException</span><span class="o">.</span><span class="na">ThrowableWithExtraContext</span><span class="o">&gt;</span> <span class="n">exceptions</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;();</span>
+    <span class="n">tracker</span><span class="o">.</span><span class="na">start</span><span class="o">();</span>
+    <span class="n">context</span><span class="o">.</span><span class="na">clear</span><span class="o">();</span>
+    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">tries</span> <span class="o">=</span> <span class="n">0</span><span class="o">;;</span> <span class="n">tries</span><span class="o">++)</span> <span class="o">{</span>
       <span class="kt">long</span> <span class="n">expectedSleep</span><span class="o">;</span>
       <span class="k">try</span> <span class="o">{</span>
         <span class="c1">// bad cache entries are cleared in the call to RetryingCallable#throwable() in catch block
-</span><span class="c1"></span>        <span class="n">callable</span><span class="o">.</span><span class="na">prepare</span><span class="o">(</span><span class="n">tries</span> <span class="o">!</span><span class="o">=</span> <span class="n">0</span><span class="o">)</span><span class="o">;</span>
-        <span class="n">interceptor</span><span class="o">.</span><span class="na">intercept</span><span class="o">(</span><span class="n">context</span><span class="o">.</span><span class="na">prepare</span><span class="o">(</span><span class="n">callable</span><span class="o">,</span> <span class="n">tries</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
-        <span class="k">return</span> <span class="n">callable</span><span class="o">.</span><span class="na">call</span><span class="o">(</span><span class="n">getTimeout</span><span class="o">(</span><span class="n">callTimeout</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
+</span><span class="c1"></span>        <span class="n">callable</span><span class="o">.</span><span class="na">prepare</span><span class="o">(</span><span class="n">tries</span> <span class="o">!=</span> <span class="n">0</span><span class="o">);</span>
+        <span class="n">interceptor</span><span class="o">.</span><span class="na">intercept</span><span class="o">(</span><span class="n">context</span><span class="o">.</span><span class="na">prepare</span><span class="o">(</span><span class="n">callable</span><span class="o">,</span> <span class="n">tries</span><span class="o">));</span>
+        <span class="k">return</span> <span class="n">callable</span><span class="o">.</span><span class="na">call</span><span class="o">(</span><span class="n">getTimeout</span><span class="o">(</span><span class="n">callTimeout</span><span class="o">));</span>
       <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">PreemptiveFastFailException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
         <span class="k">throw</span> <span class="n">e</span><span class="o">;</span>
       <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Throwable</span> <span class="n">t</span><span class="o">)</span> <span class="o">{</span>
-        <span class="n">Throwable</span> <span class="n">e</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="na">getCause</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
-        <span class="n">ExceptionUtil</span><span class="o">.</span><span class="na">rethrowIfInterrupt</span><span class="o">(</span><span class="n">t</span><span class="o">)</span><span class="o">;</span>
-        <span class="n">Throwable</span> <span class="n">cause</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="na">getCause</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+        <span class="n">Throwable</span> <span class="n">e</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="na">getCause</span><span class="o">();</span>
+        <span class="n">ExceptionUtil</span><span class="o">.</span><span class="na">rethrowIfInterrupt</span><span class="o">(</span><span class="n">t</span><span class="o">);</span>
+        <span class="n">Throwable</span> <span class="n">cause</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="na">getCause</span><span class="o">();</span>
         <span class="k">if</span> <span class="o">(</span><span class="n">cause</span> <span class="k">instanceof</span> <span class="n">DoNotRetryIOException</span><span class="o">)</span> <span class="o">{</span>
           <span class="c1">// Fail fast
 </span><span class="c1"></span>          <span class="k">throw</span> <span class="o">(</span><span class="n">DoNotRetryIOException</span><span class="o">)</span> <span class="n">cause</span><span class="o">;</span>
         <span class="o">}</span>
         <span class="c1">// translateException throws exception when should not retry: i.e. when request is bad.
-</span><span class="c1"></span>        <span class="n">interceptor</span><span class="o">.</span><span class="na">handleFailure</span><span class="o">(</span><span class="n">context</span><span class="o">,</span> <span class="n">t</span><span class="o">)</span><span class="o">;</span>
-        <span class="n">t</span> <span class="o">=</span> <span class="n">translateException</span><span class="o">(</span><span class="n">t</span><span class="o">)</span><span class="o">;</span>
+</span><span class="c1"></span>        <span class="n">interceptor</span><span class="o">.</span><span class="na">handleFailure</span><span class="o">(</span><span class="n">context</span><span class="o">,</span> <span class="n">t</span><span class="o">);</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">translateException</span><span class="o">(</span><span class="n">t</span><span class="o">);</span>
 
         <span class="k">if</span> <span class="o">(</span><span class="n">tries</span> <span class="o">&gt;</span> <span class="n">startLogErrorsCnt</span><span class="o">)</span> <span class="o">{</span>
           <span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&#34;Call exception, tries=&#34;</span> <span class="o">+</span> <span class="n">tries</span> <span class="o">+</span> <span class="s">&#34;, maxAttempts=&#34;</span> <span class="o">+</span> <span class="n">maxAttempts</span> <span class="o">+</span> <span class="s">&#34;, started=&#34;</span>
-              <span class="o">+</span> <span class="o">(</span><span class="n">EnvironmentEdgeManager</span><span class="o">.</span><span class="na">currentTime</span><span class="o">(</span><span class="o">)</span> <span class="o">-</span> <span class="n">tracker</span><span class="o">.</span><span class="na">getStartTime</span><span class="o">(</span><span class="o">)</span><span class="o">)</span> <span class="o">+</span> <span class="s">&#34; ms ago, &#34;</span>
-              <span class="o">+</span> <span class="s">&#34;cancelled=&#34;</span> <span class="o">+</span> <span class="n">cancelled</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="o">)</span> <span class="o">+</span> <span class="s">&#34;, msg=&#34;</span>
-              <span class="o">+</span> <span class="n">t</span><span class="o">.</span><span class="na">getMessage</span><span class="o">(</span><span class="o">)</span> <span class="o">+</span> <span class="s">&#34; &#34;</span> <span class="o">+</span> <span class="n">callable</span><span class="o">.</span><span class="na">getExceptionMessageAdditionalDetail</span><span class="o">(</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
+              <span class="o">+</span> <span class="o">(</span><span class="n">EnvironmentEdgeManager</span><span class="o">.</span><span class="na">currentTime</span><span class="o">()</span> <span class="o">-</span> <span class="n">tracker</span><span class="o">.</span><span class="na">getStartTime</span><span class="o">())</span> <span class="o">+</span> <span class="s">&#34; ms ago, &#34;</span>
+              <span class="o">+</span> <span class="s">&#34;cancelled=&#34;</span> <span class="o">+</span> <span class="n">cancelled</span><span class="o">.</span><span class="na">get</span><span class="o">()</span> <span class="o">+</span> <span class="s">&#34;, msg=&#34;</span>
+              <span class="o">+</span> <span class="n">t</span><span class="o">.</span><span class="na">getMessage</span><span class="o">()</span> <span class="o">+</span> <span class="s">&#34; &#34;</span> <span class="o">+</span> <span class="n">callable</span><span class="o">.</span><span class="na">getExceptionMessageAdditionalDetail</span><span class="o">());</span>
         <span class="o">}</span>
 
-        <span class="n">callable</span><span class="o">.</span><span class="na">throwable</span><span class="o">(</span><span class="n">t</span><span class="o">,</span> <span class="n">maxAttempts</span> <span class="o">!</span><span class="o">=</span> <span class="n">1</span><span class="o">)</span><span class="o">;</span>
+        <span class="n">callable</span><span class="o">.</span><span class="na">throwable</span><span class="o">(</span><span class="n">t</span><span class="o">,</span> <span class="n">maxAttempts</span> <span class="o">!=</span> <span class="n">1</span><span class="o">);</span>
         <span class="n">RetriesExhaustedException</span><span class="o">.</span><span class="na">ThrowableWithExtraContext</span> <span class="n">qt</span> <span class="o">=</span>
             <span class="k">new</span> <span class="n">RetriesExhaustedException</span><span class="o">.</span><span class="na">ThrowableWithExtraContext</span><span class="o">(</span><span class="n">t</span><span class="o">,</span>
-                <span class="n">EnvironmentEdgeManager</span><span class="o">.</span><span class="na">currentTime</span><span class="o">(</span><span class="o">)</span><span class="o">,</span> <span class="n">toString</span><span class="o">(</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
-        <span class="n">exceptions</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">qt</span><span class="o">)</span><span class="o">;</span>
-        <span class="k">if</span> <span class="o">(</span><span class="n">tries</span> <span class="o">&gt;</span><span class="o">=</span> <span class="n">maxAttempts</span> <span class="o">-</span> <span class="n">1</span><span class="o">)</span> <span class="o">{</span>
-          <span class="k">throw</span> <span class="k">new</span> <span class="n">RetriesExhaustedException</span><span class="o">(</span><span class="n">tries</span><span class="o">,</span> <span class="n">exceptions</span><span class="o">)</span><span class="o">;</span>
+                <span class="n">EnvironmentEdgeManager</span><span class="o">.</span><span class="na">currentTime</span><span class="o">(),</span> <span class="n">toString</span><span class="o">());</span>
+        <span class="n">exceptions</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">qt</span><span class="o">);</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">tries</span> <span class="o">&gt;=</span> <span class="n">maxAttempts</span> <span class="o">-</span> <span class="n">1</span><span class="o">)</span> <span class="o">{</span>
+          <span class="k">throw</span> <span class="k">new</span> <span class="n">RetriesExhaustedException</span><span class="o">(</span><span class="n">tries</span><span class="o">,</span> <span class="n">exceptions</span><span class="o">);</span>
         <span class="o">}</span>
         <span class="c1">// If the server is dead, we need to wait a little before retrying, to give
 </span><span class="c1"></span>        <span class="c1">// a chance to the regions to be moved
 </span><span class="c1"></span>        <span class="c1">// get right pause time, start by RETRY_BACKOFF[0] * pauseBase, where pauseBase might be
 </span><span class="c1"></span>        <span class="c1">// special when encountering CallQueueTooBigException, see #HBASE-17114
 </span><span class="c1"></span>        <span class="kt">long</span> <span class="n">pauseBase</span> <span class="o">=</span> <span class="o">(</span><span class="n">t</span> <span class="k">instanceof</span> <span class="n">CallQueueTooBigException</span><span class="o">)</span> <span class="o">?</span> <span class="n">pauseForCQTBE</span> <span class="o">:</span> <span class="n">pause</span><span class="o">;</span>
-        <span class="n">expectedSleep</span> <span class="o">=</span> <span class="n">callable</span><span class="o">.</span><span class="na">sleep</span><span class="o">(</span><span class="n">pauseBase</span><span class="o">,</span> <span class="n">tries</span><span class="o">)</span><span class="o">;</span>
+        <span class="n">expectedSleep</span> <span class="o">=</span> <span class="n">callable</span><span class="o">.</span><span class="na">sleep</span><span class="o">(</span><span class="n">pauseBase</span><span class="o">,</span> <span class="n">tries</span><span class="o">);</span>
 
         <span class="c1">// If, after the planned sleep, there won&#39;t be enough time left, we stop now.
-</span><span class="c1"></span>        <span class="kt">long</span> <span class="n">duration</span> <span class="o">=</span> <span class="n">singleCallDuration</span><span class="o">(</span><span class="n">expectedSleep</span><span class="o">)</span><span class="o">;</span>
+</span><span class="c1"></span>        <span class="kt">long</span> <span class="n">duration</span> <span class="o">=</span> <span class="n">singleCallDuration</span><span class="o">(</span><span class="n">expectedSleep</span><span class="o">);</span>
         <span class="k">if</span> <span class="o">(</span><span class="n">duration</span> <span class="o">&gt;</span> <span class="n">callTimeout</span><span class="o">)</span> <span class="o">{</span>
           <span class="n">String</span> <span class="n">msg</span> <span class="o">=</span> <span class="s">&#34;callTimeout=&#34;</span> <span class="o">+</span> <span class="n">callTimeout</span> <span class="o">+</span> <span class="s">&#34;, callDuration=&#34;</span> <span class="o">+</span> <span class="n">duration</span> <span class="o">+</span>
-              <span class="s">&#34;: &#34;</span> <span class="o">+</span>  <span class="n">t</span><span class="o">.</span><span class="na">getMessage</span><span class="o">(</span><span class="o">)</span> <span class="o">+</span> <span class="s">&#34; &#34;</span> <span class="o">+</span> <span class="n">callable</span><span class="o">.</span><span class="na">getExceptionMessageAdditionalDetail</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
-          <span class="k">throw</span> <span class="o">(</span><span class="n">SocketTimeoutException</span><span class="o">)</span><span class="o">(</span><span class="k">new</span> <span class="n">SocketTimeoutException</span><span class="o">(</span><span class="n">msg</span><span class="o">)</span><span class="o">.</span><span class="na">initCause</span><span class="o">(</span><span class="n">t</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
+              <span class="s">&#34;: &#34;</span> <span class="o">+</span>  <span class="n">t</span><span class="o">.</span><span class="na">getMessage</span><span class="o">()</span> <span class="o">+</span> <span class="s">&#34; &#34;</span> <span class="o">+</span> <span class="n">callable</span><span class="o">.</span><span class="na">getExceptionMessageAdditionalDetail</span><span class="o">();</span>
+          <span class="k">throw</span> <span class="o">(</span><span class="n">SocketTimeoutException</span><span class="o">)(</span><span class="k">new</span> <span class="n">SocketTimeoutException</span><span class="o">(</span><span class="n">msg</span><span class="o">).</span><span class="na">initCause</span><span class="o">(</span><span class="n">t</span><span class="o">));</span>
         <span class="o">}</span>
       <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
-        <span class="n">interceptor</span><span class="o">.</span><span class="na">updateFailureInfo</span><span class="o">(</span><span class="n">context</span><span class="o">)</span><span class="o">;</span>
+        <span class="n">interceptor</span><span class="o">.</span><span class="na">updateFailureInfo</span><span class="o">(</span><span class="n">context</span><span class="o">);</span>
       <span class="o">}</span>
       <span class="k">try</span> <span class="o">{</span>
         <span class="k">if</span> <span class="o">(</span><span class="n">expectedSleep</span> <span class="o">&gt;</span> <span class="n">0</span><span class="o">)</span> <span class="o">{</span>
           <span class="kd">synchronized</span> <span class="o">(</span><span class="n">cancelled</span><span class="o">)</span> <span class="o">{</span>
-            <span class="k">if</span> <span class="o">(</span><span class="n">cancelled</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="o">)</span><span class="o">)</span> <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
-            <span class="n">cancelled</span><span class="o">.</span><span class="na">wait</span><span class="o">(</span><span class="n">expectedSleep</span><span class="o">)</span><span class="o">;</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">cancelled</span><span class="o">.</span><span class="na">get</span><span class="o">())</span> <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+            <span class="n">cancelled</span><span class="o">.</span><span class="na">wait</span><span class="o">(</span><span class="n">expectedSleep</span><span class="o">);</span>
           <span class="o">}</span>
         <span class="o">}</span>
-        <span class="k">if</span> <span class="o">(</span><span class="n">cancelled</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="o">)</span><span class="o">)</span> <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">cancelled</span><span class="o">.</span><span class="na">get</span><span class="o">())</span> <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
       <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">InterruptedException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
         <span class="k">throw</span> <span class="k">new</span> <span class="n">InterruptedIOException</span><span class="o">(</span><span class="s">&#34;Interrupted after &#34;</span> <span class="o">+</span> <span class="n">tries</span>
-            <span class="o">+</span> <span class="s">&#34; tries while maxAttempts=&#34;</span> <span class="o">+</span> <span class="n">maxAttempts</span><span class="o">)</span><span class="o">;</span>
+            <span class="o">+</span> <span class="s">&#34; tries while maxAttempts=&#34;</span> <span class="o">+</span> <span class="n">maxAttempts</span><span class="o">);</span>
       <span class="o">}</span>
     <span class="o">}</span>
   <span class="o">}</span>
@@ -524,12 +524,12 @@ In view of the limitation of one single post, the client-side is discussed only.
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="n">T</span> <span class="nf">callWithRetries</span><span class="o">(</span><span class="n">RetryingCallable</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">callable</span><span class="o">,</span> <span class="kt">int</span> <span class="n">callTimeout</span><span class="o">)</span> <span class="o">{</span>
-  <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">tries</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span><span class="o">;</span> <span class="n">tries</span><span class="o">+</span><span class="o">+</span><span class="o">)</span> <span class="o">{</span>
+  <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">tries</span> <span class="o">=</span> <span class="n">0</span><span class="o">;;</span> <span class="n">tries</span><span class="o">++)</span> <span class="o">{</span>
     <span class="k">try</span> <span class="o">{</span>
-      <span class="n">callable</span><span class="o">.</span><span class="na">prepare</span><span class="o">(</span><span class="n">tries</span> <span class="o">!</span><span class="o">=</span> <span class="n">0</span><span class="o">)</span><span class="o">;</span>
-      <span class="k">return</span> <span class="n">callable</span><span class="o">.</span><span class="na">call</span><span class="o">(</span><span class="n">getTimeout</span><span class="o">(</span><span class="n">callTimeout</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
+      <span class="n">callable</span><span class="o">.</span><span class="na">prepare</span><span class="o">(</span><span class="n">tries</span> <span class="o">!=</span> <span class="n">0</span><span class="o">);</span>
+      <span class="k">return</span> <span class="n">callable</span><span class="o">.</span><span class="na">call</span><span class="o">(</span><span class="n">getTimeout</span><span class="o">(</span><span class="n">callTimeout</span><span class="o">));</span>
     <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Throwable</span> <span class="n">t</span><span class="o">)</span> <span class="o">{</span>
-      <span class="n">callable</span><span class="o">.</span><span class="na">throwable</span><span class="o">(</span><span class="n">t</span><span class="o">,</span> <span class="n">maxAttempts</span> <span class="o">!</span><span class="o">=</span> <span class="n">1</span><span class="o">)</span>
+      <span class="n">callable</span><span class="o">.</span><span class="na">throwable</span><span class="o">(</span><span class="n">t</span><span class="o">,</span> <span class="n">maxAttempts</span> <span class="o">!=</span> <span class="n">1</span><span class="o">)</span>
     <span class="o">}</span>
   <span class="o">}</span>
 <span class="o">}</span>
@@ -669,22 +669,22 @@ In view of the limitation of one single post, the client-side is discussed only.
     <span class="k">try</span> <span class="o">{</span>
       <span class="c1">// Iff non-null and an instance of a SHADED rpcController, do config! Unshaded -- i.e.
 </span><span class="c1"></span>      <span class="c1">// com.google.protobuf.RpcController or null -- will just skip over this config.
-</span><span class="c1"></span>      <span class="k">if</span> <span class="o">(</span><span class="n">getRpcController</span><span class="o">(</span><span class="o">)</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-        <span class="n">RpcController</span> <span class="n">shadedRpcController</span> <span class="o">=</span> <span class="o">(</span><span class="n">RpcController</span><span class="o">)</span><span class="n">getRpcController</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+</span><span class="c1"></span>      <span class="k">if</span> <span class="o">(</span><span class="n">getRpcController</span><span class="o">()</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">RpcController</span> <span class="n">shadedRpcController</span> <span class="o">=</span> <span class="o">(</span><span class="n">RpcController</span><span class="o">)</span><span class="n">getRpcController</span><span class="o">();</span>
         <span class="c1">// Do a reset to clear previous states, such as CellScanner.
-</span><span class="c1"></span>        <span class="n">shadedRpcController</span><span class="o">.</span><span class="na">reset</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+</span><span class="c1"></span>        <span class="n">shadedRpcController</span><span class="o">.</span><span class="na">reset</span><span class="o">();</span>
         <span class="k">if</span> <span class="o">(</span><span class="n">shadedRpcController</span> <span class="k">instanceof</span> <span class="n">HBaseRpcController</span><span class="o">)</span> <span class="o">{</span>
-          <span class="n">HBaseRpcController</span> <span class="n">hrc</span> <span class="o">=</span> <span class="o">(</span><span class="n">HBaseRpcController</span><span class="o">)</span><span class="n">getRpcController</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+          <span class="n">HBaseRpcController</span> <span class="n">hrc</span> <span class="o">=</span> <span class="o">(</span><span class="n">HBaseRpcController</span><span class="o">)</span><span class="n">getRpcController</span><span class="o">();</span>
           <span class="c1">// If it is an instance of HBaseRpcController, we can set priority on the controller based
 </span><span class="c1"></span>          <span class="c1">// off the tableName. Set call timeout too.
-</span><span class="c1"></span>          <span class="n">hrc</span><span class="o">.</span><span class="na">setPriority</span><span class="o">(</span><span class="n">tableName</span><span class="o">)</span><span class="o">;</span>
-          <span class="n">hrc</span><span class="o">.</span><span class="na">setPriority</span><span class="o">(</span><span class="n">priority</span><span class="o">)</span><span class="o">;</span>
-          <span class="n">hrc</span><span class="o">.</span><span class="na">setCallTimeout</span><span class="o">(</span><span class="n">callTimeout</span><span class="o">)</span><span class="o">;</span>
+</span><span class="c1"></span>          <span class="n">hrc</span><span class="o">.</span><span class="na">setPriority</span><span class="o">(</span><span class="n">tableName</span><span class="o">);</span>
+          <span class="n">hrc</span><span class="o">.</span><span class="na">setPriority</span><span class="o">(</span><span class="n">priority</span><span class="o">);</span>
+          <span class="n">hrc</span><span class="o">.</span><span class="na">setCallTimeout</span><span class="o">(</span><span class="n">callTimeout</span><span class="o">);</span>
         <span class="o">}</span>
       <span class="o">}</span>
-      <span class="k">return</span> <span class="n">rpcCall</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+      <span class="k">return</span> <span class="n">rpcCall</span><span class="o">();</span>
     <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
-      <span class="k">throw</span> <span class="n">ProtobufUtil</span><span class="o">.</span><span class="na">handleRemoteException</span><span class="o">(</span><span class="n">e</span><span class="o">)</span><span class="o">;</span>
+      <span class="k">throw</span> <span class="n">ProtobufUtil</span><span class="o">.</span><span class="na">handleRemoteException</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
     <span class="o">}</span>
   <span class="o">}</span>
 
@@ -696,22 +696,22 @@ In view of the limitation of one single post, the client-side is discussed only.
 </span><span class="cm">   * code base.
 </span><span class="cm">   * @throws Exception
 </span><span class="cm">   */</span>
-  <span class="kd">protected</span> <span class="kd">abstract</span> <span class="n">T</span> <span class="nf">rpcCall</span><span class="o">(</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span><span class="o">;</span>
+  <span class="kd">protected</span> <span class="kd">abstract</span> <span class="n">T</span> <span class="nf">rpcCall</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span><span class="o">;</span>
 
   <span class="kd">public</span> <span class="kt">void</span> <span class="nf">prepare</span><span class="o">(</span><span class="kd">final</span> <span class="kt">boolean</span> <span class="n">reload</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
     <span class="c1">// check table state if this is a retry
-</span><span class="c1"></span>    <span class="k">if</span> <span class="o">(</span><span class="n">reload</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">tableName</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="o">!</span><span class="n">tableName</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">TableName</span><span class="o">.</span><span class="na">META_TABLE_NAME</span><span class="o">)</span>
-        <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">getConnection</span><span class="o">(</span><span class="o">)</span><span class="o">.</span><span class="na">isTableDisabled</span><span class="o">(</span><span class="n">tableName</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
-      <span class="k">throw</span> <span class="k">new</span> <span class="n">TableNotEnabledException</span><span class="o">(</span><span class="n">tableName</span><span class="o">.</span><span class="na">getNameAsString</span><span class="o">(</span><span class="o">)</span> <span class="o">+</span> <span class="s">&#34; is disabled.&#34;</span><span class="o">)</span><span class="o">;</span>
+</span><span class="c1"></span>    <span class="k">if</span> <span class="o">(</span><span class="n">reload</span> <span class="o">&amp;&amp;</span> <span class="n">tableName</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">tableName</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">TableName</span><span class="o">.</span><span class="na">META_TABLE_NAME</span><span class="o">)</span>
+        <span class="o">&amp;&amp;</span> <span class="n">getConnection</span><span class="o">().</span><span class="na">isTableDisabled</span><span class="o">(</span><span class="n">tableName</span><span class="o">))</span> <span class="o">{</span>
+      <span class="k">throw</span> <span class="k">new</span> <span class="n">TableNotEnabledException</span><span class="o">(</span><span class="n">tableName</span><span class="o">.</span><span class="na">getNameAsString</span><span class="o">()</span> <span class="o">+</span> <span class="s">&#34; is disabled.&#34;</span><span class="o">);</span>
     <span class="o">}</span>
-    <span class="k">try</span> <span class="o">(</span><span class="n">RegionLocator</span> <span class="n">regionLocator</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="na">getRegionLocator</span><span class="o">(</span><span class="n">tableName</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
-      <span class="k">this</span><span class="o">.</span><span class="na">location</span> <span class="o">=</span> <span class="n">regionLocator</span><span class="o">.</span><span class="na">getRegionLocation</span><span class="o">(</span><span class="n">row</span><span class="o">)</span><span class="o">;</span>
+    <span class="k">try</span> <span class="o">(</span><span class="n">RegionLocator</span> <span class="n">regionLocator</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="na">getRegionLocator</span><span class="o">(</span><span class="n">tableName</span><span class="o">))</span> <span class="o">{</span>
+      <span class="k">this</span><span class="o">.</span><span class="na">location</span> <span class="o">=</span> <span class="n">regionLocator</span><span class="o">.</span><span class="na">getRegionLocation</span><span class="o">(</span><span class="n">row</span><span class="o">);</span>
     <span class="o">}</span>
-    <span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">location</span> <span class="o">=</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">location</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
       <span class="k">throw</span> <span class="k">new</span> <span class="n">IOException</span><span class="o">(</span><span class="s">&#34;Failed to find location, tableName=&#34;</span> <span class="o">+</span> <span class="n">tableName</span> <span class="o">+</span>
-          <span class="s">&#34;, row=&#34;</span> <span class="o">+</span> <span class="n">Bytes</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="n">row</span><span class="o">)</span> <span class="o">+</span> <span class="s">&#34;, reload=&#34;</span> <span class="o">+</span> <span class="n">reload</span><span class="o">)</span><span class="o">;</span>
+          <span class="s">&#34;, row=&#34;</span> <span class="o">+</span> <span class="n">Bytes</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="n">row</span><span class="o">)</span> <span class="o">+</span> <span class="s">&#34;, reload=&#34;</span> <span class="o">+</span> <span class="n">reload</span><span class="o">);</span>
     <span class="o">}</span>
-    <span class="n">setStubByServiceName</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">location</span><span class="o">.</span><span class="na">getServerName</span><span class="o">(</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">setStubByServiceName</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">location</span><span class="o">.</span><span class="na">getServerName</span><span class="o">());</span>
   <span class="o">}</span>
 
   <span class="cm">/**
@@ -769,12 +769,12 @@ In view of the limitation of one single post, the client-side is discussed only.
 
   <span class="nd">@Override</span>
   <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">setStubByServiceName</span><span class="o">(</span><span class="n">ServerName</span> <span class="n">serviceName</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
-    <span class="n">setStub</span><span class="o">(</span><span class="n">getConnection</span><span class="o">(</span><span class="o">)</span><span class="o">.</span><span class="na">getClient</span><span class="o">(</span><span class="n">serviceName</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">setStub</span><span class="o">(</span><span class="n">getConnection</span><span class="o">().</span><span class="na">getClient</span><span class="o">(</span><span class="n">serviceName</span><span class="o">));</span>
   <span class="o">}</span>
 
   <span class="kd">protected</span> <span class="n">ClientProtos</span><span class="o">.</span><span class="na">MutateResponse</span> <span class="nf">doMutate</span><span class="o">(</span><span class="n">ClientProtos</span><span class="o">.</span><span class="na">MutateRequest</span> <span class="n">request</span><span class="o">)</span>
   <span class="kd">throws</span> <span class="n">org</span><span class="o">.</span><span class="na">apache</span><span class="o">.</span><span class="na">hadoop</span><span class="o">.</span><span class="na">hbase</span><span class="o">.</span><span class="na">shaded</span><span class="o">.</span><span class="na">com</span><span class="o">.</span><span class="na">google</span><span class="o">.</span><span class="na">protobuf</span><span class="o">.</span><span class="na">ServiceException</span> <span class="o">{</span>
-    <span class="k">return</span> <span class="n">getStub</span><span class="o">(</span><span class="o">)</span><span class="o">.</span><span class="na">mutate</span><span class="o">(</span><span class="n">getRpcController</span><span class="o">(</span><span class="o">)</span><span class="o">,</span> <span class="n">request</span><span class="o">)</span><span class="o">;</span>
+    <span class="k">return</span> <span class="n">getStub</span><span class="o">().</span><span class="na">mutate</span><span class="o">(</span><span class="n">getRpcController</span><span class="o">(),</span> <span class="n">request</span><span class="o">);</span>
   <span class="o">}</span>
 <span class="o">}</span>
 </code></pre></td></tr></table>
@@ -827,40 +827,40 @@ In view of the limitation of one single post, the client-side is discussed only.
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// ScannerCallable.java
 </span><span class="c1"></span>
 <span class="nd">@InterfaceAudience.Private</span>
-<span class="kd">public</span> <span class="kd">class</span> <span class="nc">ScannerCallable</span> <span class="kd">extends</span> <span class="n">ClientServiceCallable</span><span class="o">&lt;</span><span class="n">Result</span><span class="o">[</span><span class="o">]</span><span class="o">&gt;</span> <span class="o">{</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">ScannerCallable</span> <span class="kd">extends</span> <span class="n">ClientServiceCallable</span><span class="o">&lt;</span><span class="n">Result</span><span class="o">[]&gt;</span> <span class="o">{</span>
   <span class="nd">@Override</span>
-  <span class="kd">protected</span> <span class="n">Result</span><span class="o">[</span><span class="o">]</span> <span class="nf">rpcCall</span><span class="o">(</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+  <span class="kd">protected</span> <span class="n">Result</span><span class="o">[]</span> <span class="nf">rpcCall</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
     <span class="n">ScanResponse</span> <span class="n">response</span><span class="o">;</span>
-    <span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">scannerId</span> <span class="o">=</span><span class="o">=</span> <span class="o">-</span><span class="n">1L</span><span class="o">)</span> <span class="o">{</span>
-      <span class="n">response</span> <span class="o">=</span> <span class="n">openScanner</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">scannerId</span> <span class="o">==</span> <span class="o">-</span><span class="n">1L</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">response</span> <span class="o">=</span> <span class="n">openScanner</span><span class="o">();</span>
     <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
-      <span class="n">response</span> <span class="o">=</span> <span class="n">next</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+      <span class="n">response</span> <span class="o">=</span> <span class="n">next</span><span class="o">();</span>
     <span class="o">}</span>
 
-    <span class="n">Result</span><span class="o">[</span><span class="o">]</span> <span class="n">rrs</span> <span class="o">=</span> <span class="n">ResponseConverter</span><span class="o">.</span><span class="na">getResults</span><span class="o">(</span><span class="n">getRpcControllerCellScanner</span><span class="o">(</span><span class="o">)</span><span class="o">,</span> <span class="n">response</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">Result</span><span class="o">[]</span> <span class="n">rrs</span> <span class="o">=</span> <span class="n">ResponseConverter</span><span class="o">.</span><span class="na">getResults</span><span class="o">(</span><span class="n">getRpcControllerCellScanner</span><span class="o">(),</span> <span class="n">response</span><span class="o">);</span>
 
-    <span class="n">updateResultsMetrics</span><span class="o">(</span><span class="n">scanMetrics</span><span class="o">,</span> <span class="n">rrs</span><span class="o">,</span> <span class="n">isRegionServerRemote</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">updateResultsMetrics</span><span class="o">(</span><span class="n">scanMetrics</span><span class="o">,</span> <span class="n">rrs</span><span class="o">,</span> <span class="n">isRegionServerRemote</span><span class="o">);</span>
     <span class="k">return</span> <span class="n">rrs</span><span class="o">;</span>
   <span class="o">}</span>
 
-  <span class="kd">private</span> <span class="n">ScanResponse</span> <span class="nf">openScanner</span><span class="o">(</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
-    <span class="n">incRPCCallsMetrics</span><span class="o">(</span><span class="n">scanMetrics</span><span class="o">,</span> <span class="n">isRegionServerRemote</span><span class="o">)</span><span class="o">;</span>
+  <span class="kd">private</span> <span class="n">ScanResponse</span> <span class="nf">openScanner</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+    <span class="n">incRPCCallsMetrics</span><span class="o">(</span><span class="n">scanMetrics</span><span class="o">,</span> <span class="n">isRegionServerRemote</span><span class="o">);</span>
     <span class="n">ScanRequest</span> <span class="n">request</span> <span class="o">=</span> <span class="n">RequestConverter</span><span class="o">.</span><span class="na">buildScanRequest</span><span class="o">(</span>
-      <span class="n">getLocation</span><span class="o">(</span><span class="o">)</span><span class="o">.</span><span class="na">getRegionInfo</span><span class="o">(</span><span class="o">)</span><span class="o">.</span><span class="na">getRegionName</span><span class="o">(</span><span class="o">)</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="na">scan</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="na">caching</span><span class="o">,</span> <span class="kc">false</span><span class="o">)</span><span class="o">;</span>
+      <span class="n">getLocation</span><span class="o">().</span><span class="na">getRegionInfo</span><span class="o">().</span><span class="na">getRegionName</span><span class="o">(),</span> <span class="k">this</span><span class="o">.</span><span class="na">scan</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="na">caching</span><span class="o">,</span> <span class="kc">false</span><span class="o">);</span>
     <span class="k">try</span> <span class="o">{</span>
-      <span class="n">ScanResponse</span> <span class="n">response</span> <span class="o">=</span> <span class="n">getStub</span><span class="o">(</span><span class="o">)</span><span class="o">.</span><span class="na">scan</span><span class="o">(</span><span class="n">getRpcController</span><span class="o">(</span><span class="o">)</span><span class="o">,</span> <span class="n">request</span><span class="o">)</span><span class="o">;</span>
-      <span class="kt">long</span> <span class="n">id</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="na">getScannerId</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+      <span class="n">ScanResponse</span> <span class="n">response</span> <span class="o">=</span> <span class="n">getStub</span><span class="o">().</span><span class="na">scan</span><span class="o">(</span><span class="n">getRpcController</span><span class="o">(),</span> <span class="n">request</span><span class="o">);</span>
+      <span class="kt">long</span> <span class="n">id</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="na">getScannerId</span><span class="o">();</span>
       <span class="k">if</span> <span class="o">(</span><span class="n">logScannerActivity</span><span class="o">)</span> <span class="o">{</span>
-        <span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&#34;Open scanner=&#34;</span> <span class="o">+</span> <span class="n">id</span> <span class="o">+</span> <span class="s">&#34; for scan=&#34;</span> <span class="o">+</span> <span class="n">scan</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="o">)</span>
-          <span class="o">+</span> <span class="s">&#34; on region &#34;</span> <span class="o">+</span> <span class="n">getLocation</span><span class="o">(</span><span class="o">)</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&#34;Open scanner=&#34;</span> <span class="o">+</span> <span class="n">id</span> <span class="o">+</span> <span class="s">&#34; for scan=&#34;</span> <span class="o">+</span> <span class="n">scan</span><span class="o">.</span><span class="na">toString</span><span class="o">()</span>
+          <span class="o">+</span> <span class="s">&#34; on region &#34;</span> <span class="o">+</span> <span class="n">getLocation</span><span class="o">().</span><span class="na">toString</span><span class="o">());</span>
       <span class="o">}</span>
-      <span class="k">if</span> <span class="o">(</span><span class="n">response</span><span class="o">.</span><span class="na">hasMvccReadPoint</span><span class="o">(</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
-        <span class="k">this</span><span class="o">.</span><span class="na">scan</span><span class="o">.</span><span class="na">setMvccReadPoint</span><span class="o">(</span><span class="n">response</span><span class="o">.</span><span class="na">getMvccReadPoint</span><span class="o">(</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">response</span><span class="o">.</span><span class="na">hasMvccReadPoint</span><span class="o">())</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">scan</span><span class="o">.</span><span class="na">setMvccReadPoint</span><span class="o">(</span><span class="n">response</span><span class="o">.</span><span class="na">getMvccReadPoint</span><span class="o">());</span>
       <span class="o">}</span>
       <span class="k">this</span><span class="o">.</span><span class="na">scannerId</span> <span class="o">=</span> <span class="n">id</span><span class="o">;</span>
       <span class="k">return</span> <span class="n">response</span><span class="o">;</span>
     <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
-      <span class="k">throw</span> <span class="n">ProtobufUtil</span><span class="o">.</span><span class="na">handleRemoteException</span><span class="o">(</span><span class="n">e</span><span class="o">)</span><span class="o">;</span>
+      <span class="k">throw</span> <span class="n">ProtobufUtil</span><span class="o">.</span><span class="na">handleRemoteException</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
     <span class="o">}</span>
   <span class="o">}</span>
 <span class="o">}</span>
@@ -891,11 +891,11 @@ In view of the limitation of one single post, the client-side is discussed only.
 <span class="kd">public</span> <span class="kd">interface</span> <span class="nc">HBaseRpcController</span> <span class="kd">extends</span> <span class="n">RpcController</span><span class="o">,</span> <span class="n">CellScannable</span> <span class="o">{</span>
 
   <span class="c1">// Priority for this request
-</span><span class="c1"></span>  <span class="kt">void</span> <span class="nf">setPriority</span><span class="o">(</span><span class="kt">int</span> <span class="n">priority</span><span class="o">)</span><span class="o">;</span>
-  <span class="kt">int</span> <span class="nf">getPriority</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+</span><span class="c1"></span>  <span class="kt">void</span> <span class="nf">setPriority</span><span class="o">(</span><span class="kt">int</span> <span class="n">priority</span><span class="o">);</span>
+  <span class="kt">int</span> <span class="nf">getPriority</span><span class="o">();</span>
 
-  <span class="kt">int</span> <span class="nf">getCallTimeout</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
-  <span class="kt">void</span> <span class="nf">setCallTimeout</span><span class="o">(</span><span class="kt">int</span> <span class="n">callTimeout</span><span class="o">)</span><span class="o">;</span>
+  <span class="kt">int</span> <span class="nf">getCallTimeout</span><span class="o">();</span>
+  <span class="kt">void</span> <span class="nf">setCallTimeout</span><span class="o">(</span><span class="kt">int</span> <span class="n">callTimeout</span><span class="o">);</span>
 <span class="o">}</span>
 </code></pre></td></tr></table>
 </div>
@@ -930,7 +930,7 @@ In view of the limitation of one single post, the client-side is discussed only.
 <span class="nd">@InterfaceAudience.Private</span>
 <span class="kd">public</span> <span class="kd">class</span> <span class="nc">HBaseRpcControllerImpl</span> <span class="kd">implements</span> <span class="n">HBaseRpcController</span> <span class="o">{</span>
   <span class="nd">@Override</span>
-  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">reset</span><span class="o">(</span><span class="o">)</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">reset</span><span class="o">()</span> <span class="o">{</span>
     <span class="n">priority</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span>
     <span class="n">cellScanner</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
     <span class="n">exception</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
@@ -942,7 +942,7 @@ In view of the limitation of one single post, the client-side is discussed only.
 </span><span class="c1"></span>    <span class="kd">synchronized</span> <span class="o">(</span><span class="k">this</span><span class="o">)</span> <span class="o">{</span>
       <span class="n">done</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
       <span class="n">cancelled</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
-      <span class="n">cancellationCbs</span><span class="o">.</span><span class="na">clear</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+      <span class="n">cancellationCbs</span><span class="o">.</span><span class="na">clear</span><span class="o">();</span>
     <span class="o">}</span>
   <span class="o">}</span>
 <span class="o">}</span>

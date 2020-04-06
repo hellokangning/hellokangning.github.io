@@ -25,7 +25,7 @@ In this post, I will refactor Strategy using functions objects.
 
 
 
-<meta name="generator" content="Hugo 0.64.1 with theme even" />
+<meta name="generator" content="Hugo 0.68.3 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/post/design-patterns-with-first-class-functions/" />
@@ -52,7 +52,7 @@ In this post, I will refactor Strategy using functions objects." />
 In this post, I will refactor Strategy using functions objects.">
 <meta itemprop="datePublished" content="2018-10-27T16:16:13&#43;08:00" />
 <meta itemprop="dateModified" content="2018-10-27T21:16:13&#43;08:00" />
-<meta itemprop="wordCount" content="896">
+<meta itemprop="wordCount" content="910">
 
 
 
@@ -133,7 +133,7 @@ In this post, I will refactor Strategy using functions objects."/>
         <div class="post-category">
             <a href="/categories/python/"> Python </a>
             </div>
-          <span class="more-meta"> 896 words </span>
+          <span class="more-meta"> 910 words </span>
           <span class="more-meta"> 5 mins read </span>
         
       </div>
@@ -260,88 +260,88 @@ In this post, I will refactor Strategy using functions objects."/>
 <pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
 
-<span class="n">Customer</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">Customer</span><span class="s1">&#39;</span><span class="p">,</span> <span class="sa"></span><span class="s1">&#39;</span><span class="s1">name fidelity</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">Customer</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Customer&#39;</span><span class="p">,</span> <span class="s1">&#39;name fidelity&#39;</span><span class="p">)</span>
 
 <span class="k">class</span> <span class="nc">LineItem</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">product</span><span class="p">,</span> <span class="n">quantity</span><span class="p">,</span> <span class="n">price</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">product</span><span class="p">,</span> <span class="n">quantity</span><span class="p">,</span> <span class="n">price</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">product</span> <span class="o">=</span> <span class="n">product</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">quantity</span> <span class="o">=</span> <span class="n">quantity</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">price</span> <span class="o">=</span> <span class="n">price</span>
 
-    <span class="k">def</span> <span class="nf">total</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">total</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">price</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">quantity</span>
 
 <span class="k">class</span> <span class="nc">Order</span><span class="p">:</span> <span class="c1"># Context</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">customer</span><span class="p">,</span> <span class="n">cart</span><span class="p">,</span> <span class="n">promotion</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">customer</span><span class="p">,</span> <span class="n">cart</span><span class="p">,</span> <span class="n">promotion</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">customer</span> <span class="o">=</span> <span class="n">customer</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cart</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">cart</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">promotion</span> <span class="o">=</span> <span class="n">promotion</span>
 
-    <span class="k">def</span> <span class="nf">total</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa"></span><span class="s1">&#39;</span><span class="s1">__total</span><span class="s1">&#39;</span><span class="p">)</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">total</span><span class="p">(</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cart</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">total</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;__total&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">total</span><span class="p">()</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cart</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__total</span>
 
-    <span class="k">def</span> <span class="nf">due</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">due</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">discount</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">promotion</span> <span class="ow">is</span> <span class="bp">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">promotion</span><span class="o">.</span><span class="n">discount</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">total</span><span class="p">(</span><span class="p">)</span> <span class="o">-</span> <span class="n">discount</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">total</span><span class="p">()</span> <span class="o">-</span> <span class="n">discount</span>
 
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
-        <span class="n">fmt</span> <span class="o">=</span> <span class="sa"></span><span class="s1">&#39;</span><span class="s1">&lt;Order total: {:.2f} due: {:.2f}&gt;</span><span class="s1">&#39;</span>
-        <span class="k">return</span> <span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total</span><span class="p">(</span><span class="p">)</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">due</span><span class="p">(</span><span class="p">)</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;&lt;Order total: {:.2f} due: {:.2f}&gt;&#39;</span>
+        <span class="k">return</span> <span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">due</span><span class="p">())</span>
 
-<span class="k">class</span> <span class="nc">Promotion</span><span class="p">(</span><span class="n">ABC</span><span class="p">)</span><span class="p">:</span> <span class="c1"># the Strategy: an Abstract Base Class</span>
+<span class="k">class</span> <span class="nc">Promotion</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span> <span class="c1"># the Strategy: an Abstract Base Class</span>
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">discount</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">order</span><span class="p">)</span><span class="p">:</span>
-        <span class="sa"></span><span class="s2">&#34;&#34;&#34;</span><span class="s2">
-</span><span class="s2"></span><span class="s2">        Return discount as a positive dollar amount</span><span class="s2">
-</span><span class="s2"></span><span class="s2">        </span><span class="s2">&#34;&#34;&#34;</span>
+    <span class="k">def</span> <span class="nf">discount</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
+        <span class="s2">&#34;&#34;&#34;
+</span><span class="s2">        Return discount as a positive dollar amount
+</span><span class="s2">        &#34;&#34;&#34;</span>
 
-<span class="k">class</span> <span class="nc">FidelityPromo</span><span class="p">(</span><span class="n">Promotion</span><span class="p">)</span><span class="p">:</span> <span class="c1"># Concrete Strategy</span>
-    <span class="k">def</span> <span class="nf">discount</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">order</span><span class="p">)</span><span class="p">:</span>
-        <span class="sa"></span><span class="s2">&#34;&#34;&#34;</span><span class="s2">
-</span><span class="s2"></span><span class="s2">        5</span><span class="si">% d</span><span class="s2">iscount for customers with 1000 or more fidelity points</span><span class="s2">
-</span><span class="s2"></span><span class="s2">        </span><span class="s2">&#34;&#34;&#34;</span>
-        <span class="k">return</span> <span class="n">order</span><span class="o">.</span><span class="n">total</span><span class="p">(</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.05</span> <span class="k">if</span> <span class="n">order</span><span class="o">.</span><span class="n">customer</span><span class="o">.</span><span class="n">fidelity</span> <span class="o">&gt;</span><span class="o">=</span> <span class="mi">1000</span> <span class="k">else</span> <span class="mi">0</span>
+<span class="k">class</span> <span class="nc">FidelityPromo</span><span class="p">(</span><span class="n">Promotion</span><span class="p">):</span> <span class="c1"># Concrete Strategy</span>
+    <span class="k">def</span> <span class="nf">discount</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
+        <span class="s2">&#34;&#34;&#34;
+</span><span class="s2">        5</span><span class="si">% d</span><span class="s2">iscount for customers with 1000 or more fidelity points
+</span><span class="s2">        &#34;&#34;&#34;</span>
+        <span class="k">return</span> <span class="n">order</span><span class="o">.</span><span class="n">total</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.05</span> <span class="k">if</span> <span class="n">order</span><span class="o">.</span><span class="n">customer</span><span class="o">.</span><span class="n">fidelity</span> <span class="o">&gt;=</span> <span class="mi">1000</span> <span class="k">else</span> <span class="mi">0</span>
 
-<span class="k">class</span> <span class="nc">BulkItemPromo</span><span class="p">(</span><span class="n">Promotion</span><span class="p">)</span><span class="p">:</span> <span class="c1"># Concrete Strategy</span>
-    <span class="k">def</span> <span class="nf">discount</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">order</span><span class="p">)</span><span class="p">:</span>
-        <span class="sa"></span><span class="s2">&#34;&#34;&#34;</span><span class="s2">
-</span><span class="s2"></span><span class="s2">        10</span><span class="si">% d</span><span class="s2">iscount for each LineItem with 20 or more units</span><span class="s2">
-</span><span class="s2"></span><span class="s2">        </span><span class="s2">&#34;&#34;&#34;</span>
+<span class="k">class</span> <span class="nc">BulkItemPromo</span><span class="p">(</span><span class="n">Promotion</span><span class="p">):</span> <span class="c1"># Concrete Strategy</span>
+    <span class="k">def</span> <span class="nf">discount</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
+        <span class="s2">&#34;&#34;&#34;
+</span><span class="s2">        10</span><span class="si">% d</span><span class="s2">iscount for each LineItem with 20 or more units
+</span><span class="s2">        &#34;&#34;&#34;</span>
         <span class="n">discount</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">order</span><span class="o">.</span><span class="n">cart</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">quantity</span> <span class="o">&gt;</span><span class="o">=</span> <span class="mi">20</span><span class="p">:</span>
-                <span class="n">discount</span> <span class="o">+</span><span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">total</span><span class="p">(</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.1</span>
+            <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">quantity</span> <span class="o">&gt;=</span> <span class="mi">20</span><span class="p">:</span>
+                <span class="n">discount</span> <span class="o">+=</span> <span class="n">item</span><span class="o">.</span><span class="n">total</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.1</span>
 
         <span class="k">return</span> <span class="n">discount</span>
 
-<span class="k">class</span> <span class="nc">LargeOrderPromo</span><span class="p">(</span><span class="n">Promotion</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">discount</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">order</span><span class="p">)</span><span class="p">:</span>
-        <span class="sa"></span><span class="s2">&#34;&#34;&#34;</span><span class="s2">
-</span><span class="s2"></span><span class="s2">        7</span><span class="si">% d</span><span class="s2">iscount for orders with 10 or more distinct items</span><span class="s2">
-</span><span class="s2"></span><span class="s2">        </span><span class="s2">&#34;&#34;&#34;</span>
+<span class="k">class</span> <span class="nc">LargeOrderPromo</span><span class="p">(</span><span class="n">Promotion</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">discount</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
+        <span class="s2">&#34;&#34;&#34;
+</span><span class="s2">        7</span><span class="si">% d</span><span class="s2">iscount for orders with 10 or more distinct items
+</span><span class="s2">        &#34;&#34;&#34;</span>
         <span class="n">distinctItems</span> <span class="o">=</span> <span class="p">{</span><span class="n">item</span><span class="o">.</span><span class="n">product</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">order</span><span class="o">.</span><span class="n">cart</span><span class="p">}</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">distinctItems</span><span class="p">)</span> <span class="o">&gt;</span><span class="o">=</span> <span class="mi">10</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">order</span><span class="o">.</span><span class="n">total</span><span class="p">(</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.07</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">distinctItems</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">order</span><span class="o">.</span><span class="n">total</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.07</span>
 
         <span class="k">return</span> <span class="mi">0</span>
 
-<span class="n">joe</span> <span class="o">=</span> <span class="n">Customer</span><span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">John Doe</span><span class="s1">&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-<span class="n">ann</span> <span class="o">=</span> <span class="n">Customer</span><span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">Ann Smith</span><span class="s1">&#39;</span><span class="p">,</span> <span class="mi">1100</span><span class="p">)</span>
-<span class="n">cart</span> <span class="o">=</span> <span class="p">[</span><span class="n">LineItem</span><span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">banana</span><span class="s1">&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span><span class="p">,</span>
-        <span class="n">LineItem</span><span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">apple</span><span class="s1">&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">)</span><span class="p">,</span>
-        <span class="n">LineItem</span><span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">watermellon</span><span class="s1">&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">)</span><span class="p">]</span>
+<span class="n">joe</span> <span class="o">=</span> <span class="n">Customer</span><span class="p">(</span><span class="s1">&#39;John Doe&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">ann</span> <span class="o">=</span> <span class="n">Customer</span><span class="p">(</span><span class="s1">&#39;Ann Smith&#39;</span><span class="p">,</span> <span class="mi">1100</span><span class="p">)</span>
+<span class="n">cart</span> <span class="o">=</span> <span class="p">[</span><span class="n">LineItem</span><span class="p">(</span><span class="s1">&#39;banana&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
+        <span class="n">LineItem</span><span class="p">(</span><span class="s1">&#39;apple&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">),</span>
+        <span class="n">LineItem</span><span class="p">(</span><span class="s1">&#39;watermellon&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">)]</span>
 
-<span class="k">print</span><span class="p">(</span><span class="n">Order</span><span class="p">(</span><span class="n">joe</span><span class="p">,</span> <span class="n">cart</span><span class="p">,</span> <span class="n">FidelityPromo</span><span class="p">(</span><span class="p">)</span><span class="p">)</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="n">Order</span><span class="p">(</span><span class="n">ann</span><span class="p">,</span> <span class="n">cart</span><span class="p">,</span> <span class="n">FidelityPromo</span><span class="p">(</span><span class="p">)</span><span class="p">)</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">Order</span><span class="p">(</span><span class="n">joe</span><span class="p">,</span> <span class="n">cart</span><span class="p">,</span> <span class="n">FidelityPromo</span><span class="p">()))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">Order</span><span class="p">(</span><span class="n">ann</span><span class="p">,</span> <span class="n">cart</span><span class="p">,</span> <span class="n">FidelityPromo</span><span class="p">()))</span>
 
-<span class="n">bananaCart</span> <span class="o">=</span> <span class="p">[</span><span class="n">LineItem</span><span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">banana</span><span class="s1">&#39;</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">)</span><span class="p">,</span> <span class="n">LineItem</span><span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">apple</span><span class="s1">&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">)</span><span class="p">]</span>
-<span class="k">print</span><span class="p">(</span><span class="n">Order</span><span class="p">(</span><span class="n">joe</span><span class="p">,</span> <span class="n">bananaCart</span><span class="p">,</span> <span class="n">BulkItemPromo</span><span class="p">(</span><span class="p">)</span><span class="p">)</span><span class="p">)</span>
+<span class="n">bananaCart</span> <span class="o">=</span> <span class="p">[</span><span class="n">LineItem</span><span class="p">(</span><span class="s1">&#39;banana&#39;</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">),</span> <span class="n">LineItem</span><span class="p">(</span><span class="s1">&#39;apple&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">)]</span>
+<span class="k">print</span><span class="p">(</span><span class="n">Order</span><span class="p">(</span><span class="n">joe</span><span class="p">,</span> <span class="n">bananaCart</span><span class="p">,</span> <span class="n">BulkItemPromo</span><span class="p">()))</span>
 
-<span class="n">longOrder</span> <span class="o">=</span> <span class="p">[</span><span class="n">LineItem</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">item</span><span class="p">)</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="p">]</span>
-<span class="k">print</span><span class="p">(</span><span class="n">Order</span><span class="p">(</span><span class="n">joe</span><span class="p">,</span> <span class="n">longOrder</span><span class="p">,</span> <span class="n">LargeOrderPromo</span><span class="p">(</span><span class="p">)</span><span class="p">)</span><span class="p">)</span>
+<span class="n">longOrder</span> <span class="o">=</span> <span class="p">[</span><span class="n">LineItem</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">item</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
+<span class="k">print</span><span class="p">(</span><span class="n">Order</span><span class="p">(</span><span class="n">joe</span><span class="p">,</span> <span class="n">longOrder</span><span class="p">,</span> <span class="n">LargeOrderPromo</span><span class="p">()))</span>
 </code></pre></td></tr></table>
 </div>
 </div><p>The above code works perfectly well, but same functionality can be implemented with less code in Python.</p>
@@ -429,78 +429,78 @@ In this post, I will refactor Strategy using functions objects."/>
 <pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
 
-<span class="n">Customer</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">Customer</span><span class="s1">&#39;</span><span class="p">,</span> <span class="sa"></span><span class="s1">&#39;</span><span class="s1">name fidelity</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">Customer</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Customer&#39;</span><span class="p">,</span> <span class="s1">&#39;name fidelity&#39;</span><span class="p">)</span>
 
 <span class="k">class</span> <span class="nc">LineItem</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">product</span><span class="p">,</span> <span class="n">quantity</span><span class="p">,</span> <span class="n">price</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">product</span><span class="p">,</span> <span class="n">quantity</span><span class="p">,</span> <span class="n">price</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">product</span> <span class="o">=</span> <span class="n">product</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">quantity</span> <span class="o">=</span> <span class="n">quantity</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">price</span> <span class="o">=</span> <span class="n">price</span>
 
-    <span class="k">def</span> <span class="nf">total</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">total</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">price</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">quantity</span>
 
 <span class="k">class</span> <span class="nc">Order</span><span class="p">:</span> <span class="c1"># Context</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">customer</span><span class="p">,</span> <span class="n">cart</span><span class="p">,</span> <span class="n">promotion</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">customer</span><span class="p">,</span> <span class="n">cart</span><span class="p">,</span> <span class="n">promotion</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">customer</span> <span class="o">=</span> <span class="n">customer</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cart</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">cart</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">promotion</span> <span class="o">=</span> <span class="n">promotion</span>
 
-    <span class="k">def</span> <span class="nf">total</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa"></span><span class="s1">&#39;</span><span class="s1">__total</span><span class="s1">&#39;</span><span class="p">)</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">total</span><span class="p">(</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cart</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">total</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;__total&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">total</span><span class="p">()</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cart</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__total</span>
 
-    <span class="k">def</span> <span class="nf">due</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">due</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">discount</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">promotion</span> <span class="ow">is</span> <span class="bp">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">promotion</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">total</span><span class="p">(</span><span class="p">)</span> <span class="o">-</span> <span class="n">discount</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">total</span><span class="p">()</span> <span class="o">-</span> <span class="n">discount</span>
 
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
-        <span class="n">fmt</span> <span class="o">=</span> <span class="sa"></span><span class="s1">&#39;</span><span class="s1">&lt;Order total: {:.2f} due: {:.2f}&gt;</span><span class="s1">&#39;</span>
-        <span class="k">return</span> <span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total</span><span class="p">(</span><span class="p">)</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">due</span><span class="p">(</span><span class="p">)</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;&lt;Order total: {:.2f} due: {:.2f}&gt;&#39;</span>
+        <span class="k">return</span> <span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">due</span><span class="p">())</span>
 
-<span class="k">def</span> <span class="nf">fidelityPromo</span><span class="p">(</span><span class="n">order</span><span class="p">)</span><span class="p">:</span>
-    <span class="sa"></span><span class="s2">&#34;&#34;&#34;</span><span class="s2">
-</span><span class="s2"></span><span class="s2">    5</span><span class="si">% d</span><span class="s2">iscount for customers with 1000 or more fidelity points</span><span class="s2">
-</span><span class="s2"></span><span class="s2">    </span><span class="s2">&#34;&#34;&#34;</span>
-    <span class="k">return</span> <span class="n">order</span><span class="o">.</span><span class="n">total</span><span class="p">(</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.05</span> <span class="k">if</span> <span class="n">order</span><span class="o">.</span><span class="n">customer</span><span class="o">.</span><span class="n">fidelity</span> <span class="o">&gt;</span><span class="o">=</span> <span class="mi">1000</span> <span class="k">else</span> <span class="mi">0</span>
+<span class="k">def</span> <span class="nf">fidelityPromo</span><span class="p">(</span><span class="n">order</span><span class="p">):</span>
+    <span class="s2">&#34;&#34;&#34;
+</span><span class="s2">    5</span><span class="si">% d</span><span class="s2">iscount for customers with 1000 or more fidelity points
+</span><span class="s2">    &#34;&#34;&#34;</span>
+    <span class="k">return</span> <span class="n">order</span><span class="o">.</span><span class="n">total</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.05</span> <span class="k">if</span> <span class="n">order</span><span class="o">.</span><span class="n">customer</span><span class="o">.</span><span class="n">fidelity</span> <span class="o">&gt;=</span> <span class="mi">1000</span> <span class="k">else</span> <span class="mi">0</span>
 
-<span class="k">def</span> <span class="nf">bulkItemPromo</span><span class="p">(</span><span class="n">order</span><span class="p">)</span><span class="p">:</span>
-    <span class="sa"></span><span class="s2">&#34;&#34;&#34;</span><span class="s2">
-</span><span class="s2"></span><span class="s2">    10</span><span class="si">% d</span><span class="s2">iscount for each LineItem with 20 or more units</span><span class="s2">
-</span><span class="s2"></span><span class="s2">    </span><span class="s2">&#34;&#34;&#34;</span>
+<span class="k">def</span> <span class="nf">bulkItemPromo</span><span class="p">(</span><span class="n">order</span><span class="p">):</span>
+    <span class="s2">&#34;&#34;&#34;
+</span><span class="s2">    10</span><span class="si">% d</span><span class="s2">iscount for each LineItem with 20 or more units
+</span><span class="s2">    &#34;&#34;&#34;</span>
     <span class="n">discount</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">order</span><span class="o">.</span><span class="n">cart</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">quantity</span> <span class="o">&gt;</span><span class="o">=</span> <span class="mi">20</span><span class="p">:</span>
-            <span class="n">discount</span> <span class="o">+</span><span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">total</span><span class="p">(</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.1</span>
+        <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">quantity</span> <span class="o">&gt;=</span> <span class="mi">20</span><span class="p">:</span>
+            <span class="n">discount</span> <span class="o">+=</span> <span class="n">item</span><span class="o">.</span><span class="n">total</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.1</span>
 
     <span class="k">return</span> <span class="n">discount</span>
 
-<span class="k">def</span> <span class="nf">largeOrderPromo</span><span class="p">(</span><span class="n">order</span><span class="p">)</span><span class="p">:</span>
-    <span class="sa"></span><span class="s2">&#34;&#34;&#34;</span><span class="s2">
-</span><span class="s2"></span><span class="s2">    7</span><span class="si">% d</span><span class="s2">iscount for orders with 10 or more distinct items</span><span class="s2">
-</span><span class="s2"></span><span class="s2">    </span><span class="s2">&#34;&#34;&#34;</span>
+<span class="k">def</span> <span class="nf">largeOrderPromo</span><span class="p">(</span><span class="n">order</span><span class="p">):</span>
+    <span class="s2">&#34;&#34;&#34;
+</span><span class="s2">    7</span><span class="si">% d</span><span class="s2">iscount for orders with 10 or more distinct items
+</span><span class="s2">    &#34;&#34;&#34;</span>
     <span class="n">distinctItems</span> <span class="o">=</span> <span class="p">{</span><span class="n">item</span><span class="o">.</span><span class="n">product</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">order</span><span class="o">.</span><span class="n">cart</span><span class="p">}</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">distinctItems</span><span class="p">)</span> <span class="o">&gt;</span><span class="o">=</span> <span class="mi">10</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">order</span><span class="o">.</span><span class="n">total</span><span class="p">(</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.07</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">distinctItems</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">10</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">order</span><span class="o">.</span><span class="n">total</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.07</span>
 
     <span class="k">return</span> <span class="mi">0</span>
 
-<span class="n">joe</span> <span class="o">=</span> <span class="n">Customer</span><span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">John Doe</span><span class="s1">&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-<span class="n">ann</span> <span class="o">=</span> <span class="n">Customer</span><span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">Ann Smith</span><span class="s1">&#39;</span><span class="p">,</span> <span class="mi">1100</span><span class="p">)</span>
-<span class="n">cart</span> <span class="o">=</span> <span class="p">[</span><span class="n">LineItem</span><span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">banana</span><span class="s1">&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span><span class="p">,</span>
-        <span class="n">LineItem</span><span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">apple</span><span class="s1">&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">)</span><span class="p">,</span>
-        <span class="n">LineItem</span><span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">watermellon</span><span class="s1">&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">)</span><span class="p">]</span>
+<span class="n">joe</span> <span class="o">=</span> <span class="n">Customer</span><span class="p">(</span><span class="s1">&#39;John Doe&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">ann</span> <span class="o">=</span> <span class="n">Customer</span><span class="p">(</span><span class="s1">&#39;Ann Smith&#39;</span><span class="p">,</span> <span class="mi">1100</span><span class="p">)</span>
+<span class="n">cart</span> <span class="o">=</span> <span class="p">[</span><span class="n">LineItem</span><span class="p">(</span><span class="s1">&#39;banana&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
+        <span class="n">LineItem</span><span class="p">(</span><span class="s1">&#39;apple&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">),</span>
+        <span class="n">LineItem</span><span class="p">(</span><span class="s1">&#39;watermellon&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">)]</span>
 
-<span class="k">print</span><span class="p">(</span><span class="n">Order</span><span class="p">(</span><span class="n">joe</span><span class="p">,</span> <span class="n">cart</span><span class="p">,</span> <span class="n">fidelityPromo</span><span class="p">)</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="n">Order</span><span class="p">(</span><span class="n">ann</span><span class="p">,</span> <span class="n">cart</span><span class="p">,</span> <span class="n">fidelityPromo</span><span class="p">)</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">Order</span><span class="p">(</span><span class="n">joe</span><span class="p">,</span> <span class="n">cart</span><span class="p">,</span> <span class="n">fidelityPromo</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">Order</span><span class="p">(</span><span class="n">ann</span><span class="p">,</span> <span class="n">cart</span><span class="p">,</span> <span class="n">fidelityPromo</span><span class="p">))</span>
 
-<span class="n">bananaCart</span> <span class="o">=</span> <span class="p">[</span><span class="n">LineItem</span><span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">banana</span><span class="s1">&#39;</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">)</span><span class="p">,</span> <span class="n">LineItem</span><span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">apple</span><span class="s1">&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">)</span><span class="p">]</span>
-<span class="k">print</span><span class="p">(</span><span class="n">Order</span><span class="p">(</span><span class="n">joe</span><span class="p">,</span> <span class="n">bananaCart</span><span class="p">,</span> <span class="n">bulkItemPromo</span><span class="p">)</span><span class="p">)</span>
+<span class="n">bananaCart</span> <span class="o">=</span> <span class="p">[</span><span class="n">LineItem</span><span class="p">(</span><span class="s1">&#39;banana&#39;</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">),</span> <span class="n">LineItem</span><span class="p">(</span><span class="s1">&#39;apple&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">)]</span>
+<span class="k">print</span><span class="p">(</span><span class="n">Order</span><span class="p">(</span><span class="n">joe</span><span class="p">,</span> <span class="n">bananaCart</span><span class="p">,</span> <span class="n">bulkItemPromo</span><span class="p">))</span>
 
-<span class="n">longOrder</span> <span class="o">=</span> <span class="p">[</span><span class="n">LineItem</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">item</span><span class="p">)</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="p">]</span>
-<span class="k">print</span><span class="p">(</span><span class="n">Order</span><span class="p">(</span><span class="n">joe</span><span class="p">,</span> <span class="n">longOrder</span><span class="p">,</span> <span class="n">largeOrderPromo</span><span class="p">)</span><span class="p">)</span>
+<span class="n">longOrder</span> <span class="o">=</span> <span class="p">[</span><span class="n">LineItem</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">item</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
+<span class="k">print</span><span class="p">(</span><span class="n">Order</span><span class="p">(</span><span class="n">joe</span><span class="p">,</span> <span class="n">longOrder</span><span class="p">,</span> <span class="n">largeOrderPromo</span><span class="p">))</span>
 </code></pre></td></tr></table>
 </div>
 </div><p>There is no need to instantiate a new promotion object with each new order: the functions are ready to use.</p>

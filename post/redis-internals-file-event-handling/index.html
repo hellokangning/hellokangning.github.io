@@ -25,7 +25,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.64.1 with theme even" />
+<meta name="generator" content="Hugo 0.68.3 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/post/redis-internals-file-event-handling/" />
@@ -265,11 +265,11 @@ In this post, we will take a look at multiplexing event handling processing requ
     <span class="kt">int</span> <span class="n">fd</span><span class="p">;</span> 
     <span class="n">sds</span> <span class="n">querybuf</span><span class="p">;</span> 
     <span class="kt">int</span> <span class="n">argc</span><span class="p">;</span>
-    <span class="n">robj</span> <span class="o">*</span><span class="o">*</span><span class="n">argv</span><span class="p">;</span>
+    <span class="n">robj</span> <span class="o">**</span><span class="n">argv</span><span class="p">;</span>
     <span class="n">redisDb</span> <span class="o">*</span><span class="n">db</span><span class="p">;</span>
     <span class="kt">int</span> <span class="n">flags</span><span class="p">;</span>
     <span class="n">list</span> <span class="o">*</span><span class="n">reply</span><span class="p">;</span>
-    <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="n">PROTO_REPLY_CHUNK_BYTES</span><span class="p">]</span><span class="p">;</span>
+    <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="n">PROTO_REPLY_CHUNK_BYTES</span><span class="p">];</span>
     <span class="c1">// ....
 </span><span class="c1"></span><span class="p">}</span>
 </code></pre></td></tr></table>
@@ -333,9 +333,9 @@ In this post, we will take a look at multiplexing event handling processing requ
 <td class="lntd">
 <pre class="chroma"><code class="language-c" data-lang="c"><span class="c1">// server.c
 </span><span class="c1"></span>
-<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="o">*</span><span class="n">argv</span><span class="p">)</span> <span class="p">{</span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">**</span><span class="n">argv</span><span class="p">)</span> <span class="p">{</span>
     <span class="c1">// ...
-</span><span class="c1"></span>    <span class="n">initServer</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
+</span><span class="c1"></span>    <span class="n">initServer</span><span class="p">();</span>
     <span class="c1">//...
 </span><span class="c1"></span>
     <span class="n">aeMain</span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">el</span><span class="p">)</span>
@@ -344,28 +344,28 @@ In this post, we will take a look at multiplexing event handling processing requ
 
 <span class="kt">void</span> <span class="nf">initServer</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
     <span class="c1">// ...
-</span><span class="c1"></span>    <span class="n">server</span><span class="p">.</span><span class="n">el</span> <span class="o">=</span> <span class="n">aeCreateEventLoop</span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">maxclients</span><span class="o">+</span><span class="n">CONFIG_FDSET_INCR</span><span class="p">)</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">el</span> <span class="o">=</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="c1"></span>    <span class="n">server</span><span class="p">.</span><span class="n">el</span> <span class="o">=</span> <span class="n">aeCreateEventLoop</span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">maxclients</span><span class="o">+</span><span class="n">CONFIG_FDSET_INCR</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">el</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
         <span class="n">serverLog</span><span class="p">(</span><span class="n">LL_WARNING</span><span class="p">,</span>
-            <span class="sa"></span><span class="s">&#34;</span><span class="s">Failed creating the event loop. Error message: &#39;%s&#39;</span><span class="s">&#34;</span><span class="p">,</span>
-            <span class="n">strerror</span><span class="p">(</span><span class="n">errno</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
-        <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="p">;</span>
+            <span class="s">&#34;Failed creating the event loop. Error message: &#39;%s&#39;&#34;</span><span class="p">,</span>
+            <span class="n">strerror</span><span class="p">(</span><span class="n">errno</span><span class="p">));</span>
+        <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
     <span class="p">}</span>
 
     <span class="cm">/* Create the timer callback - serverCron, which is called periodically and performs tasks from time to time, like checking timeout, eviction of expired keysand so forth. */</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">aeCreateTimeEvent</span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">el</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">serverCron</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">)</span> <span class="o">=</span><span class="o">=</span> <span class="n">AE_ERR</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">serverPanic</span><span class="p">(</span><span class="sa"></span><span class="s">&#34;</span><span class="s">Can&#39;t create event loop timers.</span><span class="s">&#34;</span><span class="p">)</span><span class="p">;</span>
-        <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">aeCreateTimeEvent</span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">el</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">serverCron</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">)</span> <span class="o">==</span> <span class="n">AE_ERR</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">serverPanic</span><span class="p">(</span><span class="s">&#34;Can&#39;t create event loop timers.&#34;</span><span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
     <span class="p">}</span>
 
     <span class="cm">/* Create an event handler for accepting new connections in TCP and Unix
 </span><span class="cm">     * domain sockets. */</span>
-    <span class="k">for</span> <span class="p">(</span><span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">server</span><span class="p">.</span><span class="n">ipfd_count</span><span class="p">;</span> <span class="n">j</span><span class="o">+</span><span class="o">+</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">aeCreateFileEvent</span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">el</span><span class="p">,</span> <span class="n">server</span><span class="p">.</span><span class="n">ipfd</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="p">,</span> <span class="n">AE_READABLE</span><span class="p">,</span>
-            <span class="n">acceptTcpHandler</span><span class="p">,</span><span class="nb">NULL</span><span class="p">)</span> <span class="o">=</span><span class="o">=</span> <span class="n">AE_ERR</span><span class="p">)</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">server</span><span class="p">.</span><span class="n">ipfd_count</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">aeCreateFileEvent</span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">el</span><span class="p">,</span> <span class="n">server</span><span class="p">.</span><span class="n">ipfd</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">AE_READABLE</span><span class="p">,</span>
+            <span class="n">acceptTcpHandler</span><span class="p">,</span><span class="nb">NULL</span><span class="p">)</span> <span class="o">==</span> <span class="n">AE_ERR</span><span class="p">)</span>
             <span class="p">{</span>
                 <span class="n">serverPanic</span><span class="p">(</span>
-                    <span class="sa"></span><span class="s">&#34;</span><span class="s">Unrecoverable error creating server.ipfd file event.</span><span class="s">&#34;</span><span class="p">)</span><span class="p">;</span>
+                    <span class="s">&#34;Unrecoverable error creating server.ipfd file event.&#34;</span><span class="p">);</span>
             <span class="p">}</span>
     <span class="p">}</span>
 <span class="p">}</span>
@@ -419,32 +419,32 @@ In this post, we will take a look at multiplexing event handling processing requ
     <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
 
     <span class="c1">// allocate memory for event loop
-</span><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="p">(</span><span class="n">eventLoop</span> <span class="o">=</span> <span class="n">zmalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="o">*</span><span class="n">eventLoop</span><span class="p">)</span><span class="p">)</span><span class="p">)</span> <span class="o">=</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="k">goto</span> <span class="n">err</span><span class="p">;</span>
-    <span class="n">eventLoop</span><span class="o">-</span><span class="o">&gt;</span><span class="n">events</span> <span class="o">=</span> <span class="n">zmalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">aeFileEvent</span><span class="p">)</span><span class="o">*</span><span class="n">setsize</span><span class="p">)</span><span class="p">;</span>
-    <span class="n">eventLoop</span><span class="o">-</span><span class="o">&gt;</span><span class="n">fired</span> <span class="o">=</span> <span class="n">zmalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">aeFiredEvent</span><span class="p">)</span><span class="o">*</span><span class="n">setsize</span><span class="p">)</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">eventLoop</span><span class="o">-</span><span class="o">&gt;</span><span class="n">events</span> <span class="o">=</span><span class="o">=</span> <span class="nb">NULL</span> <span class="o">|</span><span class="o">|</span> <span class="n">eventLoop</span><span class="o">-</span><span class="o">&gt;</span><span class="n">fired</span> <span class="o">=</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="k">goto</span> <span class="n">err</span><span class="p">;</span>
+</span><span class="c1"></span>    <span class="k">if</span> <span class="p">((</span><span class="n">eventLoop</span> <span class="o">=</span> <span class="n">zmalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="o">*</span><span class="n">eventLoop</span><span class="p">)))</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="k">goto</span> <span class="n">err</span><span class="p">;</span>
+    <span class="n">eventLoop</span><span class="o">-&gt;</span><span class="n">events</span> <span class="o">=</span> <span class="n">zmalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">aeFileEvent</span><span class="p">)</span><span class="o">*</span><span class="n">setsize</span><span class="p">);</span>
+    <span class="n">eventLoop</span><span class="o">-&gt;</span><span class="n">fired</span> <span class="o">=</span> <span class="n">zmalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">aeFiredEvent</span><span class="p">)</span><span class="o">*</span><span class="n">setsize</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">eventLoop</span><span class="o">-&gt;</span><span class="n">events</span> <span class="o">==</span> <span class="nb">NULL</span> <span class="o">||</span> <span class="n">eventLoop</span><span class="o">-&gt;</span><span class="n">fired</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="k">goto</span> <span class="n">err</span><span class="p">;</span>
 
     <span class="c1">// initializaiton
-</span><span class="c1"></span>    <span class="n">eventLoop</span><span class="o">-</span><span class="o">&gt;</span><span class="n">setsize</span> <span class="o">=</span> <span class="n">setsize</span><span class="p">;</span>
-    <span class="n">eventLoop</span><span class="o">-</span><span class="o">&gt;</span><span class="n">lastTime</span> <span class="o">=</span> <span class="n">time</span><span class="p">(</span><span class="nb">NULL</span><span class="p">)</span><span class="p">;</span>
-    <span class="n">eventLoop</span><span class="o">-</span><span class="o">&gt;</span><span class="n">timeEventHead</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
-    <span class="n">eventLoop</span><span class="o">-</span><span class="o">&gt;</span><span class="n">timeEventNextId</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-    <span class="n">eventLoop</span><span class="o">-</span><span class="o">&gt;</span><span class="n">stop</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-    <span class="n">eventLoop</span><span class="o">-</span><span class="o">&gt;</span><span class="n">maxfd</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-    <span class="n">eventLoop</span><span class="o">-</span><span class="o">&gt;</span><span class="n">beforesleep</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
-    <span class="n">eventLoop</span><span class="o">-</span><span class="o">&gt;</span><span class="n">aftersleep</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">aeApiCreate</span><span class="p">(</span><span class="n">eventLoop</span><span class="p">)</span> <span class="o">=</span><span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="k">goto</span> <span class="n">err</span><span class="p">;</span>
+</span><span class="c1"></span>    <span class="n">eventLoop</span><span class="o">-&gt;</span><span class="n">setsize</span> <span class="o">=</span> <span class="n">setsize</span><span class="p">;</span>
+    <span class="n">eventLoop</span><span class="o">-&gt;</span><span class="n">lastTime</span> <span class="o">=</span> <span class="n">time</span><span class="p">(</span><span class="nb">NULL</span><span class="p">);</span>
+    <span class="n">eventLoop</span><span class="o">-&gt;</span><span class="n">timeEventHead</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="n">eventLoop</span><span class="o">-&gt;</span><span class="n">timeEventNextId</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">eventLoop</span><span class="o">-&gt;</span><span class="n">stop</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">eventLoop</span><span class="o">-&gt;</span><span class="n">maxfd</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+    <span class="n">eventLoop</span><span class="o">-&gt;</span><span class="n">beforesleep</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="n">eventLoop</span><span class="o">-&gt;</span><span class="n">aftersleep</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">aeApiCreate</span><span class="p">(</span><span class="n">eventLoop</span><span class="p">)</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="k">goto</span> <span class="n">err</span><span class="p">;</span>
     <span class="cm">/* Events with mask == AE_NONE are not set. So let&#39;s initialize the
 </span><span class="cm">     * vector with it. */</span>
-    <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">setsize</span><span class="p">;</span> <span class="n">i</span><span class="o">+</span><span class="o">+</span><span class="p">)</span>
-        <span class="n">eventLoop</span><span class="o">-</span><span class="o">&gt;</span><span class="n">events</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="p">.</span><span class="n">mask</span> <span class="o">=</span> <span class="n">AE_NONE</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">setsize</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+        <span class="n">eventLoop</span><span class="o">-&gt;</span><span class="n">events</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">mask</span> <span class="o">=</span> <span class="n">AE_NONE</span><span class="p">;</span>
     <span class="k">return</span> <span class="n">eventLoop</span><span class="p">;</span>
 
 <span class="nl">err</span><span class="p">:</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">eventLoop</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">zfree</span><span class="p">(</span><span class="n">eventLoop</span><span class="o">-</span><span class="o">&gt;</span><span class="n">events</span><span class="p">)</span><span class="p">;</span>
-        <span class="n">zfree</span><span class="p">(</span><span class="n">eventLoop</span><span class="o">-</span><span class="o">&gt;</span><span class="n">fired</span><span class="p">)</span><span class="p">;</span>
-        <span class="n">zfree</span><span class="p">(</span><span class="n">eventLoop</span><span class="p">)</span><span class="p">;</span>
+        <span class="n">zfree</span><span class="p">(</span><span class="n">eventLoop</span><span class="o">-&gt;</span><span class="n">events</span><span class="p">);</span>
+        <span class="n">zfree</span><span class="p">(</span><span class="n">eventLoop</span><span class="o">-&gt;</span><span class="n">fired</span><span class="p">);</span>
+        <span class="n">zfree</span><span class="p">(</span><span class="n">eventLoop</span><span class="p">);</span>
     <span class="p">}</span>
     <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
 <span class="p">}</span>
@@ -483,22 +483,22 @@ In this post, we will take a look at multiplexing event handling processing requ
 <span class="kt">int</span> <span class="nf">aeCreateFileEvent</span><span class="p">(</span><span class="n">aeEventLoop</span> <span class="o">*</span><span class="n">eventLoop</span><span class="p">,</span> <span class="kt">int</span> <span class="n">fd</span><span class="p">,</span> <span class="kt">int</span> <span class="n">mask</span><span class="p">,</span>
         <span class="n">aeFileProc</span> <span class="o">*</span><span class="n">proc</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">clientData</span><span class="p">)</span>
 <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">fd</span> <span class="o">&gt;</span><span class="o">=</span> <span class="n">eventLoop</span><span class="o">-</span><span class="o">&gt;</span><span class="n">setsize</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">fd</span> <span class="o">&gt;=</span> <span class="n">eventLoop</span><span class="o">-&gt;</span><span class="n">setsize</span><span class="p">)</span> <span class="p">{</span>
         <span class="n">errno</span> <span class="o">=</span> <span class="n">ERANGE</span><span class="p">;</span>
         <span class="k">return</span> <span class="n">AE_ERR</span><span class="p">;</span>
     <span class="p">}</span>
-    <span class="n">aeFileEvent</span> <span class="o">*</span><span class="n">fe</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">eventLoop</span><span class="o">-</span><span class="o">&gt;</span><span class="n">events</span><span class="p">[</span><span class="n">fd</span><span class="p">]</span><span class="p">;</span>
+    <span class="n">aeFileEvent</span> <span class="o">*</span><span class="n">fe</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">eventLoop</span><span class="o">-&gt;</span><span class="n">events</span><span class="p">[</span><span class="n">fd</span><span class="p">];</span>
 
-    <span class="k">if</span> <span class="p">(</span><span class="n">aeApiAddEvent</span><span class="p">(</span><span class="n">eventLoop</span><span class="p">,</span> <span class="n">fd</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span> <span class="o">=</span><span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">aeApiAddEvent</span><span class="p">(</span><span class="n">eventLoop</span><span class="p">,</span> <span class="n">fd</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">AE_ERR</span><span class="p">;</span>
-    <span class="n">fe</span><span class="o">-</span><span class="o">&gt;</span><span class="n">mask</span> <span class="o">|</span><span class="o">=</span> <span class="n">mask</span><span class="p">;</span>
+    <span class="n">fe</span><span class="o">-&gt;</span><span class="n">mask</span> <span class="o">|=</span> <span class="n">mask</span><span class="p">;</span>
 
     <span class="c1">// Register processor for readble and writable events
-</span><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="n">mask</span> <span class="o">&amp;</span> <span class="n">AE_READABLE</span><span class="p">)</span> <span class="n">fe</span><span class="o">-</span><span class="o">&gt;</span><span class="n">rfileProc</span> <span class="o">=</span> <span class="n">proc</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">mask</span> <span class="o">&amp;</span> <span class="n">AE_WRITABLE</span><span class="p">)</span> <span class="n">fe</span><span class="o">-</span><span class="o">&gt;</span><span class="n">wfileProc</span> <span class="o">=</span> <span class="n">proc</span><span class="p">;</span>
-    <span class="n">fe</span><span class="o">-</span><span class="o">&gt;</span><span class="n">clientData</span> <span class="o">=</span> <span class="n">clientData</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">fd</span> <span class="o">&gt;</span> <span class="n">eventLoop</span><span class="o">-</span><span class="o">&gt;</span><span class="n">maxfd</span><span class="p">)</span>
-        <span class="n">eventLoop</span><span class="o">-</span><span class="o">&gt;</span><span class="n">maxfd</span> <span class="o">=</span> <span class="n">fd</span><span class="p">;</span>
+</span><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="n">mask</span> <span class="o">&amp;</span> <span class="n">AE_READABLE</span><span class="p">)</span> <span class="n">fe</span><span class="o">-&gt;</span><span class="n">rfileProc</span> <span class="o">=</span> <span class="n">proc</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">mask</span> <span class="o">&amp;</span> <span class="n">AE_WRITABLE</span><span class="p">)</span> <span class="n">fe</span><span class="o">-&gt;</span><span class="n">wfileProc</span> <span class="o">=</span> <span class="n">proc</span><span class="p">;</span>
+    <span class="n">fe</span><span class="o">-&gt;</span><span class="n">clientData</span> <span class="o">=</span> <span class="n">clientData</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">fd</span> <span class="o">&gt;</span> <span class="n">eventLoop</span><span class="o">-&gt;</span><span class="n">maxfd</span><span class="p">)</span>
+        <span class="n">eventLoop</span><span class="o">-&gt;</span><span class="n">maxfd</span> <span class="o">=</span> <span class="n">fd</span><span class="p">;</span>
     <span class="k">return</span> <span class="n">AE_OK</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
@@ -522,11 +522,11 @@ In this post, we will take a look at multiplexing event handling processing requ
 <pre class="chroma"><code class="language-c" data-lang="c"><span class="c1">// ae.c
 </span><span class="c1"></span>
 <span class="kt">void</span> <span class="nf">aeMain</span><span class="p">(</span><span class="n">aeEventLoop</span> <span class="o">*</span><span class="n">eventLoop</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">eventLoop</span><span class="o">-</span><span class="o">&gt;</span><span class="n">stop</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-    <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">eventLoop</span><span class="o">-</span><span class="o">&gt;</span><span class="n">stop</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">eventLoop</span><span class="o">-</span><span class="o">&gt;</span><span class="n">beforesleep</span> <span class="o">!</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span>
-            <span class="n">eventLoop</span><span class="o">-</span><span class="o">&gt;</span><span class="n">beforesleep</span><span class="p">(</span><span class="n">eventLoop</span><span class="p">)</span><span class="p">;</span>
-        <span class="n">aeProcessEvents</span><span class="p">(</span><span class="n">eventLoop</span><span class="p">,</span> <span class="n">AE_ALL_EVENTS</span><span class="o">|</span><span class="n">AE_CALL_AFTER_SLEEP</span><span class="p">)</span><span class="p">;</span>
+    <span class="n">eventLoop</span><span class="o">-&gt;</span><span class="n">stop</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">eventLoop</span><span class="o">-&gt;</span><span class="n">stop</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">eventLoop</span><span class="o">-&gt;</span><span class="n">beforesleep</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span>
+            <span class="n">eventLoop</span><span class="o">-&gt;</span><span class="n">beforesleep</span><span class="p">(</span><span class="n">eventLoop</span><span class="p">);</span>
+        <span class="n">aeProcessEvents</span><span class="p">(</span><span class="n">eventLoop</span><span class="p">,</span> <span class="n">AE_ALL_EVENTS</span><span class="o">|</span><span class="n">AE_CALL_AFTER_SLEEP</span><span class="p">);</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
@@ -593,41 +593,41 @@ In this post, we will take a look at multiplexing event handling processing requ
 <span class="p">{</span>
     <span class="c1">// ...
 </span><span class="c1"></span>
-    <span class="k">for</span> <span class="p">(</span><span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">numevents</span><span class="p">;</span> <span class="n">j</span><span class="o">+</span><span class="o">+</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">aeFileEvent</span> <span class="o">*</span><span class="n">fe</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">eventLoop</span><span class="o">-</span><span class="o">&gt;</span><span class="n">events</span><span class="p">[</span><span class="n">eventLoop</span><span class="o">-</span><span class="o">&gt;</span><span class="n">fired</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="p">.</span><span class="n">fd</span><span class="p">]</span><span class="p">;</span>
-        <span class="kt">int</span> <span class="n">mask</span> <span class="o">=</span> <span class="n">eventLoop</span><span class="p">.</span><span class="n">fired</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="p">.</span><span class="n">mask</span><span class="p">;</span>
-        <span class="kt">int</span> <span class="n">fd</span> <span class="o">=</span> <span class="n">eventLoop</span><span class="p">.</span><span class="n">fired</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="p">.</span><span class="n">fd</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">numevents</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">aeFileEvent</span> <span class="o">*</span><span class="n">fe</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">eventLoop</span><span class="o">-&gt;</span><span class="n">events</span><span class="p">[</span><span class="n">eventLoop</span><span class="o">-&gt;</span><span class="n">fired</span><span class="p">[</span><span class="n">j</span><span class="p">].</span><span class="n">fd</span><span class="p">];</span>
+        <span class="kt">int</span> <span class="n">mask</span> <span class="o">=</span> <span class="n">eventLoop</span><span class="p">.</span><span class="n">fired</span><span class="p">[</span><span class="n">j</span><span class="p">].</span><span class="n">mask</span><span class="p">;</span>
+        <span class="kt">int</span> <span class="n">fd</span> <span class="o">=</span> <span class="n">eventLoop</span><span class="p">.</span><span class="n">fired</span><span class="p">[</span><span class="n">j</span><span class="p">].</span><span class="n">fd</span><span class="p">;</span>
 
-        <span class="kt">int</span> <span class="n">invert</span> <span class="o">=</span> <span class="n">fe</span><span class="o">-</span><span class="o">&gt;</span><span class="n">mask</span> <span class="o">&amp;</span> <span class="n">AE_BARRIER</span><span class="p">;</span>
+        <span class="kt">int</span> <span class="n">invert</span> <span class="o">=</span> <span class="n">fe</span><span class="o">-&gt;</span><span class="n">mask</span> <span class="o">&amp;</span> <span class="n">AE_BARRIER</span><span class="p">;</span>
 
         <span class="cm">/* Fire the readable event if the call sequence is not
 </span><span class="cm">        * inverted. */</span>
-        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">invert</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">fe</span><span class="o">-</span><span class="o">&gt;</span><span class="n">mask</span> <span class="o">&amp;</span> <span class="n">mask</span> <span class="o">&amp;</span> <span class="n">AE_READABLE</span><span class="p">)</span> <span class="p">{</span>
-            <span class="n">fe</span><span class="o">-</span><span class="o">&gt;</span><span class="n">rfileProc</span><span class="p">(</span><span class="n">eventLoop</span><span class="p">,</span><span class="n">fd</span><span class="p">,</span><span class="n">fe</span><span class="o">-</span><span class="o">&gt;</span><span class="n">clientData</span><span class="p">,</span><span class="n">mask</span><span class="p">)</span><span class="p">;</span>
-            <span class="n">fired</span><span class="o">+</span><span class="o">+</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">invert</span> <span class="o">&amp;&amp;</span> <span class="n">fe</span><span class="o">-&gt;</span><span class="n">mask</span> <span class="o">&amp;</span> <span class="n">mask</span> <span class="o">&amp;</span> <span class="n">AE_READABLE</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">fe</span><span class="o">-&gt;</span><span class="n">rfileProc</span><span class="p">(</span><span class="n">eventLoop</span><span class="p">,</span><span class="n">fd</span><span class="p">,</span><span class="n">fe</span><span class="o">-&gt;</span><span class="n">clientData</span><span class="p">,</span><span class="n">mask</span><span class="p">);</span>
+            <span class="n">fired</span><span class="o">++</span><span class="p">;</span>
         <span class="p">}</span>
 
         <span class="cm">/* Fire the writable event. */</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">fe</span><span class="o">-</span><span class="o">&gt;</span><span class="n">mask</span> <span class="o">&amp;</span> <span class="n">mask</span> <span class="o">&amp;</span> <span class="n">AE_WRITABLE</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">fired</span> <span class="o">|</span><span class="o">|</span> <span class="n">fe</span><span class="o">-</span><span class="o">&gt;</span><span class="n">wfileProc</span> <span class="o">!</span><span class="o">=</span> <span class="n">fe</span><span class="o">-</span><span class="o">&gt;</span><span class="n">rfileProc</span><span class="p">)</span> <span class="p">{</span>
-                <span class="n">fe</span><span class="o">-</span><span class="o">&gt;</span><span class="n">wfileProc</span><span class="p">(</span><span class="n">eventLoop</span><span class="p">,</span><span class="n">fd</span><span class="p">,</span><span class="n">fe</span><span class="o">-</span><span class="o">&gt;</span><span class="n">clientData</span><span class="p">,</span><span class="n">mask</span><span class="p">)</span><span class="p">;</span>
-                <span class="n">fired</span><span class="o">+</span><span class="o">+</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">fe</span><span class="o">-&gt;</span><span class="n">mask</span> <span class="o">&amp;</span> <span class="n">mask</span> <span class="o">&amp;</span> <span class="n">AE_WRITABLE</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">fired</span> <span class="o">||</span> <span class="n">fe</span><span class="o">-&gt;</span><span class="n">wfileProc</span> <span class="o">!=</span> <span class="n">fe</span><span class="o">-&gt;</span><span class="n">rfileProc</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">fe</span><span class="o">-&gt;</span><span class="n">wfileProc</span><span class="p">(</span><span class="n">eventLoop</span><span class="p">,</span><span class="n">fd</span><span class="p">,</span><span class="n">fe</span><span class="o">-&gt;</span><span class="n">clientData</span><span class="p">,</span><span class="n">mask</span><span class="p">);</span>
+                <span class="n">fired</span><span class="o">++</span><span class="p">;</span>
             <span class="p">}</span>
         <span class="p">}</span>
 
         <span class="cm">/* If we have to invert the call, fire the readable event now
 </span><span class="cm">        * after the writable one. */</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">invert</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">fe</span><span class="o">-</span><span class="o">&gt;</span><span class="n">mask</span> <span class="o">&amp;</span> <span class="n">mask</span> <span class="o">&amp;</span> <span class="n">AE_READABLE</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">fired</span> <span class="o">|</span><span class="o">|</span> <span class="n">fe</span><span class="o">-</span><span class="o">&gt;</span><span class="n">wfileProc</span> <span class="o">!</span><span class="o">=</span> <span class="n">fe</span><span class="o">-</span><span class="o">&gt;</span><span class="n">rfileProc</span><span class="p">)</span> <span class="p">{</span>
-                <span class="n">fe</span><span class="o">-</span><span class="o">&gt;</span><span class="n">rfileProc</span><span class="p">(</span><span class="n">eventLoop</span><span class="p">,</span><span class="n">fd</span><span class="p">,</span><span class="n">fe</span><span class="o">-</span><span class="o">&gt;</span><span class="n">clientData</span><span class="p">,</span><span class="n">mask</span><span class="p">)</span><span class="p">;</span>
-                <span class="n">fired</span><span class="o">+</span><span class="o">+</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">invert</span> <span class="o">&amp;&amp;</span> <span class="n">fe</span><span class="o">-&gt;</span><span class="n">mask</span> <span class="o">&amp;</span> <span class="n">mask</span> <span class="o">&amp;</span> <span class="n">AE_READABLE</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">fired</span> <span class="o">||</span> <span class="n">fe</span><span class="o">-&gt;</span><span class="n">wfileProc</span> <span class="o">!=</span> <span class="n">fe</span><span class="o">-&gt;</span><span class="n">rfileProc</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">fe</span><span class="o">-&gt;</span><span class="n">rfileProc</span><span class="p">(</span><span class="n">eventLoop</span><span class="p">,</span><span class="n">fd</span><span class="p">,</span><span class="n">fe</span><span class="o">-&gt;</span><span class="n">clientData</span><span class="p">,</span><span class="n">mask</span><span class="p">);</span>
+                <span class="n">fired</span><span class="o">++</span><span class="p">;</span>
             <span class="p">}</span>
         <span class="p">}</span>
     <span class="p">}</span>
 
     <span class="cm">/* Check time events */</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">flags</span> <span class="o">&amp;</span> <span class="n">AE_TIME_EVENTS</span><span class="p">)</span>
-        <span class="n">processed</span> <span class="o">+</span><span class="o">=</span> <span class="n">processTimeEvents</span><span class="p">(</span><span class="n">eventLoop</span><span class="p">)</span><span class="p">;</span>
+        <span class="n">processed</span> <span class="o">+=</span> <span class="n">processTimeEvents</span><span class="p">(</span><span class="n">eventLoop</span><span class="p">);</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
@@ -664,24 +664,24 @@ In this post, we will take a look at multiplexing event handling processing requ
 </span><span class="c1"></span>
 <span class="kt">void</span> <span class="nf">acceptTcpHandler</span><span class="p">(</span><span class="n">aeEventLoop</span> <span class="o">*</span><span class="n">el</span><span class="p">,</span> <span class="kt">int</span> <span class="n">fd</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">privdata</span><span class="p">,</span> <span class="kt">int</span> <span class="n">mask</span><span class="p">)</span> <span class="p">{</span>
     <span class="kt">int</span> <span class="n">cport</span><span class="p">,</span> <span class="n">cfd</span><span class="p">,</span> <span class="n">max</span> <span class="o">=</span> <span class="n">MAX_ACCEPTS_PER_CALL</span><span class="p">;</span>
-    <span class="kt">char</span> <span class="n">cip</span><span class="p">[</span><span class="n">NET_IP_STR_LEN</span><span class="p">]</span><span class="p">;</span>
-    <span class="n">UNUSED</span><span class="p">(</span><span class="n">el</span><span class="p">)</span><span class="p">;</span>
-    <span class="n">UNUSED</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span><span class="p">;</span>
-    <span class="n">UNUSED</span><span class="p">(</span><span class="n">privdata</span><span class="p">)</span><span class="p">;</span>
+    <span class="kt">char</span> <span class="n">cip</span><span class="p">[</span><span class="n">NET_IP_STR_LEN</span><span class="p">];</span>
+    <span class="n">UNUSED</span><span class="p">(</span><span class="n">el</span><span class="p">);</span>
+    <span class="n">UNUSED</span><span class="p">(</span><span class="n">mask</span><span class="p">);</span>
+    <span class="n">UNUSED</span><span class="p">(</span><span class="n">privdata</span><span class="p">);</span>
 
-    <span class="k">while</span><span class="p">(</span><span class="n">max</span><span class="o">-</span><span class="o">-</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">while</span><span class="p">(</span><span class="n">max</span><span class="o">--</span><span class="p">)</span> <span class="p">{</span>
         <span class="c1">// Accept TCP requests
-</span><span class="c1"></span>        <span class="n">cfd</span> <span class="o">=</span> <span class="n">anetTcpAccept</span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">neterr</span><span class="p">,</span> <span class="n">fd</span><span class="p">,</span> <span class="n">cip</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">cip</span><span class="p">)</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">cport</span><span class="p">)</span><span class="p">;</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">cfd</span> <span class="o">=</span><span class="o">=</span> <span class="n">ANET_ERR</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">errno</span> <span class="o">!</span><span class="o">=</span> <span class="n">EWOULDBLOCK</span><span class="p">)</span>
+</span><span class="c1"></span>        <span class="n">cfd</span> <span class="o">=</span> <span class="n">anetTcpAccept</span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">neterr</span><span class="p">,</span> <span class="n">fd</span><span class="p">,</span> <span class="n">cip</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">cip</span><span class="p">),</span> <span class="o">&amp;</span><span class="n">cport</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">cfd</span> <span class="o">==</span> <span class="n">ANET_ERR</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">errno</span> <span class="o">!=</span> <span class="n">EWOULDBLOCK</span><span class="p">)</span>
                 <span class="n">serverLog</span><span class="p">(</span><span class="n">LL_WARNING</span><span class="p">,</span>
-                    <span class="sa"></span><span class="s">&#34;</span><span class="s">Accepting client connection: %s</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">server</span><span class="p">.</span><span class="n">neterr</span><span class="p">)</span><span class="p">;</span>
+                    <span class="s">&#34;Accepting client connection: %s&#34;</span><span class="p">,</span> <span class="n">server</span><span class="p">.</span><span class="n">neterr</span><span class="p">);</span>
             <span class="k">return</span><span class="p">;</span>
         <span class="p">}</span>
-        <span class="n">serverLog</span><span class="p">(</span><span class="n">LL_VERBOSE</span><span class="p">,</span><span class="sa"></span><span class="s">&#34;</span><span class="s">Accepted %s:%d</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">cip</span><span class="p">,</span> <span class="n">cport</span><span class="p">)</span><span class="p">;</span>
+        <span class="n">serverLog</span><span class="p">(</span><span class="n">LL_VERBOSE</span><span class="p">,</span><span class="s">&#34;Accepted %s:%d&#34;</span><span class="p">,</span> <span class="n">cip</span><span class="p">,</span> <span class="n">cport</span><span class="p">);</span>
 
         <span class="c1">// Constructs a client object and inserts it into asEventLoop
-</span><span class="c1"></span>        <span class="n">acceptCommonHandler</span><span class="p">(</span><span class="n">cfd</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">cip</span><span class="p">)</span><span class="p">;</span>
+</span><span class="c1"></span>        <span class="n">acceptCommonHandler</span><span class="p">(</span><span class="n">cfd</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">cip</span><span class="p">);</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
@@ -717,24 +717,24 @@ In this post, we will take a look at multiplexing event handling processing requ
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-c" data-lang="c"><span class="n">client</span> <span class="o">*</span><span class="nf">createClient</span><span class="p">(</span><span class="kt">int</span> <span class="n">fd</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">client</span> <span class="o">*</span><span class="n">c</span> <span class="o">=</span> <span class="n">zmalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">client</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
+    <span class="n">client</span> <span class="o">*</span><span class="n">c</span> <span class="o">=</span> <span class="n">zmalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">client</span><span class="p">));</span>
 
     <span class="cm">/* passing -1 as fd it is possible to create a non connected client.
 </span><span class="cm">     * This is useful since all the commands needs to be executed
 </span><span class="cm">     * in the context of a client. When commands are executed in other
 </span><span class="cm">     * contexts (for instance a Lua script) we need a non connected client. */</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">fd</span> <span class="o">!</span><span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">anetNonBlock</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span><span class="n">fd</span><span class="p">)</span><span class="p">;</span>
-        <span class="n">anetEnableTcpNoDelay</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span><span class="n">fd</span><span class="p">)</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">fd</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">anetNonBlock</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span><span class="n">fd</span><span class="p">);</span>
+        <span class="n">anetEnableTcpNoDelay</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span><span class="n">fd</span><span class="p">);</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">tcpkeepalive</span><span class="p">)</span>
-            <span class="n">anetKeepAlive</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span><span class="n">fd</span><span class="p">,</span><span class="n">server</span><span class="p">.</span><span class="n">tcpkeepalive</span><span class="p">)</span><span class="p">;</span>
+            <span class="n">anetKeepAlive</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span><span class="n">fd</span><span class="p">,</span><span class="n">server</span><span class="p">.</span><span class="n">tcpkeepalive</span><span class="p">);</span>
 
         <span class="c1">// Register readQueryFromClient for readable events
 </span><span class="c1"></span>        <span class="k">if</span> <span class="p">(</span><span class="n">aeCreateFileEvent</span><span class="p">(</span><span class="n">server</span><span class="p">.</span><span class="n">el</span><span class="p">,</span><span class="n">fd</span><span class="p">,</span><span class="n">AE_READABLE</span><span class="p">,</span>
-            <span class="n">readQueryFromClient</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="o">=</span><span class="o">=</span> <span class="n">AE_ERR</span><span class="p">)</span>
+            <span class="n">readQueryFromClient</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="o">==</span> <span class="n">AE_ERR</span><span class="p">)</span>
         <span class="p">{</span>
-            <span class="n">close</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span><span class="p">;</span>
-            <span class="n">zfree</span><span class="p">(</span><span class="n">c</span><span class="p">)</span><span class="p">;</span>
+            <span class="n">close</span><span class="p">(</span><span class="n">fd</span><span class="p">);</span>
+            <span class="n">zfree</span><span class="p">(</span><span class="n">c</span><span class="p">);</span>
             <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
         <span class="p">}</span>
     <span class="p">}</span>
@@ -780,13 +780,13 @@ In this post, we will take a look at multiplexing event handling processing requ
     <span class="n">client</span> <span class="o">*</span><span class="n">c</span> <span class="o">=</span> <span class="p">(</span><span class="n">client</span><span class="o">*</span><span class="p">)</span> <span class="n">privdata</span><span class="p">;</span>
 
     <span class="c1">//...
-</span><span class="c1"></span>    <span class="n">qblen</span> <span class="o">=</span> <span class="n">sdslen</span><span class="p">(</span><span class="n">c</span><span class="o">-</span><span class="o">&gt;</span><span class="n">querybuf</span><span class="p">)</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">c</span><span class="o">-</span><span class="o">&gt;</span><span class="n">querybuf_peak</span> <span class="o">&lt;</span> <span class="n">qblen</span><span class="p">)</span> <span class="n">c</span><span class="o">-</span><span class="o">&gt;</span><span class="n">querybuf_peak</span> <span class="o">=</span> <span class="n">qblen</span><span class="p">;</span>
-    <span class="n">c</span><span class="o">-</span><span class="o">&gt;</span><span class="n">querybuf</span> <span class="o">=</span> <span class="n">sdsMakeRoomFor</span><span class="p">(</span><span class="n">c</span><span class="o">-</span><span class="o">&gt;</span><span class="n">querybuf</span><span class="p">,</span> <span class="n">readlen</span><span class="p">)</span><span class="p">;</span>
-    <span class="n">nread</span> <span class="o">=</span> <span class="n">read</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">c</span><span class="o">-</span><span class="o">&gt;</span><span class="n">querybuf</span><span class="o">+</span><span class="n">qblen</span><span class="p">,</span> <span class="n">readlen</span><span class="p">)</span><span class="p">;</span>
+</span><span class="c1"></span>    <span class="n">qblen</span> <span class="o">=</span> <span class="n">sdslen</span><span class="p">(</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">querybuf</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">querybuf_peak</span> <span class="o">&lt;</span> <span class="n">qblen</span><span class="p">)</span> <span class="n">c</span><span class="o">-&gt;</span><span class="n">querybuf_peak</span> <span class="o">=</span> <span class="n">qblen</span><span class="p">;</span>
+    <span class="n">c</span><span class="o">-&gt;</span><span class="n">querybuf</span> <span class="o">=</span> <span class="n">sdsMakeRoomFor</span><span class="p">(</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">querybuf</span><span class="p">,</span> <span class="n">readlen</span><span class="p">);</span>
+    <span class="n">nread</span> <span class="o">=</span> <span class="n">read</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">c</span><span class="o">-&gt;</span><span class="n">querybuf</span><span class="o">+</span><span class="n">qblen</span><span class="p">,</span> <span class="n">readlen</span><span class="p">);</span>
 
     <span class="c1">// Time to process the buffer
-</span><span class="c1"></span>    <span class="n">processInputBufferAndReplicate</span><span class="p">(</span><span class="n">c</span><span class="p">)</span><span class="p">;</span>
+</span><span class="c1"></span>    <span class="n">processInputBufferAndReplicate</span><span class="p">(</span><span class="n">c</span><span class="p">);</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>

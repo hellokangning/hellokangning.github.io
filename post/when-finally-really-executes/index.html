@@ -24,7 +24,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.64.1 with theme even" />
+<meta name="generator" content="Hugo 0.68.3 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/post/when-finally-really-executes/" />
@@ -170,17 +170,17 @@ after executing finally, END_FINALLY returns.
 </span><span class="lnt">11
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="p">)</span><span class="p">:</span>
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">func</span><span class="p">():</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="mi">100</span><span class="o">/</span><span class="mi">0</span>
     <span class="k">except</span> <span class="ne">ZeroDivisionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="k">print</span> <span class="sa"></span><span class="s1">&#39;</span><span class="s1">Zero cannot be divisor</span><span class="s1">&#39;</span>
+        <span class="k">print</span> <span class="s1">&#39;Zero cannot be divisor&#39;</span>
         <span class="k">return</span>
     <span class="k">finally</span><span class="p">:</span>
-        <span class="k">print</span> <span class="sa"></span><span class="s1">&#39;</span><span class="s1">finally</span><span class="s1">&#39;</span>
+        <span class="k">print</span> <span class="s1">&#39;finally&#39;</span>
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="sa"></span><span class="s2">&#34;</span><span class="s2">__main__</span><span class="s2">&#34;</span><span class="p">:</span>
-    <span class="n">func</span><span class="p">(</span><span class="p">)</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&#34;__main__&#34;</span><span class="p">:</span>
+    <span class="n">func</span><span class="p">()</span>
 </code></pre></td></tr></table>
 </div>
 </div><p>The answer is:</p>
@@ -218,16 +218,16 @@ finally
 <span class="c1"># coding=utf-8</span>
 <span class="kn">from</span> <span class="nn">dis</span> <span class="kn">import</span> <span class="n">dis</span>
 
-<span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="p">)</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">func</span><span class="p">():</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="mi">100</span><span class="o">/</span><span class="mi">0</span>
     <span class="k">except</span> <span class="ne">ZeroDivisionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="k">print</span> <span class="sa"></span><span class="s1">&#39;</span><span class="s1">Zero cannot be divisor</span><span class="s1">&#39;</span>
+        <span class="k">print</span> <span class="s1">&#39;Zero cannot be divisor&#39;</span>
         <span class="k">return</span>
     <span class="k">finally</span><span class="p">:</span>
-        <span class="k">print</span> <span class="sa"></span><span class="s1">&#39;</span><span class="s1">finally</span><span class="s1">&#39;</span>
+        <span class="k">print</span> <span class="s1">&#39;finally&#39;</span>
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="sa"></span><span class="s2">&#34;</span><span class="s2">__main__</span><span class="s2">&#34;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&#34;__main__&#34;</span><span class="p">:</span>
     <span class="n">dis</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
 </code></pre></td></tr></table>
 </div>
@@ -310,7 +310,7 @@ finally
 <blockquote>
 <p>The dis module supports the analysis of CPython bytecode by disassembling it. According to the above output, first column is line number, the second is offset of bytecode, followed by the name of bytecode. The forth column presents parameter and the one in parenthesis is the result after bytecode&rsquo;s processing parameter.</p>
 </blockquote>
-<p>As we can see, after <code>RETURN_VALUE</code> in line 10, the <code>END_FINALLY</code> would be executed. That doesn&rsquo;t meet our expectation. What&rsquo;s more wierd, there is another <code>RETURN_VALUE</code> in line 12 after <code>END_FINALLY</code>. Since we get here, the source code is the only thing that we can ask for help.</p>
+<p>As we can see, after <code>RETURN_VALUE</code> in line 10, the <code>END_FINALLY</code> would be executed. That doesn&rsquo;t meet our expectation. What&rsquo;s more weird, there is another <code>RETURN_VALUE</code> in line 12 after <code>END_FINALLY</code>. Since we get here, the source code is the only thing that we can ask for help.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt"> 1
@@ -412,100 +412,100 @@ finally
 <pre class="chroma"><code class="language-c" data-lang="c"><span class="c1">// ceval.c
 </span><span class="c1"></span>        <span class="n">TARGET_NOARG</span><span class="p">(</span><span class="n">RETURN_VALUE</span><span class="p">)</span>
         <span class="p">{</span>
-            <span class="n">retval</span> <span class="o">=</span> <span class="n">POP</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
+            <span class="n">retval</span> <span class="o">=</span> <span class="n">POP</span><span class="p">();</span>
             <span class="n">why</span> <span class="o">=</span> <span class="n">WHY_RETURN</span><span class="p">;</span>
             <span class="k">goto</span> <span class="n">fast_block_end</span><span class="p">;</span>
         <span class="p">}</span>
 
 <span class="nl">fast_block_end</span><span class="p">:</span>
-        <span class="k">while</span> <span class="p">(</span><span class="n">why</span> <span class="o">!</span><span class="o">=</span> <span class="n">WHY_NOT</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">f</span><span class="o">-</span><span class="o">&gt;</span><span class="n">f_iblock</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">while</span> <span class="p">(</span><span class="n">why</span> <span class="o">!=</span> <span class="n">WHY_NOT</span> <span class="o">&amp;&amp;</span> <span class="n">f</span><span class="o">-&gt;</span><span class="n">f_iblock</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
             <span class="cm">/* Peek at the current block. */</span>
-            <span class="n">PyTryBlock</span> <span class="o">*</span><span class="n">b</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">f</span><span class="o">-</span><span class="o">&gt;</span><span class="n">f_blockstack</span><span class="p">[</span><span class="n">f</span><span class="o">-</span><span class="o">&gt;</span><span class="n">f_iblock</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="p">;</span>
+            <span class="n">PyTryBlock</span> <span class="o">*</span><span class="n">b</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">f</span><span class="o">-&gt;</span><span class="n">f_blockstack</span><span class="p">[</span><span class="n">f</span><span class="o">-&gt;</span><span class="n">f_iblock</span> <span class="o">-</span> <span class="mi">1</span><span class="p">];</span>
 
-            <span class="n">assert</span><span class="p">(</span><span class="n">why</span> <span class="o">!</span><span class="o">=</span> <span class="n">WHY_YIELD</span><span class="p">)</span><span class="p">;</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">b</span><span class="o">-</span><span class="o">&gt;</span><span class="n">b_type</span> <span class="o">=</span><span class="o">=</span> <span class="n">SETUP_LOOP</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">why</span> <span class="o">=</span><span class="o">=</span> <span class="n">WHY_CONTINUE</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">assert</span><span class="p">(</span><span class="n">why</span> <span class="o">!=</span> <span class="n">WHY_YIELD</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">b</span><span class="o">-&gt;</span><span class="n">b_type</span> <span class="o">==</span> <span class="n">SETUP_LOOP</span> <span class="o">&amp;&amp;</span> <span class="n">why</span> <span class="o">==</span> <span class="n">WHY_CONTINUE</span><span class="p">)</span> <span class="p">{</span>
                 <span class="n">why</span> <span class="o">=</span> <span class="n">WHY_NOT</span><span class="p">;</span>
-                <span class="n">JUMPTO</span><span class="p">(</span><span class="n">PyInt_AS_LONG</span><span class="p">(</span><span class="n">retval</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
-                <span class="n">Py_DECREF</span><span class="p">(</span><span class="n">retval</span><span class="p">)</span><span class="p">;</span>
+                <span class="n">JUMPTO</span><span class="p">(</span><span class="n">PyInt_AS_LONG</span><span class="p">(</span><span class="n">retval</span><span class="p">));</span>
+                <span class="n">Py_DECREF</span><span class="p">(</span><span class="n">retval</span><span class="p">);</span>
                 <span class="k">break</span><span class="p">;</span>
             <span class="p">}</span>
 
             <span class="cm">/* Now we have to pop the block. */</span>
-            <span class="n">f</span><span class="o">-</span><span class="o">&gt;</span><span class="n">f_iblock</span><span class="o">-</span><span class="o">-</span><span class="p">;</span>
+            <span class="n">f</span><span class="o">-&gt;</span><span class="n">f_iblock</span><span class="o">--</span><span class="p">;</span>
 
-            <span class="k">while</span> <span class="p">(</span><span class="n">STACK_LEVEL</span><span class="p">(</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">b</span><span class="o">-</span><span class="o">&gt;</span><span class="n">b_level</span><span class="p">)</span> <span class="p">{</span>
-                <span class="n">v</span> <span class="o">=</span> <span class="n">POP</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
-                <span class="n">Py_XDECREF</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="p">;</span>
+            <span class="k">while</span> <span class="p">(</span><span class="n">STACK_LEVEL</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">b</span><span class="o">-&gt;</span><span class="n">b_level</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="n">POP</span><span class="p">();</span>
+                <span class="n">Py_XDECREF</span><span class="p">(</span><span class="n">v</span><span class="p">);</span>
             <span class="p">}</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">b</span><span class="o">-</span><span class="o">&gt;</span><span class="n">b_type</span> <span class="o">=</span><span class="o">=</span> <span class="n">SETUP_LOOP</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">why</span> <span class="o">=</span><span class="o">=</span> <span class="n">WHY_BREAK</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">b</span><span class="o">-&gt;</span><span class="n">b_type</span> <span class="o">==</span> <span class="n">SETUP_LOOP</span> <span class="o">&amp;&amp;</span> <span class="n">why</span> <span class="o">==</span> <span class="n">WHY_BREAK</span><span class="p">)</span> <span class="p">{</span>
                 <span class="n">why</span> <span class="o">=</span> <span class="n">WHY_NOT</span><span class="p">;</span>
-                <span class="n">JUMPTO</span><span class="p">(</span><span class="n">b</span><span class="o">-</span><span class="o">&gt;</span><span class="n">b_handler</span><span class="p">)</span><span class="p">;</span>
+                <span class="n">JUMPTO</span><span class="p">(</span><span class="n">b</span><span class="o">-&gt;</span><span class="n">b_handler</span><span class="p">);</span>
                 <span class="k">break</span><span class="p">;</span>
             <span class="p">}</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">b</span><span class="o">-</span><span class="o">&gt;</span><span class="n">b_type</span> <span class="o">=</span><span class="o">=</span> <span class="n">SETUP_FINALLY</span> <span class="o">|</span><span class="o">|</span>
-                <span class="p">(</span><span class="n">b</span><span class="o">-</span><span class="o">&gt;</span><span class="n">b_type</span> <span class="o">=</span><span class="o">=</span> <span class="n">SETUP_EXCEPT</span> <span class="o">&amp;</span><span class="o">&amp;</span>
-                 <span class="n">why</span> <span class="o">=</span><span class="o">=</span> <span class="n">WHY_EXCEPTION</span><span class="p">)</span> <span class="o">|</span><span class="o">|</span>
-                <span class="n">b</span><span class="o">-</span><span class="o">&gt;</span><span class="n">b_type</span> <span class="o">=</span><span class="o">=</span> <span class="n">SETUP_WITH</span><span class="p">)</span> <span class="p">{</span>
-                <span class="k">if</span> <span class="p">(</span><span class="n">why</span> <span class="o">=</span><span class="o">=</span> <span class="n">WHY_EXCEPTION</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">b</span><span class="o">-&gt;</span><span class="n">b_type</span> <span class="o">==</span> <span class="n">SETUP_FINALLY</span> <span class="o">||</span>
+                <span class="p">(</span><span class="n">b</span><span class="o">-&gt;</span><span class="n">b_type</span> <span class="o">==</span> <span class="n">SETUP_EXCEPT</span> <span class="o">&amp;&amp;</span>
+                 <span class="n">why</span> <span class="o">==</span> <span class="n">WHY_EXCEPTION</span><span class="p">)</span> <span class="o">||</span>
+                <span class="n">b</span><span class="o">-&gt;</span><span class="n">b_type</span> <span class="o">==</span> <span class="n">SETUP_WITH</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">why</span> <span class="o">==</span> <span class="n">WHY_EXCEPTION</span><span class="p">)</span> <span class="p">{</span>
                     <span class="n">PyObject</span> <span class="o">*</span><span class="n">exc</span><span class="p">,</span> <span class="o">*</span><span class="n">val</span><span class="p">,</span> <span class="o">*</span><span class="n">tb</span><span class="p">;</span>
-                    <span class="n">PyErr_Fetch</span><span class="p">(</span><span class="o">&amp;</span><span class="n">exc</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">val</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">tb</span><span class="p">)</span><span class="p">;</span>
-                    <span class="k">if</span> <span class="p">(</span><span class="n">val</span> <span class="o">=</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="n">PyErr_Fetch</span><span class="p">(</span><span class="o">&amp;</span><span class="n">exc</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">val</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">tb</span><span class="p">);</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">val</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
                         <span class="n">val</span> <span class="o">=</span> <span class="n">Py_None</span><span class="p">;</span>
-                        <span class="n">Py_INCREF</span><span class="p">(</span><span class="n">val</span><span class="p">)</span><span class="p">;</span>
+                        <span class="n">Py_INCREF</span><span class="p">(</span><span class="n">val</span><span class="p">);</span>
                     <span class="p">}</span>
                     <span class="cm">/* Make the raw exception data
 </span><span class="cm">                       available to the handler,
 </span><span class="cm">                       so a program can emulate the
 </span><span class="cm">                       Python main loop.  Don&#39;t do
 </span><span class="cm">                       this for &#39;finally&#39;. */</span>
-                    <span class="k">if</span> <span class="p">(</span><span class="n">b</span><span class="o">-</span><span class="o">&gt;</span><span class="n">b_type</span> <span class="o">=</span><span class="o">=</span> <span class="n">SETUP_EXCEPT</span> <span class="o">|</span><span class="o">|</span>
-                        <span class="n">b</span><span class="o">-</span><span class="o">&gt;</span><span class="n">b_type</span> <span class="o">=</span><span class="o">=</span> <span class="n">SETUP_WITH</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">b</span><span class="o">-&gt;</span><span class="n">b_type</span> <span class="o">==</span> <span class="n">SETUP_EXCEPT</span> <span class="o">||</span>
+                        <span class="n">b</span><span class="o">-&gt;</span><span class="n">b_type</span> <span class="o">==</span> <span class="n">SETUP_WITH</span><span class="p">)</span> <span class="p">{</span>
                         <span class="n">PyErr_NormalizeException</span><span class="p">(</span>
-                            <span class="o">&amp;</span><span class="n">exc</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">val</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">tb</span><span class="p">)</span><span class="p">;</span>
+                            <span class="o">&amp;</span><span class="n">exc</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">val</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">tb</span><span class="p">);</span>
                         <span class="n">set_exc_info</span><span class="p">(</span><span class="n">tstate</span><span class="p">,</span>
-                                     <span class="n">exc</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">tb</span><span class="p">)</span><span class="p">;</span>
+                                     <span class="n">exc</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">tb</span><span class="p">);</span>
                     <span class="p">}</span>
-                    <span class="k">if</span> <span class="p">(</span><span class="n">tb</span> <span class="o">=</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
-                        <span class="n">Py_INCREF</span><span class="p">(</span><span class="n">Py_None</span><span class="p">)</span><span class="p">;</span>
-                        <span class="n">PUSH</span><span class="p">(</span><span class="n">Py_None</span><span class="p">)</span><span class="p">;</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">tb</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+                        <span class="n">Py_INCREF</span><span class="p">(</span><span class="n">Py_None</span><span class="p">);</span>
+                        <span class="n">PUSH</span><span class="p">(</span><span class="n">Py_None</span><span class="p">);</span>
                     <span class="p">}</span> <span class="k">else</span>
-                        <span class="n">PUSH</span><span class="p">(</span><span class="n">tb</span><span class="p">)</span><span class="p">;</span>
-                    <span class="n">PUSH</span><span class="p">(</span><span class="n">val</span><span class="p">)</span><span class="p">;</span>
-                    <span class="n">PUSH</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="p">;</span>
+                        <span class="n">PUSH</span><span class="p">(</span><span class="n">tb</span><span class="p">);</span>
+                    <span class="n">PUSH</span><span class="p">(</span><span class="n">val</span><span class="p">);</span>
+                    <span class="n">PUSH</span><span class="p">(</span><span class="n">exc</span><span class="p">);</span>
                 <span class="p">}</span>
                 <span class="k">else</span> <span class="p">{</span>
-                    <span class="k">if</span> <span class="p">(</span><span class="n">why</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">WHY_RETURN</span> <span class="o">|</span> <span class="n">WHY_CONTINUE</span><span class="p">)</span><span class="p">)</span>
-                        <span class="n">PUSH</span><span class="p">(</span><span class="n">retval</span><span class="p">)</span><span class="p">;</span>
-                    <span class="n">v</span> <span class="o">=</span> <span class="n">PyInt_FromLong</span><span class="p">(</span><span class="p">(</span><span class="kt">long</span><span class="p">)</span><span class="n">why</span><span class="p">)</span><span class="p">;</span>
-                    <span class="n">PUSH</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="p">;</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">why</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">WHY_RETURN</span> <span class="o">|</span> <span class="n">WHY_CONTINUE</span><span class="p">))</span>
+                        <span class="n">PUSH</span><span class="p">(</span><span class="n">retval</span><span class="p">);</span>
+                    <span class="n">v</span> <span class="o">=</span> <span class="n">PyInt_FromLong</span><span class="p">((</span><span class="kt">long</span><span class="p">)</span><span class="n">why</span><span class="p">);</span>
+                    <span class="n">PUSH</span><span class="p">(</span><span class="n">v</span><span class="p">);</span>
                 <span class="p">}</span>
                 <span class="n">why</span> <span class="o">=</span> <span class="n">WHY_NOT</span><span class="p">;</span>
-                <span class="n">JUMPTO</span><span class="p">(</span><span class="n">b</span><span class="o">-</span><span class="o">&gt;</span><span class="n">b_handler</span><span class="p">)</span><span class="p">;</span>
+                <span class="n">JUMPTO</span><span class="p">(</span><span class="n">b</span><span class="o">-&gt;</span><span class="n">b_handler</span><span class="p">);</span>
                 <span class="k">break</span><span class="p">;</span>
             <span class="p">}</span>
         <span class="p">}</span> <span class="cm">/* unwind stack */</span>
 
         <span class="cm">/* End the loop if we still have an error (or return) */</span>
 
-        <span class="k">if</span> <span class="p">(</span><span class="n">why</span> <span class="o">!</span><span class="o">=</span> <span class="n">WHY_NOT</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">why</span> <span class="o">!=</span> <span class="n">WHY_NOT</span><span class="p">)</span>
             <span class="k">break</span><span class="p">;</span>
-        <span class="n">READ_TIMESTAMP</span><span class="p">(</span><span class="n">loop1</span><span class="p">)</span><span class="p">;</span>
+        <span class="n">READ_TIMESTAMP</span><span class="p">(</span><span class="n">loop1</span><span class="p">);</span>
 
     <span class="p">}</span> <span class="cm">/* main loop */</span>
 
-    <span class="n">assert</span><span class="p">(</span><span class="n">why</span> <span class="o">!</span><span class="o">=</span> <span class="n">WHY_YIELD</span><span class="p">)</span><span class="p">;</span>
+    <span class="n">assert</span><span class="p">(</span><span class="n">why</span> <span class="o">!=</span> <span class="n">WHY_YIELD</span><span class="p">);</span>
     <span class="cm">/* Pop remaining stack entries. */</span>
-    <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">EMPTY</span><span class="p">(</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">v</span> <span class="o">=</span> <span class="n">POP</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
-        <span class="n">Py_XDECREF</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="p">;</span>
+    <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">EMPTY</span><span class="p">())</span> <span class="p">{</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">POP</span><span class="p">();</span>
+        <span class="n">Py_XDECREF</span><span class="p">(</span><span class="n">v</span><span class="p">);</span>
     <span class="p">}</span>
 
-    <span class="k">if</span> <span class="p">(</span><span class="n">why</span> <span class="o">!</span><span class="o">=</span> <span class="n">WHY_RETURN</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">why</span> <span class="o">!=</span> <span class="n">WHY_RETURN</span><span class="p">)</span>
         <span class="n">retval</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
 
 </code></pre></td></tr></table>
 </div>
-</div><p><code>RETURN_VALUE</code> does not return really, it simply assgins popped value from stack to <code>retval</code>, set <code>why</code> to <code>WHY_RETURN</code>, then go to <code>fast_block_end</code>. This pathetic scapegoat would push <code>retval</code> from <code>RETURN_VALUE</code> into stack, convert <code>why</code> to <code>Long</code> and push it into stack too, then jump to <code>b-&gt;b_handler</code>. Well, what&rsquo;s <code>b_handler</code> pointing to?</p>
+</div><p><code>RETURN_VALUE</code> does not return really, it simply assigns popped value from stack to <code>retval</code>, set <code>why</code> to <code>WHY_RETURN</code>, then go to <code>fast_block_end</code>. This pathetic scapegoat would push <code>retval</code> from <code>RETURN_VALUE</code> into stack, convert <code>why</code> to <code>Long</code> and push it into stack too, then jump to <code>b-&gt;b_handler</code>. Well, what&rsquo;s <code>b_handler</code> pointing to?</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt"> 1
@@ -584,37 +584,37 @@ finally
 </span><span class="cm">               to update the PyGen_NeedsFinalizing() function.
 </span><span class="cm">               */</span>
 
-            <span class="n">PyFrame_BlockSetup</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">opcode</span><span class="p">,</span> <span class="n">INSTR_OFFSET</span><span class="p">(</span><span class="p">)</span> <span class="o">+</span> <span class="n">oparg</span><span class="p">,</span>
-                               <span class="n">STACK_LEVEL</span><span class="p">(</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
-            <span class="n">DISPATCH</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
+            <span class="n">PyFrame_BlockSetup</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">opcode</span><span class="p">,</span> <span class="n">INSTR_OFFSET</span><span class="p">()</span> <span class="o">+</span> <span class="n">oparg</span><span class="p">,</span>
+                               <span class="n">STACK_LEVEL</span><span class="p">());</span>
+            <span class="n">DISPATCH</span><span class="p">();</span>
         <span class="p">}</span>
 
         <span class="c1">// END_FINALLY
-</span><span class="c1"></span>        <span class="n">PREDICTED</span><span class="p">(</span><span class="n">END_FINALLY</span><span class="p">)</span><span class="p">;</span>
+</span><span class="c1"></span>        <span class="n">PREDICTED</span><span class="p">(</span><span class="n">END_FINALLY</span><span class="p">);</span>
         <span class="n">TARGET_NOARG</span><span class="p">(</span><span class="n">END_FINALLY</span><span class="p">)</span>
         <span class="p">{</span>
-            <span class="n">v</span> <span class="o">=</span> <span class="n">POP</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">PyInt_Check</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
-                <span class="n">why</span> <span class="o">=</span> <span class="p">(</span><span class="k">enum</span> <span class="n">why_code</span><span class="p">)</span> <span class="n">PyInt_AS_LONG</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="p">;</span>
-                <span class="n">assert</span><span class="p">(</span><span class="n">why</span> <span class="o">!</span><span class="o">=</span> <span class="n">WHY_YIELD</span><span class="p">)</span><span class="p">;</span>
-                <span class="k">if</span> <span class="p">(</span><span class="n">why</span> <span class="o">=</span><span class="o">=</span> <span class="n">WHY_RETURN</span> <span class="o">|</span><span class="o">|</span>
-                    <span class="n">why</span> <span class="o">=</span><span class="o">=</span> <span class="n">WHY_CONTINUE</span><span class="p">)</span>
-                    <span class="n">retval</span> <span class="o">=</span> <span class="n">POP</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">POP</span><span class="p">();</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">PyInt_Check</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="p">{</span>
+                <span class="n">why</span> <span class="o">=</span> <span class="p">(</span><span class="k">enum</span> <span class="n">why_code</span><span class="p">)</span> <span class="n">PyInt_AS_LONG</span><span class="p">(</span><span class="n">v</span><span class="p">);</span>
+                <span class="n">assert</span><span class="p">(</span><span class="n">why</span> <span class="o">!=</span> <span class="n">WHY_YIELD</span><span class="p">);</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">why</span> <span class="o">==</span> <span class="n">WHY_RETURN</span> <span class="o">||</span>
+                    <span class="n">why</span> <span class="o">==</span> <span class="n">WHY_CONTINUE</span><span class="p">)</span>
+                    <span class="n">retval</span> <span class="o">=</span> <span class="n">POP</span><span class="p">();</span>
             <span class="p">}</span>
-            <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">PyExceptionClass_Check</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">|</span><span class="o">|</span>
-                     <span class="n">PyString_Check</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
-                <span class="n">w</span> <span class="o">=</span> <span class="n">POP</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
-                <span class="n">u</span> <span class="o">=</span> <span class="n">POP</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
-                <span class="n">PyErr_Restore</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span><span class="p">;</span>
+            <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">PyExceptionClass_Check</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">||</span>
+                     <span class="n">PyString_Check</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="p">{</span>
+                <span class="n">w</span> <span class="o">=</span> <span class="n">POP</span><span class="p">();</span>
+                <span class="n">u</span> <span class="o">=</span> <span class="n">POP</span><span class="p">();</span>
+                <span class="n">PyErr_Restore</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">u</span><span class="p">);</span>
                 <span class="n">why</span> <span class="o">=</span> <span class="n">WHY_RERAISE</span><span class="p">;</span>
                 <span class="k">break</span><span class="p">;</span>
             <span class="p">}</span>
-            <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">v</span> <span class="o">!</span><span class="o">=</span> <span class="n">Py_None</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">v</span> <span class="o">!=</span> <span class="n">Py_None</span><span class="p">)</span> <span class="p">{</span>
                 <span class="n">PyErr_SetString</span><span class="p">(</span><span class="n">PyExc_SystemError</span><span class="p">,</span>
-                    <span class="sa"></span><span class="s">&#34;</span><span class="s">&#39;finally&#39; pops bad exception</span><span class="s">&#34;</span><span class="p">)</span><span class="p">;</span>
+                    <span class="s">&#34;&#39;finally&#39; pops bad exception&#34;</span><span class="p">);</span>
                 <span class="n">why</span> <span class="o">=</span> <span class="n">WHY_EXCEPTION</span><span class="p">;</span>
             <span class="p">}</span>
-            <span class="n">Py_DECREF</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="p">;</span>
+            <span class="n">Py_DECREF</span><span class="p">(</span><span class="n">v</span><span class="p">);</span>
             <span class="k">break</span><span class="p">;</span>
         <span class="p">}</span>
 
@@ -625,12 +625,12 @@ finally
 <span class="n">PyFrame_BlockSetup</span><span class="p">(</span><span class="n">PyFrameObject</span> <span class="o">*</span><span class="n">f</span><span class="p">,</span> <span class="kt">int</span> <span class="n">type</span><span class="p">,</span> <span class="kt">int</span> <span class="n">handler</span><span class="p">,</span> <span class="kt">int</span> <span class="n">level</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="n">PyTryBlock</span> <span class="o">*</span><span class="n">b</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">f</span><span class="o">-</span><span class="o">&gt;</span><span class="n">f_iblock</span> <span class="o">&gt;</span><span class="o">=</span> <span class="n">CO_MAXBLOCKS</span><span class="p">)</span>
-        <span class="n">Py_FatalError</span><span class="p">(</span><span class="sa"></span><span class="s">&#34;</span><span class="s">XXX block stack overflow</span><span class="s">&#34;</span><span class="p">)</span><span class="p">;</span>
-    <span class="n">b</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">f</span><span class="o">-</span><span class="o">&gt;</span><span class="n">f_blockstack</span><span class="p">[</span><span class="n">f</span><span class="o">-</span><span class="o">&gt;</span><span class="n">f_iblock</span><span class="o">+</span><span class="o">+</span><span class="p">]</span><span class="p">;</span>
-    <span class="n">b</span><span class="o">-</span><span class="o">&gt;</span><span class="n">b_type</span> <span class="o">=</span> <span class="n">type</span><span class="p">;</span>
-    <span class="n">b</span><span class="o">-</span><span class="o">&gt;</span><span class="n">b_level</span> <span class="o">=</span> <span class="n">level</span><span class="p">;</span>
-    <span class="n">b</span><span class="o">-</span><span class="o">&gt;</span><span class="n">b_handler</span> <span class="o">=</span> <span class="n">handler</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">f</span><span class="o">-&gt;</span><span class="n">f_iblock</span> <span class="o">&gt;=</span> <span class="n">CO_MAXBLOCKS</span><span class="p">)</span>
+        <span class="n">Py_FatalError</span><span class="p">(</span><span class="s">&#34;XXX block stack overflow&#34;</span><span class="p">);</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">f</span><span class="o">-&gt;</span><span class="n">f_blockstack</span><span class="p">[</span><span class="n">f</span><span class="o">-&gt;</span><span class="n">f_iblock</span><span class="o">++</span><span class="p">];</span>
+    <span class="n">b</span><span class="o">-&gt;</span><span class="n">b_type</span> <span class="o">=</span> <span class="n">type</span><span class="p">;</span>
+    <span class="n">b</span><span class="o">-&gt;</span><span class="n">b_level</span> <span class="o">=</span> <span class="n">level</span><span class="p">;</span>
+    <span class="n">b</span><span class="o">-&gt;</span><span class="n">b_handler</span> <span class="o">=</span> <span class="n">handler</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>

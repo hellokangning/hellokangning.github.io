@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.64.1 with theme even" />
+<meta name="generator" content="Hugo 0.68.3 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/zh/" />
@@ -199,7 +199,7 @@
       <div class="post-category">
           <a href="/zh/categories/python/"> Python </a>
           </div>
-        <span class="more-meta"> 约 2741 字 </span>
+        <span class="more-meta"> 约 2746 字 </span>
         <span class="more-meta"> 预计阅读 6 分钟 </span>
     </div>
   </header>
@@ -230,20 +230,20 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">time</span><span class="o">,</span> <span class="nn">threading</span>
 
-<span class="k">def</span> <span class="nf">loop</span><span class="p">(</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">print</span><span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">thread </span><span class="si">%s</span><span class="s1"> is running...</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">threading</span><span class="o">.</span><span class="n">current_thread</span><span class="p">(</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">loop</span><span class="p">():</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;thread </span><span class="si">%s</span><span class="s1"> is running...&#39;</span> <span class="o">%</span> <span class="n">threading</span><span class="o">.</span><span class="n">current_thread</span><span class="p">()</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
     <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">while</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">:</span>
         <span class="n">n</span> <span class="o">=</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span>
-        <span class="k">print</span><span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">thread </span><span class="si">%s</span><span class="s1"> &gt;&gt;&gt; </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">threading</span><span class="o">.</span><span class="n">current_thread</span><span class="p">(</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;thread </span><span class="si">%s</span><span class="s1"> &gt;&gt;&gt; </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">threading</span><span class="o">.</span><span class="n">current_thread</span><span class="p">()</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
         <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-    <span class="k">print</span><span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">thread </span><span class="si">%s</span><span class="s1"> ended.</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">threading</span><span class="o">.</span><span class="n">current_thread</span><span class="p">(</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;thread </span><span class="si">%s</span><span class="s1"> ended.&#39;</span> <span class="o">%</span> <span class="n">threading</span><span class="o">.</span><span class="n">current_thread</span><span class="p">()</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 
-<span class="k">print</span><span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">thread </span><span class="si">%s</span><span class="s1"> is running...</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">threading</span><span class="o">.</span><span class="n">current_thread</span><span class="p">(</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-<span class="n">t</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">loop</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">LoopThread</span><span class="s1">&#39;</span><span class="p">)</span>
-<span class="n">t</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="p">)</span>
-<span class="n">t</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">thread </span><span class="si">%s</span><span class="s1"> ended.</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">threading</span><span class="o">.</span><span class="n">current_thread</span><span class="p">(</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s1">&#39;thread </span><span class="si">%s</span><span class="s1"> is running...&#39;</span> <span class="o">%</span> <span class="n">threading</span><span class="o">.</span><span class="n">current_thread</span><span class="p">()</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">loop</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;LoopThread&#39;</span><span class="p">)</span>
+<span class="n">t</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="n">t</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="s1">&#39;thread </span><span class="si">%s</span><span class="s1"> ended.&#39;</span> <span class="o">%</span> <span class="n">threading</span><span class="o">.</span><span class="n">current_thread</span><span class="p">()</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 </code></pre></td></tr></table>
 </div>
 </div><p>看完这段代码，我的脑海中浮现了这几个问题：</p>
@@ -591,17 +591,17 @@ Id:900900 When:(1/1/2019 6:16:08 PM) Duration:29050us Command:(get PRIVATE ARG)
 
 <span class="k">try</span><span class="p">:</span>
     <span class="n">conn</span> <span class="o">=</span> <span class="n">redis</span><span class="o">.</span><span class="n">StrictRedis</span><span class="p">(</span>
-        <span class="n">host</span><span class="o">=</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">&lt;cache-name&gt;.redis.cache.windows.net</span><span class="s1">&#39;</span><span class="p">,</span>
+        <span class="n">host</span><span class="o">=</span><span class="s1">&#39;&lt;cache-name&gt;.redis.cache.windows.net&#39;</span><span class="p">,</span>
         <span class="n">port</span><span class="o">=</span><span class="mi">6380</span><span class="p">,</span>
-        <span class="n">password</span><span class="o">=</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">your password here</span><span class="s1">&#39;</span><span class="p">,</span>
+        <span class="n">password</span><span class="o">=</span><span class="s1">&#39;your password here&#39;</span><span class="p">,</span>
         <span class="n">ssl</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-        <span class="n">ssl_ca_certs</span><span class="o">=</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">path to cert</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">ssl_ca_certs</span><span class="o">=</span><span class="s1">&#39;path to cert&#39;</span><span class="p">)</span>
     <span class="k">print</span> <span class="p">(</span><span class="n">conn</span><span class="p">)</span>
-    <span class="n">conn</span><span class="o">.</span><span class="n">ping</span><span class="p">(</span><span class="p">)</span>
-    <span class="k">print</span> <span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">Connected!</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">conn</span><span class="o">.</span><span class="n">ping</span><span class="p">()</span>
+    <span class="k">print</span> <span class="p">(</span><span class="s1">&#39;Connected!&#39;</span><span class="p">)</span>
 <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
-    <span class="k">print</span> <span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">Error:</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">ex</span><span class="p">)</span>
-    <span class="nb">exit</span><span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">Failed to connect, terminating.</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">print</span> <span class="p">(</span><span class="s1">&#39;Error:&#39;</span><span class="p">,</span> <span class="n">ex</span><span class="p">)</span>
+    <span class="nb">exit</span><span class="p">(</span><span class="s1">&#39;Failed to connect, terminating.&#39;</span><span class="p">)</span>
 </code></pre></td></tr></table>
 </div>
 </div>

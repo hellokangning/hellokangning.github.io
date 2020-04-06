@@ -24,7 +24,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.64.1 with theme even" />
+<meta name="generator" content="Hugo 0.68.3 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/post/connection-pool-in-redis-py/" />
@@ -71,7 +71,7 @@ r = redis.Redis(connection_pool=pool)
 ">
 <meta itemprop="datePublished" content="2019-01-18T10:52:17-08:00" />
 <meta itemprop="dateModified" content="2019-01-18T10:52:17-08:00" />
-<meta itemprop="wordCount" content="526">
+<meta itemprop="wordCount" content="527">
 
 
 
@@ -162,7 +162,7 @@ r = redis.Redis(connection_pool=pool)
         <div class="post-category">
             <a href="/categories/python/"> Python </a>
             </div>
-          <span class="more-meta"> 526 words </span>
+          <span class="more-meta"> 527 words </span>
           <span class="more-meta"> 3 mins read </span>
         
       </div>
@@ -188,7 +188,7 @@ r = redis.Redis(connection_pool=pool)
 </span><span class="lnt">2
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="n">pool</span> <span class="o">=</span> <span class="n">redis</span><span class="o">.</span><span class="n">ConnectionPool</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">localhost</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">6379</span><span class="p">,</span> <span class="n">db</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="n">pool</span> <span class="o">=</span> <span class="n">redis</span><span class="o">.</span><span class="n">ConnectionPool</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="s1">&#39;localhost&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">6379</span><span class="p">,</span> <span class="n">db</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 <span class="n">r</span> <span class="o">=</span> <span class="n">redis</span><span class="o">.</span><span class="n">Redis</span><span class="p">(</span><span class="n">connection_pool</span><span class="o">=</span><span class="n">pool</span><span class="p">)</span>
 </code></pre></td></tr></table>
 </div>
@@ -214,21 +214,21 @@ r = redis.Redis(connection_pool=pool)
 </span><span class="lnt">16
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Redis</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">localhost</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">6379</span><span class="p">,</span>
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Redis</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="s1">&#39;localhost&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">6379</span><span class="p">,</span>
                  <span class="n">db</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">socket_timeout</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                  <span class="n">socket_connect_timeout</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                  <span class="n">socket_keepalive</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">socket_keepalive_options</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                  <span class="n">connection_pool</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">unix_socket_path</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                 <span class="n">encoding</span><span class="o">=</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">utf-8</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">encoding_errors</span><span class="o">=</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">strict</span><span class="s1">&#39;</span><span class="p">,</span>
+                 <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="n">encoding_errors</span><span class="o">=</span><span class="s1">&#39;strict&#39;</span><span class="p">,</span>
                  <span class="n">charset</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                  <span class="n">decode_responses</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">retry_on_timeout</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
                  <span class="n">ssl</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">ssl_keyfile</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">ssl_certfile</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                 <span class="n">ssl_cert_reqs</span><span class="o">=</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">required</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">ssl_ca_certs</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                 <span class="n">max_connections</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="p">:</span>
+                 <span class="n">ssl_cert_reqs</span><span class="o">=</span><span class="s1">&#39;required&#39;</span><span class="p">,</span> <span class="n">ssl_ca_certs</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">max_connections</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">connection_pool</span><span class="p">:</span>
             <span class="c1"># ...</span>
-            <span class="n">connection_pool</span> <span class="o">=</span> <span class="n">ConnectionPool</span><span class="p">(</span><span class="o">*</span><span class="o">*</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">connection_pool</span> <span class="o">=</span> <span class="n">ConnectionPool</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">connection_pool</span> <span class="o">=</span> <span class="n">c</span>
 </code></pre></td></tr></table>
 </div>
@@ -257,21 +257,21 @@ r = redis.Redis(connection_pool=pool)
 </span><span class="lnt">17
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Redis</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">execute_command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">*</span><span class="o">*</span><span class="n">options</span><span class="p">)</span><span class="p">:</span>
-        <span class="sa"></span><span class="s2">&#34;</span><span class="s2">Execute a command and return a parsed response</span><span class="s2">&#34;</span>
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Redis</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">execute_command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
+        <span class="s2">&#34;Execute a command and return a parsed response&#34;</span>
         <span class="n">pool</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection_pool</span>
         <span class="n">command_name</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">connection</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">get_connection</span><span class="p">(</span><span class="n">command_name</span><span class="p">,</span> <span class="o">*</span><span class="o">*</span><span class="n">options</span><span class="p">)</span>
+        <span class="n">connection</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">get_connection</span><span class="p">(</span><span class="n">command_name</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">connection</span><span class="o">.</span><span class="n">send_command</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_response</span><span class="p">(</span><span class="n">connection</span><span class="p">,</span> <span class="n">command_name</span><span class="p">,</span> <span class="o">*</span><span class="o">*</span><span class="n">options</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_response</span><span class="p">(</span><span class="n">connection</span><span class="p">,</span> <span class="n">command_name</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span>
         <span class="k">except</span> <span class="p">(</span><span class="n">ConnectionError</span><span class="p">,</span> <span class="n">TimeoutError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">connection</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="p">)</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">connection</span><span class="o">.</span><span class="n">retry_on_timeout</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">TimeoutError</span><span class="p">)</span><span class="p">:</span>
+            <span class="n">connection</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">connection</span><span class="o">.</span><span class="n">retry_on_timeout</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">TimeoutError</span><span class="p">):</span>
                 <span class="k">raise</span>
             <span class="n">connection</span><span class="o">.</span><span class="n">send_command</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_response</span><span class="p">(</span><span class="n">connection</span><span class="p">,</span> <span class="n">command_name</span><span class="p">,</span> <span class="o">*</span><span class="o">*</span><span class="n">options</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_response</span><span class="p">(</span><span class="n">connection</span><span class="p">,</span> <span class="n">command_name</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span>
         <span class="k">finally</span><span class="p">:</span>
             <span class="n">pool</span><span class="o">.</span><span class="n">release</span><span class="p">(</span><span class="n">connection</span><span class="p">)</span>
 </code></pre></td></tr></table>
@@ -291,14 +291,14 @@ r = redis.Redis(connection_pool=pool)
 </span><span class="lnt">10
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">ConnectionPool</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">get_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command_name</span><span class="p">,</span> <span class="o">*</span><span class="n">keys</span><span class="p">,</span> <span class="o">*</span><span class="o">*</span><span class="n">options</span><span class="p">)</span><span class="p">:</span>
-        <span class="sa"></span><span class="s2">&#34;</span><span class="s2">Get a connection from the pool</span><span class="s2">&#34;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_checkpid</span><span class="p">(</span><span class="p">)</span>
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">ConnectionPool</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command_name</span><span class="p">,</span> <span class="o">*</span><span class="n">keys</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
+        <span class="s2">&#34;Get a connection from the pool&#34;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_checkpid</span><span class="p">()</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">connection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_available_connections</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="p">)</span>
+            <span class="n">connection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_available_connections</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
         <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
-            <span class="n">connection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_connection</span><span class="p">(</span><span class="p">)</span>
+            <span class="n">connection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_connection</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_in_use_connections</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">connection</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">connection</span>
 </code></pre></td></tr></table>
@@ -334,26 +334,26 @@ r = redis.Redis(connection_pool=pool)
 </span><span class="lnt">20
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">ConnectionPool</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span><span class="p">:</span>
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">ConnectionPool</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connection_class</span><span class="o">=</span><span class="n">Connection</span><span class="p">,</span> <span class="n">max_connections</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                 <span class="o">*</span><span class="o">*</span><span class="n">connection_kwargs</span><span class="p">)</span><span class="p">:</span>
-        <span class="n">max_connections</span> <span class="o">=</span> <span class="n">max_connections</span> <span class="ow">or</span> <span class="mi">2</span> <span class="o">*</span><span class="o">*</span> <span class="mi">31</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">max_connections</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">long</span><span class="p">)</span><span class="p">)</span> <span class="ow">or</span> <span class="n">max_connections</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">&#34;</span><span class="s1">max_connections</span><span class="s1">&#34;</span><span class="s1"> must be a positive integer</span><span class="s1">&#39;</span><span class="p">)</span>
+                 <span class="o">**</span><span class="n">connection_kwargs</span><span class="p">):</span>
+        <span class="n">max_connections</span> <span class="o">=</span> <span class="n">max_connections</span> <span class="ow">or</span> <span class="mi">2</span> <span class="o">**</span> <span class="mi">31</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">max_connections</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">long</span><span class="p">))</span> <span class="ow">or</span> <span class="n">max_connections</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;&#34;max_connections&#34; must be a positive integer&#39;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">connection_class</span> <span class="o">=</span> <span class="n">connection_class</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">connection_kwargs</span> <span class="o">=</span> <span class="n">connection_kwargs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_connections</span> <span class="o">=</span> <span class="n">max_connections</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
 
     
-    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pid</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">(</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pid</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_created_connections</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_available_connections</span> <span class="o">=</span> <span class="p">[</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_in_use_connections</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_check_lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">(</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_available_connections</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_in_use_connections</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
 </code></pre></td></tr></table>
 </div>
 </div><h1 id="create-a-connection">Create a connection</h1>
@@ -368,12 +368,12 @@ r = redis.Redis(connection_pool=pool)
 </span><span class="lnt">6
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python">    <span class="k">def</span> <span class="nf">make_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
-        <span class="sa"></span><span class="s2">&#34;</span><span class="s2">Create a new connection</span><span class="s2">&#34;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_created_connections</span> <span class="o">&gt;</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_connections</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ConnectionError</span><span class="p">(</span><span class="sa"></span><span class="s2">&#34;</span><span class="s2">Too many connections</span><span class="s2">&#34;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_created_connections</span> <span class="o">+</span><span class="o">=</span> <span class="mi">1</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection_class</span><span class="p">(</span><span class="o">*</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">connection_kwargs</span><span class="p">)</span>
+<pre class="chroma"><code class="language-python" data-lang="python">    <span class="k">def</span> <span class="nf">make_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s2">&#34;Create a new connection&#34;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_created_connections</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_connections</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ConnectionError</span><span class="p">(</span><span class="s2">&#34;Too many connections&#34;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_created_connections</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection_class</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">connection_kwargs</span><span class="p">)</span>
 </code></pre></td></tr></table>
 </div>
 </div><h1 id="release-a-connection">Release a connection</h1>
@@ -389,9 +389,9 @@ r = redis.Redis(connection_pool=pool)
 </span><span class="lnt">7
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python">    <span class="k">def</span> <span class="nf">release</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connection</span><span class="p">)</span><span class="p">:</span>
-        <span class="sa"></span><span class="s2">&#34;</span><span class="s2">Releases the connection back to the pool</span><span class="s2">&#34;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_checkpid</span><span class="p">(</span><span class="p">)</span>
+<pre class="chroma"><code class="language-python" data-lang="python">    <span class="k">def</span> <span class="nf">release</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connection</span><span class="p">):</span>
+        <span class="s2">&#34;Releases the connection back to the pool&#34;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_checkpid</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">connection</span><span class="o">.</span><span class="n">pid</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pid</span><span class="p">:</span>
             <span class="k">return</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_in_use_connections</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">connection</span><span class="p">)</span>
@@ -410,13 +410,13 @@ r = redis.Redis(connection_pool=pool)
 </span><span class="lnt">7
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">ConnectionPool</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
-        <span class="sa"></span><span class="s2">&#34;</span><span class="s2">Disconnects all connections in the pool</span><span class="s2">&#34;</span>
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">ConnectionPool</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s2">&#34;Disconnects all connections in the pool&#34;</span>
         <span class="n">all_conns</span> <span class="o">=</span> <span class="n">chain</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_available_connections</span><span class="p">,</span>
                           <span class="bp">self</span><span class="o">.</span><span class="n">_in_use_connections</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">connection</span> <span class="ow">in</span> <span class="n">all_conns</span><span class="p">:</span>
-            <span class="n">connection</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="p">)</span>
+            <span class="n">connection</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
 </code></pre></td></tr></table>
 </div>
 </div><p>Aha, bingo!</p>

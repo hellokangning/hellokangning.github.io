@@ -25,7 +25,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.64.1 with theme even" />
+<meta name="generator" content="Hugo 0.68.3 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/post/java-hashtable-comparing-with-hashmap/" />
@@ -165,7 +165,7 @@ I am wondering how these arguments are supported by code. This post will give a 
     <li><a href="#hierarchy">Hierarchy</a></li>
     <li><a href="#enumeration">Enumeration</a></li>
     <li><a href="#synchronized">Synchronized</a></li>
-    <li><a href="#null-support">null Support</a></li>
+    <li><a href="#null-support"><code>null</code> Support</a></li>
     <li><a href="#increasing-the-capacity">Increasing the Capacity</a></li>
     <li><a href="#hash">Hash</a></li>
   </ul>
@@ -183,7 +183,7 @@ I am wondering how these arguments are supported by code. This post will give a 
 <p>I am wondering how these arguments are supported by code. This post will give a view of code illustrating the above confusion.</p>
 <h1 id="hierarchy">Hierarchy</h1>
 <p><img src="/images/java-hashtable-class.png" alt=""></p>
-<p>Hashtable implements Map interfance just as HashMap does. But unlike HashMap, Hashtable inherits from Dictionary with extra methods: <code>keys()</code> and <code>elements()</code>.</p>
+<p>Hashtable implements Map interface just as HashMap does. But unlike HashMap, Hashtable inherits from Dictionary with extra methods: <code>keys()</code> and <code>elements()</code>.</p>
 <ul>
 <li><code>keys()</code> returns an enumeration of the keys in this dictionary.</li>
 <li><code>elements</code> returns an enumeration of the values in this dictionary.</li>
@@ -215,15 +215,15 @@ not fail-fast.</p>
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// Hashtable.java
 </span><span class="c1"></span>
-<span class="kd">public</span> <span class="kd">synchronized</span> <span class="n">Enumeration</span><span class="o">&lt;</span><span class="n">K</span><span class="o">&gt;</span> <span class="nf">keys</span><span class="o">(</span><span class="o">)</span> <span class="o">{</span>
-    <span class="k">return</span> <span class="k">this</span><span class="o">.</span><span class="o">&lt;</span><span class="n">K</span><span class="o">&gt;</span><span class="n">getEnumeration</span><span class="o">(</span><span class="n">KEYS</span><span class="o">)</span><span class="o">;</span>
+<span class="kd">public</span> <span class="kd">synchronized</span> <span class="n">Enumeration</span><span class="o">&lt;</span><span class="n">K</span><span class="o">&gt;</span> <span class="nf">keys</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="o">.&lt;</span><span class="n">K</span><span class="o">&gt;</span><span class="n">getEnumeration</span><span class="o">(</span><span class="n">KEYS</span><span class="o">);</span>
 <span class="o">}</span>
 
 <span class="kd">private</span> <span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">Enumeration</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="nf">getEnumeration</span><span class="o">(</span><span class="kt">int</span> <span class="n">type</span><span class="o">)</span> <span class="o">{</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">count</span> <span class="o">=</span><span class="o">=</span> <span class="n">0</span><span class="o">)</span> <span class="o">{</span>
-        <span class="k">return</span> <span class="n">Collections</span><span class="o">.</span><span class="na">emptyEnumeration</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">count</span> <span class="o">==</span> <span class="n">0</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">Collections</span><span class="o">.</span><span class="na">emptyEnumeration</span><span class="o">();</span>
     <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
-        <span class="k">return</span> <span class="k">new</span> <span class="n">Enumerator</span><span class="o">&lt;</span><span class="o">&gt;</span><span class="o">(</span><span class="n">type</span><span class="o">,</span> <span class="kc">false</span><span class="o">)</span><span class="o">;</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="n">Enumerator</span><span class="o">&lt;&gt;(</span><span class="n">type</span><span class="o">,</span> <span class="kc">false</span><span class="o">);</span>
     <span class="o">}</span>
 <span class="o">}</span>
 </code></pre></td></tr></table>
@@ -294,11 +294,11 @@ not fail-fast.</p>
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// Hashtable.java
 </span><span class="c1"></span>
-<span class="kd">private</span> <span class="kd">class</span> <span class="nc">Enumerator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="kd">implements</span> <span class="n">Enumeration</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="o">,</span> <span class="n">Iterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="o">{</span>
-    <span class="n">Entry</span><span class="o">&lt;</span><span class="o">?</span><span class="o">,</span><span class="o">?</span><span class="o">&gt;</span><span class="o">[</span><span class="o">]</span> <span class="n">table</span> <span class="o">=</span> <span class="n">Hashtable</span><span class="o">.</span><span class="na">this</span><span class="o">.</span><span class="na">table</span><span class="o">;</span>
+<span class="kd">private</span> <span class="kd">class</span> <span class="nc">Enumerator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="kd">implements</span> <span class="n">Enumeration</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;,</span> <span class="n">Iterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="o">{</span>
+    <span class="n">Entry</span><span class="o">&lt;?,?&gt;[]</span> <span class="n">table</span> <span class="o">=</span> <span class="n">Hashtable</span><span class="o">.</span><span class="na">this</span><span class="o">.</span><span class="na">table</span><span class="o">;</span>
     <span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="na">length</span><span class="o">;</span>
-    <span class="n">Entry</span><span class="o">&lt;</span><span class="o">?</span><span class="o">,</span><span class="o">?</span><span class="o">&gt;</span> <span class="n">entry</span><span class="o">;</span>
-    <span class="n">Entry</span><span class="o">&lt;</span><span class="o">?</span><span class="o">,</span><span class="o">?</span><span class="o">&gt;</span> <span class="n">lastReturned</span><span class="o">;</span>
+    <span class="n">Entry</span><span class="o">&lt;?,?&gt;</span> <span class="n">entry</span><span class="o">;</span>
+    <span class="n">Entry</span><span class="o">&lt;?,?&gt;</span> <span class="n">lastReturned</span><span class="o">;</span>
     <span class="kt">int</span> <span class="n">type</span><span class="o">;</span>
 
     <span class="cm">/**
@@ -319,36 +319,36 @@ not fail-fast.</p>
         <span class="k">this</span><span class="o">.</span><span class="na">iterator</span> <span class="o">=</span> <span class="n">iterator</span><span class="o">;</span>
     <span class="o">}</span>
 
-    <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">hasMoreElements</span><span class="o">(</span><span class="o">)</span> <span class="o">{</span>
-        <span class="n">Entry</span><span class="o">&lt;</span><span class="o">?</span><span class="o">,</span><span class="o">?</span><span class="o">&gt;</span> <span class="n">e</span> <span class="o">=</span> <span class="n">entry</span><span class="o">;</span>
+    <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">hasMoreElements</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">Entry</span><span class="o">&lt;?,?&gt;</span> <span class="n">e</span> <span class="o">=</span> <span class="n">entry</span><span class="o">;</span>
         <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">index</span><span class="o">;</span>
-        <span class="n">Entry</span><span class="o">&lt;</span><span class="o">?</span><span class="o">,</span><span class="o">?</span><span class="o">&gt;</span><span class="o">[</span><span class="o">]</span> <span class="n">t</span> <span class="o">=</span> <span class="n">table</span><span class="o">;</span>
+        <span class="n">Entry</span><span class="o">&lt;?,?&gt;[]</span> <span class="n">t</span> <span class="o">=</span> <span class="n">table</span><span class="o">;</span>
         <span class="cm">/* Use locals for faster loop iteration */</span>
-        <span class="k">while</span> <span class="o">(</span><span class="n">e</span> <span class="o">=</span><span class="o">=</span> <span class="kc">null</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="n">0</span><span class="o">)</span> <span class="o">{</span>
-            <span class="n">e</span> <span class="o">=</span> <span class="n">t</span><span class="o">[</span><span class="o">-</span><span class="o">-</span><span class="n">i</span><span class="o">]</span><span class="o">;</span>
+        <span class="k">while</span> <span class="o">(</span><span class="n">e</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="n">0</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">e</span> <span class="o">=</span> <span class="n">t</span><span class="o">[--</span><span class="n">i</span><span class="o">];</span>
         <span class="o">}</span>
         <span class="n">entry</span> <span class="o">=</span> <span class="n">e</span><span class="o">;</span>
         <span class="n">index</span> <span class="o">=</span> <span class="n">i</span><span class="o">;</span>
-        <span class="k">return</span> <span class="n">e</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="k">return</span> <span class="n">e</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">;</span>
     <span class="o">}</span>
 
     <span class="nd">@SuppressWarnings</span><span class="o">(</span><span class="s">&#34;unchecked&#34;</span><span class="o">)</span>
-    <span class="kd">public</span> <span class="n">T</span> <span class="nf">nextElement</span><span class="o">(</span><span class="o">)</span> <span class="o">{</span>
-        <span class="n">Entry</span><span class="o">&lt;</span><span class="o">?</span><span class="o">,</span><span class="o">?</span><span class="o">&gt;</span> <span class="n">et</span> <span class="o">=</span> <span class="n">entry</span><span class="o">;</span>
+    <span class="kd">public</span> <span class="n">T</span> <span class="nf">nextElement</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">Entry</span><span class="o">&lt;?,?&gt;</span> <span class="n">et</span> <span class="o">=</span> <span class="n">entry</span><span class="o">;</span>
         <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">index</span><span class="o">;</span>
-        <span class="n">Entry</span><span class="o">&lt;</span><span class="o">?</span><span class="o">,</span><span class="o">?</span><span class="o">&gt;</span><span class="o">[</span><span class="o">]</span> <span class="n">t</span> <span class="o">=</span> <span class="n">table</span><span class="o">;</span>
+        <span class="n">Entry</span><span class="o">&lt;?,?&gt;[]</span> <span class="n">t</span> <span class="o">=</span> <span class="n">table</span><span class="o">;</span>
         <span class="cm">/* Use locals for faster loop iteration */</span>
-        <span class="k">while</span> <span class="o">(</span><span class="n">et</span> <span class="o">=</span><span class="o">=</span> <span class="kc">null</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="n">0</span><span class="o">)</span> <span class="o">{</span>
-            <span class="n">et</span> <span class="o">=</span> <span class="n">t</span><span class="o">[</span><span class="o">-</span><span class="o">-</span><span class="n">i</span><span class="o">]</span><span class="o">;</span>
+        <span class="k">while</span> <span class="o">(</span><span class="n">et</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="n">0</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">et</span> <span class="o">=</span> <span class="n">t</span><span class="o">[--</span><span class="n">i</span><span class="o">];</span>
         <span class="o">}</span>
         <span class="n">entry</span> <span class="o">=</span> <span class="n">et</span><span class="o">;</span>
         <span class="n">index</span> <span class="o">=</span> <span class="n">i</span><span class="o">;</span>
-        <span class="k">if</span> <span class="o">(</span><span class="n">et</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-            <span class="n">Entry</span><span class="o">&lt;</span><span class="o">?</span><span class="o">,</span><span class="o">?</span><span class="o">&gt;</span> <span class="n">e</span> <span class="o">=</span> <span class="n">lastReturned</span> <span class="o">=</span> <span class="n">entry</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">et</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">Entry</span><span class="o">&lt;?,?&gt;</span> <span class="n">e</span> <span class="o">=</span> <span class="n">lastReturned</span> <span class="o">=</span> <span class="n">entry</span><span class="o">;</span>
             <span class="n">entry</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="na">next</span><span class="o">;</span>
-            <span class="k">return</span> <span class="n">type</span> <span class="o">=</span><span class="o">=</span> <span class="n">KEYS</span> <span class="o">?</span> <span class="o">(</span><span class="n">T</span><span class="o">)</span><span class="n">e</span><span class="o">.</span><span class="na">key</span> <span class="o">:</span> <span class="o">(</span><span class="n">type</span> <span class="o">=</span><span class="o">=</span> <span class="n">VALUES</span> <span class="o">?</span> <span class="o">(</span><span class="n">T</span><span class="o">)</span><span class="n">e</span><span class="o">.</span><span class="na">value</span> <span class="o">:</span> <span class="o">(</span><span class="n">T</span><span class="o">)</span><span class="n">e</span><span class="o">)</span><span class="o">;</span>
+            <span class="k">return</span> <span class="n">type</span> <span class="o">==</span> <span class="n">KEYS</span> <span class="o">?</span> <span class="o">(</span><span class="n">T</span><span class="o">)</span><span class="n">e</span><span class="o">.</span><span class="na">key</span> <span class="o">:</span> <span class="o">(</span><span class="n">type</span> <span class="o">==</span> <span class="n">VALUES</span> <span class="o">?</span> <span class="o">(</span><span class="n">T</span><span class="o">)</span><span class="n">e</span><span class="o">.</span><span class="na">value</span> <span class="o">:</span> <span class="o">(</span><span class="n">T</span><span class="o">)</span><span class="n">e</span><span class="o">);</span>
         <span class="o">}</span>
-        <span class="k">throw</span> <span class="k">new</span> <span class="n">NoSuchElementException</span><span class="o">(</span><span class="s">&#34;Hashtable Enumerator&#34;</span><span class="o">)</span><span class="o">;</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="n">NoSuchElementException</span><span class="o">(</span><span class="s">&#34;Hashtable Enumerator&#34;</span><span class="o">);</span>
     <span class="o">}</span>
 <span class="o">}</span>
 </code></pre></td></tr></table>
@@ -387,8 +387,8 @@ not fail-fast.</p>
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// HashMap
 </span><span class="c1"></span>
 <span class="kd">final</span> <span class="kd">class</span> <span class="nc">EntryIterator</span> <span class="kd">extends</span> <span class="n">HashIterator</span>
-    <span class="kd">implements</span> <span class="n">Iterator</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">.</span><span class="na">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span><span class="o">&gt;</span> <span class="o">{</span>
-    <span class="kd">public</span> <span class="kd">final</span> <span class="n">Map</span><span class="o">.</span><span class="na">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="nf">next</span><span class="o">(</span><span class="o">)</span> <span class="o">{</span> <span class="k">return</span> <span class="n">nextNode</span><span class="o">(</span><span class="o">)</span><span class="o">;</span> <span class="o">}</span>
+    <span class="kd">implements</span> <span class="n">Iterator</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">.</span><span class="na">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;&gt;</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kd">final</span> <span class="n">Map</span><span class="o">.</span><span class="na">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="nf">next</span><span class="o">()</span> <span class="o">{</span> <span class="k">return</span> <span class="n">nextNode</span><span class="o">();</span> <span class="o">}</span>
 <span class="o">}</span>
 
 <span class="kd">abstract</span> <span class="kd">class</span> <span class="nc">HashIterator</span> <span class="o">{</span>
@@ -397,15 +397,15 @@ not fail-fast.</p>
 </span><span class="c1"></span>    <span class="kt">int</span> <span class="n">expectedModCount</span><span class="o">;</span>  <span class="c1">// for fast-fail
 </span><span class="c1"></span>    <span class="kt">int</span> <span class="n">index</span><span class="o">;</span>             <span class="c1">// current slot
 </span><span class="c1"></span>
-    <span class="kd">final</span> <span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="nf">nextNode</span><span class="o">(</span><span class="o">)</span> <span class="o">{</span>
-        <span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span><span class="o">[</span><span class="o">]</span> <span class="n">t</span><span class="o">;</span>
+    <span class="kd">final</span> <span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="nf">nextNode</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;[]</span> <span class="n">t</span><span class="o">;</span>
         <span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">e</span> <span class="o">=</span> <span class="n">next</span><span class="o">;</span>
-        <span class="k">if</span> <span class="o">(</span><span class="n">modCount</span> <span class="o">!</span><span class="o">=</span> <span class="n">expectedModCount</span><span class="o">)</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="n">ConcurrentModificationException</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
-        <span class="k">if</span> <span class="o">(</span><span class="n">e</span> <span class="o">=</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="n">NoSuchElementException</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
-        <span class="k">if</span> <span class="o">(</span><span class="o">(</span><span class="n">next</span> <span class="o">=</span> <span class="o">(</span><span class="n">current</span> <span class="o">=</span> <span class="n">e</span><span class="o">)</span><span class="o">.</span><span class="na">next</span><span class="o">)</span> <span class="o">=</span><span class="o">=</span> <span class="kc">null</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="o">(</span><span class="n">t</span> <span class="o">=</span> <span class="n">table</span><span class="o">)</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-            <span class="k">do</span> <span class="o">{</span><span class="o">}</span> <span class="k">while</span> <span class="o">(</span><span class="n">index</span> <span class="o">&lt;</span> <span class="n">t</span><span class="o">.</span><span class="na">length</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="o">(</span><span class="n">next</span> <span class="o">=</span> <span class="n">t</span><span class="o">[</span><span class="n">index</span><span class="o">+</span><span class="o">+</span><span class="o">]</span><span class="o">)</span> <span class="o">=</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">modCount</span> <span class="o">!=</span> <span class="n">expectedModCount</span><span class="o">)</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="n">ConcurrentModificationException</span><span class="o">();</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">e</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="n">NoSuchElementException</span><span class="o">();</span>
+        <span class="k">if</span> <span class="o">((</span><span class="n">next</span> <span class="o">=</span> <span class="o">(</span><span class="n">current</span> <span class="o">=</span> <span class="n">e</span><span class="o">).</span><span class="na">next</span><span class="o">)</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="o">(</span><span class="n">t</span> <span class="o">=</span> <span class="n">table</span><span class="o">)</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">do</span> <span class="o">{}</span> <span class="k">while</span> <span class="o">(</span><span class="n">index</span> <span class="o">&lt;</span> <span class="n">t</span><span class="o">.</span><span class="na">length</span> <span class="o">&amp;&amp;</span> <span class="o">(</span><span class="n">next</span> <span class="o">=</span> <span class="n">t</span><span class="o">[</span><span class="n">index</span><span class="o">++])</span> <span class="o">==</span> <span class="kc">null</span><span class="o">);</span>
         <span class="o">}</span>
         <span class="k">return</span> <span class="n">e</span><span class="o">;</span>
     <span class="o">}</span>
@@ -447,25 +447,25 @@ not fail-fast.</p>
 </span><span class="c1"></span>
 <span class="kd">public</span> <span class="kd">synchronized</span> <span class="n">V</span> <span class="nf">put</span><span class="o">(</span><span class="n">K</span> <span class="n">key</span><span class="o">,</span> <span class="n">V</span> <span class="n">value</span><span class="o">)</span> <span class="o">{</span>
     <span class="c1">// Make sure the value is not null
-</span><span class="c1"></span>    <span class="k">if</span> <span class="o">(</span><span class="n">value</span> <span class="o">=</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-        <span class="k">throw</span> <span class="k">new</span> <span class="n">NullPointerException</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+</span><span class="c1"></span>    <span class="k">if</span> <span class="o">(</span><span class="n">value</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="n">NullPointerException</span><span class="o">();</span>
     <span class="o">}</span>
 
     <span class="c1">// Makes sure the key is not already in the hashtable.
-</span><span class="c1"></span>    <span class="n">Entry</span><span class="o">&lt;</span><span class="o">?</span><span class="o">,</span><span class="o">?</span><span class="o">&gt;</span> <span class="n">tab</span><span class="o">[</span><span class="o">]</span> <span class="o">=</span> <span class="n">table</span><span class="o">;</span>
-    <span class="kt">int</span> <span class="n">hash</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="na">hashCode</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+</span><span class="c1"></span>    <span class="n">Entry</span><span class="o">&lt;?,?&gt;</span> <span class="n">tab</span><span class="o">[]</span> <span class="o">=</span> <span class="n">table</span><span class="o">;</span>
+    <span class="kt">int</span> <span class="n">hash</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="na">hashCode</span><span class="o">();</span>
     <span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="o">(</span><span class="n">hash</span> <span class="o">&amp;</span> <span class="n">0x7FFFFFFF</span><span class="o">)</span> <span class="o">%</span> <span class="n">tab</span><span class="o">.</span><span class="na">length</span><span class="o">;</span>
     <span class="nd">@SuppressWarnings</span><span class="o">(</span><span class="s">&#34;unchecked&#34;</span><span class="o">)</span>
-    <span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">entry</span> <span class="o">=</span> <span class="o">(</span><span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span><span class="o">)</span><span class="n">tab</span><span class="o">[</span><span class="n">index</span><span class="o">]</span><span class="o">;</span>
-    <span class="k">for</span><span class="o">(</span><span class="o">;</span> <span class="n">entry</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span> <span class="o">;</span> <span class="n">entry</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="na">next</span><span class="o">)</span> <span class="o">{</span>
-        <span class="k">if</span> <span class="o">(</span><span class="o">(</span><span class="n">entry</span><span class="o">.</span><span class="na">hash</span> <span class="o">=</span><span class="o">=</span> <span class="n">hash</span><span class="o">)</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">entry</span><span class="o">.</span><span class="na">key</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">key</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">entry</span> <span class="o">=</span> <span class="o">(</span><span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;)</span><span class="n">tab</span><span class="o">[</span><span class="n">index</span><span class="o">];</span>
+    <span class="k">for</span><span class="o">(;</span> <span class="n">entry</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">;</span> <span class="n">entry</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="na">next</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">((</span><span class="n">entry</span><span class="o">.</span><span class="na">hash</span> <span class="o">==</span> <span class="n">hash</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="n">entry</span><span class="o">.</span><span class="na">key</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">key</span><span class="o">))</span> <span class="o">{</span>
             <span class="n">V</span> <span class="n">old</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="na">value</span><span class="o">;</span>
             <span class="n">entry</span><span class="o">.</span><span class="na">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">;</span>
             <span class="k">return</span> <span class="n">old</span><span class="o">;</span>
         <span class="o">}</span>
     <span class="o">}</span>
 
-    <span class="n">addEntry</span><span class="o">(</span><span class="n">hash</span><span class="o">,</span> <span class="n">key</span><span class="o">,</span> <span class="n">value</span><span class="o">,</span> <span class="n">index</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">addEntry</span><span class="o">(</span><span class="n">hash</span><span class="o">,</span> <span class="n">key</span><span class="o">,</span> <span class="n">value</span><span class="o">,</span> <span class="n">index</span><span class="o">);</span>
     <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
     <span class="o">}</span>
 </code></pre></td></tr></table>
@@ -512,31 +512,31 @@ not fail-fast.</p>
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// Hashtable.java
 </span><span class="c1"></span>
-<span class="kd">protected</span> <span class="kt">void</span> <span class="nf">rehash</span><span class="o">(</span><span class="o">)</span> <span class="o">{</span>
+<span class="kd">protected</span> <span class="kt">void</span> <span class="nf">rehash</span><span class="o">()</span> <span class="o">{</span>
     <span class="kt">int</span> <span class="n">oldCapacity</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="na">length</span><span class="o">;</span>
-    <span class="n">Entry</span><span class="o">&lt;</span><span class="o">?</span><span class="o">,</span><span class="o">?</span><span class="o">&gt;</span><span class="o">[</span><span class="o">]</span> <span class="n">oldMap</span> <span class="o">=</span> <span class="n">table</span><span class="o">;</span>
+    <span class="n">Entry</span><span class="o">&lt;?,?&gt;[]</span> <span class="n">oldMap</span> <span class="o">=</span> <span class="n">table</span><span class="o">;</span>
 
     <span class="c1">// overflow-conscious code
-</span><span class="c1"></span>    <span class="kt">int</span> <span class="n">newCapacity</span> <span class="o">=</span> <span class="o">(</span><span class="n">oldCapacity</span> <span class="o">&lt;</span><span class="o">&lt;</span> <span class="n">1</span><span class="o">)</span> <span class="o">+</span> <span class="n">1</span><span class="o">;</span>
+</span><span class="c1"></span>    <span class="kt">int</span> <span class="n">newCapacity</span> <span class="o">=</span> <span class="o">(</span><span class="n">oldCapacity</span> <span class="o">&lt;&lt;</span> <span class="n">1</span><span class="o">)</span> <span class="o">+</span> <span class="n">1</span><span class="o">;</span>
     <span class="k">if</span> <span class="o">(</span><span class="n">newCapacity</span> <span class="o">-</span> <span class="n">MAX_ARRAY_SIZE</span> <span class="o">&gt;</span> <span class="n">0</span><span class="o">)</span> <span class="o">{</span>
-        <span class="k">if</span> <span class="o">(</span><span class="n">oldCapacity</span> <span class="o">=</span><span class="o">=</span> <span class="n">MAX_ARRAY_SIZE</span><span class="o">)</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">oldCapacity</span> <span class="o">==</span> <span class="n">MAX_ARRAY_SIZE</span><span class="o">)</span>
             <span class="c1">// Keep running with MAX_ARRAY_SIZE buckets
 </span><span class="c1"></span>            <span class="k">return</span><span class="o">;</span>
         <span class="n">newCapacity</span> <span class="o">=</span> <span class="n">MAX_ARRAY_SIZE</span><span class="o">;</span>
     <span class="o">}</span>
-    <span class="n">Entry</span><span class="o">&lt;</span><span class="o">?</span><span class="o">,</span><span class="o">?</span><span class="o">&gt;</span><span class="o">[</span><span class="o">]</span> <span class="n">newMap</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Entry</span><span class="o">&lt;</span><span class="o">?</span><span class="o">,</span><span class="o">?</span><span class="o">&gt;</span><span class="o">[</span><span class="n">newCapacity</span><span class="o">]</span><span class="o">;</span>
+    <span class="n">Entry</span><span class="o">&lt;?,?&gt;[]</span> <span class="n">newMap</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Entry</span><span class="o">&lt;?,?&gt;[</span><span class="n">newCapacity</span><span class="o">];</span>
 
-    <span class="n">modCount</span><span class="o">+</span><span class="o">+</span><span class="o">;</span>
-    <span class="n">threshold</span> <span class="o">=</span> <span class="o">(</span><span class="kt">int</span><span class="o">)</span><span class="n">Math</span><span class="o">.</span><span class="na">min</span><span class="o">(</span><span class="n">newCapacity</span> <span class="o">*</span> <span class="n">loadFactor</span><span class="o">,</span> <span class="n">MAX_ARRAY_SIZE</span> <span class="o">+</span> <span class="n">1</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">modCount</span><span class="o">++;</span>
+    <span class="n">threshold</span> <span class="o">=</span> <span class="o">(</span><span class="kt">int</span><span class="o">)</span><span class="n">Math</span><span class="o">.</span><span class="na">min</span><span class="o">(</span><span class="n">newCapacity</span> <span class="o">*</span> <span class="n">loadFactor</span><span class="o">,</span> <span class="n">MAX_ARRAY_SIZE</span> <span class="o">+</span> <span class="n">1</span><span class="o">);</span>
     <span class="n">table</span> <span class="o">=</span> <span class="n">newMap</span><span class="o">;</span>
 
-    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">oldCapacity</span> <span class="o">;</span> <span class="n">i</span><span class="o">-</span><span class="o">-</span> <span class="o">&gt;</span> <span class="n">0</span> <span class="o">;</span><span class="o">)</span> <span class="o">{</span>
-        <span class="k">for</span> <span class="o">(</span><span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">old</span> <span class="o">=</span> <span class="o">(</span><span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span><span class="o">)</span><span class="n">oldMap</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">;</span> <span class="n">old</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span> <span class="o">;</span> <span class="o">)</span> <span class="o">{</span>
+    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">oldCapacity</span> <span class="o">;</span> <span class="n">i</span><span class="o">--</span> <span class="o">&gt;</span> <span class="n">0</span> <span class="o">;)</span> <span class="o">{</span>
+        <span class="k">for</span> <span class="o">(</span><span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">old</span> <span class="o">=</span> <span class="o">(</span><span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;)</span><span class="n">oldMap</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">;</span> <span class="n">old</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">;</span> <span class="o">)</span> <span class="o">{</span>
             <span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">e</span> <span class="o">=</span> <span class="n">old</span><span class="o">;</span>
             <span class="n">old</span> <span class="o">=</span> <span class="n">old</span><span class="o">.</span><span class="na">next</span><span class="o">;</span>
 
             <span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="o">(</span><span class="n">e</span><span class="o">.</span><span class="na">hash</span> <span class="o">&amp;</span> <span class="n">0x7FFFFFFF</span><span class="o">)</span> <span class="o">%</span> <span class="n">newCapacity</span><span class="o">;</span>
-            <span class="n">e</span><span class="o">.</span><span class="na">next</span> <span class="o">=</span> <span class="o">(</span><span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span><span class="o">)</span><span class="n">newMap</span><span class="o">[</span><span class="n">index</span><span class="o">]</span><span class="o">;</span>
+            <span class="n">e</span><span class="o">.</span><span class="na">next</span> <span class="o">=</span> <span class="o">(</span><span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;)</span><span class="n">newMap</span><span class="o">[</span><span class="n">index</span><span class="o">];</span>
             <span class="n">newMap</span><span class="o">[</span><span class="n">index</span><span class="o">]</span> <span class="o">=</span> <span class="n">e</span><span class="o">;</span>
         <span class="o">}</span>
     <span class="o">}</span>
@@ -573,23 +573,23 @@ not fail-fast.</p>
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// Hashtable.java
 </span><span class="c1"></span>
 <span class="kd">private</span> <span class="kt">void</span> <span class="nf">addEntry</span><span class="o">(</span><span class="kt">int</span> <span class="n">hash</span><span class="o">,</span> <span class="n">K</span> <span class="n">key</span><span class="o">,</span> <span class="n">V</span> <span class="n">value</span><span class="o">,</span> <span class="kt">int</span> <span class="n">index</span><span class="o">)</span> <span class="o">{</span>
-    <span class="n">modCount</span><span class="o">+</span><span class="o">+</span><span class="o">;</span>
+    <span class="n">modCount</span><span class="o">++;</span>
 
-    <span class="n">Entry</span><span class="o">&lt;</span><span class="o">?</span><span class="o">,</span><span class="o">?</span><span class="o">&gt;</span> <span class="n">tab</span><span class="o">[</span><span class="o">]</span> <span class="o">=</span> <span class="n">table</span><span class="o">;</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">count</span> <span class="o">&gt;</span><span class="o">=</span> <span class="n">threshold</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">Entry</span><span class="o">&lt;?,?&gt;</span> <span class="n">tab</span><span class="o">[]</span> <span class="o">=</span> <span class="n">table</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">count</span> <span class="o">&gt;=</span> <span class="n">threshold</span><span class="o">)</span> <span class="o">{</span>
         <span class="c1">// Rehash the table if the threshold is exceeded
-</span><span class="c1"></span>        <span class="n">rehash</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+</span><span class="c1"></span>        <span class="n">rehash</span><span class="o">();</span>
 
         <span class="n">tab</span> <span class="o">=</span> <span class="n">table</span><span class="o">;</span>
-        <span class="n">hash</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="na">hashCode</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+        <span class="n">hash</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="na">hashCode</span><span class="o">();</span>
         <span class="n">index</span> <span class="o">=</span> <span class="o">(</span><span class="n">hash</span> <span class="o">&amp;</span> <span class="n">0x7FFFFFFF</span><span class="o">)</span> <span class="o">%</span> <span class="n">tab</span><span class="o">.</span><span class="na">length</span><span class="o">;</span>
     <span class="o">}</span>
 
     <span class="c1">// Creates the new entry.
 </span><span class="c1"></span>    <span class="nd">@SuppressWarnings</span><span class="o">(</span><span class="s">&#34;unchecked&#34;</span><span class="o">)</span>
-    <span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">e</span> <span class="o">=</span> <span class="o">(</span><span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span><span class="o">)</span> <span class="n">tab</span><span class="o">[</span><span class="n">index</span><span class="o">]</span><span class="o">;</span>
-    <span class="n">tab</span><span class="o">[</span><span class="n">index</span><span class="o">]</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Entry</span><span class="o">&lt;</span><span class="o">&gt;</span><span class="o">(</span><span class="n">hash</span><span class="o">,</span> <span class="n">key</span><span class="o">,</span> <span class="n">value</span><span class="o">,</span> <span class="n">e</span><span class="o">)</span><span class="o">;</span>
-    <span class="n">count</span><span class="o">+</span><span class="o">+</span><span class="o">;</span>
+    <span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">e</span> <span class="o">=</span> <span class="o">(</span><span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;)</span> <span class="n">tab</span><span class="o">[</span><span class="n">index</span><span class="o">];</span>
+    <span class="n">tab</span><span class="o">[</span><span class="n">index</span><span class="o">]</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Entry</span><span class="o">&lt;&gt;(</span><span class="n">hash</span><span class="o">,</span> <span class="n">key</span><span class="o">,</span> <span class="n">value</span><span class="o">,</span> <span class="n">e</span><span class="o">);</span>
+    <span class="n">count</span><span class="o">++;</span>
 <span class="o">}</span>
 </code></pre></td></tr></table>
 </div>
@@ -611,12 +611,12 @@ not fail-fast.</p>
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// HashMap.java
 </span><span class="c1"></span>
 <span class="kd">public</span> <span class="n">V</span> <span class="nf">put</span><span class="o">(</span><span class="n">K</span> <span class="n">key</span><span class="o">,</span> <span class="n">V</span> <span class="n">value</span><span class="o">)</span> <span class="o">{</span>
-    <span class="k">return</span> <span class="n">putVal</span><span class="o">(</span><span class="n">hash</span><span class="o">(</span><span class="n">key</span><span class="o">)</span><span class="o">,</span> <span class="n">key</span><span class="o">,</span> <span class="n">value</span><span class="o">,</span> <span class="kc">false</span><span class="o">,</span> <span class="kc">true</span><span class="o">)</span><span class="o">;</span>
+    <span class="k">return</span> <span class="n">putVal</span><span class="o">(</span><span class="n">hash</span><span class="o">(</span><span class="n">key</span><span class="o">),</span> <span class="n">key</span><span class="o">,</span> <span class="n">value</span><span class="o">,</span> <span class="kc">false</span><span class="o">,</span> <span class="kc">true</span><span class="o">);</span>
 <span class="o">}</span>
 
 <span class="kd">static</span> <span class="kd">final</span> <span class="kt">int</span> <span class="nf">hash</span><span class="o">(</span><span class="n">Object</span> <span class="n">key</span><span class="o">)</span> <span class="o">{</span>
     <span class="kt">int</span> <span class="n">h</span><span class="o">;</span>
-    <span class="k">return</span> <span class="o">(</span><span class="n">key</span> <span class="o">=</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">?</span> <span class="n">0</span> <span class="o">:</span> <span class="o">(</span><span class="n">h</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="na">hashCode</span><span class="o">(</span><span class="o">)</span><span class="o">)</span> <span class="o">^</span> <span class="o">(</span><span class="n">h</span> <span class="o">&gt;</span><span class="o">&gt;</span><span class="o">&gt;</span> <span class="n">16</span><span class="o">)</span><span class="o">;</span>
+    <span class="k">return</span> <span class="o">(</span><span class="n">key</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">?</span> <span class="n">0</span> <span class="o">:</span> <span class="o">(</span><span class="n">h</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="na">hashCode</span><span class="o">())</span> <span class="o">^</span> <span class="o">(</span><span class="n">h</span> <span class="o">&gt;&gt;&gt;</span> <span class="n">16</span><span class="o">);</span>
 <span class="o">}</span>
 </code></pre></td></tr></table>
 </div>

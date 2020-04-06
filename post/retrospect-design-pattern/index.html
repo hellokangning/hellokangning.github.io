@@ -24,7 +24,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.64.1 with theme even" />
+<meta name="generator" content="Hugo 0.68.3 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/post/retrospect-design-pattern/" />
@@ -51,7 +51,7 @@
 ">
 <meta itemprop="datePublished" content="2018-08-13T15:24:26&#43;08:00" />
 <meta itemprop="dateModified" content="2018-08-13T15:24:26&#43;08:00" />
-<meta itemprop="wordCount" content="1848">
+<meta itemprop="wordCount" content="1850">
 
 
 
@@ -132,7 +132,7 @@
         <div class="post-category">
             <a href="/categories/programming/"> Programming </a>
             </div>
-          <span class="more-meta"> 1848 words </span>
+          <span class="more-meta"> 1850 words </span>
           <span class="more-meta"> 9 mins read </span>
         
       </div>
@@ -225,34 +225,34 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span>
 
-<span class="k">class</span> <span class="nc">Shape</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">)</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">Shape</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
-<span class="k">class</span> <span class="nc">Triangle</span><span class="p">(</span><span class="n">Shape</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="sa"></span><span class="s2">&#34;</span><span class="s2">triangle</span><span class="s2">&#34;</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">Triangle</span><span class="p">(</span><span class="n">Shape</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&#34;triangle&#34;</span><span class="p">)</span>
 
-<span class="k">class</span> <span class="nc">Circle</span><span class="p">(</span><span class="n">Shape</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="sa"></span><span class="s2">&#34;</span><span class="s2">circle</span><span class="s2">&#34;</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">Circle</span><span class="p">(</span><span class="n">Shape</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&#34;circle&#34;</span><span class="p">)</span>
 
-<span class="k">class</span> <span class="nc">Factory</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getInstance</span><span class="p">(</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">Factory</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getInstance</span><span class="p">()</span>
 
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">getInstance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">getInstance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
-<span class="k">class</span> <span class="nc">ConcreteFactoryA</span><span class="p">(</span><span class="n">Factory</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">getInstance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">Triangle</span><span class="p">(</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">ConcreteFactoryA</span><span class="p">(</span><span class="n">Factory</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">getInstance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Triangle</span><span class="p">()</span>
 
-<span class="k">class</span> <span class="nc">ConcreteFactoryB</span><span class="p">(</span><span class="n">Factory</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">getInstance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">Circle</span><span class="p">(</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">ConcreteFactoryB</span><span class="p">(</span><span class="n">Factory</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">getInstance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Circle</span><span class="p">()</span>
 </code></pre></td></tr></table>
 </div>
 </div><h2 id="abstract-factory">Abstract Factory</h2>
@@ -307,44 +307,44 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span>
 
-<span class="k">class</span> <span class="nc">Shape</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">)</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">Shape</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
-<span class="k">class</span> <span class="nc">Triangle</span><span class="p">(</span><span class="n">Shape</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="sa"></span><span class="s2">&#34;</span><span class="s2">triangle</span><span class="s2">&#34;</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">Triangle</span><span class="p">(</span><span class="n">Shape</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&#34;triangle&#34;</span><span class="p">)</span>
 
-<span class="k">class</span> <span class="nc">Color</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">)</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">Color</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
-<span class="k">class</span> <span class="nc">Red</span><span class="p">(</span><span class="n">Color</span><span class="p">)</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">Red</span><span class="p">(</span><span class="n">Color</span><span class="p">):</span>
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="sa"></span><span class="s2">&#34;</span><span class="s2">red</span><span class="s2">&#34;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&#34;red&#34;</span><span class="p">)</span>
 
-<span class="k">class</span> <span class="nc">Factory</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getInstance</span><span class="p">(</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">Factory</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getInstance</span><span class="p">()</span>
 
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">getShape</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">getShape</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">getColor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">getColor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
-<span class="k">class</span> <span class="nc">ShapeFactory</span><span class="p">(</span><span class="n">Factory</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">getShape</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">Triangle</span><span class="p">(</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">ShapeFactory</span><span class="p">(</span><span class="n">Factory</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">getShape</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Triangle</span><span class="p">()</span>
 
-<span class="k">class</span> <span class="nc">ColorFactory</span><span class="p">(</span><span class="n">Factory</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">getColor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">Red</span><span class="p">(</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">ColorFactory</span><span class="p">(</span><span class="n">Factory</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">getColor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Red</span><span class="p">()</span>
 </code></pre></td></tr></table>
 </div>
 </div><h2 id="builder">Builder</h2>
@@ -387,31 +387,31 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Director</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_builder</span> <span class="o">=</span> <span class="bp">None</span>
 
-    <span class="k">def</span> <span class="nf">construct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">builder</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">construct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">builder</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_builder</span> <span class="o">=</span> <span class="n">builder</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_builder</span><span class="o">.</span><span class="n">buildPartA</span><span class="p">(</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_builder</span><span class="o">.</span><span class="n">buildPartB</span><span class="p">(</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_builder</span><span class="o">.</span><span class="n">buildPartA</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_builder</span><span class="o">.</span><span class="n">buildPartB</span><span class="p">()</span>
 
-<span class="k">class</span> <span class="nc">Builder</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">product</span> <span class="o">=</span> <span class="n">Product</span><span class="p">(</span><span class="p">)</span>
-
-    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">buildPartA</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
-        <span class="k">pass</span>
+<span class="k">class</span> <span class="nc">Builder</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">product</span> <span class="o">=</span> <span class="n">Product</span><span class="p">()</span>
 
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">buildPartB</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">buildPartA</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
-<span class="k">class</span> <span class="nc">ConcreteBuilder</span><span class="p">(</span><span class="n">Builder</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">buildPartA</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">buildPartB</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
-    <span class="k">def</span> <span class="nf">buildPartB</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">ConcreteBuilder</span><span class="p">(</span><span class="n">Builder</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">buildPartA</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">buildPartB</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
 <span class="k">class</span> <span class="nc">Product</span><span class="p">:</span>
@@ -438,14 +438,14 @@
 </span><span class="lnt">9
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Singleton</span><span class="p">(</span><span class="nb">type</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">attrs</span><span class="p">,</span> <span class="o">*</span><span class="o">*</span><span class="n">kwargs</span><span class="p">)</span><span class="p">:</span>
-        <span class="nb">super</span><span class="p">(</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">attrs</span><span class="p">)</span>
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Singleton</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">attrs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">attrs</span><span class="p">)</span>
         <span class="bp">cls</span><span class="o">.</span><span class="n">_instance</span> <span class="o">=</span> <span class="bp">None</span>
 
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">*</span><span class="o">*</span><span class="n">kwargs</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_instance</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="bp">cls</span><span class="o">.</span><span class="n">_instance</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="p">)</span><span class="o">.</span><span class="fm">__call__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">*</span><span class="o">*</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">_instance</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__call__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_instance</span>
 </code></pre></td></tr></table>
 </div>
@@ -474,14 +474,14 @@
 <pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">copy</span>
 
 <span class="k">class</span> <span class="nc">Prototype</span><span class="p">:</span>
-    <span class="sa"></span><span class="s2">&#34;&#34;&#34;</span><span class="s2">
-</span><span class="s2"></span><span class="s2">    Example class to be copied.</span><span class="s2">
-</span><span class="s2"></span><span class="s2">    </span><span class="s2">&#34;&#34;&#34;</span>
+    <span class="s2">&#34;&#34;&#34;
+</span><span class="s2">    Example class to be copied.
+</span><span class="s2">    &#34;&#34;&#34;</span>
 
     <span class="k">pass</span>
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="p">)</span><span class="p">:</span>
-    <span class="n">prototype</span> <span class="o">=</span> <span class="n">Prototype</span><span class="p">(</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">prototype</span> <span class="o">=</span> <span class="n">Prototype</span><span class="p">()</span>
     <span class="n">prototype_copy</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">prototype</span><span class="p">)</span>
 </code></pre></td></tr></table>
 </div>
@@ -515,20 +515,20 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span>
 
-<span class="k">class</span> <span class="nc">Shape</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">)</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">Shape</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">display</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">display</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">):</span>
         <span class="k">pass</span>
 
-<span class="k">class</span> <span class="nc">Rectangle</span><span class="p">(</span><span class="n">Shape</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_adaptee</span> <span class="o">=</span> <span class="n">LegacyRectangle</span><span class="p">(</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">Rectangle</span><span class="p">(</span><span class="n">Shape</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_adaptee</span> <span class="o">=</span> <span class="n">LegacyRectangle</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">display</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">display</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_adaptee</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="o">-</span><span class="n">x1</span><span class="p">,</span> <span class="n">y2</span><span class="o">-</span><span class="n">y1</span><span class="p">)</span>
 
 <span class="k">class</span> <span class="nc">LegacyRectangle</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">display</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">display</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">):</span>
         <span class="k">pass</span>
 </code></pre></td></tr></table>
 </div>
@@ -562,19 +562,19 @@
 <pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">abstractmethod</span><span class="p">,</span> <span class="n">ABCMeta</span>
 
 <span class="k">class</span> <span class="nc">Shape</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">api</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">api</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_api</span> <span class="o">=</span> <span class="n">api</span>
 
-    <span class="k">def</span> <span class="nf">draw</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="o">.</span><span class="n">drawCircle</span><span class="p">(</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">draw</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="o">.</span><span class="n">drawCircle</span><span class="p">()</span>
 
-<span class="k">class</span> <span class="nc">DrawAPI</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">)</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">DrawAPI</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">drawCircle</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">drawCircle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
-<span class="k">class</span> <span class="nc">RedCircle</span><span class="p">(</span><span class="n">DrawAPI</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">drawCircle</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">RedCircle</span><span class="p">(</span><span class="n">DrawAPI</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">drawCircle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 </code></pre></td></tr></table>
 </div>
@@ -614,27 +614,27 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">abstractmethod</span><span class="p">,</span> <span class="n">ABCMeta</span>
 
-<span class="k">class</span> <span class="nc">Component</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">)</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">Component</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">do</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">do</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
-<span class="k">class</span> <span class="nc">Composite</span><span class="p">(</span><span class="n">Component</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_children</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">Composite</span><span class="p">(</span><span class="n">Component</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_children</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">do</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">do</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_children</span><span class="p">:</span>
-            <span class="n">child</span><span class="o">.</span><span class="n">do</span><span class="p">(</span><span class="p">)</span>
+            <span class="n">child</span><span class="o">.</span><span class="n">do</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">component</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_children</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">component</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">component</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_children</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="n">component</span><span class="p">)</span>
 
-<span class="k">class</span> <span class="nc">Leaf</span><span class="p">(</span><span class="n">Component</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">do</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">Leaf</span><span class="p">(</span><span class="n">Component</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">do</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 </code></pre></td></tr></table>
 </div>
@@ -678,31 +678,31 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">abstractmethod</span><span class="p">,</span> <span class="n">ABCMeta</span>
 
-<span class="k">class</span> <span class="nc">Shape</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">)</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">Shape</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">draw</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">draw</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
-<span class="k">class</span> <span class="nc">ShapeDecorator</span><span class="p">(</span><span class="n">Shape</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shape</span><span class="p">)</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">ShapeDecorator</span><span class="p">(</span><span class="n">Shape</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shape</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_shape</span><span class="o">=</span> <span class="n">shape</span>
 
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">operation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">operation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
-<span class="k">class</span> <span class="nc">RedShapeDecorator</span><span class="p">(</span><span class="n">ShapeDecorator</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">operation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_shape</span><span class="o">.</span><span class="n">operation</span><span class="p">(</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">RedShapeDecorator</span><span class="p">(</span><span class="n">ShapeDecorator</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">operation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_shape</span><span class="o">.</span><span class="n">operation</span><span class="p">()</span>
 
-<span class="k">class</span> <span class="nc">Circle</span><span class="p">(</span><span class="n">Shape</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">operation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">Circle</span><span class="p">(</span><span class="n">Shape</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">operation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="p">)</span><span class="p">:</span>
-    <span class="n">cc</span> <span class="o">=</span> <span class="n">Circle</span><span class="p">(</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">cc</span> <span class="o">=</span> <span class="n">Circle</span><span class="p">()</span>
     <span class="n">decorator</span> <span class="o">=</span> <span class="n">RedShapeDecorator</span><span class="p">(</span><span class="n">cc</span><span class="p">)</span>
-    <span class="n">decorator</span><span class="o">.</span><span class="n">operation</span><span class="p">(</span><span class="p">)</span>
+    <span class="n">decorator</span><span class="o">.</span><span class="n">operation</span><span class="p">()</span>
 </code></pre></td></tr></table>
 </div>
 </div><h2 id="facade">Facade</h2>
@@ -745,34 +745,34 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Facade</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_subsystem_1</span> <span class="o">=</span> <span class="n">Subsystem1</span><span class="p">(</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_subsystem_2</span> <span class="o">=</span> <span class="n">Subsystem2</span><span class="p">(</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_subsystem_1</span> <span class="o">=</span> <span class="n">Subsystem1</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_subsystem_2</span> <span class="o">=</span> <span class="n">Subsystem2</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">operation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_subsystem_1</span><span class="o">.</span><span class="n">operation1</span><span class="p">(</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_subsystem_1</span><span class="o">.</span><span class="n">operation2</span><span class="p">(</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_subsystem_2</span><span class="o">.</span><span class="n">operation1</span><span class="p">(</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_subsystem_2</span><span class="o">.</span><span class="n">operation2</span><span class="p">(</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">operation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_subsystem_1</span><span class="o">.</span><span class="n">operation1</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_subsystem_1</span><span class="o">.</span><span class="n">operation2</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_subsystem_2</span><span class="o">.</span><span class="n">operation1</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_subsystem_2</span><span class="o">.</span><span class="n">operation2</span><span class="p">()</span>
 
 <span class="k">class</span> <span class="nc">Subsystem1</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">operation1</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">operation1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
-    <span class="k">def</span> <span class="nf">operation2</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">operation2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
 <span class="k">class</span> <span class="nc">Subsystem2</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">operation1</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">operation1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
-    <span class="k">def</span> <span class="nf">operation2</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">operation2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="p">)</span><span class="p">:</span>
-    <span class="n">facade</span> <span class="o">=</span> <span class="n">Facade</span><span class="p">(</span><span class="p">)</span>
-    <span class="n">facade</span><span class="o">.</span><span class="n">operation</span><span class="p">(</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">facade</span> <span class="o">=</span> <span class="n">Facade</span><span class="p">()</span>
+    <span class="n">facade</span><span class="o">.</span><span class="n">operation</span><span class="p">()</span>
 </code></pre></td></tr></table>
 </div>
 </div><h2 id="flyweight">Flyweight</h2>
@@ -818,34 +818,34 @@
 <pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span>
 
 <span class="k">class</span> <span class="nc">ShapeFactory</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_circleDict</span> <span class="o">=</span> <span class="p">{</span><span class="p">}</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_circleDict</span> <span class="o">=</span> <span class="p">{}</span>
 
-    <span class="k">def</span> <span class="nf">getShape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">getShape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_circleDict</span><span class="p">:</span>
-            <span class="n">circle</span> <span class="o">=</span> <span class="n">Circle</span><span class="p">(</span><span class="p">)</span>
+            <span class="n">circle</span> <span class="o">=</span> <span class="n">Circle</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_circleDict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">circle</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_circleDict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
 
 
-<span class="k">class</span> <span class="nc">Shape</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">Shape</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">intrinsic_state</span> <span class="o">=</span> <span class="bp">None</span>
 
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">draw</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">draw</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
 
-<span class="k">class</span> <span class="nc">Circle</span><span class="p">(</span><span class="n">Shape</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">draw</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">Circle</span><span class="p">(</span><span class="n">Shape</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">draw</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="p">)</span><span class="p">:</span>
-    <span class="n">factory</span> <span class="o">=</span> <span class="n">ShapeFactory</span><span class="p">(</span><span class="p">)</span>
-    <span class="n">concrete</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">getShape</span><span class="p">(</span><span class="sa"></span><span class="s2">&#34;</span><span class="s2">key</span><span class="s2">&#34;</span><span class="p">)</span>
-    <span class="n">concrete</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">factory</span> <span class="o">=</span> <span class="n">ShapeFactory</span><span class="p">()</span>
+    <span class="n">concrete</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">getShape</span><span class="p">(</span><span class="s2">&#34;key&#34;</span><span class="p">)</span>
+    <span class="n">concrete</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
 </code></pre></td></tr></table>
 </div>
 </div><h2 id="proxy">Proxy</h2>
@@ -883,27 +883,27 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span>
 
-<span class="k">class</span> <span class="nc">Subject</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">)</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">Subject</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
-<span class="k">class</span> <span class="nc">Proxy</span><span class="p">(</span><span class="n">Subject</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">real_subject</span><span class="p">)</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">Proxy</span><span class="p">(</span><span class="n">Subject</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">real_subject</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_real_subject</span> <span class="o">=</span> <span class="n">real_subject</span>
 
-    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_real_subject</span><span class="o">.</span><span class="n">op</span><span class="p">(</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_real_subject</span><span class="o">.</span><span class="n">op</span><span class="p">()</span>
 
 
-<span class="k">class</span> <span class="nc">RealSubject</span><span class="p">(</span><span class="n">Subject</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="sa"></span><span class="s2">&#34;</span><span class="s2">real</span><span class="s2">&#34;</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">RealSubject</span><span class="p">(</span><span class="n">Subject</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&#34;real&#34;</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="p">)</span><span class="p">:</span>
-    <span class="n">real_subject</span> <span class="o">=</span> <span class="n">RealSubject</span><span class="p">(</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">real_subject</span> <span class="o">=</span> <span class="n">RealSubject</span><span class="p">()</span>
     <span class="n">proxy</span> <span class="o">=</span> <span class="n">Proxy</span><span class="p">(</span><span class="n">real_subject</span><span class="p">)</span>
-    <span class="n">proxy</span><span class="o">.</span><span class="n">op</span><span class="p">(</span><span class="p">)</span>
+    <span class="n">proxy</span><span class="o">.</span><span class="n">op</span><span class="p">()</span>
 </code></pre></td></tr></table>
 </div>
 </div><h1 id="behavioral-pattern">Behavioral Pattern</h1>
@@ -944,33 +944,33 @@
 </span><span class="lnt">27
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Handler</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">next</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="p">:</span>
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Handler</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">next</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_next</span> <span class="o">=</span> <span class="nb">next</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_canHandle</span> <span class="o">=</span> <span class="bp">True</span>
 
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
-<span class="k">class</span> <span class="nc">HandlerOne</span><span class="p">(</span><span class="n">Handler</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">handle_request</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">HandlerOne</span><span class="p">(</span><span class="n">Handler</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">handle_request</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">canHandle</span><span class="p">:</span>
             <span class="k">pass</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_next</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_next</span><span class="o">.</span><span class="n">handle</span><span class="p">(</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_next</span><span class="o">.</span><span class="n">handle</span><span class="p">()</span>
 
-<span class="k">class</span> <span class="nc">HandlerTwo</span><span class="p">(</span><span class="n">Handler</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">HandlerTwo</span><span class="p">(</span><span class="n">Handler</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_canHandle</span><span class="p">:</span>
             <span class="k">pass</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_next</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_next</span><span class="o">.</span><span class="n">handle</span><span class="p">(</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_next</span><span class="o">.</span><span class="n">handle</span><span class="p">()</span>
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="p">)</span><span class="p">:</span>
-    <span class="n">handler1</span> <span class="o">=</span> <span class="n">HandlerOne</span><span class="p">(</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">handler1</span> <span class="o">=</span> <span class="n">HandlerOne</span><span class="p">()</span>
     <span class="n">handler2</span> <span class="o">=</span> <span class="n">HandlerTwo</span><span class="p">(</span><span class="n">handler1</span><span class="p">)</span>
-    <span class="n">handler2</span><span class="o">.</span><span class="n">handle</span><span class="p">(</span><span class="p">)</span>
+    <span class="n">handler2</span><span class="o">.</span><span class="n">handle</span><span class="p">()</span>
 </code></pre></td></tr></table>
 </div>
 </div><h2 id="command">Command</h2>
@@ -1017,38 +1017,38 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Invoker</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_commands</span> <span class="o">=</span> <span class="p">[</span><span class="p">]</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_commands</span> <span class="o">=</span> <span class="p">[]</span>
 
-    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_commands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">command</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_commands</span><span class="p">:</span>
-            <span class="n">command</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="p">)</span>
+            <span class="n">command</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
 
-<span class="k">class</span> <span class="nc">Command</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">receiver</span><span class="p">)</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">Command</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">receiver</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_receiver</span> <span class="o">=</span> <span class="n">receiver</span>
 
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
-<span class="k">class</span> <span class="nc">ConcreteCommand</span><span class="p">(</span><span class="n">Command</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_receiver</span><span class="o">.</span><span class="n">action</span><span class="p">(</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">ConcreteCommand</span><span class="p">(</span><span class="n">Command</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_receiver</span><span class="o">.</span><span class="n">action</span><span class="p">()</span>
 
 <span class="k">class</span> <span class="nc">Receiver</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">action</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">action</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="p">)</span><span class="p">:</span>
-    <span class="n">receiver</span> <span class="o">=</span> <span class="n">Receiver</span><span class="p">(</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">receiver</span> <span class="o">=</span> <span class="n">Receiver</span><span class="p">()</span>
     <span class="n">cmd</span> <span class="o">=</span> <span class="n">ConcreteCommand</span><span class="p">(</span><span class="n">receiver</span><span class="p">)</span>
-    <span class="n">invoker</span> <span class="o">=</span> <span class="n">Invoker</span><span class="p">(</span><span class="p">)</span>
+    <span class="n">invoker</span> <span class="o">=</span> <span class="n">Invoker</span><span class="p">()</span>
     <span class="n">invoker</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
-    <span class="n">invoker</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="p">)</span>
+    <span class="n">invoker</span><span class="o">.</span><span class="n">call</span><span class="p">()</span>
 </code></pre></td></tr></table>
 </div>
 </div><h2 id="mediator">Mediator</h2>
@@ -1110,51 +1110,51 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span>
 
-<span class="k">class</span> <span class="nc">Mediator</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_colleagues</span> <span class="o">=</span> <span class="p">{</span><span class="p">}</span>
+<span class="k">class</span> <span class="nc">Mediator</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_colleagues</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">register</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">colleague</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">register</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">colleague</span><span class="p">):</span>
         <span class="k">pass</span>
 
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
-<span class="k">class</span> <span class="nc">ConcreteMediator</span><span class="p">(</span><span class="n">Mediator</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">register</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">colleague</span><span class="p">)</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">ConcreteMediator</span><span class="p">(</span><span class="n">Mediator</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">register</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">colleague</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_colleagues</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">colleague</span><span class="p">)</span>
         <span class="n">colleague</span><span class="o">.</span><span class="n">setMeidator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-<span class="k">class</span> <span class="nc">Colleague</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mediator</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">Colleague</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mediator</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_mediator</span> <span class="o">=</span> <span class="n">mediator</span>
 
-    <span class="k">def</span> <span class="nf">setMediator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mediator</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">setMediator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mediator</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_mediator</span> <span class="o">=</span> <span class="n">mediator</span>
 
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
 <span class="k">class</span> <span class="nc">ColleagueA</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
 <span class="k">class</span> <span class="nc">ColleagueB</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="p">)</span><span class="p">:</span>
-    <span class="n">c1</span> <span class="o">=</span> <span class="n">ColleagueA</span><span class="p">(</span><span class="p">)</span>
-    <span class="n">c2</span> <span class="o">=</span> <span class="n">ColleagueB</span><span class="p">(</span><span class="p">)</span>
-    <span class="n">mediator</span> <span class="o">=</span> <span class="n">ConcreteMediator</span><span class="p">(</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">c1</span> <span class="o">=</span> <span class="n">ColleagueA</span><span class="p">()</span>
+    <span class="n">c2</span> <span class="o">=</span> <span class="n">ColleagueB</span><span class="p">()</span>
+    <span class="n">mediator</span> <span class="o">=</span> <span class="n">ConcreteMediator</span><span class="p">()</span>
     <span class="n">mediator</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">c1</span><span class="p">)</span>
     <span class="n">mediator</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">c2</span><span class="p">)</span>
 
-    <span class="n">c1</span><span class="o">.</span><span class="n">op</span><span class="p">(</span><span class="p">)</span>
-    <span class="n">c2</span><span class="o">.</span><span class="n">op</span><span class="p">(</span><span class="p">)</span>
+    <span class="n">c1</span><span class="o">.</span><span class="n">op</span><span class="p">()</span>
+    <span class="n">c2</span><span class="o">.</span><span class="n">op</span><span class="p">()</span>
 </code></pre></td></tr></table>
 </div>
 </div><h2 id="memento">Memento</h2>
@@ -1206,43 +1206,43 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Memnto</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="o">=</span> <span class="n">state</span>
 
-    <span class="k">def</span> <span class="nf">getState</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">getState</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state</span>
 
 <span class="k">class</span> <span class="nc">Originator</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="o">=</span> <span class="n">state</span>
 
-    <span class="k">def</span> <span class="nf">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="o">=</span> <span class="n">state</span>
 
-    <span class="k">def</span> <span class="nf">getStateFromMemento</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">memento</span><span class="p">)</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="o">=</span> <span class="n">memento</span><span class="o">.</span><span class="n">getState</span><span class="p">(</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">getStateFromMemento</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">memento</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="o">=</span> <span class="n">memento</span><span class="o">.</span><span class="n">getState</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">createMemento</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">createMemento</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">Memnto</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_state</span><span class="p">)</span>
 
 <span class="k">class</span> <span class="nc">CareTaker</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_mem</span> <span class="o">=</span> <span class="p">[</span><span class="p">]</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mem</span> <span class="o">=</span> <span class="p">[]</span>
 
-    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_mem</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mem</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mem</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mem</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
-<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="p">)</span><span class="p">:</span>
-    <span class="n">originator</span> <span class="o">=</span> <span class="n">Originator</span><span class="p">(</span><span class="p">)</span>
-    <span class="n">taker</span> <span class="o">=</span> <span class="n">CareTaker</span><span class="p">(</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">originator</span> <span class="o">=</span> <span class="n">Originator</span><span class="p">()</span>
+    <span class="n">taker</span> <span class="o">=</span> <span class="n">CareTaker</span><span class="p">()</span>
 
     <span class="n">originator</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
-    <span class="n">taker</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">originator</span><span class="o">.</span><span class="n">createMemento</span><span class="p">(</span><span class="p">)</span><span class="p">)</span>
+    <span class="n">taker</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">originator</span><span class="o">.</span><span class="n">createMemento</span><span class="p">())</span>
 
-    <span class="n">originator</span><span class="o">.</span><span class="n">getStateFromMemento</span><span class="p">(</span><span class="n">taker</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="p">)</span>
+    <span class="n">originator</span><span class="o">.</span><span class="n">getStateFromMemento</span><span class="p">(</span><span class="n">taker</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
 </code></pre></td></tr></table>
 </div>
 </div><h2 id="observer">Observer</h2>
@@ -1295,42 +1295,42 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Subject</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_obList</span> <span class="o">=</span> <span class="p">[</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_obList</span> <span class="o">=</span> <span class="p">[]</span>
 
-    <span class="k">def</span> <span class="nf">attach</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">observer</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">attach</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">observer</span><span class="p">):</span>
         <span class="n">observer</span><span class="o">.</span><span class="n">_subject</span> <span class="o">=</span> <span class="bp">self</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_obList</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">observer</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">detach</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">observer</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">detach</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">observer</span><span class="p">):</span>
         <span class="n">observer</span><span class="o">.</span><span class="n">_subject</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_obList</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="n">observer</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_notify</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_notify</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">observer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obList</span><span class="p">:</span>
             <span class="n">observer</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_state</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">updateState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">updateState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="o">=</span> <span class="n">state</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_notify</span><span class="p">(</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_notify</span><span class="p">()</span>
 
-<span class="k">class</span> <span class="nc">Observer</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">Observer</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_subject</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="o">=</span> <span class="bp">None</span>
 
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="p">):</span>
         <span class="k">pass</span>
 
-<span class="k">class</span> <span class="nc">ConcreteObserver</span><span class="p">(</span><span class="n">Observer</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">ConcreteObserver</span><span class="p">(</span><span class="n">Observer</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="o">=</span> <span class="n">state</span>
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="p">)</span><span class="p">:</span>
-    <span class="n">subject</span> <span class="o">=</span> <span class="n">Subject</span><span class="p">(</span><span class="p">)</span>
-    <span class="n">observer</span> <span class="o">=</span>  <span class="n">ConcreteObserver</span><span class="p">(</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">subject</span> <span class="o">=</span> <span class="n">Subject</span><span class="p">()</span>
+    <span class="n">observer</span> <span class="o">=</span>  <span class="n">ConcreteObserver</span><span class="p">()</span>
     <span class="n">subject</span><span class="o">.</span><span class="n">attach</span><span class="p">(</span><span class="n">observer</span><span class="p">)</span>
     <span class="n">subject</span><span class="o">.</span><span class="n">updateState</span><span class="p">(</span><span class="mi">123</span><span class="p">)</span>
 </code></pre></td></tr></table>
@@ -1370,29 +1370,29 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Context</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="o">=</span> <span class="n">state</span>
 
-    <span class="k">def</span> <span class="nf">request</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_state</span><span class="o">.</span><span class="n">handle</span><span class="p">(</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">request</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_state</span><span class="o">.</span><span class="n">handle</span><span class="p">()</span>
 
-<span class="k">class</span> <span class="nc">State</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">)</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">State</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
-<span class="k">class</span> <span class="nc">ConcreteStateA</span><span class="p">(</span><span class="n">State</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">ConcreteStateA</span><span class="p">(</span><span class="n">State</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
-<span class="k">class</span> <span class="nc">ConcreteStateB</span><span class="p">(</span><span class="n">State</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">ConcreteStateB</span><span class="p">(</span><span class="n">State</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="p">)</span><span class="p">:</span>
-    <span class="n">state</span> <span class="o">=</span> <span class="n">ConcreteStateA</span><span class="p">(</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">state</span> <span class="o">=</span> <span class="n">ConcreteStateA</span><span class="p">()</span>
     <span class="n">context</span> <span class="o">=</span> <span class="n">Context</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
-    <span class="n">context</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="p">)</span>
+    <span class="n">context</span><span class="o">.</span><span class="n">request</span><span class="p">()</span>
 </code></pre></td></tr></table>
 </div>
 </div><h2 id="strategy">Strategy</h2>
@@ -1431,30 +1431,30 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Context</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strategy</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strategy</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_strategy</span> <span class="o">=</span> <span class="n">strategy</span>
 
-    <span class="k">def</span> <span class="nf">algorithm</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_strategy</span><span class="o">.</span><span class="n">algorithm</span><span class="p">(</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">algorithm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_strategy</span><span class="o">.</span><span class="n">algorithm</span><span class="p">()</span>
 
 
-<span class="k">class</span> <span class="nc">Strategy</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">)</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">Strategy</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">algorithm</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">algorithm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
-<span class="k">class</span> <span class="nc">ConcreteStrategyA</span><span class="p">(</span><span class="n">Strategy</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">algorithm</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">ConcreteStrategyA</span><span class="p">(</span><span class="n">Strategy</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">algorithm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
-<span class="k">class</span> <span class="nc">ConcreteStrategyB</span><span class="p">(</span><span class="n">Strategy</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">algorithm</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">ConcreteStrategyB</span><span class="p">(</span><span class="n">Strategy</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">algorithm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="p">)</span><span class="p">:</span>
-    <span class="n">strategy</span> <span class="o">=</span> <span class="n">ConcreteStrategyA</span><span class="p">(</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">strategy</span> <span class="o">=</span> <span class="n">ConcreteStrategyA</span><span class="p">()</span>
     <span class="n">context</span> <span class="o">=</span> <span class="n">Context</span><span class="p">(</span><span class="n">strategy</span><span class="p">)</span>
-    <span class="n">context</span><span class="o">.</span><span class="n">algorithm</span><span class="p">(</span><span class="p">)</span>
+    <span class="n">context</span><span class="o">.</span><span class="n">algorithm</span><span class="p">()</span>
 </code></pre></td></tr></table>
 </div>
 </div><h2 id="visitor">Visitor</h2>
@@ -1500,38 +1500,38 @@
 </span><span class="lnt">33
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Element</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">)</span><span class="p">:</span>
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Element</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">accept</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">visitor</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">accept</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">visitor</span><span class="p">):</span>
         <span class="k">pass</span>
 
-<span class="k">class</span> <span class="nc">ConcreteElementA</span><span class="p">(</span><span class="n">Element</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">accept</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">visitor</span><span class="p">)</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">ConcreteElementA</span><span class="p">(</span><span class="n">Element</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">accept</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">visitor</span><span class="p">):</span>
         <span class="n">visitor</span><span class="o">.</span><span class="n">visitA</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-<span class="k">class</span> <span class="nc">ConcreteElementB</span><span class="p">(</span><span class="n">Element</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">accept</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">visitor</span><span class="p">)</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">ConcreteElementB</span><span class="p">(</span><span class="n">Element</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">accept</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">visitor</span><span class="p">):</span>
         <span class="n">visitor</span><span class="o">.</span><span class="n">visitB</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-<span class="k">class</span> <span class="nc">Visitor</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">)</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">Visitor</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">visitA</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eleA</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">visitA</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eleA</span><span class="p">):</span>
         <span class="k">pass</span>
 
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">visitB</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eleB</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">visitB</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eleB</span><span class="p">):</span>
         <span class="k">pass</span>
 
-<span class="k">class</span> <span class="nc">ConcreteVisitorA</span><span class="p">(</span><span class="n">Visitor</span><span class="p">)</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">visitA</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eleA</span><span class="p">)</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">ConcreteVisitorA</span><span class="p">(</span><span class="n">Visitor</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">visitA</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eleA</span><span class="p">):</span>
         <span class="k">pass</span>
 
-    <span class="k">def</span> <span class="nf">visitB</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eleB</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">visitB</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eleB</span><span class="p">):</span>
         <span class="k">pass</span>
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="p">)</span><span class="p">:</span>
-    <span class="n">visitor</span> <span class="o">=</span> <span class="n">ConcreteVisitorA</span><span class="p">(</span><span class="p">)</span>
-    <span class="n">element</span> <span class="o">=</span> <span class="n">ConcreteElementA</span><span class="p">(</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">visitor</span> <span class="o">=</span> <span class="n">ConcreteVisitorA</span><span class="p">()</span>
+    <span class="n">element</span> <span class="o">=</span> <span class="n">ConcreteElementA</span><span class="p">()</span>
     <span class="n">element</span><span class="o">.</span><span class="n">accept</span><span class="p">(</span><span class="n">visitor</span><span class="p">)</span>
 </code></pre></td></tr></table>
 </div>

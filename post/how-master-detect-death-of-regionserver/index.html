@@ -26,7 +26,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.64.1 with theme even" />
+<meta name="generator" content="Hugo 0.68.3 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/post/how-master-detect-death-of-regionserver/" />
@@ -195,18 +195,18 @@ deleted, processing expiration [xs319,60020,1530601168001]</p>
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// RegionServerTracker.java
 </span><span class="c1"></span>
 <span class="kd">public</span> <span class="kt">void</span> <span class="nf">nodeDeleted</span><span class="o">(</span><span class="n">String</span> <span class="n">path</span><span class="o">)</span> <span class="o">{</span>
-  <span class="k">if</span> <span class="o">(</span><span class="n">path</span><span class="o">.</span><span class="na">startsWith</span><span class="o">(</span><span class="n">watcher</span><span class="o">.</span><span class="na">znodePaths</span><span class="o">.</span><span class="na">rsZNode</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
-    <span class="n">String</span> <span class="n">serverName</span> <span class="o">=</span> <span class="n">ZKUtil</span><span class="o">.</span><span class="na">getNodeName</span><span class="o">(</span><span class="n">path</span><span class="o">)</span><span class="o">;</span>
+  <span class="k">if</span> <span class="o">(</span><span class="n">path</span><span class="o">.</span><span class="na">startsWith</span><span class="o">(</span><span class="n">watcher</span><span class="o">.</span><span class="na">znodePaths</span><span class="o">.</span><span class="na">rsZNode</span><span class="o">))</span> <span class="o">{</span>
+    <span class="n">String</span> <span class="n">serverName</span> <span class="o">=</span> <span class="n">ZKUtil</span><span class="o">.</span><span class="na">getNodeName</span><span class="o">(</span><span class="n">path</span><span class="o">);</span>
     <span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&#34;RegionServer ephemeral node deleted, processing expiration [&#34;</span> <span class="o">+</span>
-      <span class="n">serverName</span> <span class="o">+</span> <span class="s">&#34;]&#34;</span><span class="o">)</span><span class="o">;</span>
-    <span class="n">ServerName</span> <span class="n">sn</span> <span class="o">=</span> <span class="n">ServerName</span><span class="o">.</span><span class="na">parseServerName</span><span class="o">(</span><span class="n">serverName</span><span class="o">)</span><span class="o">;</span>
-    <span class="k">if</span> <span class="o">(</span><span class="o">!</span><span class="n">serverManager</span><span class="o">.</span><span class="na">isServerOnline</span><span class="o">(</span><span class="n">sn</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
-      <span class="n">LOG</span><span class="o">.</span><span class="na">warn</span><span class="o">(</span><span class="n">serverName</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="o">)</span> <span class="o">+</span> <span class="s">&#34; is not online or isn&#39;t known to the master.&#34;</span><span class="o">+</span>
-       <span class="s">&#34;The latter could be caused by a DNS misconfiguration.&#34;</span><span class="o">)</span><span class="o">;</span>
+      <span class="n">serverName</span> <span class="o">+</span> <span class="s">&#34;]&#34;</span><span class="o">);</span>
+    <span class="n">ServerName</span> <span class="n">sn</span> <span class="o">=</span> <span class="n">ServerName</span><span class="o">.</span><span class="na">parseServerName</span><span class="o">(</span><span class="n">serverName</span><span class="o">);</span>
+    <span class="k">if</span> <span class="o">(!</span><span class="n">serverManager</span><span class="o">.</span><span class="na">isServerOnline</span><span class="o">(</span><span class="n">sn</span><span class="o">))</span> <span class="o">{</span>
+      <span class="n">LOG</span><span class="o">.</span><span class="na">warn</span><span class="o">(</span><span class="n">serverName</span><span class="o">.</span><span class="na">toString</span><span class="o">()</span> <span class="o">+</span> <span class="s">&#34; is not online or isn&#39;t known to the master.&#34;</span><span class="o">+</span>
+       <span class="s">&#34;The latter could be caused by a DNS misconfiguration.&#34;</span><span class="o">);</span>
       <span class="k">return</span><span class="o">;</span>
     <span class="o">}</span>
-    <span class="n">remove</span><span class="o">(</span><span class="n">sn</span><span class="o">)</span><span class="o">;</span>
-    <span class="k">this</span><span class="o">.</span><span class="na">serverManager</span><span class="o">.</span><span class="na">expireServer</span><span class="o">(</span><span class="n">sn</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">remove</span><span class="o">(</span><span class="n">sn</span><span class="o">);</span>
+    <span class="k">this</span><span class="o">.</span><span class="na">serverManager</span><span class="o">.</span><span class="na">expireServer</span><span class="o">(</span><span class="n">sn</span><span class="o">);</span>
   <span class="o">}</span>
 <span class="o">}</span>
 </code></pre></td></tr></table>
@@ -233,11 +233,11 @@ deleted, processing expiration [xs319,60020,1530601168001]</p>
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">//  ZKWatcher.java
 </span><span class="c1"></span>
 <span class="kd">public</span> <span class="kt">void</span> <span class="nf">process</span><span class="o">(</span><span class="n">WatchedEvent</span> <span class="n">event</span><span class="o">)</span> <span class="o">{</span>
-    <span class="k">switch</span><span class="o">(</span><span class="n">event</span><span class="o">.</span><span class="na">getType</span><span class="o">(</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">switch</span><span class="o">(</span><span class="n">event</span><span class="o">.</span><span class="na">getType</span><span class="o">())</span> <span class="o">{</span>
       <span class="c1">// ...  
 </span><span class="c1"></span>      <span class="k">case</span> <span class="n">NodeDeleted</span><span class="o">:</span> <span class="o">{</span>
         <span class="k">for</span><span class="o">(</span><span class="n">ZKListener</span> <span class="n">listener</span> <span class="o">:</span> <span class="n">listeners</span><span class="o">)</span> <span class="o">{</span>
-          <span class="n">listener</span><span class="o">.</span><span class="na">nodeDeleted</span><span class="o">(</span><span class="n">event</span><span class="o">.</span><span class="na">getPath</span><span class="o">(</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
+          <span class="n">listener</span><span class="o">.</span><span class="na">nodeDeleted</span><span class="o">(</span><span class="n">event</span><span class="o">.</span><span class="na">getPath</span><span class="o">());</span>
         <span class="o">}</span>
         <span class="k">break</span><span class="o">;</span>
       <span class="o">}</span>

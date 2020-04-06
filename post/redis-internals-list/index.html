@@ -25,7 +25,7 @@ This post will plough into the implementation of doubly linked list.
 
 
 
-<meta name="generator" content="Hugo 0.64.1 with theme even" />
+<meta name="generator" content="Hugo 0.68.3 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/post/redis-internals-list/" />
@@ -52,7 +52,7 @@ This post will plough into the implementation of doubly linked list." />
 This post will plough into the implementation of doubly linked list.">
 <meta itemprop="datePublished" content="2018-11-06T09:38:12&#43;08:00" />
 <meta itemprop="dateModified" content="2018-11-06T09:38:12&#43;08:00" />
-<meta itemprop="wordCount" content="1276">
+<meta itemprop="wordCount" content="1285">
 
 
 
@@ -133,8 +133,8 @@ This post will plough into the implementation of doubly linked list."/>
         <div class="post-category">
             <a href="/categories/redis/"> Redis </a>
             </div>
-          <span class="more-meta"> 1276 words </span>
-          <span class="more-meta"> 6 mins read </span>
+          <span class="more-meta"> 1285 words </span>
+          <span class="more-meta"> 7 mins read </span>
         
       </div>
     </header>
@@ -198,9 +198,9 @@ This post will plough into the implementation of doubly linked list."/>
 <pre class="chroma"><code class="language-c" data-lang="c"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">list</span> <span class="p">{</span>
     <span class="n">listNode</span> <span class="o">*</span><span class="n">head</span><span class="p">;</span>
     <span class="n">listNode</span> <span class="o">*</span><span class="n">tail</span><span class="p">;</span>
-    <span class="kt">void</span> <span class="o">*</span><span class="p">(</span><span class="o">*</span><span class="n">dup</span><span class="p">)</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">ptr</span><span class="p">)</span><span class="p">;</span>
-    <span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">free</span><span class="p">)</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">ptr</span><span class="p">)</span><span class="p">;</span>
-    <span class="kt">int</span> <span class="p">(</span><span class="o">*</span><span class="n">match</span><span class="p">)</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">ptr</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">key</span><span class="p">)</span><span class="p">;</span>
+    <span class="kt">void</span> <span class="o">*</span><span class="p">(</span><span class="o">*</span><span class="n">dup</span><span class="p">)(</span><span class="kt">void</span> <span class="o">*</span><span class="n">ptr</span><span class="p">);</span>
+    <span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">free</span><span class="p">)(</span><span class="kt">void</span> <span class="o">*</span><span class="n">ptr</span><span class="p">);</span>
+    <span class="kt">int</span> <span class="p">(</span><span class="o">*</span><span class="n">match</span><span class="p">)(</span><span class="kt">void</span> <span class="o">*</span><span class="n">ptr</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">key</span><span class="p">);</span>
     <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">len</span><span class="p">;</span>
 <span class="p">}</span> <span class="n">list</span><span class="p">;</span>
 </code></pre></td></tr></table>
@@ -234,20 +234,20 @@ This post will plough into the implementation of doubly linked list."/>
 </span><span class="lnt">14
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="cp">#</span><span class="cp">define listLength(l) ((l)-&gt;len)</span><span class="cp">
-</span><span class="cp"></span><span class="cp">#</span><span class="cp">define listFirst(l) ((l)-&gt;head)</span><span class="cp">
-</span><span class="cp"></span><span class="cp">#</span><span class="cp">define listLast(l) ((l)-&gt;tail)</span><span class="cp">
-</span><span class="cp"></span><span class="cp">#</span><span class="cp">define listPrevNode(n) ((n)-&gt;prev)</span><span class="cp">
-</span><span class="cp"></span><span class="cp">#</span><span class="cp">define listNextNode(n) ((n)-&gt;next)</span><span class="cp">
-</span><span class="cp"></span><span class="cp">#</span><span class="cp">define listNodeValue(n) ((n)-&gt;value)</span><span class="cp">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="cp">#define listLength(l) ((l)-&gt;len)
+</span><span class="cp">#define listFirst(l) ((l)-&gt;head)
+</span><span class="cp">#define listLast(l) ((l)-&gt;tail)
+</span><span class="cp">#define listPrevNode(n) ((n)-&gt;prev)
+</span><span class="cp">#define listNextNode(n) ((n)-&gt;next)
+</span><span class="cp">#define listNodeValue(n) ((n)-&gt;value)
 </span><span class="cp"></span>
-<span class="cp">#</span><span class="cp">define listSetDupMethod(l,m) ((l)-&gt;dup = (m))</span><span class="cp">
-</span><span class="cp"></span><span class="cp">#</span><span class="cp">define listSetFreeMethod(l,m) ((l)-&gt;free = (m))</span><span class="cp">
-</span><span class="cp"></span><span class="cp">#</span><span class="cp">define listSetMatchMethod(l,m) ((l)-&gt;match = (m))</span><span class="cp">
+<span class="cp">#define listSetDupMethod(l,m) ((l)-&gt;dup = (m))
+</span><span class="cp">#define listSetFreeMethod(l,m) ((l)-&gt;free = (m))
+</span><span class="cp">#define listSetMatchMethod(l,m) ((l)-&gt;match = (m))
 </span><span class="cp"></span>
-<span class="cp">#</span><span class="cp">define listGetDupMethod(l) ((l)-&gt;dup)</span><span class="cp">
-</span><span class="cp"></span><span class="cp">#</span><span class="cp">define listGetFree(l) ((l)-&gt;free)</span><span class="cp">
-</span><span class="cp"></span><span class="cp">#</span><span class="cp">define listGetMatchMethod(l) ((l)-&gt;match)</span><span class="cp">
+<span class="cp">#define listGetDupMethod(l) ((l)-&gt;dup)
+</span><span class="cp">#define listGetFree(l) ((l)-&gt;free)
+</span><span class="cp">#define listGetMatchMethod(l) ((l)-&gt;match)
 </span></code></pre></td></tr></table>
 </div>
 </div><h1 id="create-a-list">Create a List</h1>
@@ -277,13 +277,13 @@ This post will plough into the implementation of doubly linked list."/>
 <span class="p">{</span>
     <span class="k">struct</span> <span class="n">list</span> <span class="o">*</span><span class="n">list</span><span class="p">;</span>
 
-    <span class="k">if</span> <span class="p">(</span><span class="p">(</span><span class="n">list</span> <span class="o">=</span> <span class="n">zmalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="o">*</span><span class="n">list</span><span class="p">)</span><span class="p">)</span><span class="p">)</span> <span class="o">=</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">((</span><span class="n">list</span> <span class="o">=</span> <span class="n">zmalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="o">*</span><span class="n">list</span><span class="p">)))</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
-    <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">head</span> <span class="o">=</span> <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">tail</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
-    <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">len</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-    <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">dup</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
-    <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">free</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
-    <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">match</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="n">list</span><span class="o">-&gt;</span><span class="n">head</span> <span class="o">=</span> <span class="n">list</span><span class="o">-&gt;</span><span class="n">tail</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="n">list</span><span class="o">-&gt;</span><span class="n">len</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">list</span><span class="o">-&gt;</span><span class="n">dup</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="n">list</span><span class="o">-&gt;</span><span class="n">free</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="n">list</span><span class="o">-&gt;</span><span class="n">match</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
     <span class="k">return</span> <span class="n">list</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
@@ -321,16 +321,16 @@ This post will plough into the implementation of doubly linked list."/>
     <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">len</span><span class="p">;</span>
     <span class="n">listNode</span> <span class="o">*</span><span class="n">current</span><span class="p">,</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>
 
-    <span class="n">current</span> <span class="o">=</span> <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">head</span><span class="p">;</span>
-    <span class="n">len</span> <span class="o">=</span> <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">len</span><span class="p">;</span>
-    <span class="k">while</span><span class="p">(</span><span class="n">len</span><span class="o">-</span><span class="o">-</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">next</span> <span class="o">=</span> <span class="n">current</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span><span class="p">;</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">free</span><span class="p">)</span> <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">free</span><span class="p">(</span><span class="n">current</span><span class="o">-</span><span class="o">&gt;</span><span class="n">value</span><span class="p">)</span><span class="p">;</span>
-        <span class="n">zfree</span><span class="p">(</span><span class="n">current</span><span class="p">)</span><span class="p">;</span>
+    <span class="n">current</span> <span class="o">=</span> <span class="n">list</span><span class="o">-&gt;</span><span class="n">head</span><span class="p">;</span>
+    <span class="n">len</span> <span class="o">=</span> <span class="n">list</span><span class="o">-&gt;</span><span class="n">len</span><span class="p">;</span>
+    <span class="k">while</span><span class="p">(</span><span class="n">len</span><span class="o">--</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">next</span> <span class="o">=</span> <span class="n">current</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">list</span><span class="o">-&gt;</span><span class="n">free</span><span class="p">)</span> <span class="n">list</span><span class="o">-&gt;</span><span class="n">free</span><span class="p">(</span><span class="n">current</span><span class="o">-&gt;</span><span class="n">value</span><span class="p">);</span>
+        <span class="n">zfree</span><span class="p">(</span><span class="n">current</span><span class="p">);</span>
         <span class="n">current</span> <span class="o">=</span> <span class="n">next</span><span class="p">;</span>
     <span class="p">}</span>
-    <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">head</span> <span class="o">=</span> <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">tail</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
-    <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">len</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">list</span><span class="o">-&gt;</span><span class="n">head</span> <span class="o">=</span> <span class="n">list</span><span class="o">-&gt;</span><span class="n">tail</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="n">list</span><span class="o">-&gt;</span><span class="n">len</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
@@ -346,8 +346,8 @@ This post will plough into the implementation of doubly linked list."/>
 <td class="lntd">
 <pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">void</span> <span class="nf">listRelease</span><span class="p">(</span><span class="n">list</span> <span class="o">*</span><span class="n">list</span><span class="p">)</span>
 <span class="p">{</span>
-    <span class="n">listEmpty</span><span class="p">(</span><span class="n">list</span><span class="p">)</span><span class="p">;</span>
-    <span class="n">zfree</span><span class="p">(</span><span class="n">list</span><span class="p">)</span><span class="p">;</span>
+    <span class="n">listEmpty</span><span class="p">(</span><span class="n">list</span><span class="p">);</span>
+    <span class="n">zfree</span><span class="p">(</span><span class="n">list</span><span class="p">);</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
@@ -384,19 +384,19 @@ This post will plough into the implementation of doubly linked list."/>
 <span class="p">{</span>
     <span class="n">listNode</span> <span class="o">*</span><span class="n">node</span><span class="p">;</span>
 
-    <span class="k">if</span> <span class="p">(</span><span class="p">(</span><span class="n">node</span> <span class="o">=</span> <span class="n">zmalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="o">*</span><span class="n">node</span><span class="p">)</span><span class="p">)</span><span class="p">)</span> <span class="o">=</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">((</span><span class="n">node</span> <span class="o">=</span> <span class="n">zmalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="o">*</span><span class="n">node</span><span class="p">)))</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
-    <span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">len</span> <span class="o">=</span><span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">head</span> <span class="o">=</span> <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">tail</span> <span class="o">=</span> <span class="n">node</span><span class="p">;</span>
-        <span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">prev</span> <span class="o">=</span> <span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="n">node</span><span class="o">-&gt;</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">list</span><span class="o">-&gt;</span><span class="n">len</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">list</span><span class="o">-&gt;</span><span class="n">head</span> <span class="o">=</span> <span class="n">list</span><span class="o">-&gt;</span><span class="n">tail</span> <span class="o">=</span> <span class="n">node</span><span class="p">;</span>
+        <span class="n">node</span><span class="o">-&gt;</span><span class="n">prev</span> <span class="o">=</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
     <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-        <span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">prev</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
-        <span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">head</span><span class="p">;</span>
-        <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">head</span><span class="o">-</span><span class="o">&gt;</span><span class="n">prev</span> <span class="o">=</span> <span class="n">node</span><span class="p">;</span>
-        <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">head</span> <span class="o">=</span> <span class="n">node</span><span class="p">;</span>
+        <span class="n">node</span><span class="o">-&gt;</span><span class="n">prev</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+        <span class="n">node</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">list</span><span class="o">-&gt;</span><span class="n">head</span><span class="p">;</span>
+        <span class="n">list</span><span class="o">-&gt;</span><span class="n">head</span><span class="o">-&gt;</span><span class="n">prev</span> <span class="o">=</span> <span class="n">node</span><span class="p">;</span>
+        <span class="n">list</span><span class="o">-&gt;</span><span class="n">head</span> <span class="o">=</span> <span class="n">node</span><span class="p">;</span>
     <span class="p">}</span>
-    <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">len</span><span class="o">+</span><span class="o">+</span><span class="p">;</span>
+    <span class="n">list</span><span class="o">-&gt;</span><span class="n">len</span><span class="o">++</span><span class="p">;</span>
     <span class="k">return</span> <span class="n">list</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
@@ -443,29 +443,29 @@ This post will plough into the implementation of doubly linked list."/>
 <span class="n">list</span> <span class="o">*</span><span class="nf">listInsertNode</span><span class="p">(</span><span class="n">list</span> <span class="o">*</span><span class="n">list</span><span class="p">,</span> <span class="n">listNode</span> <span class="o">*</span><span class="n">old_node</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">value</span><span class="p">,</span> <span class="kt">int</span> <span class="n">after</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">listNode</span> <span class="o">*</span><span class="n">node</span><span class="p">;</span>
 
-    <span class="k">if</span> <span class="p">(</span><span class="p">(</span><span class="n">node</span> <span class="o">=</span> <span class="n">zmalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="o">*</span><span class="n">node</span><span class="p">)</span><span class="p">)</span><span class="p">)</span> <span class="o">=</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">((</span><span class="n">node</span> <span class="o">=</span> <span class="n">zmalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="o">*</span><span class="n">node</span><span class="p">)))</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
-    <span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="p">;</span>
+    <span class="n">node</span><span class="o">-&gt;</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="p">;</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">after</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">prev</span> <span class="o">=</span> <span class="n">old_node</span><span class="p">;</span>
-        <span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">old_node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span><span class="p">;</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">tail</span> <span class="o">=</span><span class="o">=</span> <span class="n">old_node</span><span class="p">)</span> <span class="p">{</span>
-            <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">tail</span> <span class="o">=</span> <span class="n">node</span><span class="p">;</span>
+        <span class="n">node</span><span class="o">-&gt;</span><span class="n">prev</span> <span class="o">=</span> <span class="n">old_node</span><span class="p">;</span>
+        <span class="n">node</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">old_node</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">list</span><span class="o">-&gt;</span><span class="n">tail</span> <span class="o">==</span> <span class="n">old_node</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">list</span><span class="o">-&gt;</span><span class="n">tail</span> <span class="o">=</span> <span class="n">node</span><span class="p">;</span>
         <span class="p">}</span>
     <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-        <span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">old_node</span><span class="p">;</span>
-        <span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">prev</span> <span class="o">=</span> <span class="n">old_node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">prev</span><span class="p">;</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">head</span> <span class="o">=</span><span class="o">=</span> <span class="n">old_node</span><span class="p">)</span> <span class="p">{</span>
-            <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">head</span> <span class="o">=</span> <span class="n">node</span><span class="p">;</span>
+        <span class="n">node</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">old_node</span><span class="p">;</span>
+        <span class="n">node</span><span class="o">-&gt;</span><span class="n">prev</span> <span class="o">=</span> <span class="n">old_node</span><span class="o">-&gt;</span><span class="n">prev</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">list</span><span class="o">-&gt;</span><span class="n">head</span> <span class="o">==</span> <span class="n">old_node</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">list</span><span class="o">-&gt;</span><span class="n">head</span> <span class="o">=</span> <span class="n">node</span><span class="p">;</span>
         <span class="p">}</span>
     <span class="p">}</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">prev</span> <span class="o">!</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">prev</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">node</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">prev</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">node</span><span class="o">-&gt;</span><span class="n">prev</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">node</span><span class="p">;</span>
     <span class="p">}</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span> <span class="o">!</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span><span class="o">-</span><span class="o">&gt;</span><span class="n">prev</span> <span class="o">=</span> <span class="n">node</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">node</span><span class="o">-&gt;</span><span class="n">next</span><span class="o">-&gt;</span><span class="n">prev</span> <span class="o">=</span> <span class="n">node</span><span class="p">;</span>
     <span class="p">}</span>
-    <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">len</span><span class="o">+</span><span class="o">+</span><span class="p">;</span>
+    <span class="n">list</span><span class="o">-&gt;</span><span class="n">len</span><span class="o">++</span><span class="p">;</span>
     <span class="k">return</span> <span class="n">list</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
@@ -496,17 +496,17 @@ This post will plough into the implementation of doubly linked list."/>
 </span><span class="c1"></span>
 <span class="kt">void</span> <span class="nf">listDelNode</span><span class="p">(</span><span class="n">list</span> <span class="o">*</span><span class="n">list</span><span class="p">,</span> <span class="n">listNode</span> <span class="o">*</span><span class="n">node</span><span class="p">)</span>
 <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">prev</span><span class="p">)</span>
-        <span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">prev</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">prev</span><span class="p">)</span>
+        <span class="n">node</span><span class="o">-&gt;</span><span class="n">prev</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
     <span class="k">else</span>
-        <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">head</span> <span class="o">=</span> <span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span><span class="p">)</span>
-        <span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span><span class="o">-</span><span class="o">&gt;</span><span class="n">prev</span> <span class="o">=</span> <span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">prev</span><span class="p">;</span>
+        <span class="n">list</span><span class="o">-&gt;</span><span class="n">head</span> <span class="o">=</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">)</span>
+        <span class="n">node</span><span class="o">-&gt;</span><span class="n">next</span><span class="o">-&gt;</span><span class="n">prev</span> <span class="o">=</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">prev</span><span class="p">;</span>
     <span class="k">else</span>
-        <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">tail</span> <span class="o">=</span> <span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">prev</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">free</span><span class="p">)</span> <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">free</span><span class="p">(</span><span class="n">node</span><span class="o">-</span><span class="o">&gt;</span><span class="n">value</span><span class="p">)</span><span class="p">;</span>
-    <span class="n">zfree</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="p">;</span>
-    <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">len</span><span class="o">-</span><span class="o">-</span><span class="p">;</span>
+        <span class="n">list</span><span class="o">-&gt;</span><span class="n">tail</span> <span class="o">=</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">prev</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">list</span><span class="o">-&gt;</span><span class="n">free</span><span class="p">)</span> <span class="n">list</span><span class="o">-&gt;</span><span class="n">free</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">value</span><span class="p">);</span>
+    <span class="n">zfree</span><span class="p">(</span><span class="n">node</span><span class="p">);</span>
+    <span class="n">list</span><span class="o">-&gt;</span><span class="n">len</span><span class="o">--</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
@@ -555,24 +555,24 @@ This post will plough into the implementation of doubly linked list."/>
 <span class="p">{</span>
     <span class="n">listIter</span> <span class="o">*</span><span class="n">iter</span><span class="p">;</span>
 
-    <span class="k">if</span> <span class="p">(</span><span class="p">(</span><span class="n">iter</span> <span class="o">=</span> <span class="n">zmalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="o">*</span><span class="n">iter</span><span class="p">)</span><span class="p">)</span><span class="p">)</span> <span class="o">=</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">direction</span> <span class="o">=</span><span class="o">=</span> <span class="n">AL_START_HEAD</span><span class="p">)</span>
-        <span class="n">iter</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">head</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">((</span><span class="n">iter</span> <span class="o">=</span> <span class="n">zmalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="o">*</span><span class="n">iter</span><span class="p">)))</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">direction</span> <span class="o">==</span> <span class="n">AL_START_HEAD</span><span class="p">)</span>
+        <span class="n">iter</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">list</span><span class="o">-&gt;</span><span class="n">head</span><span class="p">;</span>
     <span class="k">else</span>
-        <span class="n">iter</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">tail</span><span class="p">;</span>
-    <span class="n">iter</span><span class="o">-</span><span class="o">&gt;</span><span class="n">direction</span> <span class="o">=</span> <span class="n">direction</span><span class="p">;</span>
+        <span class="n">iter</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">list</span><span class="o">-&gt;</span><span class="n">tail</span><span class="p">;</span>
+    <span class="n">iter</span><span class="o">-&gt;</span><span class="n">direction</span> <span class="o">=</span> <span class="n">direction</span><span class="p">;</span>
     <span class="k">return</span> <span class="n">iter</span><span class="p">;</span>
 <span class="p">}</span>
 
 <span class="n">listNode</span> <span class="o">*</span><span class="nf">listNext</span><span class="p">(</span><span class="n">listIter</span> <span class="o">*</span><span class="n">iter</span><span class="p">)</span>
 <span class="p">{</span>
-    <span class="n">listNode</span> <span class="o">*</span><span class="n">current</span> <span class="o">=</span> <span class="n">iter</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span><span class="p">;</span>
+    <span class="n">listNode</span> <span class="o">*</span><span class="n">current</span> <span class="o">=</span> <span class="n">iter</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
 
-    <span class="k">if</span> <span class="p">(</span><span class="n">current</span> <span class="o">!</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">iter</span><span class="o">-</span><span class="o">&gt;</span><span class="n">direction</span> <span class="o">=</span><span class="o">=</span> <span class="n">AL_START_HEAD</span><span class="p">)</span>
-            <span class="n">iter</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">current</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">current</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">iter</span><span class="o">-&gt;</span><span class="n">direction</span> <span class="o">==</span> <span class="n">AL_START_HEAD</span><span class="p">)</span>
+            <span class="n">iter</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">current</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
         <span class="k">else</span>
-            <span class="n">iter</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">current</span><span class="o">-</span><span class="o">&gt;</span><span class="n">prev</span><span class="p">;</span>
+            <span class="n">iter</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">current</span><span class="o">-&gt;</span><span class="n">prev</span><span class="p">;</span>
     <span class="p">}</span>
     <span class="k">return</span> <span class="n">current</span><span class="p">;</span>
 <span class="p">}</span>
@@ -603,18 +603,18 @@ This post will plough into the implementation of doubly linked list."/>
 <pre class="chroma"><code class="language-c" data-lang="c"><span class="c1">// Time complexity: O(1)
 </span><span class="c1"></span>
 <span class="kt">void</span> <span class="nf">listRotate</span><span class="p">(</span><span class="n">list</span> <span class="o">*</span><span class="n">list</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">listNode</span> <span class="o">*</span><span class="n">tail</span> <span class="o">=</span> <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">tail</span><span class="p">;</span>
+    <span class="n">listNode</span> <span class="o">*</span><span class="n">tail</span> <span class="o">=</span> <span class="n">list</span><span class="o">-&gt;</span><span class="n">tail</span><span class="p">;</span>
 
-    <span class="k">if</span> <span class="p">(</span><span class="n">listLength</span><span class="p">(</span><span class="n">list</span><span class="p">)</span> <span class="o">&lt;</span><span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="k">return</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">listLength</span><span class="p">(</span><span class="n">list</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">)</span> <span class="k">return</span><span class="p">;</span>
 
     <span class="cm">/* Detach current tail */</span>
-    <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">tail</span> <span class="o">=</span> <span class="n">tail</span><span class="o">-</span><span class="o">&gt;</span><span class="n">prev</span><span class="p">;</span>
-    <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">tail</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="n">list</span><span class="o">-&gt;</span><span class="n">tail</span> <span class="o">=</span> <span class="n">tail</span><span class="o">-&gt;</span><span class="n">prev</span><span class="p">;</span>
+    <span class="n">list</span><span class="o">-&gt;</span><span class="n">tail</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
     <span class="cm">/* Move it as head */</span>
-    <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">head</span><span class="o">-</span><span class="o">&gt;</span><span class="n">prev</span> <span class="o">=</span> <span class="n">tail</span><span class="p">;</span>
-    <span class="n">tail</span><span class="o">-</span><span class="o">&gt;</span><span class="n">prev</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
-    <span class="n">tail</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">head</span><span class="p">;</span>
-    <span class="n">list</span><span class="o">-</span><span class="o">&gt;</span><span class="n">head</span> <span class="o">=</span> <span class="n">tail</span><span class="p">;</span>
+    <span class="n">list</span><span class="o">-&gt;</span><span class="n">head</span><span class="o">-&gt;</span><span class="n">prev</span> <span class="o">=</span> <span class="n">tail</span><span class="p">;</span>
+    <span class="n">tail</span><span class="o">-&gt;</span><span class="n">prev</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="n">tail</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">list</span><span class="o">-&gt;</span><span class="n">head</span><span class="p">;</span>
+    <span class="n">list</span><span class="o">-&gt;</span><span class="n">head</span> <span class="o">=</span> <span class="n">tail</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
@@ -645,20 +645,20 @@ This post will plough into the implementation of doubly linked list."/>
 <pre class="chroma"><code class="language-c" data-lang="c"><span class="c1">// Time complexity: O(1)
 </span><span class="c1"></span>
 <span class="kt">void</span> <span class="nf">listJoin</span><span class="p">(</span><span class="n">list</span> <span class="o">*</span><span class="n">l</span><span class="p">,</span> <span class="n">list</span> <span class="o">*</span><span class="n">o</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">o</span><span class="o">-</span><span class="o">&gt;</span><span class="n">head</span><span class="p">)</span>
-        <span class="n">o</span><span class="o">-</span><span class="o">&gt;</span><span class="n">head</span><span class="o">-</span><span class="o">&gt;</span><span class="n">prev</span> <span class="o">=</span> <span class="n">l</span><span class="o">-</span><span class="o">&gt;</span><span class="n">tail</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">o</span><span class="o">-&gt;</span><span class="n">head</span><span class="p">)</span>
+        <span class="n">o</span><span class="o">-&gt;</span><span class="n">head</span><span class="o">-&gt;</span><span class="n">prev</span> <span class="o">=</span> <span class="n">l</span><span class="o">-&gt;</span><span class="n">tail</span><span class="p">;</span>
 
-    <span class="k">if</span> <span class="p">(</span><span class="n">l</span><span class="o">-</span><span class="o">&gt;</span><span class="n">tail</span><span class="p">)</span>
-        <span class="n">l</span><span class="o">-</span><span class="o">&gt;</span><span class="n">tail</span><span class="o">-</span><span class="o">&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">o</span><span class="o">-</span><span class="o">&gt;</span><span class="n">head</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">l</span><span class="o">-&gt;</span><span class="n">tail</span><span class="p">)</span>
+        <span class="n">l</span><span class="o">-&gt;</span><span class="n">tail</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">o</span><span class="o">-&gt;</span><span class="n">head</span><span class="p">;</span>
     <span class="k">else</span>
-        <span class="n">l</span><span class="o">-</span><span class="o">&gt;</span><span class="n">head</span> <span class="o">=</span> <span class="n">o</span><span class="o">-</span><span class="o">&gt;</span><span class="n">head</span><span class="p">;</span>
+        <span class="n">l</span><span class="o">-&gt;</span><span class="n">head</span> <span class="o">=</span> <span class="n">o</span><span class="o">-&gt;</span><span class="n">head</span><span class="p">;</span>
 
-    <span class="k">if</span> <span class="p">(</span><span class="n">o</span><span class="o">-</span><span class="o">&gt;</span><span class="n">tail</span><span class="p">)</span> <span class="n">l</span><span class="o">-</span><span class="o">&gt;</span><span class="n">tail</span> <span class="o">=</span> <span class="n">o</span><span class="o">-</span><span class="o">&gt;</span><span class="n">tail</span><span class="p">;</span>
-    <span class="n">l</span><span class="o">-</span><span class="o">&gt;</span><span class="n">len</span> <span class="o">+</span><span class="o">=</span> <span class="n">o</span><span class="o">-</span><span class="o">&gt;</span><span class="n">len</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">o</span><span class="o">-&gt;</span><span class="n">tail</span><span class="p">)</span> <span class="n">l</span><span class="o">-&gt;</span><span class="n">tail</span> <span class="o">=</span> <span class="n">o</span><span class="o">-&gt;</span><span class="n">tail</span><span class="p">;</span>
+    <span class="n">l</span><span class="o">-&gt;</span><span class="n">len</span> <span class="o">+=</span> <span class="n">o</span><span class="o">-&gt;</span><span class="n">len</span><span class="p">;</span>
 
     <span class="cm">/* Setup other as an empty list. */</span>
-    <span class="n">o</span><span class="o">-</span><span class="o">&gt;</span><span class="n">head</span> <span class="o">=</span> <span class="n">o</span><span class="o">-</span><span class="o">&gt;</span><span class="n">tail</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
-    <span class="n">o</span><span class="o">-</span><span class="o">&gt;</span><span class="n">len</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">o</span><span class="o">-&gt;</span><span class="n">head</span> <span class="o">=</span> <span class="n">o</span><span class="o">-&gt;</span><span class="n">tail</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="n">o</span><span class="o">-&gt;</span><span class="n">len</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>

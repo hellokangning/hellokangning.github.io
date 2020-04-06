@@ -24,7 +24,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.64.1 with theme even" />
+<meta name="generator" content="Hugo 0.68.3 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/post/managing-ordered-sequences-with-bisect/" />
@@ -49,7 +49,7 @@
 <meta itemprop="description" content="The bisect module offers two main functions - bisect and insort - that use the binary search algorithm to quickly find an d insert items in any sorted sequence.">
 <meta itemprop="datePublished" content="2018-09-24T14:16:14&#43;08:00" />
 <meta itemprop="dateModified" content="2018-10-24T14:16:14&#43;08:00" />
-<meta itemprop="wordCount" content="345">
+<meta itemprop="wordCount" content="352">
 
 
 
@@ -129,7 +129,7 @@
         <div class="post-category">
             <a href="/categories/python/"> Python </a>
             </div>
-          <span class="more-meta"> 345 words </span>
+          <span class="more-meta"> 352 words </span>
           <span class="more-meta"> 2 mins read </span>
         
       </div>
@@ -140,8 +140,8 @@
   <div class="post-toc-content">
     <nav id="TableOfContents">
   <ul>
-    <li><a href="#searching-with-bisect">Searching with bisect</a></li>
-    <li><a href="#inserting-with-bisectinsort">Inserting with bisect.insort</a></li>
+    <li><a href="#searching-with-bisect">Searching with <code>bisect</code></a></li>
+    <li><a href="#inserting-with-bisectinsort">Inserting with <code>bisect.insort</code></a></li>
   </ul>
 </nav>
   </div>
@@ -182,14 +182,14 @@
     <span class="n">l</span> <span class="o">=</span> <span class="n">bisect</span><span class="o">.</span><span class="n">bisect_left</span><span class="p">(</span><span class="n">haystack</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
     <span class="n">r</span> <span class="o">=</span> <span class="n">bisect</span><span class="o">.</span><span class="n">bisect</span><span class="p">(</span><span class="n">haystack</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
 
-    <span class="sa"></span><span class="s2">&#34;&#34;&#34;</span><span class="s2">
-</span><span class="s2"></span><span class="s2">    0 0</span><span class="s2">
-</span><span class="s2"></span><span class="s2">    0 1</span><span class="s2">
-</span><span class="s2"></span><span class="s2">    1 1</span><span class="s2">
-</span><span class="s2"></span><span class="s2">    1 3</span><span class="s2">
-</span><span class="s2"></span><span class="s2">    5 6</span><span class="s2">
-</span><span class="s2"></span><span class="s2">    6 6</span><span class="s2">
-</span><span class="s2"></span><span class="s2">    </span><span class="s2">&#34;&#34;&#34;</span>
+    <span class="s2">&#34;&#34;&#34;
+</span><span class="s2">    0 0
+</span><span class="s2">    0 1
+</span><span class="s2">    1 1
+</span><span class="s2">    1 3
+</span><span class="s2">    5 6
+</span><span class="s2">    6 6
+</span><span class="s2">    &#34;&#34;&#34;</span>
     <span class="k">print</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
 </code></pre></td></tr></table>
 </div>
@@ -204,12 +204,12 @@
 </span><span class="lnt">6
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">grade</span><span class="p">(</span><span class="n">score</span><span class="p">,</span> <span class="n">breakpoints</span><span class="o">=</span><span class="p">[</span><span class="mi">60</span><span class="p">,</span> <span class="mi">70</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="mi">90</span><span class="p">]</span><span class="p">,</span> <span class="n">grades</span><span class="o">=</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">FDCBA</span><span class="s1">&#39;</span><span class="p">)</span><span class="p">:</span>
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">grade</span><span class="p">(</span><span class="n">score</span><span class="p">,</span> <span class="n">breakpoints</span><span class="o">=</span><span class="p">[</span><span class="mi">60</span><span class="p">,</span> <span class="mi">70</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span> <span class="n">grades</span><span class="o">=</span><span class="s1">&#39;FDCBA&#39;</span><span class="p">):</span>
     <span class="n">i</span> <span class="o">=</span> <span class="n">bisect</span><span class="p">(</span><span class="n">breakpoints</span><span class="p">,</span> <span class="n">score</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">grades</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
 
 <span class="c1"># [&#39;F&#39;, &#39;A&#39;, &#39;C&#39;, &#39;C&#39;, &#39;B&#39;, &#39;A&#39;, &#39;A&#39;]</span>
-<span class="p">[</span><span class="n">grade</span><span class="p">(</span><span class="n">score</span><span class="p">)</span> <span class="k">for</span> <span class="n">score</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">33</span><span class="p">,</span> <span class="mi">99</span><span class="p">,</span> <span class="mi">77</span><span class="p">,</span> <span class="mi">70</span><span class="p">,</span> <span class="mi">89</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span><span class="p">]</span>
+<span class="p">[</span><span class="n">grade</span><span class="p">(</span><span class="n">score</span><span class="p">)</span> <span class="k">for</span> <span class="n">score</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">33</span><span class="p">,</span> <span class="mi">99</span><span class="p">,</span> <span class="mi">77</span><span class="p">,</span> <span class="mi">70</span><span class="p">,</span> <span class="mi">89</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="mi">100</span><span class="p">]]</span>
 </code></pre></td></tr></table>
 </div>
 </div><h1 id="inserting-with-bisectinsort">Inserting with <code>bisect.insort</code></h1>
@@ -235,11 +235,11 @@
 <span class="n">SIZE</span> <span class="o">=</span> <span class="mi">7</span>
 <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1902</span><span class="p">)</span>
 
-<span class="n">lst</span> <span class="o">=</span> <span class="p">[</span><span class="p">]</span>
-<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">SIZE</span><span class="p">)</span><span class="p">:</span>
+<span class="n">lst</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">SIZE</span><span class="p">):</span>
     <span class="n">item</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randrange</span><span class="p">(</span><span class="n">SIZE</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span>
     <span class="n">bisect</span><span class="o">.</span><span class="n">insort</span><span class="p">(</span><span class="n">lst</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span>
-    <span class="k">print</span><span class="p">(</span><span class="sa"></span><span class="s1">&#39;</span><span class="si">%2d</span><span class="s1"> -&gt; </span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">item</span><span class="p">,</span> <span class="n">lst</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%2d</span><span class="s1"> -&gt; &#39;</span> <span class="o">%</span> <span class="n">item</span><span class="p">,</span> <span class="n">lst</span><span class="p">)</span>
 </code></pre></td></tr></table>
 </div>
 </div><p>The output of above code is:</p>

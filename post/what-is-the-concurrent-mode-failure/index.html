@@ -27,7 +27,7 @@ In a nutshell,
 
 
 
-<meta name="generator" content="Hugo 0.64.1 with theme even" />
+<meta name="generator" content="Hugo 0.68.3 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/post/what-is-the-concurrent-mode-failure/" />
@@ -167,7 +167,7 @@ The message &ldquo;concurrent mode failure&rdquo; signifies that the concurrent 
 <p>The message &ldquo;concurrent mode failure&rdquo; signifies that the concurrent collection of the Old Generation did not finish before the Old Generation became full.</p>
 </blockquote>
 <p>By the word &ldquo;concurrent&rdquo; in Concurrent Mark Sweep, it means CMS does not explicitly stop the application threads to perform mark-sweep in the Old Generation. In real world situation, Minor Garbage Collections of the Young Generation can occur anytime during concurrent collecting the Old Generation. That&rsquo;s the root cause of concurrent mode failure. If the Young Generation grows too fast and overflows to Old Generation, but the CMS could not clear out in the background, you will get a &ldquo;Concurrent Mode Failure&rdquo;.</p>
-<p>Recall a cycle of CMS If yout want to understand it thoroughly.</p>
+<p>Recall a cycle of CMS If you want to understand it thoroughly.</p>
 <blockquote>
 <p>The following contents are copied from <a href="https://plumbr.io/handbook/garbage-collection-algorithms-implementations#concurrent-mark-and-sweep">Concurrent Mark and Sweep</a>.</p>
 </blockquote>

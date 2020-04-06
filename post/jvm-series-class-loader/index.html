@@ -24,7 +24,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.64.1 with theme even" />
+<meta name="generator" content="Hugo 0.68.3 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/post/jvm-series-class-loader/" />
@@ -140,9 +140,9 @@
   <div class="post-toc-content">
     <nav id="TableOfContents">
   <ul>
-    <li><a href="#every-class-object-has-a-classloader">Every Class object has a ClassLoader</a></li>
+    <li><a href="#every-class-object-has-a-classloader">Every <code>Class</code> object has a <code>ClassLoader</code></a></li>
     <li><a href="#parent-delegation-model">Parent Delegation Model</a></li>
-    <li><a href="#defineclass">defineClass</a></li>
+    <li><a href="#defineclass"><code>defineClass</code></a></li>
     <li><a href="#example">Example</a></li>
   </ul>
 </nav>
@@ -188,17 +188,17 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">JavaTestApp</span> <span class="o">{</span>
 
-    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[</span><span class="o">]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
         <span class="k">try</span> <span class="o">{</span>
-            <span class="n">Class</span><span class="o">&lt;</span><span class="o">?</span><span class="o">&gt;</span> <span class="n">clazz</span> <span class="o">=</span> <span class="n">Class</span><span class="o">.</span><span class="na">forName</span><span class="o">(</span><span class="s">&#34;com.qiniu.fusion.app.Demo&#34;</span><span class="o">)</span><span class="o">;</span>
-            <span class="n">ClassLoader</span> <span class="n">classLoader</span> <span class="o">=</span> <span class="n">clazz</span><span class="o">.</span><span class="na">getClassLoader</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
-            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">printf</span><span class="o">(</span><span class="s">&#34;currentClassLoader is %s\n&#34;</span><span class="o">,</span> <span class="n">classLoader</span><span class="o">.</span><span class="na">getClass</span><span class="o">(</span><span class="o">)</span><span class="o">.</span><span class="na">getSimpleName</span><span class="o">(</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
-            <span class="k">while</span> <span class="o">(</span><span class="n">classLoader</span><span class="o">.</span><span class="na">getParent</span><span class="o">(</span><span class="o">)</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-                <span class="n">classLoader</span> <span class="o">=</span> <span class="n">classLoader</span><span class="o">.</span><span class="na">getParent</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
-                <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">printf</span><span class="o">(</span><span class="s">&#34;Parent is %s\n&#34;</span><span class="o">,</span> <span class="n">classLoader</span><span class="o">.</span><span class="na">getClass</span><span class="o">(</span><span class="o">)</span><span class="o">.</span><span class="na">getSimpleName</span><span class="o">(</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
+            <span class="n">Class</span><span class="o">&lt;?&gt;</span> <span class="n">clazz</span> <span class="o">=</span> <span class="n">Class</span><span class="o">.</span><span class="na">forName</span><span class="o">(</span><span class="s">&#34;com.qiniu.fusion.app.Demo&#34;</span><span class="o">);</span>
+            <span class="n">ClassLoader</span> <span class="n">classLoader</span> <span class="o">=</span> <span class="n">clazz</span><span class="o">.</span><span class="na">getClassLoader</span><span class="o">();</span>
+            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">printf</span><span class="o">(</span><span class="s">&#34;currentClassLoader is %s\n&#34;</span><span class="o">,</span> <span class="n">classLoader</span><span class="o">.</span><span class="na">getClass</span><span class="o">().</span><span class="na">getSimpleName</span><span class="o">());</span>
+            <span class="k">while</span> <span class="o">(</span><span class="n">classLoader</span><span class="o">.</span><span class="na">getParent</span><span class="o">()</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">classLoader</span> <span class="o">=</span> <span class="n">classLoader</span><span class="o">.</span><span class="na">getParent</span><span class="o">();</span>
+                <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">printf</span><span class="o">(</span><span class="s">&#34;Parent is %s\n&#34;</span><span class="o">,</span> <span class="n">classLoader</span><span class="o">.</span><span class="na">getClass</span><span class="o">().</span><span class="na">getSimpleName</span><span class="o">());</span>
             <span class="o">}</span>
         <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
-            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">e</span><span class="o">)</span><span class="o">;</span>
+            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
         <span class="o">}</span>
     <span class="o">}</span>
 <span class="o">}</span>
@@ -240,9 +240,9 @@ Parent is ExtClassLoader
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">AppTest</span> <span class="o">{</span>
 
-    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[</span><span class="o">]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
-        <span class="n">Demo</span> <span class="n">d</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Demo</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
-        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">d</span><span class="o">.</span><span class="na">getClass</span><span class="o">(</span><span class="o">)</span><span class="o">.</span><span class="na">getClassLoader</span><span class="o">(</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">Demo</span> <span class="n">d</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Demo</span><span class="o">();</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">d</span><span class="o">.</span><span class="na">getClass</span><span class="o">().</span><span class="na">getClassLoader</span><span class="o">());</span>
     <span class="o">}</span>
 <span class="o">}</span>
 
@@ -278,18 +278,18 @@ Parent is ExtClassLoader
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// Class.java
 </span><span class="c1"></span>
-<span class="kd">public</span> <span class="n">ClassLoader</span> <span class="nf">getClassLoader</span><span class="o">(</span><span class="o">)</span> <span class="o">{</span>
-    <span class="n">ClassLoader</span> <span class="n">cl</span> <span class="o">=</span> <span class="n">getClassLoader0</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">cl</span> <span class="o">=</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span>
+<span class="kd">public</span> <span class="n">ClassLoader</span> <span class="nf">getClassLoader</span><span class="o">()</span> <span class="o">{</span>
+    <span class="n">ClassLoader</span> <span class="n">cl</span> <span class="o">=</span> <span class="n">getClassLoader0</span><span class="o">();</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">cl</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span>
         <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
-    <span class="n">SecurityManager</span> <span class="n">sm</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="na">getSecurityManager</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">sm</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-        <span class="n">ClassLoader</span><span class="o">.</span><span class="na">checkClassLoaderPermission</span><span class="o">(</span><span class="n">cl</span><span class="o">,</span> <span class="n">Reflection</span><span class="o">.</span><span class="na">getCallerClass</span><span class="o">(</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">SecurityManager</span> <span class="n">sm</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="na">getSecurityManager</span><span class="o">();</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">sm</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">ClassLoader</span><span class="o">.</span><span class="na">checkClassLoaderPermission</span><span class="o">(</span><span class="n">cl</span><span class="o">,</span> <span class="n">Reflection</span><span class="o">.</span><span class="na">getCallerClass</span><span class="o">());</span>
     <span class="o">}</span>
     <span class="k">return</span> <span class="n">cl</span><span class="o">;</span>
 <span class="o">}</span>
 
-<span class="n">ClassLoader</span> <span class="nf">getClassLoader0</span><span class="o">(</span><span class="o">)</span> <span class="o">{</span> <span class="k">return</span> <span class="n">classLoader</span><span class="o">;</span> <span class="o">}</span>
+<span class="n">ClassLoader</span> <span class="nf">getClassLoader0</span><span class="o">()</span> <span class="o">{</span> <span class="k">return</span> <span class="n">classLoader</span><span class="o">;</span> <span class="o">}</span>
 
 <span class="kd">private</span> <span class="kd">final</span> <span class="n">ClassLoader</span> <span class="n">classLoader</span><span class="o">;</span>
 
@@ -323,7 +323,7 @@ Parent is ExtClassLoader
 
     <span class="c1">// The classes loaded by this class loader. The only purpose of this table
 </span><span class="c1"></span>    <span class="c1">// is to keep the classes from being GC&#39;ed until the loader is GC&#39;ed.
-</span><span class="c1"></span>    <span class="kd">private</span> <span class="kd">final</span> <span class="n">Vector</span><span class="o">&lt;</span><span class="n">Class</span><span class="o">&lt;</span><span class="o">?</span><span class="o">&gt;</span><span class="o">&gt;</span> <span class="n">classes</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Vector</span><span class="o">&lt;</span><span class="o">&gt;</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+</span><span class="c1"></span>    <span class="kd">private</span> <span class="kd">final</span> <span class="n">Vector</span><span class="o">&lt;</span><span class="n">Class</span><span class="o">&lt;?&gt;&gt;</span> <span class="n">classes</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Vector</span><span class="o">&lt;&gt;();</span>
 <span class="o">}</span>
 </code></pre></td></tr></table>
 </div>
@@ -370,39 +370,39 @@ Parent is ExtClassLoader
 </span><span class="lnt">37
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">protected</span> <span class="n">Class</span><span class="o">&lt;</span><span class="o">?</span><span class="o">&gt;</span> <span class="n">loadClass</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">,</span> <span class="kt">boolean</span> <span class="n">resolve</span><span class="o">)</span>
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">protected</span> <span class="n">Class</span><span class="o">&lt;?&gt;</span> <span class="n">loadClass</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">,</span> <span class="kt">boolean</span> <span class="n">resolve</span><span class="o">)</span>
         <span class="kd">throws</span> <span class="n">ClassNotFoundException</span>
 <span class="o">{</span>
-    <span class="kd">synchronized</span> <span class="o">(</span><span class="n">getClassLoadingLock</span><span class="o">(</span><span class="n">name</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kd">synchronized</span> <span class="o">(</span><span class="n">getClassLoadingLock</span><span class="o">(</span><span class="n">name</span><span class="o">))</span> <span class="o">{</span>
         <span class="c1">// First, check if the class has already been loaded
-</span><span class="c1"></span>        <span class="n">Class</span><span class="o">&lt;</span><span class="o">?</span><span class="o">&gt;</span> <span class="n">c</span> <span class="o">=</span> <span class="n">findLoadedClass</span><span class="o">(</span><span class="n">name</span><span class="o">)</span><span class="o">;</span>
-        <span class="k">if</span> <span class="o">(</span><span class="n">c</span> <span class="o">=</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-            <span class="kt">long</span> <span class="n">t0</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="na">nanoTime</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+</span><span class="c1"></span>        <span class="n">Class</span><span class="o">&lt;?&gt;</span> <span class="n">c</span> <span class="o">=</span> <span class="n">findLoadedClass</span><span class="o">(</span><span class="n">name</span><span class="o">);</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">c</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="kt">long</span> <span class="n">t0</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="na">nanoTime</span><span class="o">();</span>
             <span class="k">try</span> <span class="o">{</span>
-                <span class="k">if</span> <span class="o">(</span><span class="n">parent</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-                    <span class="n">c</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="na">loadClass</span><span class="o">(</span><span class="n">name</span><span class="o">,</span> <span class="kc">false</span><span class="o">)</span><span class="o">;</span>
+                <span class="k">if</span> <span class="o">(</span><span class="n">parent</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="n">c</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="na">loadClass</span><span class="o">(</span><span class="n">name</span><span class="o">,</span> <span class="kc">false</span><span class="o">);</span>
                 <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
-                    <span class="n">c</span> <span class="o">=</span> <span class="n">findBootstrapClassOrNull</span><span class="o">(</span><span class="n">name</span><span class="o">)</span><span class="o">;</span>
+                    <span class="n">c</span> <span class="o">=</span> <span class="n">findBootstrapClassOrNull</span><span class="o">(</span><span class="n">name</span><span class="o">);</span>
                 <span class="o">}</span>
             <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">ClassNotFoundException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
                 <span class="c1">// ClassNotFoundException thrown if class not found
 </span><span class="c1"></span>                <span class="c1">// from the non-null parent class loader
 </span><span class="c1"></span>            <span class="o">}</span>
 
-            <span class="k">if</span> <span class="o">(</span><span class="n">c</span> <span class="o">=</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">c</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
                 <span class="c1">// If still not found, then invoke findClass in order
 </span><span class="c1"></span>                <span class="c1">// to find the class.
-</span><span class="c1"></span>                <span class="kt">long</span> <span class="n">t1</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="na">nanoTime</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
-                <span class="n">c</span> <span class="o">=</span> <span class="n">findClass</span><span class="o">(</span><span class="n">name</span><span class="o">)</span><span class="o">;</span>
+</span><span class="c1"></span>                <span class="kt">long</span> <span class="n">t1</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="na">nanoTime</span><span class="o">();</span>
+                <span class="n">c</span> <span class="o">=</span> <span class="n">findClass</span><span class="o">(</span><span class="n">name</span><span class="o">);</span>
 
                 <span class="c1">// this is the defining class loader; record the stats
-</span><span class="c1"></span>                <span class="n">sun</span><span class="o">.</span><span class="na">misc</span><span class="o">.</span><span class="na">PerfCounter</span><span class="o">.</span><span class="na">getParentDelegationTime</span><span class="o">(</span><span class="o">)</span><span class="o">.</span><span class="na">addTime</span><span class="o">(</span><span class="n">t1</span> <span class="o">-</span> <span class="n">t0</span><span class="o">)</span><span class="o">;</span>
-                <span class="n">sun</span><span class="o">.</span><span class="na">misc</span><span class="o">.</span><span class="na">PerfCounter</span><span class="o">.</span><span class="na">getFindClassTime</span><span class="o">(</span><span class="o">)</span><span class="o">.</span><span class="na">addElapsedTimeFrom</span><span class="o">(</span><span class="n">t1</span><span class="o">)</span><span class="o">;</span>
-                <span class="n">sun</span><span class="o">.</span><span class="na">misc</span><span class="o">.</span><span class="na">PerfCounter</span><span class="o">.</span><span class="na">getFindClasses</span><span class="o">(</span><span class="o">)</span><span class="o">.</span><span class="na">increment</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+</span><span class="c1"></span>                <span class="n">sun</span><span class="o">.</span><span class="na">misc</span><span class="o">.</span><span class="na">PerfCounter</span><span class="o">.</span><span class="na">getParentDelegationTime</span><span class="o">().</span><span class="na">addTime</span><span class="o">(</span><span class="n">t1</span> <span class="o">-</span> <span class="n">t0</span><span class="o">);</span>
+                <span class="n">sun</span><span class="o">.</span><span class="na">misc</span><span class="o">.</span><span class="na">PerfCounter</span><span class="o">.</span><span class="na">getFindClassTime</span><span class="o">().</span><span class="na">addElapsedTimeFrom</span><span class="o">(</span><span class="n">t1</span><span class="o">);</span>
+                <span class="n">sun</span><span class="o">.</span><span class="na">misc</span><span class="o">.</span><span class="na">PerfCounter</span><span class="o">.</span><span class="na">getFindClasses</span><span class="o">().</span><span class="na">increment</span><span class="o">();</span>
             <span class="o">}</span>
         <span class="o">}</span>
         <span class="k">if</span> <span class="o">(</span><span class="n">resolve</span><span class="o">)</span> <span class="o">{</span>
-            <span class="n">resolveClass</span><span class="o">(</span><span class="n">c</span><span class="o">)</span><span class="o">;</span>
+            <span class="n">resolveClass</span><span class="o">(</span><span class="n">c</span><span class="o">);</span>
         <span class="o">}</span>
         <span class="k">return</span> <span class="n">c</span><span class="o">;</span>
     <span class="o">}</span>
@@ -438,14 +438,14 @@ Parent is ExtClassLoader
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// ClassLoader.java
 </span><span class="c1"></span>
-<span class="kd">protected</span> <span class="kd">final</span> <span class="n">Class</span><span class="o">&lt;</span><span class="o">?</span><span class="o">&gt;</span> <span class="n">defineClass</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">,</span> <span class="kt">byte</span><span class="o">[</span><span class="o">]</span> <span class="n">b</span><span class="o">,</span> <span class="kt">int</span> <span class="n">off</span><span class="o">,</span> <span class="kt">int</span> <span class="n">len</span><span class="o">,</span>
+<span class="kd">protected</span> <span class="kd">final</span> <span class="n">Class</span><span class="o">&lt;?&gt;</span> <span class="n">defineClass</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">,</span> <span class="kt">byte</span><span class="o">[]</span> <span class="n">b</span><span class="o">,</span> <span class="kt">int</span> <span class="n">off</span><span class="o">,</span> <span class="kt">int</span> <span class="n">len</span><span class="o">,</span>
                                      <span class="n">ProtectionDomain</span> <span class="n">protectionDomain</span><span class="o">)</span>
     <span class="kd">throws</span> <span class="n">ClassFormatError</span>
 <span class="o">{</span>
-    <span class="n">protectionDomain</span> <span class="o">=</span> <span class="n">preDefineClass</span><span class="o">(</span><span class="n">name</span><span class="o">,</span> <span class="n">protectionDomain</span><span class="o">)</span><span class="o">;</span>
-    <span class="n">String</span> <span class="n">source</span> <span class="o">=</span> <span class="n">defineClassSourceLocation</span><span class="o">(</span><span class="n">protectionDomain</span><span class="o">)</span><span class="o">;</span>
-    <span class="n">Class</span><span class="o">&lt;</span><span class="o">?</span><span class="o">&gt;</span> <span class="n">c</span> <span class="o">=</span> <span class="n">defineClass1</span><span class="o">(</span><span class="n">name</span><span class="o">,</span> <span class="n">b</span><span class="o">,</span> <span class="n">off</span><span class="o">,</span> <span class="n">len</span><span class="o">,</span> <span class="n">protectionDomain</span><span class="o">,</span> <span class="n">source</span><span class="o">)</span><span class="o">;</span>
-    <span class="n">postDefineClass</span><span class="o">(</span><span class="n">c</span><span class="o">,</span> <span class="n">protectionDomain</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">protectionDomain</span> <span class="o">=</span> <span class="n">preDefineClass</span><span class="o">(</span><span class="n">name</span><span class="o">,</span> <span class="n">protectionDomain</span><span class="o">);</span>
+    <span class="n">String</span> <span class="n">source</span> <span class="o">=</span> <span class="n">defineClassSourceLocation</span><span class="o">(</span><span class="n">protectionDomain</span><span class="o">);</span>
+    <span class="n">Class</span><span class="o">&lt;?&gt;</span> <span class="n">c</span> <span class="o">=</span> <span class="n">defineClass1</span><span class="o">(</span><span class="n">name</span><span class="o">,</span> <span class="n">b</span><span class="o">,</span> <span class="n">off</span><span class="o">,</span> <span class="n">len</span><span class="o">,</span> <span class="n">protectionDomain</span><span class="o">,</span> <span class="n">source</span><span class="o">);</span>
+    <span class="n">postDefineClass</span><span class="o">(</span><span class="n">c</span><span class="o">,</span> <span class="n">protectionDomain</span><span class="o">);</span>
     <span class="k">return</span> <span class="n">c</span><span class="o">;</span>
 <span class="o">}</span>
 </code></pre></td></tr></table>
@@ -490,14 +490,14 @@ Parent is ExtClassLoader
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">JavaTestApp</span> <span class="o">{</span>
 
-    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[</span><span class="o">]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
         <span class="k">try</span> <span class="o">{</span>
-            <span class="n">ClassLoader</span> <span class="n">appClassLoader</span> <span class="o">=</span> <span class="n">ClassLoader</span><span class="o">.</span><span class="na">getSystemClassLoader</span><span class="o">(</span><span class="o">)</span><span class="o">;</span> <span class="c1">// AppClassLoader
-</span><span class="c1"></span>            <span class="n">Class</span><span class="o">&lt;</span><span class="o">?</span><span class="o">&gt;</span> <span class="n">clazz</span> <span class="o">=</span> <span class="n">appClassLoader</span><span class="o">.</span><span class="na">loadClass</span><span class="o">(</span><span class="s">&#34;com.qiniu.fusion.app.Demo&#34;</span><span class="o">)</span><span class="o">;</span>
-            <span class="n">ClassLoader</span> <span class="n">classLoader</span> <span class="o">=</span> <span class="n">clazz</span><span class="o">.</span><span class="na">getClassLoader</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
-            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">printf</span><span class="o">(</span><span class="s">&#34;ClassLoader is %s&#34;</span><span class="o">,</span> <span class="n">classLoader</span><span class="o">.</span><span class="na">getClass</span><span class="o">(</span><span class="o">)</span><span class="o">.</span><span class="na">getSimpleName</span><span class="o">(</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
+            <span class="n">ClassLoader</span> <span class="n">appClassLoader</span> <span class="o">=</span> <span class="n">ClassLoader</span><span class="o">.</span><span class="na">getSystemClassLoader</span><span class="o">();</span> <span class="c1">// AppClassLoader
+</span><span class="c1"></span>            <span class="n">Class</span><span class="o">&lt;?&gt;</span> <span class="n">clazz</span> <span class="o">=</span> <span class="n">appClassLoader</span><span class="o">.</span><span class="na">loadClass</span><span class="o">(</span><span class="s">&#34;com.qiniu.fusion.app.Demo&#34;</span><span class="o">);</span>
+            <span class="n">ClassLoader</span> <span class="n">classLoader</span> <span class="o">=</span> <span class="n">clazz</span><span class="o">.</span><span class="na">getClassLoader</span><span class="o">();</span>
+            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">printf</span><span class="o">(</span><span class="s">&#34;ClassLoader is %s&#34;</span><span class="o">,</span> <span class="n">classLoader</span><span class="o">.</span><span class="na">getClass</span><span class="o">().</span><span class="na">getSimpleName</span><span class="o">());</span>
         <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
-            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">e</span><span class="o">)</span><span class="o">;</span>
+            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
         <span class="o">}</span>
     <span class="o">}</span>
 <span class="o">}</span>

@@ -24,7 +24,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.64.1 with theme even" />
+<meta name="generator" content="Hugo 0.68.3 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/post/hbase-storage-internals/" />
@@ -257,12 +257,12 @@ StoreFiles are composed of Blocks.
     <span class="cm">/**
 </span><span class="cm">    * @return a list of the Stores managed by this region
 </span><span class="cm">    */</span>
-    <span class="n">List</span><span class="o">&lt;</span><span class="o">?</span> <span class="kd">extends</span> <span class="n">Store</span><span class="o">&gt;</span> <span class="nf">getStores</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">List</span><span class="o">&lt;?</span> <span class="kd">extends</span> <span class="n">Store</span><span class="o">&gt;</span> <span class="nf">getStores</span><span class="o">();</span>
 
     <span class="cm">/**
 </span><span class="cm">    * @return the Store for the given family
 </span><span class="cm">    */</span>
-    <span class="n">Store</span> <span class="nf">getStore</span><span class="o">(</span><span class="kt">byte</span><span class="o">[</span><span class="o">]</span> <span class="n">family</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">Store</span> <span class="nf">getStore</span><span class="o">(</span><span class="kt">byte</span><span class="o">[]</span> <span class="n">family</span><span class="o">);</span>
 
     <span class="cm">/**
 </span><span class="cm">    * Check the region&#39;s underlying store files, open the files that have not
@@ -270,14 +270,14 @@ StoreFiles are composed of Blocks.
 </span><span class="cm">    * longer available.
 </span><span class="cm">    * @throws IOException
 </span><span class="cm">    */</span>
-    <span class="kt">boolean</span> <span class="nf">refreshStoreFiles</span><span class="o">(</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
+    <span class="kt">boolean</span> <span class="nf">refreshStoreFiles</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
 
     <span class="cm">/**
 </span><span class="cm">    * @return memstore size for this region, in bytes. It just accounts data size of cells added to
 </span><span class="cm">    *         the memstores of this Region. Means size in bytes for key, value and tags within Cells.
 </span><span class="cm">    *         It wont consider any java heap overhead for the cell objects or any other.
 </span><span class="cm">    */</span>
-    <span class="kt">long</span> <span class="nf">getMemStoreSize</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+    <span class="kt">long</span> <span class="nf">getMemStoreSize</span><span class="o">();</span>
 
     <span class="cm">/**
 </span><span class="cm">    * Puts some data in the table.
@@ -307,8 +307,8 @@ StoreFiles are composed of Blocks.
     <span class="kd">private</span> <span class="kd">final</span> <span class="n">HRegionFileSystem</span> <span class="n">fs</span><span class="o">;</span>
 
 
-    <span class="kd">protected</span> <span class="kd">final</span> <span class="n">Map</span><span class="o">&lt;</span><span class="kt">byte</span><span class="o">[</span><span class="o">]</span><span class="o">,</span> <span class="n">HStore</span><span class="o">&gt;</span> <span class="n">stores</span> <span class="o">=</span>
-     <span class="k">new</span> <span class="n">ConcurrentSkipListMap</span><span class="o">&lt;</span><span class="o">&gt;</span><span class="o">(</span><span class="n">Bytes</span><span class="o">.</span><span class="na">BYTES_RAWCOMPARATOR</span><span class="o">)</span><span class="o">;</span>
+    <span class="kd">protected</span> <span class="kd">final</span> <span class="n">Map</span><span class="o">&lt;</span><span class="kt">byte</span><span class="o">[],</span> <span class="n">HStore</span><span class="o">&gt;</span> <span class="n">stores</span> <span class="o">=</span>
+     <span class="k">new</span> <span class="n">ConcurrentSkipListMap</span><span class="o">&lt;&gt;(</span><span class="n">Bytes</span><span class="o">.</span><span class="na">BYTES_RAWCOMPARATOR</span><span class="o">);</span>
 <span class="o">}</span>
 </code></pre></td></tr></table>
 </div>
@@ -337,14 +337,14 @@ StoreFiles are composed of Blocks.
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">Store</span> <span class="o">{</span>
-    <span class="n">Collection</span><span class="o">&lt;</span><span class="o">?</span> <span class="kd">extends</span> <span class="n">StoreFile</span><span class="o">&gt;</span> <span class="nf">getStorefiles</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">Collection</span><span class="o">&lt;?</span> <span class="kd">extends</span> <span class="n">StoreFile</span><span class="o">&gt;</span> <span class="nf">getStorefiles</span><span class="o">();</span>
 
-    <span class="n">FileSystem</span> <span class="nf">getFileSystem</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">FileSystem</span> <span class="nf">getFileSystem</span><span class="o">();</span>
 
     <span class="cm">/**
 </span><span class="cm">    * @return The size of this store&#39;s memstore.
 </span><span class="cm">    */</span>
-    <span class="n">MemStoreSize</span> <span class="nf">getMemStoreSize</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">MemStoreSize</span> <span class="nf">getMemStoreSize</span><span class="o">();</span>
 <span class="o">}</span>
 
 <span class="kd">public</span> <span class="kd">class</span> <span class="nc">HStore</span> <span class="kd">implements</span> <span class="n">Store</span><span class="o">,</span> <span class="n">HeapSize</span><span class="o">,</span> <span class="n">StoreConfigInformation</span><span class="o">,</span> <span class="n">PropagatingConfigurationObserver</span> <span class="o">{</span>
@@ -379,7 +379,7 @@ StoreFiles are composed of Blocks.
 </span><span class="cm">    * @param memstoreSizing The delta in memstore size will be passed back via this.
 </span><span class="cm">    *        This will include both data size and heap overhead delta.
 </span><span class="cm">    */</span>
-    <span class="kt">void</span> <span class="nf">add</span><span class="o">(</span><span class="n">Iterable</span><span class="o">&lt;</span><span class="n">Cell</span><span class="o">&gt;</span> <span class="n">cells</span><span class="o">,</span> <span class="n">MemStoreSizing</span> <span class="n">memstoreSizing</span><span class="o">)</span><span class="o">;</span>
+    <span class="kt">void</span> <span class="nf">add</span><span class="o">(</span><span class="n">Iterable</span><span class="o">&lt;</span><span class="n">Cell</span><span class="o">&gt;</span> <span class="n">cells</span><span class="o">,</span> <span class="n">MemStoreSizing</span> <span class="n">memstoreSizing</span><span class="o">);</span>
 <span class="o">}</span>
 </code></pre></td></tr></table>
 </div>
@@ -424,12 +424,12 @@ StoreFiles are composed of Blocks.
     <span class="cm">/**
 </span><span class="cm">    * @return True if this is HFile.
 </span><span class="cm">    */</span>
-    <span class="kt">boolean</span> <span class="nf">isHFile</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+    <span class="kt">boolean</span> <span class="nf">isHFile</span><span class="o">();</span>
 
     <span class="cm">/**
 </span><span class="cm">    * Get the first key in this store file.
 </span><span class="cm">    */</span>
-    <span class="n">Optional</span><span class="o">&lt;</span><span class="n">Cell</span><span class="o">&gt;</span> <span class="nf">getFirstKey</span><span class="o">(</span><span class="o">)</span><span class="o">;</span> 
+    <span class="n">Optional</span><span class="o">&lt;</span><span class="n">Cell</span><span class="o">&gt;</span> <span class="nf">getFirstKey</span><span class="o">();</span> 
 <span class="o">}</span>
 
 <span class="cm">/**

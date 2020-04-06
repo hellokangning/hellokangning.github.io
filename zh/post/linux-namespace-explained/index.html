@@ -24,7 +24,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.64.1 with theme even" />
+<meta name="generator" content="Hugo 0.68.3 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/zh/post/linux-namespace-explained/" />
@@ -159,9 +159,9 @@ Container 哪些地方用到了 Linux Namespace
     <li><a href="#实现">实现</a></li>
     <li><a href="#namespace-的-api">Namespace 的 API</a>
       <ul>
-        <li><a href="#clone-创建新-namespace">clone() 创建新 namespace</a></li>
-        <li><a href="#setns-加入已有-namespace">setns() 加入已有 namespace</a></li>
-        <li><a href="#unshare-离开-namespace">unshare() 离开 namespace</a></li>
+        <li><a href="#clone-创建新-namespace"><code>clone()</code> 创建新 namespace</a></li>
+        <li><a href="#setns-加入已有-namespace"><code>setns()</code> 加入已有 namespace</a></li>
+        <li><a href="#unshare-离开-namespace"><code>unshare()</code> 离开 namespace</a></li>
       </ul>
     </li>
     <li><a href="#procpidns-目录">/proc/[pid]/ns/ 目录</a></li>
@@ -298,7 +298,7 @@ Container 哪些地方用到了 Linux Namespace
 	<span class="k">struct</span> <span class="n">pid_namespace</span> <span class="o">*</span><span class="n">pid_ns_for_children</span><span class="p">;</span>
 	<span class="k">struct</span> <span class="n">net</span> 	     <span class="o">*</span><span class="n">net_ns</span><span class="p">;</span>
 	<span class="k">struct</span> <span class="n">cgroup_namespace</span> <span class="o">*</span><span class="n">cgroup_ns</span><span class="p">;</span>
-<span class="p">}</span><span class="p">;</span>
+<span class="p">};</span>
 </code></pre></td></tr></table>
 </div>
 </div><p>这里特别说明下:</p>
@@ -323,9 +323,9 @@ Container 哪些地方用到了 Linux Namespace
 </span><span class="lnt">3
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">int</span> <span class="nf">clone</span><span class="p">(</span><span class="kt">int</span> <span class="p">(</span><span class="o">*</span><span class="n">fn</span><span class="p">)</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="p">)</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">child_stack</span><span class="p">,</span>
-                 <span class="kt">int</span> <span class="n">flags</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">arg</span><span class="p">,</span> <span class="p">.</span><span class="p">.</span><span class="p">.</span>
-                 <span class="cm">/* pid_t *ptid, void *newtls, pid_t *ctid */</span> <span class="p">)</span><span class="p">;</span>
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">int</span> <span class="nf">clone</span><span class="p">(</span><span class="kt">int</span> <span class="p">(</span><span class="o">*</span><span class="n">fn</span><span class="p">)(</span><span class="kt">void</span> <span class="o">*</span><span class="p">),</span> <span class="kt">void</span> <span class="o">*</span><span class="n">child_stack</span><span class="p">,</span>
+                 <span class="kt">int</span> <span class="n">flags</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">arg</span><span class="p">,</span> <span class="p">...</span>
+                 <span class="cm">/* pid_t *ptid, void *newtls, pid_t *ctid */</span> <span class="p">);</span>
 </code></pre></td></tr></table>
 </div>
 </div><p><code>clone()</code> 可以看作是传统 UNIX <code>fork</code> 的通用版本，两者都创建一个新的进程，也创建了一个新的 namespace。不同之处在于，<code>clone()</code> 允许子进程共享父进程的部分执行上下文，比如虚拟地址空间、文件描述符等。通过 <code>flags</code> 参数，我们可以控制父子进程之间共享的内容。</p>
@@ -343,7 +343,7 @@ Container 哪些地方用到了 Linux Namespace
 <pre class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">int</span> <span class="nf">setns</span><span class="p">(</span><span class="kt">int</span> <span class="n">fd</span><span class="p">,</span> <span class="kt">int</span> <span class="n">nstype</span><span class="p">)</span><span class="p">;</span>
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">int</span> <span class="nf">setns</span><span class="p">(</span><span class="kt">int</span> <span class="n">fd</span><span class="p">,</span> <span class="kt">int</span> <span class="n">nstype</span><span class="p">);</span>
 </code></pre></td></tr></table>
 </div>
 </div><p>其中，</p>
@@ -357,7 +357,7 @@ Container 哪些地方用到了 Linux Namespace
 <pre class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">int</span> <span class="nf">unshare</span><span class="p">(</span><span class="kt">int</span> <span class="n">flags</span><span class="p">)</span><span class="p">;</span>
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">int</span> <span class="nf">unshare</span><span class="p">(</span><span class="kt">int</span> <span class="n">flags</span><span class="p">);</span>
 </code></pre></td></tr></table>
 </div>
 </div><p><code>unshare()</code> 将进程（线程）从它被其他进程（线程）共享的执行上下文中分离出来。<code>flags</code> 参数是 <code>CLONE_*</code> 的位掩码。</p>
@@ -498,7 +498,7 @@ rwxrwxrwx. 1 mtk mtk 0 Apr 28 12:46 uts -&gt; uts:[4026531838]
 	<span class="kt">unsigned</span> <span class="kt">long</span>		<span class="n">flags</span><span class="p">;</span>
 
 	<span class="k">struct</span> <span class="n">ucounts</span>		<span class="o">*</span><span class="n">ucounts</span><span class="p">;</span>
-	<span class="kt">int</span> <span class="n">ucount_max</span><span class="p">[</span><span class="n">UCOUNT_COUNTS</span><span class="p">]</span><span class="p">;</span>
+	<span class="kt">int</span> <span class="n">ucount_max</span><span class="p">[</span><span class="n">UCOUNT_COUNTS</span><span class="p">];</span>
 <span class="p">}</span> <span class="n">__randomize_layout</span><span class="p">;</span>
 </code></pre></td></tr></table>
 </div>

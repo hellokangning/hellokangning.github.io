@@ -27,7 +27,7 @@ Performances differ on account of distinctive data structures. This implementati
 
 
 
-<meta name="generator" content="Hugo 0.64.1 with theme even" />
+<meta name="generator" content="Hugo 0.68.3 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/post/java-treemap/" />
@@ -153,9 +153,9 @@ Performances differ on account of distinctive data structures. This implementati
     <nav id="TableOfContents">
   <ul>
     <li><a href="#member-variables">Member Variables</a></li>
-    <li><a href="#get">get</a></li>
-    <li><a href="#put">put</a></li>
-    <li><a href="#remove">remove</a></li>
+    <li><a href="#get"><code>get</code></a></li>
+    <li><a href="#put"><code>put</code></a></li>
+    <li><a href="#remove"><code>remove</code></a></li>
   </ul>
 </nav>
   </div>
@@ -190,12 +190,12 @@ Performances differ on account of distinctive data structures. This implementati
 </span><span class="c1"></span>
 <span class="kd">public</span> <span class="kd">class</span> <span class="nc">TreeMap</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span>
     <span class="kd">extends</span> <span class="n">AbstractMap</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span>
-    <span class="kd">implements</span> <span class="n">NavigableMap</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span><span class="o">,</span> <span class="n">Cloneable</span><span class="o">,</span> <span class="n">java</span><span class="o">.</span><span class="na">io</span><span class="o">.</span><span class="na">Serializable</span>
+    <span class="kd">implements</span> <span class="n">NavigableMap</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;,</span> <span class="n">Cloneable</span><span class="o">,</span> <span class="n">java</span><span class="o">.</span><span class="na">io</span><span class="o">.</span><span class="na">Serializable</span>
 <span class="o">{</span>
     <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">boolean</span> <span class="n">RED</span>   <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
     <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">boolean</span> <span class="n">BLACK</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
 
-    <span class="kd">private</span> <span class="kd">final</span> <span class="n">Comparator</span><span class="o">&lt;</span><span class="o">?</span> <span class="kd">super</span> <span class="n">K</span><span class="o">&gt;</span> <span class="n">comparator</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">Comparator</span><span class="o">&lt;?</span> <span class="kd">super</span> <span class="n">K</span><span class="o">&gt;</span> <span class="n">comparator</span><span class="o">;</span>
 
     <span class="kd">private</span> <span class="kd">transient</span> <span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">root</span><span class="o">;</span>
 
@@ -269,21 +269,21 @@ Performances differ on account of distinctive data structures. This implementati
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// TreeMap.java
 </span><span class="c1"></span>
 <span class="kd">public</span> <span class="n">V</span> <span class="nf">get</span><span class="o">(</span><span class="n">Object</span> <span class="n">key</span><span class="o">)</span> <span class="o">{</span>
-    <span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">p</span> <span class="o">=</span> <span class="n">getEntry</span><span class="o">(</span><span class="n">key</span><span class="o">)</span><span class="o">;</span>
-    <span class="k">return</span> <span class="o">(</span><span class="n">p</span><span class="o">=</span><span class="o">=</span><span class="kc">null</span> <span class="o">?</span> <span class="kc">null</span> <span class="o">:</span> <span class="n">p</span><span class="o">.</span><span class="na">value</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">p</span> <span class="o">=</span> <span class="n">getEntry</span><span class="o">(</span><span class="n">key</span><span class="o">);</span>
+    <span class="k">return</span> <span class="o">(</span><span class="n">p</span><span class="o">==</span><span class="kc">null</span> <span class="o">?</span> <span class="kc">null</span> <span class="o">:</span> <span class="n">p</span><span class="o">.</span><span class="na">value</span><span class="o">);</span>
 <span class="o">}</span>
 
 <span class="kd">final</span> <span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="nf">getEntry</span><span class="o">(</span><span class="n">Object</span> <span class="n">key</span><span class="o">)</span> <span class="o">{</span>
     <span class="c1">// Offload comparator-based version for sake of performance
-</span><span class="c1"></span>    <span class="k">if</span> <span class="o">(</span><span class="n">comparator</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span>
-        <span class="k">return</span> <span class="n">getEntryUsingComparator</span><span class="o">(</span><span class="n">key</span><span class="o">)</span><span class="o">;</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">key</span> <span class="o">=</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span>
-        <span class="k">throw</span> <span class="k">new</span> <span class="n">NullPointerException</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+</span><span class="c1"></span>    <span class="k">if</span> <span class="o">(</span><span class="n">comparator</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span>
+        <span class="k">return</span> <span class="n">getEntryUsingComparator</span><span class="o">(</span><span class="n">key</span><span class="o">);</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">key</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="n">NullPointerException</span><span class="o">();</span>
     <span class="nd">@SuppressWarnings</span><span class="o">(</span><span class="s">&#34;unchecked&#34;</span><span class="o">)</span>
-        <span class="n">Comparable</span><span class="o">&lt;</span><span class="o">?</span> <span class="kd">super</span> <span class="n">K</span><span class="o">&gt;</span> <span class="n">k</span> <span class="o">=</span> <span class="o">(</span><span class="n">Comparable</span><span class="o">&lt;</span><span class="o">?</span> <span class="kd">super</span> <span class="n">K</span><span class="o">&gt;</span><span class="o">)</span> <span class="n">key</span><span class="o">;</span>
+        <span class="n">Comparable</span><span class="o">&lt;?</span> <span class="kd">super</span> <span class="n">K</span><span class="o">&gt;</span> <span class="n">k</span> <span class="o">=</span> <span class="o">(</span><span class="n">Comparable</span><span class="o">&lt;?</span> <span class="kd">super</span> <span class="n">K</span><span class="o">&gt;)</span> <span class="n">key</span><span class="o">;</span>
     <span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">p</span> <span class="o">=</span> <span class="n">root</span><span class="o">;</span>
-    <span class="k">while</span> <span class="o">(</span><span class="n">p</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-        <span class="kt">int</span> <span class="n">cmp</span> <span class="o">=</span> <span class="n">k</span><span class="o">.</span><span class="na">compareTo</span><span class="o">(</span><span class="n">p</span><span class="o">.</span><span class="na">key</span><span class="o">)</span><span class="o">;</span>
+    <span class="k">while</span> <span class="o">(</span><span class="n">p</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kt">int</span> <span class="n">cmp</span> <span class="o">=</span> <span class="n">k</span><span class="o">.</span><span class="na">compareTo</span><span class="o">(</span><span class="n">p</span><span class="o">.</span><span class="na">key</span><span class="o">);</span>
         <span class="k">if</span> <span class="o">(</span><span class="n">cmp</span> <span class="o">&lt;</span> <span class="n">0</span><span class="o">)</span>
             <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="na">left</span><span class="o">;</span>
         <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">cmp</span> <span class="o">&gt;</span> <span class="n">0</span><span class="o">)</span>
@@ -325,11 +325,11 @@ Performances differ on account of distinctive data structures. This implementati
 <span class="kd">final</span> <span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="nf">getEntryUsingComparator</span><span class="o">(</span><span class="n">Object</span> <span class="n">key</span><span class="o">)</span> <span class="o">{</span>
     <span class="nd">@SuppressWarnings</span><span class="o">(</span><span class="s">&#34;unchecked&#34;</span><span class="o">)</span>
         <span class="n">K</span> <span class="n">k</span> <span class="o">=</span> <span class="o">(</span><span class="n">K</span><span class="o">)</span> <span class="n">key</span><span class="o">;</span>
-    <span class="n">Comparator</span><span class="o">&lt;</span><span class="o">?</span> <span class="kd">super</span> <span class="n">K</span><span class="o">&gt;</span> <span class="n">cpr</span> <span class="o">=</span> <span class="n">comparator</span><span class="o">;</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">cpr</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">Comparator</span><span class="o">&lt;?</span> <span class="kd">super</span> <span class="n">K</span><span class="o">&gt;</span> <span class="n">cpr</span> <span class="o">=</span> <span class="n">comparator</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">cpr</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
         <span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">p</span> <span class="o">=</span> <span class="n">root</span><span class="o">;</span>
-        <span class="k">while</span> <span class="o">(</span><span class="n">p</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-            <span class="kt">int</span> <span class="n">cmp</span> <span class="o">=</span> <span class="n">cpr</span><span class="o">.</span><span class="na">compare</span><span class="o">(</span><span class="n">k</span><span class="o">,</span> <span class="n">p</span><span class="o">.</span><span class="na">key</span><span class="o">)</span><span class="o">;</span>
+        <span class="k">while</span> <span class="o">(</span><span class="n">p</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="kt">int</span> <span class="n">cmp</span> <span class="o">=</span> <span class="n">cpr</span><span class="o">.</span><span class="na">compare</span><span class="o">(</span><span class="n">k</span><span class="o">,</span> <span class="n">p</span><span class="o">.</span><span class="na">key</span><span class="o">);</span>
             <span class="k">if</span> <span class="o">(</span><span class="n">cmp</span> <span class="o">&lt;</span> <span class="n">0</span><span class="o">)</span>
                 <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="na">left</span><span class="o">;</span>
             <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">cmp</span> <span class="o">&gt;</span> <span class="n">0</span><span class="o">)</span>
@@ -342,7 +342,7 @@ Performances differ on account of distinctive data structures. This implementati
 <span class="o">}</span>
 </code></pre></td></tr></table>
 </div>
-</div><p>As we can see, it&rsquo;s a typical preorder traversal of binary tree, a binary search tree particularly. Time complexity of log(n) is inevictable involving iteration of a tree.</p>
+</div><p>As we can see, it&rsquo;s a typical pre-order traversal of binary tree, a binary search tree particularly. Time complexity of log(n) is inevitable involving iteration of a tree.</p>
 <p>Then how is this tree built?</p>
 <h1 id="put"><code>put</code></h1>
 <p><code>put</code> associates the specified value with the specified key in this map. If the map previously contained a mapping for the key, the old value is replaced.</p>
@@ -408,59 +408,59 @@ Performances differ on account of distinctive data structures. This implementati
 </span><span class="c1"></span>
 <span class="kd">public</span> <span class="n">V</span> <span class="nf">put</span><span class="o">(</span><span class="n">K</span> <span class="n">key</span><span class="o">,</span> <span class="n">V</span> <span class="n">value</span><span class="o">)</span> <span class="o">{</span>
     <span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">t</span> <span class="o">=</span> <span class="n">root</span><span class="o">;</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">t</span> <span class="o">=</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-        <span class="n">compare</span><span class="o">(</span><span class="n">key</span><span class="o">,</span> <span class="n">key</span><span class="o">)</span><span class="o">;</span> <span class="c1">// type (and possibly null) check
+    <span class="k">if</span> <span class="o">(</span><span class="n">t</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">compare</span><span class="o">(</span><span class="n">key</span><span class="o">,</span> <span class="n">key</span><span class="o">);</span> <span class="c1">// type (and possibly null) check
 </span><span class="c1"></span>
-        <span class="n">root</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Entry</span><span class="o">&lt;</span><span class="o">&gt;</span><span class="o">(</span><span class="n">key</span><span class="o">,</span> <span class="n">value</span><span class="o">,</span> <span class="kc">null</span><span class="o">)</span><span class="o">;</span>
+        <span class="n">root</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Entry</span><span class="o">&lt;&gt;(</span><span class="n">key</span><span class="o">,</span> <span class="n">value</span><span class="o">,</span> <span class="kc">null</span><span class="o">);</span>
         <span class="n">size</span> <span class="o">=</span> <span class="n">1</span><span class="o">;</span>
-        <span class="n">modCount</span><span class="o">+</span><span class="o">+</span><span class="o">;</span>
+        <span class="n">modCount</span><span class="o">++;</span>
         <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
     <span class="o">}</span>
     <span class="kt">int</span> <span class="n">cmp</span><span class="o">;</span>
     <span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">parent</span><span class="o">;</span>
     <span class="c1">// split comparator and comparable paths
-</span><span class="c1"></span>    <span class="n">Comparator</span><span class="o">&lt;</span><span class="o">?</span> <span class="kd">super</span> <span class="n">K</span><span class="o">&gt;</span> <span class="n">cpr</span> <span class="o">=</span> <span class="n">comparator</span><span class="o">;</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">cpr</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="c1"></span>    <span class="n">Comparator</span><span class="o">&lt;?</span> <span class="kd">super</span> <span class="n">K</span><span class="o">&gt;</span> <span class="n">cpr</span> <span class="o">=</span> <span class="n">comparator</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">cpr</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
         <span class="k">do</span> <span class="o">{</span>
             <span class="n">parent</span> <span class="o">=</span> <span class="n">t</span><span class="o">;</span>
-            <span class="n">cmp</span> <span class="o">=</span> <span class="n">cpr</span><span class="o">.</span><span class="na">compare</span><span class="o">(</span><span class="n">key</span><span class="o">,</span> <span class="n">t</span><span class="o">.</span><span class="na">key</span><span class="o">)</span><span class="o">;</span>
+            <span class="n">cmp</span> <span class="o">=</span> <span class="n">cpr</span><span class="o">.</span><span class="na">compare</span><span class="o">(</span><span class="n">key</span><span class="o">,</span> <span class="n">t</span><span class="o">.</span><span class="na">key</span><span class="o">);</span>
             <span class="k">if</span> <span class="o">(</span><span class="n">cmp</span> <span class="o">&lt;</span> <span class="n">0</span><span class="o">)</span>
                 <span class="n">t</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="na">left</span><span class="o">;</span>
             <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">cmp</span> <span class="o">&gt;</span> <span class="n">0</span><span class="o">)</span>
                 <span class="n">t</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="na">right</span><span class="o">;</span>
             <span class="k">else</span>
-                <span class="k">return</span> <span class="n">t</span><span class="o">.</span><span class="na">setValue</span><span class="o">(</span><span class="n">value</span><span class="o">)</span><span class="o">;</span>
-        <span class="o">}</span> <span class="k">while</span> <span class="o">(</span><span class="n">t</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span><span class="o">;</span>
+                <span class="k">return</span> <span class="n">t</span><span class="o">.</span><span class="na">setValue</span><span class="o">(</span><span class="n">value</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">while</span> <span class="o">(</span><span class="n">t</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">);</span>
     <span class="o">}</span>
     <span class="k">else</span> <span class="o">{</span>
-        <span class="k">if</span> <span class="o">(</span><span class="n">key</span> <span class="o">=</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="n">NullPointerException</span><span class="o">(</span><span class="o">)</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">key</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="n">NullPointerException</span><span class="o">();</span>
         <span class="nd">@SuppressWarnings</span><span class="o">(</span><span class="s">&#34;unchecked&#34;</span><span class="o">)</span>
-            <span class="n">Comparable</span><span class="o">&lt;</span><span class="o">?</span> <span class="kd">super</span> <span class="n">K</span><span class="o">&gt;</span> <span class="n">k</span> <span class="o">=</span> <span class="o">(</span><span class="n">Comparable</span><span class="o">&lt;</span><span class="o">?</span> <span class="kd">super</span> <span class="n">K</span><span class="o">&gt;</span><span class="o">)</span> <span class="n">key</span><span class="o">;</span>
+            <span class="n">Comparable</span><span class="o">&lt;?</span> <span class="kd">super</span> <span class="n">K</span><span class="o">&gt;</span> <span class="n">k</span> <span class="o">=</span> <span class="o">(</span><span class="n">Comparable</span><span class="o">&lt;?</span> <span class="kd">super</span> <span class="n">K</span><span class="o">&gt;)</span> <span class="n">key</span><span class="o">;</span>
         <span class="k">do</span> <span class="o">{</span>
             <span class="n">parent</span> <span class="o">=</span> <span class="n">t</span><span class="o">;</span>
-            <span class="n">cmp</span> <span class="o">=</span> <span class="n">k</span><span class="o">.</span><span class="na">compareTo</span><span class="o">(</span><span class="n">t</span><span class="o">.</span><span class="na">key</span><span class="o">)</span><span class="o">;</span>
+            <span class="n">cmp</span> <span class="o">=</span> <span class="n">k</span><span class="o">.</span><span class="na">compareTo</span><span class="o">(</span><span class="n">t</span><span class="o">.</span><span class="na">key</span><span class="o">);</span>
             <span class="k">if</span> <span class="o">(</span><span class="n">cmp</span> <span class="o">&lt;</span> <span class="n">0</span><span class="o">)</span>
                 <span class="n">t</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="na">left</span><span class="o">;</span>
             <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">cmp</span> <span class="o">&gt;</span> <span class="n">0</span><span class="o">)</span>
                 <span class="n">t</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="na">right</span><span class="o">;</span>
             <span class="k">else</span>
-                <span class="k">return</span> <span class="n">t</span><span class="o">.</span><span class="na">setValue</span><span class="o">(</span><span class="n">value</span><span class="o">)</span><span class="o">;</span>
-        <span class="o">}</span> <span class="k">while</span> <span class="o">(</span><span class="n">t</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span><span class="o">;</span>
+                <span class="k">return</span> <span class="n">t</span><span class="o">.</span><span class="na">setValue</span><span class="o">(</span><span class="n">value</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">while</span> <span class="o">(</span><span class="n">t</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">);</span>
     <span class="o">}</span>
-    <span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">e</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Entry</span><span class="o">&lt;</span><span class="o">&gt;</span><span class="o">(</span><span class="n">key</span><span class="o">,</span> <span class="n">value</span><span class="o">,</span> <span class="n">parent</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">e</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Entry</span><span class="o">&lt;&gt;(</span><span class="n">key</span><span class="o">,</span> <span class="n">value</span><span class="o">,</span> <span class="n">parent</span><span class="o">);</span>
     <span class="k">if</span> <span class="o">(</span><span class="n">cmp</span> <span class="o">&lt;</span> <span class="n">0</span><span class="o">)</span>
         <span class="n">parent</span><span class="o">.</span><span class="na">left</span> <span class="o">=</span> <span class="n">e</span><span class="o">;</span>
     <span class="k">else</span>
         <span class="n">parent</span><span class="o">.</span><span class="na">right</span> <span class="o">=</span> <span class="n">e</span><span class="o">;</span>
-    <span class="n">fixAfterInsertion</span><span class="o">(</span><span class="n">e</span><span class="o">)</span><span class="o">;</span>
-    <span class="n">size</span><span class="o">+</span><span class="o">+</span><span class="o">;</span>
-    <span class="n">modCount</span><span class="o">+</span><span class="o">+</span><span class="o">;</span>
+    <span class="n">fixAfterInsertion</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
+    <span class="n">size</span><span class="o">++;</span>
+    <span class="n">modCount</span><span class="o">++;</span>
     <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
 <span class="o">}</span>
 </code></pre></td></tr></table>
 </div>
-</div><p>Firstly, find the parent of new node by preorder traversal. After inserting new entry, <code>fixAfterInsertion</code> is invoked to rotate the tree for rebalance.</p>
+</div><p>Firstly, find the parent of new node by pre-order traversal. After inserting new entry, <code>fixAfterInsertion</code> is invoked to rotate the tree for rebalance.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt"> 1
@@ -512,38 +512,38 @@ Performances differ on account of distinctive data structures. This implementati
 <span class="kd">private</span> <span class="kt">void</span> <span class="nf">fixAfterInsertion</span><span class="o">(</span><span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">x</span><span class="o">)</span> <span class="o">{</span>
     <span class="n">x</span><span class="o">.</span><span class="na">color</span> <span class="o">=</span> <span class="n">RED</span><span class="o">;</span>
 
-    <span class="k">while</span> <span class="o">(</span><span class="n">x</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">x</span> <span class="o">!</span><span class="o">=</span> <span class="n">root</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">x</span><span class="o">.</span><span class="na">parent</span><span class="o">.</span><span class="na">color</span> <span class="o">=</span><span class="o">=</span> <span class="n">RED</span><span class="o">)</span> <span class="o">{</span>
-        <span class="k">if</span> <span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">x</span><span class="o">)</span> <span class="o">=</span><span class="o">=</span> <span class="n">leftOf</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">x</span><span class="o">)</span><span class="o">)</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
-            <span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">y</span> <span class="o">=</span> <span class="n">rightOf</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">x</span><span class="o">)</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
-            <span class="k">if</span> <span class="o">(</span><span class="n">colorOf</span><span class="o">(</span><span class="n">y</span><span class="o">)</span> <span class="o">=</span><span class="o">=</span> <span class="n">RED</span><span class="o">)</span> <span class="o">{</span>
-                <span class="n">setColor</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">x</span><span class="o">)</span><span class="o">,</span> <span class="n">BLACK</span><span class="o">)</span><span class="o">;</span>
-                <span class="n">setColor</span><span class="o">(</span><span class="n">y</span><span class="o">,</span> <span class="n">BLACK</span><span class="o">)</span><span class="o">;</span>
-                <span class="n">setColor</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">x</span><span class="o">)</span><span class="o">)</span><span class="o">,</span> <span class="n">RED</span><span class="o">)</span><span class="o">;</span>
-                <span class="n">x</span> <span class="o">=</span> <span class="n">parentOf</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">x</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
+    <span class="k">while</span> <span class="o">(</span><span class="n">x</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">x</span> <span class="o">!=</span> <span class="n">root</span> <span class="o">&amp;&amp;</span> <span class="n">x</span><span class="o">.</span><span class="na">parent</span><span class="o">.</span><span class="na">color</span> <span class="o">==</span> <span class="n">RED</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">x</span><span class="o">)</span> <span class="o">==</span> <span class="n">leftOf</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">x</span><span class="o">))))</span> <span class="o">{</span>
+            <span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">y</span> <span class="o">=</span> <span class="n">rightOf</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">x</span><span class="o">)));</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">colorOf</span><span class="o">(</span><span class="n">y</span><span class="o">)</span> <span class="o">==</span> <span class="n">RED</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">setColor</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">x</span><span class="o">),</span> <span class="n">BLACK</span><span class="o">);</span>
+                <span class="n">setColor</span><span class="o">(</span><span class="n">y</span><span class="o">,</span> <span class="n">BLACK</span><span class="o">);</span>
+                <span class="n">setColor</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">x</span><span class="o">)),</span> <span class="n">RED</span><span class="o">);</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">parentOf</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">x</span><span class="o">));</span>
             <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
-                <span class="k">if</span> <span class="o">(</span><span class="n">x</span> <span class="o">=</span><span class="o">=</span> <span class="n">rightOf</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">x</span><span class="o">)</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
-                    <span class="n">x</span> <span class="o">=</span> <span class="n">parentOf</span><span class="o">(</span><span class="n">x</span><span class="o">)</span><span class="o">;</span>
-                    <span class="n">rotateLeft</span><span class="o">(</span><span class="n">x</span><span class="o">)</span><span class="o">;</span>
+                <span class="k">if</span> <span class="o">(</span><span class="n">x</span> <span class="o">==</span> <span class="n">rightOf</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">x</span><span class="o">)))</span> <span class="o">{</span>
+                    <span class="n">x</span> <span class="o">=</span> <span class="n">parentOf</span><span class="o">(</span><span class="n">x</span><span class="o">);</span>
+                    <span class="n">rotateLeft</span><span class="o">(</span><span class="n">x</span><span class="o">);</span>
                 <span class="o">}</span>
-                <span class="n">setColor</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">x</span><span class="o">)</span><span class="o">,</span> <span class="n">BLACK</span><span class="o">)</span><span class="o">;</span>
-                <span class="n">setColor</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">x</span><span class="o">)</span><span class="o">)</span><span class="o">,</span> <span class="n">RED</span><span class="o">)</span><span class="o">;</span>
-                <span class="n">rotateRight</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">x</span><span class="o">)</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
+                <span class="n">setColor</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">x</span><span class="o">),</span> <span class="n">BLACK</span><span class="o">);</span>
+                <span class="n">setColor</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">x</span><span class="o">)),</span> <span class="n">RED</span><span class="o">);</span>
+                <span class="n">rotateRight</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">x</span><span class="o">)));</span>
             <span class="o">}</span>
         <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
-            <span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">y</span> <span class="o">=</span> <span class="n">leftOf</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">x</span><span class="o">)</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
-            <span class="k">if</span> <span class="o">(</span><span class="n">colorOf</span><span class="o">(</span><span class="n">y</span><span class="o">)</span> <span class="o">=</span><span class="o">=</span> <span class="n">RED</span><span class="o">)</span> <span class="o">{</span>
-                <span class="n">setColor</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">x</span><span class="o">)</span><span class="o">,</span> <span class="n">BLACK</span><span class="o">)</span><span class="o">;</span>
-                <span class="n">setColor</span><span class="o">(</span><span class="n">y</span><span class="o">,</span> <span class="n">BLACK</span><span class="o">)</span><span class="o">;</span>
-                <span class="n">setColor</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">x</span><span class="o">)</span><span class="o">)</span><span class="o">,</span> <span class="n">RED</span><span class="o">)</span><span class="o">;</span>
-                <span class="n">x</span> <span class="o">=</span> <span class="n">parentOf</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">x</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
+            <span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">y</span> <span class="o">=</span> <span class="n">leftOf</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">x</span><span class="o">)));</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">colorOf</span><span class="o">(</span><span class="n">y</span><span class="o">)</span> <span class="o">==</span> <span class="n">RED</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">setColor</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">x</span><span class="o">),</span> <span class="n">BLACK</span><span class="o">);</span>
+                <span class="n">setColor</span><span class="o">(</span><span class="n">y</span><span class="o">,</span> <span class="n">BLACK</span><span class="o">);</span>
+                <span class="n">setColor</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">x</span><span class="o">)),</span> <span class="n">RED</span><span class="o">);</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">parentOf</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">x</span><span class="o">));</span>
             <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
-                <span class="k">if</span> <span class="o">(</span><span class="n">x</span> <span class="o">=</span><span class="o">=</span> <span class="n">leftOf</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">x</span><span class="o">)</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
-                    <span class="n">x</span> <span class="o">=</span> <span class="n">parentOf</span><span class="o">(</span><span class="n">x</span><span class="o">)</span><span class="o">;</span>
-                    <span class="n">rotateRight</span><span class="o">(</span><span class="n">x</span><span class="o">)</span><span class="o">;</span>
+                <span class="k">if</span> <span class="o">(</span><span class="n">x</span> <span class="o">==</span> <span class="n">leftOf</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">x</span><span class="o">)))</span> <span class="o">{</span>
+                    <span class="n">x</span> <span class="o">=</span> <span class="n">parentOf</span><span class="o">(</span><span class="n">x</span><span class="o">);</span>
+                    <span class="n">rotateRight</span><span class="o">(</span><span class="n">x</span><span class="o">);</span>
                 <span class="o">}</span>
-                <span class="n">setColor</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">x</span><span class="o">)</span><span class="o">,</span> <span class="n">BLACK</span><span class="o">)</span><span class="o">;</span>
-                <span class="n">setColor</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">x</span><span class="o">)</span><span class="o">)</span><span class="o">,</span> <span class="n">RED</span><span class="o">)</span><span class="o">;</span>
-                <span class="n">rotateLeft</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">x</span><span class="o">)</span><span class="o">)</span><span class="o">)</span><span class="o">;</span>
+                <span class="n">setColor</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">x</span><span class="o">),</span> <span class="n">BLACK</span><span class="o">);</span>
+                <span class="n">setColor</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">x</span><span class="o">)),</span> <span class="n">RED</span><span class="o">);</span>
+                <span class="n">rotateLeft</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">parentOf</span><span class="o">(</span><span class="n">x</span><span class="o">)));</span>
             <span class="o">}</span>
         <span class="o">}</span>
     <span class="o">}</span>
@@ -620,37 +620,37 @@ Performances differ on account of distinctive data structures. This implementati
 <pre class="chroma"><code class="language-java" data-lang="java"><span class="c1">// TreeMap.java
 </span><span class="c1"></span>
 <span class="kd">public</span> <span class="n">V</span> <span class="nf">remove</span><span class="o">(</span><span class="n">Object</span> <span class="n">key</span><span class="o">)</span> <span class="o">{</span>
-    <span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">p</span> <span class="o">=</span> <span class="n">getEntry</span><span class="o">(</span><span class="n">key</span><span class="o">)</span><span class="o">;</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">p</span> <span class="o">=</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span>
+    <span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">p</span> <span class="o">=</span> <span class="n">getEntry</span><span class="o">(</span><span class="n">key</span><span class="o">);</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">p</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span>
         <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
 
     <span class="n">V</span> <span class="n">oldValue</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="na">value</span><span class="o">;</span>
-    <span class="n">deleteEntry</span><span class="o">(</span><span class="n">p</span><span class="o">)</span><span class="o">;</span>
+    <span class="n">deleteEntry</span><span class="o">(</span><span class="n">p</span><span class="o">);</span>
     <span class="k">return</span> <span class="n">oldValue</span><span class="o">;</span>
 <span class="o">}</span>
 
 <span class="kd">private</span> <span class="kt">void</span> <span class="nf">deleteEntry</span><span class="o">(</span><span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">p</span><span class="o">)</span> <span class="o">{</span>
-    <span class="n">modCount</span><span class="o">+</span><span class="o">+</span><span class="o">;</span>
-    <span class="n">size</span><span class="o">-</span><span class="o">-</span><span class="o">;</span>
+    <span class="n">modCount</span><span class="o">++;</span>
+    <span class="n">size</span><span class="o">--;</span>
 
     <span class="c1">// If strictly internal, copy successor&#39;s element to p and then make p
 </span><span class="c1"></span>    <span class="c1">// point to successor.
-</span><span class="c1"></span>    <span class="k">if</span> <span class="o">(</span><span class="n">p</span><span class="o">.</span><span class="na">left</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">p</span><span class="o">.</span><span class="na">right</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-        <span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">s</span> <span class="o">=</span> <span class="n">successor</span><span class="o">(</span><span class="n">p</span><span class="o">)</span><span class="o">;</span>
+</span><span class="c1"></span>    <span class="k">if</span> <span class="o">(</span><span class="n">p</span><span class="o">.</span><span class="na">left</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">p</span><span class="o">.</span><span class="na">right</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">s</span> <span class="o">=</span> <span class="n">successor</span><span class="o">(</span><span class="n">p</span><span class="o">);</span>
         <span class="n">p</span><span class="o">.</span><span class="na">key</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="na">key</span><span class="o">;</span>
         <span class="n">p</span><span class="o">.</span><span class="na">value</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="na">value</span><span class="o">;</span>
         <span class="n">p</span> <span class="o">=</span> <span class="n">s</span><span class="o">;</span>
     <span class="o">}</span> <span class="c1">// p has 2 children
 </span><span class="c1"></span>
     <span class="c1">// Start fixup at replacement node, if it exists.
-</span><span class="c1"></span>    <span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">replacement</span> <span class="o">=</span> <span class="o">(</span><span class="n">p</span><span class="o">.</span><span class="na">left</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span> <span class="o">?</span> <span class="n">p</span><span class="o">.</span><span class="na">left</span> <span class="o">:</span> <span class="n">p</span><span class="o">.</span><span class="na">right</span><span class="o">)</span><span class="o">;</span>
+</span><span class="c1"></span>    <span class="n">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span><span class="n">V</span><span class="o">&gt;</span> <span class="n">replacement</span> <span class="o">=</span> <span class="o">(</span><span class="n">p</span><span class="o">.</span><span class="na">left</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">?</span> <span class="n">p</span><span class="o">.</span><span class="na">left</span> <span class="o">:</span> <span class="n">p</span><span class="o">.</span><span class="na">right</span><span class="o">);</span>
 
-    <span class="k">if</span> <span class="o">(</span><span class="n">replacement</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">replacement</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
         <span class="c1">// Link replacement to parent
 </span><span class="c1"></span>        <span class="n">replacement</span><span class="o">.</span><span class="na">parent</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="na">parent</span><span class="o">;</span>
-        <span class="k">if</span> <span class="o">(</span><span class="n">p</span><span class="o">.</span><span class="na">parent</span> <span class="o">=</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">p</span><span class="o">.</span><span class="na">parent</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span>
             <span class="n">root</span> <span class="o">=</span> <span class="n">replacement</span><span class="o">;</span>
-        <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">p</span> <span class="o">=</span><span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="na">parent</span><span class="o">.</span><span class="na">left</span><span class="o">)</span>
+        <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">p</span> <span class="o">==</span> <span class="n">p</span><span class="o">.</span><span class="na">parent</span><span class="o">.</span><span class="na">left</span><span class="o">)</span>
             <span class="n">p</span><span class="o">.</span><span class="na">parent</span><span class="o">.</span><span class="na">left</span>  <span class="o">=</span> <span class="n">replacement</span><span class="o">;</span>
         <span class="k">else</span>
             <span class="n">p</span><span class="o">.</span><span class="na">parent</span><span class="o">.</span><span class="na">right</span> <span class="o">=</span> <span class="n">replacement</span><span class="o">;</span>
@@ -659,18 +659,18 @@ Performances differ on account of distinctive data structures. This implementati
 </span><span class="c1"></span>        <span class="n">p</span><span class="o">.</span><span class="na">left</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="na">right</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="na">parent</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
 
         <span class="c1">// Fix replacement
-</span><span class="c1"></span>        <span class="k">if</span> <span class="o">(</span><span class="n">p</span><span class="o">.</span><span class="na">color</span> <span class="o">=</span><span class="o">=</span> <span class="n">BLACK</span><span class="o">)</span>
-            <span class="n">fixAfterDeletion</span><span class="o">(</span><span class="n">replacement</span><span class="o">)</span><span class="o">;</span>
-    <span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">p</span><span class="o">.</span><span class="na">parent</span> <span class="o">=</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span> <span class="c1">// return if we are the only node.
+</span><span class="c1"></span>        <span class="k">if</span> <span class="o">(</span><span class="n">p</span><span class="o">.</span><span class="na">color</span> <span class="o">==</span> <span class="n">BLACK</span><span class="o">)</span>
+            <span class="n">fixAfterDeletion</span><span class="o">(</span><span class="n">replacement</span><span class="o">);</span>
+    <span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">p</span><span class="o">.</span><span class="na">parent</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span> <span class="c1">// return if we are the only node.
 </span><span class="c1"></span>        <span class="n">root</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
     <span class="o">}</span> <span class="k">else</span> <span class="o">{</span> <span class="c1">//  No children. Use self as phantom replacement and unlink.
-</span><span class="c1"></span>        <span class="k">if</span> <span class="o">(</span><span class="n">p</span><span class="o">.</span><span class="na">color</span> <span class="o">=</span><span class="o">=</span> <span class="n">BLACK</span><span class="o">)</span>
-            <span class="n">fixAfterDeletion</span><span class="o">(</span><span class="n">p</span><span class="o">)</span><span class="o">;</span>
+</span><span class="c1"></span>        <span class="k">if</span> <span class="o">(</span><span class="n">p</span><span class="o">.</span><span class="na">color</span> <span class="o">==</span> <span class="n">BLACK</span><span class="o">)</span>
+            <span class="n">fixAfterDeletion</span><span class="o">(</span><span class="n">p</span><span class="o">);</span>
 
-        <span class="k">if</span> <span class="o">(</span><span class="n">p</span><span class="o">.</span><span class="na">parent</span> <span class="o">!</span><span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-            <span class="k">if</span> <span class="o">(</span><span class="n">p</span> <span class="o">=</span><span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="na">parent</span><span class="o">.</span><span class="na">left</span><span class="o">)</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">p</span><span class="o">.</span><span class="na">parent</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">p</span> <span class="o">==</span> <span class="n">p</span><span class="o">.</span><span class="na">parent</span><span class="o">.</span><span class="na">left</span><span class="o">)</span>
                 <span class="n">p</span><span class="o">.</span><span class="na">parent</span><span class="o">.</span><span class="na">left</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
-            <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">p</span> <span class="o">=</span><span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="na">parent</span><span class="o">.</span><span class="na">right</span><span class="o">)</span>
+            <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">p</span> <span class="o">==</span> <span class="n">p</span><span class="o">.</span><span class="na">parent</span><span class="o">.</span><span class="na">right</span><span class="o">)</span>
                 <span class="n">p</span><span class="o">.</span><span class="na">parent</span><span class="o">.</span><span class="na">right</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
             <span class="n">p</span><span class="o">.</span><span class="na">parent</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
         <span class="o">}</span>
