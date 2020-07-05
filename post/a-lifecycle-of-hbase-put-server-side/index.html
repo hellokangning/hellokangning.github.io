@@ -154,7 +154,7 @@
   </div>
 </div>
     <div class="post-content">
-      <p>Following the preceding <a href="https://hellokangning.github.io/en/post/a-lifecycle-of-hbase-put-client-side/">A Lifecycle of HBase&rsquo;s Put: Client-side</a>, this post will figure out how a <code>Put</code> request does its mutation on <code>HRegionServer</code>. The whole process involves WAL, MemStore, and Coprocessor etc. After reading this post, hope you make their roles clear.</p>
+      <p>Following the preceding <a href="https://hellokangning.github.io/post/a-lifecycle-of-hbase-put-client-side/">A Lifecycle of HBase&rsquo;s Put: Client-side</a>, this post will figure out how a <code>Put</code> request does its mutation on <code>HRegionServer</code>. The whole process involves WAL, MemStore, and Coprocessor etc. After reading this post, hope you make their roles clear.</p>
 <p><img src="/images/hbase-regionserver-put-interaction.png" alt=""></p>
 <p>What <code>ClientServiceCallable</code> do on client-side, if you remember, is calling <code>ClientProtos.ClientService.BlockingInterface</code>'s <code>mutate</code> method to send <code>Put</code> request to <code>RegionServer</code>.</p>
 <div class="highlight"><div class="chroma">
