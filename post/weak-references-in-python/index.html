@@ -27,7 +27,7 @@ But sometimes, it is useful to have a reference to an object that does not keep 
 
 
 
-<meta name="generator" content="Hugo 0.73.0 with theme even" />
+<meta name="generator" content="Hugo 0.68.3 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/post/weak-references-in-python/" />
@@ -182,13 +182,13 @@ But sometimes, it is useful to have a reference to an object that does not keep 
 <pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">weakref</span>
 <span class="n">s</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">}</span>
 <span class="n">wref</span> <span class="o">=</span> <span class="n">weakref</span><span class="o">.</span><span class="n">ref</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="n">wref</span><span class="p">)</span> <span class="c1"># &lt;weakref at 0x10767bb88; to &#39;set&#39; at 0x1076a5f28&gt;</span>
-<span class="k">print</span><span class="p">(</span><span class="n">wref</span><span class="p">())</span> <span class="c1"># {0, 1}</span>
+<span class="k">print</span><span class="p">(</span><span class="n">wref</span><span class="p">)</span> <span class="c1"># &lt;weakref at 0x10767bb88; to &#39;set&#39; at 0x1076a5f28&gt;</span>
+<span class="k">print</span><span class="p">(</span><span class="n">wref</span><span class="p">())</span> <span class="c1"># {0, 1}</span>
 
 <span class="n">s</span> <span class="o">=</span> <span class="p">{</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">}</span>
-<span class="k">print</span><span class="p">(</span><span class="n">wref</span><span class="p">)</span> <span class="c1"># &lt;weakref at 0x109871b88; dead&gt;</span>
-<span class="k">print</span><span class="p">(</span><span class="n">wref</span><span class="p">())</span> <span class="c1"># None</span>
-<span class="k">print</span><span class="p">(</span><span class="n">wref</span><span class="p">()</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">)</span> <span class="c1"># True</span>
+<span class="k">print</span><span class="p">(</span><span class="n">wref</span><span class="p">)</span> <span class="c1"># &lt;weakref at 0x109871b88; dead&gt;</span>
+<span class="k">print</span><span class="p">(</span><span class="n">wref</span><span class="p">())</span> <span class="c1"># None</span>
+<span class="k">print</span><span class="p">(</span><span class="n">wref</span><span class="p">()</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">)</span> <span class="c1"># True</span>
 </code></pre></td></tr></table>
 </div>
 </div><h1 id="weekvaluedictionary"><code>WeekValueDictionary</code></h1>
@@ -230,11 +230,11 @@ But sometimes, it is useful to have a reference to an object that does not keep 
 <span class="k">for</span> <span class="n">ce</span> <span class="ow">in</span> <span class="n">catalog</span><span class="p">:</span>
     <span class="n">stock</span><span class="p">[</span><span class="n">ce</span><span class="o">.</span><span class="n">kind</span><span class="p">]</span> <span class="o">=</span> <span class="n">ce</span>
 
-<span class="k">print</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">stock</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span> <span class="c1"># [&#39;Brie&#39;, &#39;Parmesan&#39;, &#39;Red Leicester&#39;, &#39;Tilsit&#39;]</span>
+<span class="k">print</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">stock</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span> <span class="c1"># [&#39;Brie&#39;, &#39;Parmesan&#39;, &#39;Red Leicester&#39;, &#39;Tilsit&#39;]</span>
 <span class="k">del</span> <span class="n">catalog</span>
-<span class="k">print</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">stock</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span> <span class="c1"># [&#39;Parmesan&#39;]</span>
+<span class="k">print</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">stock</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span> <span class="c1"># [&#39;Parmesan&#39;]</span>
 <span class="k">del</span> <span class="n">ce</span>
-<span class="k">print</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">stock</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span> <span class="c1"># []</span>
+<span class="k">print</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">stock</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span> <span class="c1"># []</span>
 </code></pre></td></tr></table>
 </div>
 </div><p>After <code>catelog</code> is deleted, most cheeses are gone from the <code>stock</code> except one. Because a temporary variable may cause an object to last longer than expected by holding a reference to it.</p>

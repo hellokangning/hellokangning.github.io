@@ -25,7 +25,7 @@ In this post, I will refactor Strategy using functions objects.
 
 
 
-<meta name="generator" content="Hugo 0.73.0 with theme even" />
+<meta name="generator" content="Hugo 0.68.3 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/post/design-patterns-with-first-class-functions/" />
@@ -156,7 +156,7 @@ In this post, I will refactor Strategy using functions objects."/>
 <p>In this post, I will refactor Strategy using functions objects.</p>
 <p>Strategy is a good example of a design pattern that can be simpler in Python if you leverage functions as first-class objects.</p>
 <h1 id="classic-strategy">Classic Strategy</h1>
-<p>A coarse explanation of Strategy is <a href="https://hellokangning.github.io/en/post/retrospect-design-pattern/#strategy">Strategy</a>, and a clear example is needed.</p>
+<p>A coarse explanation of Strategy is <a href="https://hellokangning.github.io/post/retrospect-design-pattern/#strategy">Strategy</a>, and a clear example is needed.</p>
 <p>Let&rsquo;s consider an online store with three discount rules:</p>
 <ul>
 <li>5% discount for customers with 1000 or more fidelity points</li>
@@ -272,7 +272,7 @@ In this post, I will refactor Strategy using functions objects."/>
     <span class="k">def</span> <span class="nf">total</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">price</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">quantity</span>
 
-<span class="k">class</span> <span class="nc">Order</span><span class="p">:</span> <span class="c1"># Context</span>
+<span class="k">class</span> <span class="nc">Order</span><span class="p">:</span> <span class="c1"># Context</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">customer</span><span class="p">,</span> <span class="n">cart</span><span class="p">,</span> <span class="n">promotion</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">customer</span> <span class="o">=</span> <span class="n">customer</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cart</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">cart</span><span class="p">)</span>
@@ -292,21 +292,21 @@ In this post, I will refactor Strategy using functions objects."/>
         <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;&lt;Order total: {:.2f} due: {:.2f}&gt;&#39;</span>
         <span class="k">return</span> <span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">due</span><span class="p">())</span>
 
-<span class="k">class</span> <span class="nc">Promotion</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span> <span class="c1"># the Strategy: an Abstract Base Class</span>
+<span class="k">class</span> <span class="nc">Promotion</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span> <span class="c1"># the Strategy: an Abstract Base Class</span>
     <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">discount</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
         <span class="s2">&#34;&#34;&#34;
 </span><span class="s2">        Return discount as a positive dollar amount
 </span><span class="s2">        &#34;&#34;&#34;</span>
 
-<span class="k">class</span> <span class="nc">FidelityPromo</span><span class="p">(</span><span class="n">Promotion</span><span class="p">):</span> <span class="c1"># Concrete Strategy</span>
+<span class="k">class</span> <span class="nc">FidelityPromo</span><span class="p">(</span><span class="n">Promotion</span><span class="p">):</span> <span class="c1"># Concrete Strategy</span>
     <span class="k">def</span> <span class="nf">discount</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
         <span class="s2">&#34;&#34;&#34;
 </span><span class="s2">        5</span><span class="si">% d</span><span class="s2">iscount for customers with 1000 or more fidelity points
 </span><span class="s2">        &#34;&#34;&#34;</span>
         <span class="k">return</span> <span class="n">order</span><span class="o">.</span><span class="n">total</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.05</span> <span class="k">if</span> <span class="n">order</span><span class="o">.</span><span class="n">customer</span><span class="o">.</span><span class="n">fidelity</span> <span class="o">&gt;=</span> <span class="mi">1000</span> <span class="k">else</span> <span class="mi">0</span>
 
-<span class="k">class</span> <span class="nc">BulkItemPromo</span><span class="p">(</span><span class="n">Promotion</span><span class="p">):</span> <span class="c1"># Concrete Strategy</span>
+<span class="k">class</span> <span class="nc">BulkItemPromo</span><span class="p">(</span><span class="n">Promotion</span><span class="p">):</span> <span class="c1"># Concrete Strategy</span>
     <span class="k">def</span> <span class="nf">discount</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
         <span class="s2">&#34;&#34;&#34;
 </span><span class="s2">        10</span><span class="si">% d</span><span class="s2">iscount for each LineItem with 20 or more units
@@ -441,7 +441,7 @@ In this post, I will refactor Strategy using functions objects."/>
     <span class="k">def</span> <span class="nf">total</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">price</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">quantity</span>
 
-<span class="k">class</span> <span class="nc">Order</span><span class="p">:</span> <span class="c1"># Context</span>
+<span class="k">class</span> <span class="nc">Order</span><span class="p">:</span> <span class="c1"># Context</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">customer</span><span class="p">,</span> <span class="n">cart</span><span class="p">,</span> <span class="n">promotion</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">customer</span> <span class="o">=</span> <span class="n">customer</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cart</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">cart</span><span class="p">)</span>

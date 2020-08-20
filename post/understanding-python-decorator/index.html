@@ -24,7 +24,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.73.0 with theme even" />
+<meta name="generator" content="Hugo 0.68.3 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/post/understanding-python-decorator/" />
@@ -163,7 +163,7 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-python" data-lang="python"><span class="nd">@classmethod</span>
 <span class="k">def</span> <span class="nf">foo</span><span class="p">():</span>
-    <span class="c1"># do something</span>
+    <span class="c1"># do something</span>
 </code></pre></td></tr></table>
 </div>
 </div><h1 id="first-class-function">First-class Function</h1>
@@ -209,25 +209,25 @@
 <pre class="chroma"><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">say_hello</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
     <span class="k">return</span> <span class="s2">&#34;hello to &#34;</span> <span class="o">+</span> <span class="n">name</span>
 
-<span class="c1"># 1. assign function to a variable</span>
+<span class="c1"># 1. assign function to a variable</span>
 <span class="n">say_hello_to</span> <span class="o">=</span> <span class="n">say_hello</span>
-<span class="k">print</span> <span class="n">say_hello_to</span><span class="p">(</span><span class="s1">&#39;John&#39;</span><span class="p">)</span> <span class="c1"># hello to John</span>
+<span class="k">print</span> <span class="n">say_hello_to</span><span class="p">(</span><span class="s1">&#39;John&#39;</span><span class="p">)</span> <span class="c1"># hello to John</span>
 
-<span class="c1"># 2. pass function as parameter to other function</span>
+<span class="c1"># 2. pass function as parameter to other function</span>
 <span class="k">def</span> <span class="nf">call_func</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-<span class="k">print</span> <span class="n">call_func</span><span class="p">(</span><span class="n">say_hello</span><span class="p">,</span> <span class="s1">&#39;John&#39;</span><span class="p">)</span> <span class="c1"># hello to John</span>
+<span class="k">print</span> <span class="n">call_func</span><span class="p">(</span><span class="n">say_hello</span><span class="p">,</span> <span class="s1">&#39;John&#39;</span><span class="p">)</span> <span class="c1"># hello to John</span>
 
-<span class="c1"># 3. return a function in other function</span>
+<span class="c1"># 3. return a function in other function</span>
 <span class="k">def</span> <span class="nf">compose_func</span><span class="p">():</span>
     <span class="k">def</span> <span class="nf">name</span><span class="p">():</span>
         <span class="k">return</span> <span class="s1">&#39;John&#39;</span>
     <span class="k">return</span> <span class="n">name</span>
 
-<span class="k">print</span> <span class="n">compose_func</span><span class="p">()</span> <span class="c1"># &lt;function name at 0x10bcdccf8&gt;</span>
+<span class="k">print</span> <span class="n">compose_func</span><span class="p">()</span> <span class="c1"># &lt;function name at 0x10bcdccf8&gt;</span>
 
 <span class="n">hello</span> <span class="o">=</span> <span class="n">compose_func</span><span class="p">()</span>
-<span class="k">print</span> <span class="n">hello</span><span class="p">()</span> <span class="c1"># John</span>
+<span class="k">print</span> <span class="n">hello</span><span class="p">()</span> <span class="c1"># John</span>
 
 <span class="s1">&#39;&#39;&#39;
 </span><span class="s1">4. inner function has access to the enclosing scope
@@ -239,7 +239,7 @@
     <span class="k">return</span> <span class="n">complete_msg</span>
 
 <span class="n">hello</span> <span class="o">=</span> <span class="n">compose_func</span><span class="p">(</span><span class="s1">&#39;John&#39;</span><span class="p">)</span>
-<span class="k">print</span> <span class="n">greet</span><span class="p">()</span> <span class="c1"># hello to John</span>
+<span class="k">print</span> <span class="n">greet</span><span class="p">()</span> <span class="c1"># hello to John</span>
 </code></pre></td></tr></table>
 </div>
 </div><h1 id="rough-decorator-implemented-by-function">Rough Decorator Implemented by Function</h1>
@@ -267,7 +267,7 @@
     <span class="k">return</span> <span class="n">wrapper</span>
 
 <span class="n">my_name</span> <span class="o">=</span> <span class="n">p_decorate</span><span class="p">(</span><span class="n">get_name</span><span class="p">)</span>
-<span class="k">print</span> <span class="n">my_name</span><span class="p">(</span><span class="s1">&#39;John&#39;</span><span class="p">)</span> <span class="c1"># JOHN</span>
+<span class="k">print</span> <span class="n">my_name</span><span class="p">(</span><span class="s1">&#39;John&#39;</span><span class="p">)</span> <span class="c1"># JOHN</span>
 </code></pre></td></tr></table>
 </div>
 </div><h1 id="pythons-decorator-syntax">Python&rsquo;s Decorator Syntax</h1>
@@ -295,7 +295,7 @@
 <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">name</span>
 
-<span class="k">print</span> <span class="n">my_name</span><span class="p">(</span><span class="s1">&#39;John&#39;</span><span class="p">)</span> <span class="c1"># JOHN</span>
+<span class="k">print</span> <span class="n">my_name</span><span class="p">(</span><span class="s1">&#39;John&#39;</span><span class="p">)</span> <span class="c1"># JOHN</span>
 </code></pre></td></tr></table>
 </div>
 </div><h1 id="decorating-method">Decorating Method</h1>
@@ -335,7 +335,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&#34; &#34;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">family</span>
 
 <span class="n">cp3</span> <span class="o">=</span> <span class="n">Player</span><span class="p">()</span>
-<span class="k">print</span> <span class="n">cp3</span><span class="o">.</span><span class="n">get_fullname</span><span class="p">()</span> <span class="c1"># CHRIS PAUL</span>
+<span class="k">print</span> <span class="n">cp3</span><span class="o">.</span><span class="n">get_fullname</span><span class="p">()</span> <span class="c1"># CHRIS PAUL</span>
 </code></pre></td></tr></table>
 </div>
 </div><p>A much better approach would be to make our decorator useful for functions and methods alike. This can be done by putting <code>args</code> and <code>*kwargs</code> as parameters for the wrapper, then it can accept any arbitrary number of arguments and keyword arguments.</p>
@@ -374,7 +374,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&#34; &#34;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">family</span>
 
 <span class="n">cp3</span> <span class="o">=</span> <span class="n">Player</span><span class="p">()</span>
-<span class="k">print</span> <span class="n">cp3</span><span class="o">.</span><span class="n">get_fullname</span><span class="p">()</span> <span class="c1"># CHRIS PAUL</span>
+<span class="k">print</span> <span class="n">cp3</span><span class="o">.</span><span class="n">get_fullname</span><span class="p">()</span> <span class="c1"># CHRIS PAUL</span>
 </code></pre></td></tr></table>
 </div>
 </div><h1 id="function-object">Function Object</h1>
@@ -401,8 +401,8 @@
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">print</span> <span class="s1">&#39;hello&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
 
-<span class="n">fo</span> <span class="o">=</span> <span class="n">FuncObj</span><span class="p">(</span><span class="s1">&#39;chris&#39;</span><span class="p">)</span> <span class="c1"># init</span>
-<span class="n">fo</span><span class="p">()</span> <span class="c1"># hello chris</span>
+<span class="n">fo</span> <span class="o">=</span> <span class="n">FuncObj</span><span class="p">(</span><span class="s1">&#39;chris&#39;</span><span class="p">)</span> <span class="c1"># init</span>
+<span class="n">fo</span><span class="p">()</span> <span class="c1"># hello chris</span>
 </code></pre></td></tr></table>
 </div>
 </div><p>From the example above, we infer that function calling can be decomposed to two steps: construct and call. Base on this, a decorator implemented by <code>class</code> is feasible.</p>
@@ -437,13 +437,13 @@
         <span class="k">print</span> <span class="s1">&#39;call&#39;</span>
         <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">()</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
 
-<span class="c1"># init</span>
+<span class="c1"># init</span>
 <span class="nd">@make_upper</span>
 <span class="k">def</span> <span class="nf">get_name</span><span class="p">():</span>
     <span class="k">return</span> <span class="s1">&#39;chris&#39;</span>
 
-<span class="c1"># call</span>
-<span class="c1"># CHRIS</span>
+<span class="c1"># call</span>
+<span class="c1"># CHRIS</span>
 <span class="n">get_name</span><span class="p">()</span>
 </code></pre></td></tr></table>
 </div>
@@ -458,11 +458,11 @@
 </span><span class="lnt">6
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="c1"># call __init__</span>
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="c1"># call __init__</span>
 <span class="n">name</span> <span class="o">=</span> <span class="n">make_upper</span><span class="p">(</span><span class="n">get_name</span><span class="p">)</span>
 
-<span class="c1"># call</span>
-<span class="c1"># CHRIS</span>
+<span class="c1"># call</span>
+<span class="c1"># CHRIS</span>
 <span class="n">name</span><span class="p">()</span>
 </code></pre></td></tr></table>
 </div>

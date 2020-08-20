@@ -17,14 +17,14 @@
 
 
 <meta name="author" content="Guoqing Geng" /><meta name="description" content="这篇博客的起源是一位内部用户询问，Azure Cache for Redis 有没有 .pem 或者 .cem 的证书，然后可以在客户端指定它：
-1 2 3 4 5 6 7 8 9 10 11 12 13 14 15  import redis try: conn = redis.StrictRedis( host=&amp;#39;&amp;lt;cache-name&amp;gt;.redis.cache.windows.net&amp;#39;, port=6380, password=&amp;#39;your password here&amp;#39;, ssl=True, ssl_ca_certs=&amp;#39;path to cert&amp;#39;) print (conn) conn.ping() print (&amp;#39;Connected!&amp;#39;) except Exception as ex: print (&amp;#39;Error:&amp;#39;, ex) exit(&amp;#39;Failed to connect, terminating.&amp;#39;)   " /><meta name="keywords" content="Redis, SSL" />
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15  import redistry:conn = redis.StrictRedis(host=&amp;#39;&amp;lt;cache-name&amp;gt;.redis.cache.windows.net&amp;#39;,port=6380,password=&amp;#39;your password here&amp;#39;,ssl=True,ssl_ca_certs=&amp;#39;path to cert&amp;#39;)print (conn)conn.ping()print (&amp;#39;Connected!&amp;#39;)except Exception as ex:print (&amp;#39;Error:&amp;#39;, ex)exit(&amp;#39;Failed to connect, terminating.&amp;#39;)  " /><meta name="keywords" content="Redis, SSL" />
 
 
 
 
 
 
-<meta name="generator" content="Hugo 0.73.0 with theme even" />
+<meta name="generator" content="Hugo 0.68.3 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/zh/post/redis-ssl/" />
@@ -317,8 +317,8 @@ except Exception as ex:
 <pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">redis</span>
 <span class="n">r</span> <span class="o">=</span> <span class="n">redis</span><span class="o">.</span><span class="n">StrictRedis</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="s1">&#39;&lt;Your Host Name&gt;.redis.cache.windows.net&#39;</span><span class="p">,</span>
         <span class="n">port</span><span class="o">=</span><span class="mi">6380</span><span class="p">,</span> <span class="n">db</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s1">&#39;&lt;Your Access Key&gt;&#39;</span><span class="p">,</span> <span class="n">ssl</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-<span class="n">r</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">)</span> <span class="c1"># True</span>
-<span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">)</span> <span class="c1">#b&#39;bar&#39;</span>
+<span class="n">r</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">)</span> <span class="c1"># True</span>
+<span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">)</span> <span class="c1">#b&#39;bar&#39;</span>
 </code></pre></td></tr></table>
 </div>
 </div><p>既然 <code>ssl = True</code> 已经开启了 SSL，那 <code>ssl_ca_certs</code> 这个参数是做什么的呢？</p>
@@ -419,7 +419,7 @@ except Exception as ex:
                     <span class="s1">&#39;connection_class&#39;</span><span class="p">:</span> <span class="n">UnixDomainSocketConnection</span>
                 <span class="p">})</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="c1"># TCP specific options</span>
+                <span class="c1"># TCP specific options</span>
                 <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
                     <span class="s1">&#39;host&#39;</span><span class="p">:</span> <span class="n">host</span><span class="p">,</span>
                     <span class="s1">&#39;port&#39;</span><span class="p">:</span> <span class="n">port</span><span class="p">,</span>
@@ -491,7 +491,7 @@ except Exception as ex:
 
         <span class="bp">self</span><span class="o">.</span><span class="n">keyfile</span> <span class="o">=</span> <span class="n">ssl_keyfile</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">certfile</span> <span class="o">=</span> <span class="n">ssl_certfile</span>
-        <span class="c1"># ...</span>
+        <span class="c1"># ...</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cert_reqs</span> <span class="o">=</span> <span class="n">ssl_cert_reqs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ca_certs</span> <span class="o">=</span> <span class="n">ssl_ca_certs</span>
 
@@ -556,22 +556,22 @@ except Exception as ex:
             <span class="n">sock</span> <span class="o">=</span> <span class="bp">None</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">sock</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">family</span><span class="p">,</span> <span class="n">socktype</span><span class="p">,</span> <span class="n">proto</span><span class="p">)</span>
-                <span class="c1"># TCP_NODELAY</span>
+                <span class="c1"># TCP_NODELAY</span>
                 <span class="n">sock</span><span class="o">.</span><span class="n">setsockopt</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">IPPROTO_TCP</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">TCP_NODELAY</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
-                <span class="c1"># TCP_KEEPALIVE</span>
+                <span class="c1"># TCP_KEEPALIVE</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">socket_keepalive</span><span class="p">:</span>
                     <span class="n">sock</span><span class="o">.</span><span class="n">setsockopt</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">SOL_SOCKET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SO_KEEPALIVE</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
                     <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">socket_keepalive_options</span><span class="p">):</span>
                         <span class="n">sock</span><span class="o">.</span><span class="n">setsockopt</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">SOL_TCP</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
 
-                <span class="c1"># set the socket_connect_timeout before we connect</span>
+                <span class="c1"># set the socket_connect_timeout before we connect</span>
                 <span class="n">sock</span><span class="o">.</span><span class="n">settimeout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">socket_connect_timeout</span><span class="p">)</span>
 
-                <span class="c1"># connect</span>
+                <span class="c1"># connect</span>
                 <span class="n">sock</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">socket_address</span><span class="p">)</span>
 
-                <span class="c1"># set the socket_timeout now that we&#39;re connected</span>
+                <span class="c1"># set the socket_timeout now that we&#39;re connected</span>
                 <span class="n">sock</span><span class="o">.</span><span class="n">settimeout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">socket_timeout</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">sock</span>
 
@@ -670,8 +670,8 @@ except Exception as ex:
                     <span class="n">do_handshake_on_connect</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
                     <span class="n">suppress_ragged_eofs</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
                     <span class="n">server_hostname</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">session</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="c1"># SSLSocket class handles server_hostname encoding before it calls</span>
-        <span class="c1"># ctx._wrap_socket()</span>
+        <span class="c1"># SSLSocket class handles server_hostname encoding before it calls</span>
+        <span class="c1"># ctx._wrap_socket()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sslsocket_class</span><span class="o">.</span><span class="n">_create</span><span class="p">(</span>
             <span class="n">sock</span><span class="o">=</span><span class="n">sock</span><span class="p">,</span>
             <span class="n">server_side</span><span class="o">=</span><span class="n">server_side</span><span class="p">,</span>
