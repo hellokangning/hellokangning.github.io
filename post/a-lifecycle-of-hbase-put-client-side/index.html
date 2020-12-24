@@ -25,7 +25,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.68.3 with theme even" />
+<meta name="generator" content="Hugo 0.79.1 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/post/a-lifecycle-of-hbase-put-client-side/" />
@@ -59,13 +59,14 @@ Client-side, How the put request is built up and sent to the right RegionServer.
 Server-side, How the RegionServer handle the Put request and update one row.
 
 In view of the limitation of one single post, the client-side is discussed only.">
-<meta itemprop="datePublished" content="2017-11-24T11:38:14&#43;08:00" />
-<meta itemprop="dateModified" content="2017-12-07T10:38:14&#43;08:00" />
+<meta itemprop="datePublished" content="2017-11-24T11:38:14+08:00" />
+<meta itemprop="dateModified" content="2017-12-07T10:38:14+08:00" />
 <meta itemprop="wordCount" content="2223">
 
 
 
-<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="A Lifecycle of HBase&#39;s Put: Client-side"/>
 <meta name="twitter:description" content="Put is used to perform insert or update a single row of HBase table. It&rsquo;s essential to understand its lifecycle, which can be broke into two pieces,
 
@@ -536,13 +537,13 @@ In view of the limitation of one single post, the client-side is discussed only.
 <span class="o">}</span>
 </code></pre></td></tr></table>
 </div>
-</div><p>At present, it becomes clear. <code>RpcRetryingCaller</code> invokes <code>ServerCallable</code>'s</p>
+</div><p>At present, it becomes clear. <code>RpcRetryingCaller</code> invokes <code>ServerCallable</code>&rsquo;s</p>
 <ol>
 <li><code>prepare()</code></li>
 <li><code>call()</code></li>
 <li><code>throwable()</code>, if <code>call()</code> throws any <code>Throwable</code> exception.</li>
 </ol>
-<p>Next, It&rsquo;s time for <code>ServerCallable</code>'s appearance on the stage.</p>
+<p>Next, It&rsquo;s time for <code>ServerCallable</code>&rsquo;s appearance on the stage.</p>
 <h1 id="servercallable"><code>ServerCallable</code></h1>
 <p>The root class of <code>ServerCallable</code> is <code>RetryingCallable</code>, a callable that will be retried. It declares two important methods, <code>prepare()</code> and <code>call()</code>, which will be used in the remaining <code>Put</code> process.</p>
 <div class="highlight"><div class="chroma">
@@ -733,15 +734,15 @@ In view of the limitation of one single post, the client-side is discussed only.
 <blockquote>
 <p>The detail of get region&rsquo;s location see here: <a href="https://hellokangning.github.io/post/how-does-client-find-the-region/">How Does Client Find the Region</a></p>
 </blockquote>
-<p><code>setStubByServiceName</code> is an abstract method and should be implemented by <code>RegionServerCallable</code>'s children.</p>
+<p><code>setStubByServiceName</code> is an abstract method and should be implemented by <code>RegionServerCallable</code>&rsquo;s children.</p>
 <p>And the <code>call()</code> method,</p>
 <ol>
 <li>gets <code>RpcController</code>, reset it, the set its priority and timeout if it&rsquo;s <code>HBaseRpcController</code>.</li>
 <li>call <code>rpcCall()</code> for the remaining work.</li>
 </ol>
 <p>Like <code>setStubByServiceName</code>, <code>rpcCall()</code> is also abstract, waiting for being implemented.</p>
-<p>One son of <code>RegionServerCallable</code>, <code>ClientServiceCallable</code> get <code>stub</code> from <code>Connection</code>'s client. We will penetrate <code>Connection</code> thereafter.</p>
-<p>See the definition of <code>ClientServiceCallable</code>, <code>stub</code>'s type is determined to <code>ClientProtos.ClientService.BlockingInterface</code>. With <code>stub</code> in hand, <code>ClientServiceCallable</code> can mutate request finally. Remember int the <code>put</code> method of <code>HTable</code>, <code>doMutate</code> is called when initializing <code>ServerCallable</code>.</p>
+<p>One son of <code>RegionServerCallable</code>, <code>ClientServiceCallable</code> get <code>stub</code> from <code>Connection</code>&rsquo;s client. We will penetrate <code>Connection</code> thereafter.</p>
+<p>See the definition of <code>ClientServiceCallable</code>, <code>stub</code>&rsquo;s type is determined to <code>ClientProtos.ClientService.BlockingInterface</code>. With <code>stub</code> in hand, <code>ClientServiceCallable</code> can mutate request finally. Remember int the <code>put</code> method of <code>HTable</code>, <code>doMutate</code> is called when initializing <code>ServerCallable</code>.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt"> 1

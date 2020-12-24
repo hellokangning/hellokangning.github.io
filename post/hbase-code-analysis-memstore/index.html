@@ -24,7 +24,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.68.3 with theme even" />
+<meta name="generator" content="Hugo 0.79.1 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/post/hbase-code-analysis-memstore/" />
@@ -48,13 +48,14 @@
 <meta property="article:modified_time" content="2017-11-23T11:39:43+08:00" />
 <meta itemprop="name" content="HBase Code Analysis: MemStore">
 <meta itemprop="description" content="The MemStore holds in-memory modifications to the Store. This post deeps into the source code for sake of understanding what it really do underneath.">
-<meta itemprop="datePublished" content="2017-11-23T11:39:43&#43;08:00" />
-<meta itemprop="dateModified" content="2017-11-23T11:39:43&#43;08:00" />
+<meta itemprop="datePublished" content="2017-11-23T11:39:43+08:00" />
+<meta itemprop="dateModified" content="2017-11-23T11:39:43+08:00" />
 <meta itemprop="wordCount" content="1540">
 
 
 
-<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="HBase Code Analysis: MemStore"/>
 <meta name="twitter:description" content="The MemStore holds in-memory modifications to the Store. This post deeps into the source code for sake of understanding what it really do underneath."/>
 
@@ -558,7 +559,7 @@ A compaction pipeline is added between the active set and the snapshot data stru
 it consists of a list of kv-sets that are subject to compaction.
 Like the snapshot, all pipeline components are read-only; updates only affect the active set.
 To ensure this property we take advantage of the existing blocking mechanism &ndash; the active set is pushed to the pipeline while holding the region&rsquo;s updatesLock in exclusive mode.
-Periodically, a compaction is applied in the background to all pipeline components resulting in a single read-only component. The ``old&rsquo;&rsquo; components are discarded when no scanner is reading them.</p>
+Periodically, a compaction is applied in the background to all pipeline components resulting in a single read-only component. The ``old'' components are discarded when no scanner is reading them.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt"> 1

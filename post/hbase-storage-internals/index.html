@@ -17,14 +17,14 @@
 
 
 <meta name="author" content="Guoqing Geng" /><meta name="description" content="Overview
- An HBase Table consists of multiple rows. Table will be split into Regions based on rows&amp;rsquo; lexicographical order. A Store corresponds to a column family for a table for a given region. A Store hosts a MemStore and 0 or more StoreFiles (HFiles). The MemStore holds in-memory modifications to the Store. StoreFiles are composed of Blocks. " /><meta name="keywords" content="HBase" />
+ An HBase Table consists of multiple rows. Table will be split into Regions based on rows&#39; lexicographical order. A Store corresponds to a column family for a table for a given region. A Store hosts a MemStore and 0 or more StoreFiles (HFiles). The MemStore holds in-memory modifications to the Store. StoreFiles are composed of Blocks. " /><meta name="keywords" content="HBase" />
 
 
 
 
 
 
-<meta name="generator" content="Hugo 0.68.3 with theme even" />
+<meta name="generator" content="Hugo 0.79.1 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/post/hbase-storage-internals/" />
@@ -44,7 +44,7 @@
 <meta property="og:description" content="Overview
 
 An HBase Table consists of multiple rows.
-Table will be split into Regions based on rows&rsquo; lexicographical order.
+Table will be split into Regions based on rows&#39; lexicographical order.
 A Store corresponds to a column family for a table for a given region.
 A Store hosts a MemStore and 0 or more StoreFiles (HFiles).
 The MemStore holds in-memory modifications to the Store.
@@ -58,24 +58,25 @@ StoreFiles are composed of Blocks.
 <meta itemprop="description" content="Overview
 
 An HBase Table consists of multiple rows.
-Table will be split into Regions based on rows&rsquo; lexicographical order.
+Table will be split into Regions based on rows&#39; lexicographical order.
 A Store corresponds to a column family for a table for a given region.
 A Store hosts a MemStore and 0 or more StoreFiles (HFiles).
 The MemStore holds in-memory modifications to the Store.
 StoreFiles are composed of Blocks.
 ">
-<meta itemprop="datePublished" content="2017-11-16T11:34:49&#43;08:00" />
-<meta itemprop="dateModified" content="2017-11-16T11:34:49&#43;08:00" />
+<meta itemprop="datePublished" content="2017-11-16T11:34:49+08:00" />
+<meta itemprop="dateModified" content="2017-11-16T11:34:49+08:00" />
 <meta itemprop="wordCount" content="1411">
 
 
 
-<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="HBase Storage Internals"/>
 <meta name="twitter:description" content="Overview
 
 An HBase Table consists of multiple rows.
-Table will be split into Regions based on rows&rsquo; lexicographical order.
+Table will be split into Regions based on rows&#39; lexicographical order.
 A Store corresponds to a column family for a table for a given region.
 A Store hosts a MemStore and 0 or more StoreFiles (HFiles).
 The MemStore holds in-memory modifications to the Store.
@@ -178,7 +179,7 @@ StoreFiles are composed of Blocks.
       <p>Overview</p>
 <ul>
 <li>An HBase <code>Table</code> consists of multiple rows.</li>
-<li>Table will be split into <code>Regions</code> based on rows&rsquo; lexicographical order.</li>
+<li>Table will be split into <code>Regions</code> based on rows' lexicographical order.</li>
 <li>A <code>Store</code> corresponds to a column family for a table for a given region.</li>
 <li>A Store hosts a <code>MemStore</code> and 0 or more <code>StoreFiles (HFiles)</code>.</li>
 <li>The MemStore holds in-memory modifications to the Store.</li>
@@ -488,7 +489,7 @@ This section still contains unified-format v2 blocks but it does not have to be 
 <p>We are supporting &ldquo;meta&rdquo; blocks in version 2 the same way they were supported in version 1, even though we do not store Bloom filter data in these blocks anymore.</p>
 <h1 id="block">Block</h1>
 <p>StoreFiles are composed of blocks. The blocksize is configured on a per-ColumnFamily basis.</p>
-<p>HFile doesn&rsquo;t know anything about key and value struct/type (row key, qualifier, family, timestamp, …). As Hadoop&rsquo; SequenceFile (Block-Compressed), keys and values are grouped in blocks, and blocks contains records. Each record has two Int Values that contains Key Length and Value Length followed by key and value byte-array <!-- raw HTML omitted -->[8]<!-- raw HTML omitted -->.</p>
+<p>HFile doesn&rsquo;t know anything about key and value struct/type (row key, qualifier, family, timestamp, …). As Hadoop' SequenceFile (Block-Compressed), keys and values are grouped in blocks, and blocks contains records. Each record has two Int Values that contains Key Length and Value Length followed by key and value byte-array <!-- raw HTML omitted -->[8]<!-- raw HTML omitted -->.</p>
 <p><img src="/images/hfile-block-record.png" alt=""></p>
 <p><strong>Reference</strong></p>
 <ol>

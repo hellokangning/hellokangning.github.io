@@ -24,7 +24,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.68.3 with theme even" />
+<meta name="generator" content="Hugo 0.79.1 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/post/args-and-kwargs-usage-in-python/" />
@@ -48,13 +48,14 @@
 <meta property="article:modified_time" content="2017-09-08T16:46:50+08:00" />
 <meta itemprop="name" content="*args and **kwargs Usage in Python">
 <meta itemprop="description" content="The *args and **kwargs is a common idiom to allow arbitrary number of arguments to functions as described in the section more on defining functions in the Python documentation.">
-<meta itemprop="datePublished" content="2017-09-08T16:46:50&#43;08:00" />
-<meta itemprop="dateModified" content="2017-09-08T16:46:50&#43;08:00" />
+<meta itemprop="datePublished" content="2017-09-08T16:46:50+08:00" />
+<meta itemprop="dateModified" content="2017-09-08T16:46:50+08:00" />
 <meta itemprop="wordCount" content="604">
 
 
 
-<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="*args and **kwargs Usage in Python"/>
 <meta name="twitter:description" content="The *args and **kwargs is a common idiom to allow arbitrary number of arguments to functions as described in the section more on defining functions in the Python documentation."/>
 
@@ -176,11 +177,11 @@
 <span class="k">def</span> <span class="nf">test_args</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
     <span class="k">print</span> <span class="n">args</span>
 
-<span class="n">test_args</span><span class="p">()</span> <span class="c1"># ()</span>
-<span class="n">test_args</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="c1">#(0,)</span>
-<span class="n">test_args</span><span class="p">(</span><span class="o">*</span><span class="n">tmp_list</span><span class="p">)</span> <span class="c1"># (1, 2, 3)</span>
-<span class="n">test_args</span><span class="p">(</span><span class="o">*</span><span class="n">tmp_tuple</span><span class="p">)</span> <span class="c1"># (4, 5, 6)</span>
-<span class="n">test_args</span><span class="p">(</span><span class="o">*</span><span class="n">tmp_dict</span><span class="p">)</span> <span class="c1"># (&#39;p&#39;, &#39;m&#39;, &#39;v&#39;)</span>
+<span class="n">test_args</span><span class="p">()</span> <span class="c1"># ()</span>
+<span class="n">test_args</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="c1">#(0,)</span>
+<span class="n">test_args</span><span class="p">(</span><span class="o">*</span><span class="n">tmp_list</span><span class="p">)</span> <span class="c1"># (1, 2, 3)</span>
+<span class="n">test_args</span><span class="p">(</span><span class="o">*</span><span class="n">tmp_tuple</span><span class="p">)</span> <span class="c1"># (4, 5, 6)</span>
+<span class="n">test_args</span><span class="p">(</span><span class="o">*</span><span class="n">tmp_dict</span><span class="p">)</span> <span class="c1"># (&#39;p&#39;, &#39;m&#39;, &#39;v&#39;)</span>
 </code></pre></td></tr></table>
 </div>
 </div><h1 id="kwargs"><code>**kwargs</code></h1>
@@ -242,11 +243,11 @@
     <span class="k">if</span> <span class="n">kwargs</span><span class="p">:</span> 
         <span class="k">print</span> <span class="s1">&#39;kwargs:&#39;</span><span class="p">,</span> <span class="n">kwargs</span>
 
-<span class="n">test_mixup</span><span class="p">(</span><span class="n">tmp_list</span><span class="p">)</span> <span class="c1"># args: ([1, 2, 3],)</span>
-<span class="n">test_mixup</span><span class="p">(</span><span class="n">tmp_list</span><span class="p">,</span> <span class="n">tmp_tuple</span><span class="p">)</span> <span class="c1"># args: ([1, 2, 3], (4, 5, 6))</span>
-<span class="n">test_mixup</span><span class="p">(</span><span class="n">tmp_list</span><span class="p">,</span> <span class="n">tmp_dict</span><span class="p">)</span> <span class="c1"># args: ([1, 2, 3], {&#39;p&#39;: 49, &#39;m&#39;: 7, &#39;v&#39;: 8})</span>
+<span class="n">test_mixup</span><span class="p">(</span><span class="n">tmp_list</span><span class="p">)</span> <span class="c1"># args: ([1, 2, 3],)</span>
+<span class="n">test_mixup</span><span class="p">(</span><span class="n">tmp_list</span><span class="p">,</span> <span class="n">tmp_tuple</span><span class="p">)</span> <span class="c1"># args: ([1, 2, 3], (4, 5, 6))</span>
+<span class="n">test_mixup</span><span class="p">(</span><span class="n">tmp_list</span><span class="p">,</span> <span class="n">tmp_dict</span><span class="p">)</span> <span class="c1"># args: ([1, 2, 3], {&#39;p&#39;: 49, &#39;m&#39;: 7, &#39;v&#39;: 8})</span>
 
-<span class="n">test_mixup</span><span class="p">(</span><span class="n">tmp_tuple</span><span class="p">,</span> <span class="n">lis</span><span class="o">=</span><span class="n">tmp_list</span><span class="p">,</span> <span class="n">dic</span><span class="o">=</span><span class="n">tmp_dict</span><span class="p">)</span> <span class="c1"># kwargs: {&#39;dic&#39;: {&#39;p&#39;: 49, &#39;m&#39;: 7, &#39;v&#39;: 8}, &#39;lis&#39;: [1, 2, 3]}</span>
+<span class="n">test_mixup</span><span class="p">(</span><span class="n">tmp_tuple</span><span class="p">,</span> <span class="n">lis</span><span class="o">=</span><span class="n">tmp_list</span><span class="p">,</span> <span class="n">dic</span><span class="o">=</span><span class="n">tmp_dict</span><span class="p">)</span> <span class="c1"># kwargs: {&#39;dic&#39;: {&#39;p&#39;: 49, &#39;m&#39;: 7, &#39;v&#39;: 8}, &#39;lis&#39;: [1, 2, 3]}</span>
 </code></pre></td></tr></table>
 </div>
 </div><h1 id="summary">Summary</h1>

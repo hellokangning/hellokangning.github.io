@@ -24,7 +24,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.68.3 with theme even" />
+<meta name="generator" content="Hugo 0.79.1 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/zh/post/100-server-load-because-of-redis-sync/" />
@@ -50,13 +50,14 @@
 <meta itemprop="name" content="Redis 同步引发的系统过载">
 <meta itemprop="description" content="今天一早，就有客户来报说机器负载 100%。从日志中看到的现象是，Slave 向 Master 请求部分同步，Master 却要求 Slave 做个全套：全量同步，因为 Slave 发过来的 replication ID 太老了。Slave 说好吧，整个全的，然后消费成功。接着，Slave 还想来个部分同步，上述的过程连续发生 3 次。Master 有点强买强卖的意思了，这样一来两边的 CPU 不干了，这不是加班嘛！二者之间的网络带宽也是突增，从下图可以看出：
 ">
-<meta itemprop="datePublished" content="2018-11-28T14:25:25&#43;08:00" />
-<meta itemprop="dateModified" content="2018-11-28T14:25:25&#43;08:00" />
+<meta itemprop="datePublished" content="2018-11-28T14:25:25+08:00" />
+<meta itemprop="dateModified" content="2018-11-28T14:25:25+08:00" />
 <meta itemprop="wordCount" content="3104">
 
 
 
-<meta itemprop="keywords" content="苦逼运维," /><meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="苦逼运维," />
+<meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Redis 同步引发的系统过载"/>
 <meta name="twitter:description" content="今天一早，就有客户来报说机器负载 100%。从日志中看到的现象是，Slave 向 Master 请求部分同步，Master 却要求 Slave 做个全套：全量同步，因为 Slave 发过来的 replication ID 太老了。Slave 说好吧，整个全的，然后消费成功。接着，Slave 还想来个部分同步，上述的过程连续发生 3 次。Master 有点强买强卖的意思了，这样一来两边的 CPU 不干了，这不是加班嘛！二者之间的网络带宽也是突增，从下图可以看出：
 "/>

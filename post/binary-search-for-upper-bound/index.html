@@ -25,7 +25,7 @@ This post elucidates the steps of binary search by illustrating some common mist
 
 
 
-<meta name="generator" content="Hugo 0.68.3 with theme even" />
+<meta name="generator" content="Hugo 0.79.1 with theme even" />
 
 
 <link rel="canonical" href="https://hellokangning.github.io/post/binary-search-for-upper-bound/" />
@@ -51,13 +51,14 @@ This post elucidates the steps of binary search by illustrating some common mist
 <meta itemprop="name" content="Binary Search for Upper Bound">
 <meta itemprop="description" content="A frequent question I ask when interviewing some candidates is binary search. It cannot be more easier to write a binary search, but the variant may be challenging. For example, upper bound for the given target. When should I shrink my scope to left?
 This post elucidates the steps of binary search by illustrating some common mistakes and sloving a problem in LeetCode. And I will remind what should be paid more attention when doing search.">
-<meta itemprop="datePublished" content="2018-08-03T10:55:27&#43;08:00" />
-<meta itemprop="dateModified" content="2018-08-03T10:55:27&#43;08:00" />
+<meta itemprop="datePublished" content="2018-08-03T10:55:27+08:00" />
+<meta itemprop="dateModified" content="2018-08-03T10:55:27+08:00" />
 <meta itemprop="wordCount" content="730">
 
 
 
-<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Binary Search for Upper Bound"/>
 <meta name="twitter:description" content="A frequent question I ask when interviewing some candidates is binary search. It cannot be more easier to write a binary search, but the variant may be challenging. For example, upper bound for the given target. When should I shrink my scope to left?
 This post elucidates the steps of binary search by illustrating some common mistakes and sloving a problem in LeetCode. And I will remind what should be paid more attention when doing search."/>
@@ -276,15 +277,15 @@ This post elucidates the steps of binary search by illustrating some common mist
 <span class="k">class</span> <span class="nc">TestDict</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">testResult</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">s</span> <span class="o">=</span> <span class="n">Solution</span><span class="p">()</span>
-        <span class="c1"># Case 1</span>
+        <span class="c1"># Case 1</span>
         <span class="n">ret</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">nextGreatestLetter</span><span class="p">([</span><span class="s2">&#34;c&#34;</span><span class="p">,</span> <span class="s2">&#34;f&#34;</span><span class="p">,</span> <span class="s2">&#34;j&#34;</span><span class="p">],</span> <span class="s2">&#34;a&#34;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="s2">&#34;c&#34;</span><span class="p">)</span>
 
-        <span class="c1"># Case 2</span>
+        <span class="c1"># Case 2</span>
         <span class="n">ret</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">nextGreatestLetter</span><span class="p">([</span><span class="s2">&#34;c&#34;</span><span class="p">,</span> <span class="s2">&#34;f&#34;</span><span class="p">,</span> <span class="s2">&#34;j&#34;</span><span class="p">],</span> <span class="s2">&#34;c&#34;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="s2">&#34;f&#34;</span><span class="p">)</span>
 
-        <span class="c1"># Case 3</span>
+        <span class="c1"># Case 3</span>
         <span class="n">ret</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">nextGreatestLetter</span><span class="p">([</span><span class="s2">&#34;c&#34;</span><span class="p">,</span> <span class="s2">&#34;f&#34;</span><span class="p">,</span> <span class="s2">&#34;f&#34;</span><span class="p">,</span> <span class="s2">&#34;j&#34;</span><span class="p">],</span> <span class="s2">&#34;f&#34;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="s2">&#34;j&#34;</span><span class="p">)</span>
 
